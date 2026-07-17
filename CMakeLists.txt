@@ -288,6 +288,12 @@ LIST(APPEND source src/openal.c)
 LIST(APPEND source src/cdplayer.c)
 LIST(APPEND source src/menus.c)
 
+# Include headers in the target so IDEs expose the complete project tree.
+FILE(GLOB_RECURSE headers
+    src/*.h
+    src/*.hpp
+)
+
 IF(SDL_TYPE STREQUAL "SDL")
     LIST(APPEND source src/main.c)
 
@@ -315,7 +321,7 @@ INCLUDE_DIRECTORIES(${include})
 # manually include src/include
 INCLUDE_DIRECTORIES(src/include)
 
-ADD_EXECUTABLE(avp ${source})
+ADD_EXECUTABLE(avp ${source} ${headers})
 
 # required dependencies
 IF(SDL_TYPE STREQUAL "SDL")
