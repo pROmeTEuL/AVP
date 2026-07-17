@@ -1,3 +1,4 @@
+#include <math.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
@@ -22,7 +23,6 @@
 #include "fragchnk.hpp"
 #include "jsndsup.h"
 #include "mempool.h"
-#include <math.h>
 // for log file
 void SetupAnimatedTextures(Shape_Chunk* sc,SHAPEHEADER* shp,Animation_Chunk* ac,Shape_Merge_Data_Chunk* smdc);
 void SetupAnimOnTriangle(SHAPEHEADER* shp,TEXANIM* ta,int poly);

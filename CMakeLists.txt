@@ -1,6 +1,6 @@
 # Aliens vs Predator Linux - http://icculus.org/avp/
 # CMake 2.8 project
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.8)
 
 # default to Release
 IF(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)

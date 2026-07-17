@@ -1,4 +1,5 @@
 #define DB_LEVEL 2
+#include <math.h>
 
 #include "3dc.h"
 #include "inline.h"

@@ -1,6 +1,7 @@
-#include "chunk.hpp"
 #include <math.h>
 #include "chnktype.hpp"
+
+#include "chunk.hpp"
 
 #define UseLocalAssert No
 #include "ourasert.h"

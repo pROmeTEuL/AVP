@@ -1,7 +1,8 @@
+#include <math.h>
+
 #include "hierchnk.hpp"
 #include "animobs.hpp"
 #include "list_tem.hpp"
-#include <math.h>
 
 //macro for helping to force inclusion of chunks when using libraries
 FORCE_CHUNK_INCLUDE_IMPLEMENT(animobs)
