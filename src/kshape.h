@@ -4,99 +4,90 @@
 #include "particle.h"
 #include "sphere.h"
 
-
-typedef struct 
+typedef struct
 {
-	/* base coords */
-	int X;
-	int Y;
-	int Z;
+    /* base coords */
+    int X;
+    int Y;
+    int Z;
 
-	/* texels and intensity */
-	int U;
-	int V;
+    /* texels and intensity */
+    int U;
+    int V;
 
-	/* coloured components */
-	unsigned char R;
-	unsigned char G;
-	unsigned char B;
+    /* coloured components */
+    unsigned char R;
+    unsigned char G;
+    unsigned char B;
 
-	/* alpha component */
-	unsigned char A;
+    /* alpha component */
+    unsigned char A;
 
-	/* specular colour */
-	unsigned char SpecularR;
-	unsigned char SpecularG;
-	unsigned char SpecularB;
+    /* specular colour */
+    unsigned char SpecularR;
+    unsigned char SpecularG;
+    unsigned char SpecularB;
 
-	/* fog component */
-	unsigned char Fog;
+    /* fog component */
+    unsigned char Fog;
 
 } RENDERVERTEX;
 
 typedef struct
 {
-	/* stamp used for lazy evaluation */
-	int Stamp;
+    /* stamp used for lazy evaluation */
+    int Stamp;
 
-	/* colour scalings */
-	unsigned char R;
-	unsigned char G;
-	unsigned char B;
+    /* colour scalings */
+    unsigned char R;
+    unsigned char G;
+    unsigned char B;
 
-	/* specular colour */
-	unsigned char SpecularR;
-	unsigned char SpecularG;
-	unsigned char SpecularB;
+    /* specular colour */
+    unsigned char SpecularR;
+    unsigned char SpecularG;
+    unsigned char SpecularB;
 
-	/* fog component */
-	unsigned char Fog;
+    /* fog component */
+    unsigned char Fog;
 
 } COLOURINTENSITIES;
 
-
-typedef struct 
+typedef struct
 {
-	RENDERVERTEX Vertices[maxpolypts];
+    RENDERVERTEX Vertices[maxpolypts];
 
-	unsigned int NumberOfVertices;
+    unsigned int NumberOfVertices;
 
-	unsigned int MinZ;
-	unsigned int MaxZ;
+    unsigned int MinZ;
+    unsigned int MaxZ;
 
-	int ImageIndex;
+    int ImageIndex;
 
-	unsigned char IsTextured :1;
-	unsigned char IsLit :1;
-	unsigned char IsSpecularLit :1;
-	enum TRANSLUCENCY_TYPE TranslucencyMode;
+    unsigned char IsTextured : 1;
+    unsigned char IsLit : 1;
+    unsigned char IsSpecularLit : 1;
+    enum TRANSLUCENCY_TYPE TranslucencyMode;
 
 } RENDERPOLYGON;
 
 extern RENDERVERTEX VerticesBuffer[9];
 extern RENDERPOLYGON RenderPolygon;
 
-
-
-
-enum LIGHTING_MODEL_ID
-{
-	LIGHTING_MODEL_STANDARD,
-	LIGHTING_MODEL_HIERARCHICAL,
-	LIGHTING_MODEL_PRELIT,
+enum LIGHTING_MODEL_ID {
+    LIGHTING_MODEL_STANDARD,
+    LIGHTING_MODEL_HIERARCHICAL,
+    LIGHTING_MODEL_PRELIT,
 };
-
 
 extern void InitialiseLightIntensityStamps(void);
 
 extern int FindHeatSourcesInHModel(DISPLAYBLOCK *dispPtr);
 
-
 extern void TranslationSetup(void);
 extern void TranslatePointIntoViewspace(VECTORCH *pointPtr);
 
 extern void CheckRenderStatesForModule(MODULE *modulePtr);
-
 
 extern void RenderDecal(DECAL *decalPtr);
 extern void RenderParticle(PARTICLE *particlePtr);
@@ -118,7 +109,7 @@ extern int HeadUpDisplayZOffset;
 /* KJL 16:17:13 11/02/98 - heat source containment */
 typedef struct
 {
-	VECTORCH Position;
+    VECTORCH Position;
 } HEATSOURCE;
 
 #define MAX_NUMBER_OF_HEAT_SOURCES 10

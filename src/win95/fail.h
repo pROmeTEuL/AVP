@@ -21,7 +21,7 @@ extern "C" {
 #define VARARG_DECL
 #endif
 
-extern void VARARG_DECL fail (const char * __format, ...);
+extern void VARARG_DECL fail(const char *__format, ...);
 
 #ifdef __cplusplus
 }

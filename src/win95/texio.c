@@ -1,6 +1,5 @@
 #if 1
 
-
 #include "3dc.h"
 
 #include <sys/stat.h>
@@ -30,9 +29,7 @@
 #include "chnktexi.h"
 #endif
 
-
 #endif
-
 
 #include "awtexld.h"
 
@@ -47,19 +44,18 @@
 
 #define DefinedTextureType TextureTypePPM
 
-
 /*
 
  externs for commonly used global variables and arrays
 
 */
 
-	extern SHAPEHEADER **mainshapelist;
-	extern SCREENDESCRIPTORBLOCK ScreenDescriptorBlock;
-	extern unsigned char *ScreenBuffer;
-	extern char projectsubdirectory[];
-    extern int ScanDrawMode;
-	extern int VideoModeType;
+extern SHAPEHEADER **mainshapelist;
+extern SCREENDESCRIPTORBLOCK ScreenDescriptorBlock;
+extern unsigned char *ScreenBuffer;
+extern char projectsubdirectory[];
+extern int ScanDrawMode;
+extern int VideoModeType;
 
 /*
 
@@ -67,19 +63,19 @@
 
 */
 
-	TEXTURE *ImageBuffer;							/* Memory Resident Image Data */
+TEXTURE *ImageBuffer; /* Memory Resident Image Data */
 
-	#ifdef MaxImageGroups
-	#if MaxImageGroups < 2 /* optimize if this multiple groups are not required */
-	#undef MaxImageGroups
-	#endif /* MaxImageGroups < 2 */
-	#endif /* MaxImageGroups */
+#ifdef MaxImageGroups
+#if MaxImageGroups < 2 /* optimize if this multiple groups are not required */
+#undef MaxImageGroups
+#endif /* MaxImageGroups < 2 */
+#endif /* MaxImageGroups */
 
-	#ifdef MaxImageGroups
+#ifdef MaxImageGroups
 
-	#include "txioctrl.h"
-	
-	/*
+#include "txioctrl.h"
+
+/*
 	basically, I want there to be more than one image header array
 	so that I can load some images once only, then load shapes, call
 	InitializeTextures, DeallocateAllImages, etc. and only the images associated
@@ -95,25 +91,24 @@
 	Jake.
 	*/
 
-	/* these three globals must behave the same */
-	int NumImages = 0;								/* # current images */
-	IMAGEHEADER *ImageHeaderPtrs[MaxImageGroups*MaxImages];	/* Ptrs to Image Header Blocks */
-	IMAGEHEADER ImageHeaderArray[MaxImageGroups*MaxImages];	/* Array of Image Headers */
-	
-	int NumImagesArray[MaxImageGroups]; /* must be static to ensure initialization to zero */
-	static int CurrentImageGroup = 0;
-	static IMAGEHEADER *NextFreeImageHeaderPtr[MaxImageGroups];
-	
-	#else /* ! MaxImageGroups */
-	
-	int NumImages = 0;								/* # current images */
-	IMAGEHEADER *ImageHeaderPtrs[MaxImages];	/* Ptrs to Image Header Blocks */
-	IMAGEHEADER ImageHeaderArray[MaxImages];	/* Array of Image Headers */
-	
-	static IMAGEHEADER *NextFreeImageHeaderPtr;
+/* these three globals must behave the same */
+int NumImages = 0;                                        /* # current images */
+IMAGEHEADER *ImageHeaderPtrs[MaxImageGroups * MaxImages]; /* Ptrs to Image Header Blocks */
+IMAGEHEADER ImageHeaderArray[MaxImageGroups * MaxImages]; /* Array of Image Headers */
 
-	#endif /* ! MaxImageGroups */
+int NumImagesArray[MaxImageGroups]; /* must be static to ensure initialization to zero */
+static int CurrentImageGroup = 0;
+static IMAGEHEADER *NextFreeImageHeaderPtr[MaxImageGroups];
 
+#else /* ! MaxImageGroups */
+
+int NumImages = 0;                       /* # current images */
+IMAGEHEADER *ImageHeaderPtrs[MaxImages]; /* Ptrs to Image Header Blocks */
+IMAGEHEADER ImageHeaderArray[MaxImages]; /* Array of Image Headers */
+
+static IMAGEHEADER *NextFreeImageHeaderPtr;
+
+#endif /* ! MaxImageGroups */
 
 /*
 
@@ -121,42 +116,38 @@
 
 */
 
-
 #if LoadingMapsShapesAndTexturesEtc
-
 
 void InitialiseImageHeaders(void)
 
 {
-	#ifdef MaxImageGroups
+#ifdef MaxImageGroups
 
-	NumImages = CurrentImageGroup * MaxImages;
-	NextFreeImageHeaderPtr[CurrentImageGroup] = &ImageHeaderArray[CurrentImageGroup*MaxImages];
-
-	#else
-
-	NumImages = 0;
-	NextFreeImageHeaderPtr = ImageHeaderArray;
-
-	#endif
-}
+    NumImages = CurrentImageGroup * MaxImages;
+    NextFreeImageHeaderPtr[CurrentImageGroup] = &ImageHeaderArray[CurrentImageGroup * MaxImages];
 
 #else
 
+    NumImages = 0;
+    NextFreeImageHeaderPtr = ImageHeaderArray;
+
+#endif
+}
+
+#else
 
 #define InitTexPrnt No
 
 int InitialiseTextures(void)
 
 {
+    SHAPEHEADER **shlistptr;
+    SHAPEHEADER *shptr;
+    char **txfiles;
+    int TxIndex;
+    int LTxIndex;
 
-	SHAPEHEADER **shlistptr;
-	SHAPEHEADER *shptr;
-	char **txfiles;
-	int TxIndex;
-	int LTxIndex;
-
-	/*
+    /*
 
 	Free up any currently loaded images
 
@@ -165,72 +156,69 @@ int InitialiseTextures(void)
 
 	*/
 
-	#ifdef MaxImageGroups
+#ifdef MaxImageGroups
 
     DeallocateCurrentImages();
 
-	NumImages = CurrentImageGroup * MaxImages;
-	NextFreeImageHeaderPtr[CurrentImageGroup] = &ImageHeaderArray[CurrentImageGroup*MaxImages];
+    NumImages = CurrentImageGroup * MaxImages;
+    NextFreeImageHeaderPtr[CurrentImageGroup] = &ImageHeaderArray[CurrentImageGroup * MaxImages];
 
-	#else
+#else
 
     DeallocateAllImages();
 
-	/* Initialise Image Header Variables */
+    /* Initialise Image Header Variables */
 
-	NumImages = 0;
-	NextFreeImageHeaderPtr = ImageHeaderArray;
+    NumImages = 0;
+    NextFreeImageHeaderPtr = ImageHeaderArray;
 
-	#endif
+#endif
 
-	/* Added 23/3/98 by DHM so that this can be called without loading any
+    /* Added 23/3/98 by DHM so that this can be called without loading any
 	shapes (to get textprint working in the menus):
 	*/
-	if ( NULL == mainshapelist )
-	{
-		return Yes;
-			// early exit
-	}
+    if (NULL == mainshapelist) {
+        return Yes;
+        // early exit
+    }
 
-	/* Build the Texture List */
+    /* Build the Texture List */
 
-	shlistptr = &mainshapelist[0];
+    shlistptr = &mainshapelist[0];
 
-	while(*shlistptr) {
+    while (*shlistptr) {
+        shptr = *shlistptr++;
 
-		shptr = *shlistptr++;
+        /* If the shape has textures */
 
-		/* If the shape has textures */
+        if (shptr->sh_localtextures) {
 
-		if(shptr->sh_localtextures) {
+#if InitTexPrnt
+            textprint("This shape has textures\n");
+#endif
 
-			#if InitTexPrnt
-			textprint("This shape has textures\n");
-			#endif
+            txfiles = shptr->sh_localtextures;
 
-			txfiles = shptr->sh_localtextures;
+            LTxIndex = 0;
 
-			LTxIndex = 0;
+            while (*txfiles) {
+                /* The RIFF Image loaders have changed to support not loading the same image twice - JH 17-2-96 */
 
-			while(*txfiles) {
+                char *src;
+                char *dst;
+                char fname[ImageNameSize];
+                char *txfilesptr;
+#ifndef RIFF_SYSTEM
+                int i, j, NewImage;
+                char *iname;
+                IMAGEHEADER *ihptr;
+                IMAGEHEADER *new_ihptr;
+                void *im;
+#endif
 
-				/* The RIFF Image loaders have changed to support not loading the same image twice - JH 17-2-96 */
+                txfilesptr = *txfiles++;
 
-				char *src;
-				char *dst;
-				char fname[ImageNameSize];
-				char *txfilesptr;
-				#ifndef RIFF_SYSTEM
-				int i, j, NewImage;
-				char *iname;
-				IMAGEHEADER *ihptr;
-				IMAGEHEADER *new_ihptr;
-				void* im;
-				#endif
-				
-				txfilesptr = *txfiles++;
-				
-				/*
+                /*
 
 				"txfilesptr" is in the form "textures\<fname>". We need to
 				prefix that text with the name of the current textures path.
@@ -240,114 +228,109 @@ int InitialiseTextures(void)
 
 				*/
 
-				src = projectsubdirectory;
-				dst = fname;
+                src = projectsubdirectory;
+                dst = fname;
 
-				while(*src)
-					*dst++ = *src++;
+                while (*src)
+                    *dst++ = *src++;
 
-				src = txfilesptr;
+                src = txfilesptr;
 
-				while(*src)
-					*dst++ = *src++;
+                while (*src)
+                    *dst++ = *src++;
 
-				*dst = 0;
+                *dst = 0;
 
+#if InitTexPrnt
+                textprint(" A Texture\n");
+#endif
 
-				#if InitTexPrnt
-				textprint(" A Texture\n");
-				#endif
+#ifdef RIFF_SYSTEM
 
-				
-				#ifdef RIFF_SYSTEM
+                /* This function calls GetExistingImageHeader to figure out if the image is already loaded */
+                TxIndex = CL_LoadImageOnce(
+                    fname,
+                    (ScanDrawDirectDraw == ScanDrawMode ? LIO_CHIMAGE : LIO_D3DTEXTURE)
+                        | LIO_TRANSPARENT | LIO_RELATIVEPATH | LIO_RESTORABLE);
+                GLOBALASSERT(GEI_NOTLOADED != TxIndex);
 
-				/* This function calls GetExistingImageHeader to figure out if the image is already loaded */
-				TxIndex = CL_LoadImageOnce(fname,(ScanDrawDirectDraw == ScanDrawMode ? LIO_CHIMAGE : LIO_D3DTEXTURE)|LIO_TRANSPARENT|LIO_RELATIVEPATH|LIO_RESTORABLE);
-				GLOBALASSERT(GEI_NOTLOADED != TxIndex);
-				
-				#else
-				
-				/* If there are already images, try and find this one */
+#else
 
-				NewImage = Yes;
+                /* If there are already images, try and find this one */
 
-				#ifdef MaxImageGroups
+                NewImage = Yes;
 
-				TxIndex = CurrentImageGroup * MaxImages;			/* Assume image 0 */
-				
-				if(NumImagesArray[CurrentImageGroup]) {
+#ifdef MaxImageGroups
 
-					for(i=NumImagesArray[CurrentImageGroup]; i!=0 && NewImage!=No; i--) {
+                TxIndex = CurrentImageGroup * MaxImages; /* Assume image 0 */
 
-				#else
+                if (NumImagesArray[CurrentImageGroup]) {
+                    for (i = NumImagesArray[CurrentImageGroup]; i != 0 && NewImage != No; i--) {
 
-				TxIndex = 0;			/* Assume image 0 */
-				
-				if(NumImages) {
+#else
 
-					for(i=NumImages; i!=0 && NewImage!=No; i--) {
+                TxIndex = 0; /* Assume image 0 */
 
-				#endif
+                if (NumImages) {
+                    for (i = NumImages; i != 0 && NewImage != No; i--) {
 
-						ihptr = ImageHeaderPtrs[TxIndex];
+#endif
 
-						iname = &ihptr->ImageName[0];
+                        ihptr = ImageHeaderPtrs[TxIndex];
 
-						j = CompareFilenameCH(txfilesptr, iname);
+                        iname = &ihptr->ImageName[0];
 
-						if(j) NewImage = No;
+                        j = CompareFilenameCH(txfilesptr, iname);
 
-						else TxIndex++;
+                        if (j)
+                            NewImage = No;
 
-					}
+                        else
+                            TxIndex++;
+                    }
+                }
 
-				}
+                /* If this is a new image, add it */
 
+                if (NewImage) {
 
-				/* If this is a new image, add it */
+#if InitTexPrnt
+                    textprint("New Image\n");
+                    WaitForReturn();
+#endif
 
-				if(NewImage) {
+                    /* Get an Image Header */
 
-					#if InitTexPrnt
-					textprint("New Image\n");
-					WaitForReturn();
-					#endif
+                    new_ihptr = GetImageHeader();
 
-					/* Get an Image Header */
+                    if (new_ihptr) {
+                        if (ScanDrawMode == ScanDrawDirectDraw)
+                            im = (void *) LoadImageCH(&fname[0], new_ihptr);
+                        else
+                            im = LoadImageIntoD3DImmediateSurface(
+                                &fname[0], new_ihptr, DefinedTextureType);
 
-					new_ihptr = GetImageHeader();
+                        if (im) {
 
-					if(new_ihptr) {
+#if InitTexPrnt
+                            textprint("Load OK, NumImages = %d\n", NumImages);
+                            WaitForReturn();
+#endif
+                        }
+                    }
 
-			            if (ScanDrawMode == ScanDrawDirectDraw)
-						  im = (void*) LoadImageCH(&fname[0], new_ihptr);
-						else
-						  im = LoadImageIntoD3DImmediateSurface
-						     (&fname[0], new_ihptr, DefinedTextureType);
+                }
 
-						if(im) {
+                /* test */
 
-							#if InitTexPrnt
-							textprint("Load OK, NumImages = %d\n", NumImages);
-							WaitForReturn();
-							#endif
+#if InitTexPrnt
+                else
+                    textprint("Image Already Exists\n");
+#endif
 
-						}
+#endif
 
-					}
-
-				}
-
-
-				/* test */
-
-				#if InitTexPrnt
-				else textprint("Image Already Exists\n");
-				#endif
-
-				#endif
-
-				/*
+                /*
 
 					The local index for this image in this shape is
 					"LTxIndex".
@@ -359,42 +342,35 @@ int InitialiseTextures(void)
 
 				*/
 
-				#if InitTexPrnt
-				textprint("\nLocal to Global for Shape\n");
-				#endif
+#if InitTexPrnt
+                textprint("\nLocal to Global for Shape\n");
+#endif
 
-				MakeShapeTexturesGlobal(shptr, TxIndex, LTxIndex);
+                MakeShapeTexturesGlobal(shptr, TxIndex, LTxIndex);
 
-				LTxIndex++;			/* Next Local Texture */
+                LTxIndex++; /* Next Local Texture */
+            }
 
-			}
+            /* Is this shape a sprite that requires resizing? */
 
-			/* Is this shape a sprite that requires resizing? */
+            if ((shptr->shapeflags & ShapeFlag_Sprite)
+                && (shptr->shapeflags & ShapeFlag_SpriteResizing)) {
+                SpriteResizing(shptr);
+            }
+        }
+    }
 
-			if((shptr->shapeflags & ShapeFlag_Sprite) &&
-				(shptr->shapeflags & ShapeFlag_SpriteResizing)) {
+#if InitTexPrnt
+    textprint("\nFinished PP for textures\n");
 
-				SpriteResizing(shptr);
-
-			}
-
-		}
-
-	}
-
-	#if InitTexPrnt
-	textprint("\nFinished PP for textures\n");
-
-	WaitForReturn();
-
-	#endif
-
-	return Yes;
-}
-
+    WaitForReturn();
 
 #endif
 
+    return Yes;
+}
+
+#endif
 
 /*
 
@@ -444,95 +420,81 @@ int CUBE_item3[]={
 void MakeShapeTexturesGlobal(SHAPEHEADER *shptr, int TxIndex, int LTxIndex)
 
 {
+    int **ShapeItemArrayPtr;
+    POLYHEADER *ShapeItemPtr;
 
-	int **ShapeItemArrayPtr;
-	POLYHEADER *ShapeItemPtr;
+#if SupportBSP
+    SHAPEDATA_BSP_BLOCK *ShapeBSPPtr;
+    int num_bsp_blocks;
+    int j, k;
+#endif
 
-	#if SupportBSP
-	SHAPEDATA_BSP_BLOCK *ShapeBSPPtr;
-	int num_bsp_blocks;
-	int j, k;
-	#endif
+    int i, txi;
 
-	int i, txi;
+    /* Are the items in a pointer array? */
 
+    if (shptr->items) {
+#if InitTexPrnt
+        textprint("Item Array\n");
+#endif
 
-	/* Are the items in a pointer array? */
+        ShapeItemArrayPtr = shptr->items;
 
-	if(shptr->items) {
+        for (i = shptr->numitems; i != 0; i--) {
+            ShapeItemPtr = (POLYHEADER *) *ShapeItemArrayPtr++;
 
-		#if InitTexPrnt
-		textprint("Item Array\n");
-		#endif
+#if SupportZBuffering
 
-		ShapeItemArrayPtr = shptr->items;
+            if (ShapeItemPtr->PolyItemType == I_2dTexturedPolygon
+                || ShapeItemPtr->PolyItemType == I_ZB_2dTexturedPolygon
+                || ShapeItemPtr->PolyItemType == I_Gouraud2dTexturedPolygon
+                || ShapeItemPtr->PolyItemType == I_ZB_Gouraud2dTexturedPolygon
+                || ShapeItemPtr->PolyItemType == I_Gouraud3dTexturedPolygon
+                || ShapeItemPtr->PolyItemType == I_ZB_Gouraud3dTexturedPolygon
+                || ShapeItemPtr->PolyItemType == I_ScaledSprite
+                || ShapeItemPtr->PolyItemType == I_3dTexturedPolygon
+                || ShapeItemPtr->PolyItemType == I_ZB_3dTexturedPolygon) {
+#else
+            if (ShapeItemPtr->PolyItemType == I_2dTexturedPolygon
+                || ShapeItemPtr->PolyItemType == I_Gouraud2dTexturedPolygon
+                || ShapeItemPtr->PolyItemType == I_Gouraud3dTexturedPolygon
+                || ShapeItemPtr->PolyItemType == I_ScaledSprite
+                || ShapeItemPtr->PolyItemType == I_3dTexturedPolygon) {
+#endif /* SupportZBuffering */
 
-		for(i = shptr->numitems; i!=0; i--) {
+                if (ShapeItemPtr->PolyFlags & iflag_txanim) {
+                    MakeTxAnimFrameTexturesGlobal(shptr, ShapeItemPtr, LTxIndex, TxIndex);
+                }
 
-			ShapeItemPtr = (POLYHEADER *) *ShapeItemArrayPtr++;
-			
-			#if SupportZBuffering
+                if (ShapeItemPtr->PolyColour & TxLocal) {
+                    txi = ShapeItemPtr->PolyColour;
+                    txi &= ~TxLocal;  /* Clear Flag */
+                    txi &= ClrTxDefn; /* Clear UV array index */
 
-			if(ShapeItemPtr->PolyItemType == I_2dTexturedPolygon
-				|| ShapeItemPtr->PolyItemType == I_ZB_2dTexturedPolygon
-				|| ShapeItemPtr->PolyItemType == I_Gouraud2dTexturedPolygon
-				|| ShapeItemPtr->PolyItemType == I_ZB_Gouraud2dTexturedPolygon
-				|| ShapeItemPtr->PolyItemType == I_Gouraud3dTexturedPolygon
-				|| ShapeItemPtr->PolyItemType == I_ZB_Gouraud3dTexturedPolygon
-				|| ShapeItemPtr->PolyItemType == I_ScaledSprite
-				|| ShapeItemPtr->PolyItemType == I_3dTexturedPolygon
-				|| ShapeItemPtr->PolyItemType == I_ZB_3dTexturedPolygon) {
-			#else
-			if(ShapeItemPtr->PolyItemType == I_2dTexturedPolygon
-				|| ShapeItemPtr->PolyItemType == I_Gouraud2dTexturedPolygon
-				|| ShapeItemPtr->PolyItemType == I_Gouraud3dTexturedPolygon
-				|| ShapeItemPtr->PolyItemType == I_ScaledSprite
-				|| ShapeItemPtr->PolyItemType == I_3dTexturedPolygon){
-			#endif /* SupportZBuffering */
+                    /* Is this the local index? */
 
-				if(ShapeItemPtr->PolyFlags & iflag_txanim) {
+                    if (txi == LTxIndex) {
+                        /* Clear low word, OR in global index */
 
-					MakeTxAnimFrameTexturesGlobal(shptr, ShapeItemPtr,
-															LTxIndex, TxIndex);
+                        ShapeItemPtr->PolyColour &= ClrTxIndex;
+                        ShapeItemPtr->PolyColour |= TxIndex;
+                    }
+                }
+            }
+        }
 
-				}
+    }
+#if SupportBSP
 
-				if(ShapeItemPtr->PolyColour & TxLocal) {
+    /* Or are they in a BSP block array? */
 
-					txi = ShapeItemPtr->PolyColour;
-					txi &= ~TxLocal;							/* Clear Flag */
-					txi &= ClrTxDefn;							/* Clear UV array index */
+    else if (shptr->sh_bsp_blocks) {
 
-					/* Is this the local index? */
+#if InitTexPrnt
+        textprint("BSP Block Array\n");
+#endif
 
-					if(txi == LTxIndex) {
-
-						/* Clear low word, OR in global index */
-
-						ShapeItemPtr->PolyColour &= ClrTxIndex;
-						ShapeItemPtr->PolyColour |= TxIndex;
-
-					}
-
-				}
-
-			}
-
-		}
-
-	}
-
-	#if SupportBSP
-
-	/* Or are they in a BSP block array? */
-
-	else if(shptr->sh_bsp_blocks) {
-
-		#if InitTexPrnt
-		textprint("BSP Block Array\n");
-		#endif
-
-		#if 0
+#if 0
 		/* Find the BSP Instruction */
 		ShInstrPtr = shptr->sh_instruction;
 		num_bsp_blocks = 0;
@@ -542,103 +504,83 @@ void MakeShapeTexturesGlobal(SHAPEHEADER *shptr, int TxIndex, int LTxIndex)
 			}
 			ShInstrPtr++;
 		}
-		#endif
+#endif
 
-		num_bsp_blocks = FindNumBSPNodes(shptr);
+        num_bsp_blocks = FindNumBSPNodes(shptr);
 
+#if InitTexPrnt
+        textprint("Number of BSP blocks = %d\n", num_bsp_blocks);
+#endif
 
-		#if InitTexPrnt
-		textprint("Number of BSP blocks = %d\n", num_bsp_blocks);
-		#endif
+        if (num_bsp_blocks) {
+            ShapeBSPPtr = shptr->sh_bsp_blocks;
 
-		if(num_bsp_blocks) {
+            for (k = num_bsp_blocks; k != 0; k--) {
+                ShapeItemArrayPtr = ShapeBSPPtr->bsp_block_data;
 
-			ShapeBSPPtr = shptr->sh_bsp_blocks;
+                for (j = ShapeBSPPtr->bsp_numitems; j != 0; j--) {
+                    ShapeItemPtr = (POLYHEADER *) *ShapeItemArrayPtr++;
 
-			for(k=num_bsp_blocks; k!=0; k--) {
+#if InitTexPrnt
+                    textprint("shape item\n");
+#endif
 
-				ShapeItemArrayPtr = ShapeBSPPtr->bsp_block_data;
+                    if (ShapeItemPtr->PolyItemType == I_2dTexturedPolygon
+                        || ShapeItemPtr->PolyItemType == I_ZB_2dTexturedPolygon
+                        || ShapeItemPtr->PolyItemType == I_Gouraud2dTexturedPolygon
+                        || ShapeItemPtr->PolyItemType == I_ZB_Gouraud2dTexturedPolygon
+                        || ShapeItemPtr->PolyItemType == I_Gouraud3dTexturedPolygon
+                        || ShapeItemPtr->PolyItemType == I_ZB_Gouraud3dTexturedPolygon
+                        || ShapeItemPtr->PolyItemType == I_ScaledSprite
+                        || ShapeItemPtr->PolyItemType == I_3dTexturedPolygon
+                        || ShapeItemPtr->PolyItemType == I_ZB_3dTexturedPolygon) {
+                        if (ShapeItemPtr->PolyFlags & iflag_txanim) {
+                            MakeTxAnimFrameTexturesGlobal(shptr, ShapeItemPtr, LTxIndex, TxIndex);
+                        }
 
-				for(j=ShapeBSPPtr->bsp_numitems; j!=0; j--) {
+#if InitTexPrnt
+                        textprint(" - textured\n");
+#endif
 
-					ShapeItemPtr = (POLYHEADER *) *ShapeItemArrayPtr++;
+                        if (ShapeItemPtr->PolyColour & TxLocal) {
+#if InitTexPrnt
+                            textprint("  - local index\n");
+#endif
 
-					#if InitTexPrnt
-					textprint("shape item\n");
-					#endif
+                            txi = ShapeItemPtr->PolyColour;
+                            txi &= ~(TxLocal); /* Clear Flag */
+                            txi &= ClrTxDefn;  /* Clear Defn */
 
-					if(ShapeItemPtr->PolyItemType == I_2dTexturedPolygon
-						|| ShapeItemPtr->PolyItemType == I_ZB_2dTexturedPolygon
-						|| ShapeItemPtr->PolyItemType == I_Gouraud2dTexturedPolygon
-						|| ShapeItemPtr->PolyItemType == I_ZB_Gouraud2dTexturedPolygon
-						|| ShapeItemPtr->PolyItemType == I_Gouraud3dTexturedPolygon
-						|| ShapeItemPtr->PolyItemType == I_ZB_Gouraud3dTexturedPolygon
-						|| ShapeItemPtr->PolyItemType == I_ScaledSprite
-						|| ShapeItemPtr->PolyItemType == I_3dTexturedPolygon
-						|| ShapeItemPtr->PolyItemType == I_ZB_3dTexturedPolygon) {
+#if InitTexPrnt
+                            textprint("  - is %d\n", txi);
+                            textprint("  - LTxIndex is %d\n", LTxIndex);
+#endif
 
-						if(ShapeItemPtr->PolyFlags & iflag_txanim) {
+                            /* Is this the local index? */
 
-							MakeTxAnimFrameTexturesGlobal(shptr, ShapeItemPtr,
-																	LTxIndex, TxIndex);
+                            if (txi == LTxIndex) {
+                                /* Clear low word, OR in global index */
 
-						}
+                                ShapeItemPtr->PolyColour &= ClrTxIndex;
+                                ShapeItemPtr->PolyColour |= TxIndex;
 
-						#if InitTexPrnt
-						textprint(" - textured\n");
-						#endif
+#if InitTexPrnt
+                                textprint("Local %d, Global %d\n", LTxIndex, TxIndex);
+#endif
+                            }
+                        }
+                    }
+                }
 
-						if(ShapeItemPtr->PolyColour & TxLocal) {
+                ShapeBSPPtr++;
+            }
+        }
+    }
 
-							#if InitTexPrnt
-							textprint("  - local index\n");
-							#endif
+#endif /* SupportBSP */
 
-							txi = ShapeItemPtr->PolyColour;
-							txi &= ~(TxLocal);					/* Clear Flag */
-							txi &= ClrTxDefn;						/* Clear Defn */
-
-							#if InitTexPrnt
-							textprint("  - is %d\n", txi);
-							textprint("  - LTxIndex is %d\n", LTxIndex);
-							#endif
-
-							/* Is this the local index? */
-
-							if(txi == LTxIndex) {
-
-								/* Clear low word, OR in global index */
-
-								ShapeItemPtr->PolyColour &= ClrTxIndex;
-								ShapeItemPtr->PolyColour |= TxIndex;
-
-								#if InitTexPrnt
-								textprint("Local %d, Global %d\n", LTxIndex, TxIndex);
-								#endif
-
-							}
-
-						}
-
-					}
-
-				}
-
-				ShapeBSPPtr++;
-
-			}
-
-		}
-
-	}
-
-	#endif	/* SupportBSP */
-
-	/* Otherwise the shape has no item data */
-
-
+    /* Otherwise the shape has no item data */
 }
-
 
 /*
 
@@ -648,110 +590,81 @@ void MakeShapeTexturesGlobal(SHAPEHEADER *shptr, int TxIndex, int LTxIndex)
 
 */
 
-void MakeTxAnimFrameTexturesGlobal(SHAPEHEADER *sptr,
-														POLYHEADER *pheader,
-														int LTxIndex, int TxIndex)
+void MakeTxAnimFrameTexturesGlobal(SHAPEHEADER *sptr, POLYHEADER *pheader, int LTxIndex, int TxIndex)
 
 {
+    TXANIMHEADER **txah_ptr;
+    TXANIMHEADER *txah;
+    TXANIMFRAME *txaf;
+    int **shape_textures;
+    int *txf_imageptr;
+    int texture_defn_index;
+    int i, txi, image;
 
-	TXANIMHEADER **txah_ptr;
-	TXANIMHEADER *txah;
-	TXANIMFRAME *txaf;
-	int **shape_textures;
-	int *txf_imageptr;
-	int texture_defn_index;
-	int i, txi, image;
-
-
-	#if 0
+#if 0
 	textprint("LTxIndex = %d, TxIndex = %d\n", LTxIndex, TxIndex);
 	WaitForReturn();
-	#endif
+#endif
 
+    /* Get the animation sequence header */
 
-	/* Get the animation sequence header */
+    shape_textures = sptr->sh_textures;
+    texture_defn_index = (pheader->PolyColour >> TxDefn);
+    txah_ptr = (TXANIMHEADER **) shape_textures[texture_defn_index];
 
-	shape_textures = sptr->sh_textures;
-	texture_defn_index = (pheader->PolyColour >> TxDefn);
-	txah_ptr = (TXANIMHEADER **) shape_textures[texture_defn_index];
+    /* The first array element is the sequence shadow, which we skip here */
 
+    txah_ptr++;
 
-	/* The first array element is the sequence shadow, which we skip here */
+    /* Process the animation sequences */
 
-	txah_ptr++;
+    while (*txah_ptr) {
+        /* Get the animation header */
 
+        txah = *txah_ptr++;
 
-	/* Process the animation sequences */
+        /* Process the animation frames */
 
-	while(*txah_ptr) {
+        if (txah && txah->txa_numframes) {
+            txaf = txah->txa_framedata;
 
-		/* Get the animation header */
+            for (i = txah->txa_numframes; i != 0; i--) {
+                /* Multi-View Sprite? */
 
-		txah = *txah_ptr++;
+                if (sptr->shapeflags & ShapeFlag_MultiViewSprite) {
+                    txf_imageptr = (int *) txaf->txf_image;
 
-		/* Process the animation frames */
+                    for (image = txah->txa_num_mvs_images; image != 0; image--) {
+                        if (*txf_imageptr & TxLocal) {
+                            txi = *txf_imageptr;
+                            txi &= ~TxLocal; /* Clear Flag */
 
-		if(txah && txah->txa_numframes) {
+                            if (txi == LTxIndex) {
+                                *txf_imageptr = TxIndex;
+                            }
+                        }
 
-			txaf = txah->txa_framedata;
+                        txf_imageptr++;
+                    }
 
-			for(i = txah->txa_numframes; i!=0; i--) {
+                }
 
-				/* Multi-View Sprite? */
+                else {
+                    if (txaf->txf_image & TxLocal) {
+                        txi = txaf->txf_image;
+                        txi &= ~TxLocal; /* Clear Flag */
 
-				if(sptr->shapeflags & ShapeFlag_MultiViewSprite) {
+                        if (txi == LTxIndex) {
+                            txaf->txf_image = TxIndex;
+                        }
+                    }
+                }
 
-					txf_imageptr = (int *) txaf->txf_image;
-
-					for(image = txah->txa_num_mvs_images; image!=0; image--) {
-
-						if(*txf_imageptr & TxLocal) {
-
-							txi = *txf_imageptr;
-							txi &= ~TxLocal;					/* Clear Flag */
-
-							if(txi == LTxIndex) {
-
-								*txf_imageptr = TxIndex;
-
-							}
-
-						}
-
-						txf_imageptr++;
-
-					}
-
-				}
-
-				else {
-
-					if(txaf->txf_image & TxLocal) {
-
-						txi = txaf->txf_image;
-						txi &= ~TxLocal;					/* Clear Flag */
-
-						if(txi == LTxIndex) {
-
-							txaf->txf_image = TxIndex;
-
-						}
-
-					}
-
-				}
-
-				txaf++;
-
-			}
-
-		}
-
-	}
-
+                txaf++;
+            }
+        }
+    }
 }
-
-
 
 /*
 
@@ -774,332 +687,289 @@ void MakeTxAnimFrameTexturesGlobal(SHAPEHEADER *sptr,
 void SpriteResizing(SHAPEHEADER *sptr)
 
 {
+    TXANIMHEADER **txah_ptr;
+    TXANIMHEADER *txah;
+    TXANIMFRAME *txaf;
+    int **shape_textures;
+    IMAGEHEADER *ihdr;
+    IMAGEEXTENTS e;
+    IMAGEEXTENTS e_curr;
+    IMAGEPOLYEXTENTS e_poly;
+    int *uvptr;
+    int texture_defn_index;
+    int **item_array_ptr;
+    int *item_ptr;
+    POLYHEADER *pheader;
+    int i, f;
+    int polypts[4 * vsize];
+    int *iptr;
+    int *iptr2;
+    int *mypolystart;
+    int *ShapePoints = *(sptr->points);
+    VECTOR2D cen_poly;
+    VECTOR2D size_poly;
+    VECTOR2D cen_uv_curr;
+    VECTOR2D size_uv_curr;
+    VECTOR2D cen_uv;
+    VECTOR2D size_uv;
+    VECTOR2D tv;
+    int *txf_imageptr;
+    int **txf_uvarrayptr;
+    int *txf_uvarray;
+    int image;
+    int num_images;
 
-	TXANIMHEADER **txah_ptr;
-	TXANIMHEADER *txah;
-	TXANIMFRAME *txaf;
-	int **shape_textures;
-	IMAGEHEADER *ihdr;
-	IMAGEEXTENTS e;
-	IMAGEEXTENTS e_curr;
-	IMAGEPOLYEXTENTS e_poly;
-	int *uvptr;
-	int texture_defn_index;
-	int **item_array_ptr;
-	int *item_ptr;
-	POLYHEADER *pheader;
-	int i, f;
-	int polypts[4 * vsize];
-	int *iptr;
-	int *iptr2;
-	int *mypolystart;
-	int *ShapePoints = *(sptr->points);
-	VECTOR2D cen_poly;
-	VECTOR2D size_poly;
-	VECTOR2D cen_uv_curr;
-	VECTOR2D size_uv_curr;
-	VECTOR2D cen_uv;
-	VECTOR2D size_uv;
-	VECTOR2D tv;
-	int *txf_imageptr;
-	int **txf_uvarrayptr;
-	int *txf_uvarray;
-	int image;
-	int num_images;
+#if sr_print
+    textprint("\nSprite Resize Shape\n\n");
+#endif
 
+    /* Get the animation sequence header */
 
-	#if sr_print
-	textprint("\nSprite Resize Shape\n\n");
-	#endif
+    shape_textures = sptr->sh_textures;
 
+    item_array_ptr = sptr->items; /* Assume item array */
+    item_ptr = item_array_ptr[0]; /* Assume only one polygon */
+    pheader = (POLYHEADER *) item_ptr;
 
-	/* Get the animation sequence header */
+    /* Get the polygon points, and at the same time the extents, assuming an XY plane polygon */
 
-	shape_textures = sptr->sh_textures;
+    e_poly.x_low = bigint;
+    e_poly.y_low = bigint;
 
-	item_array_ptr = sptr->items;		/* Assume item array */
-	item_ptr = item_array_ptr[0];		/* Assume only one polygon */
-	pheader = (POLYHEADER *) item_ptr;
+    e_poly.x_high = smallint;
+    e_poly.y_high = smallint;
 
+    iptr = polypts;
+    mypolystart = &pheader->Poly1stPt;
 
-	/* Get the polygon points, and at the same time the extents, assuming an XY plane polygon */
+    for (i = 4; i != 0; i--) {
+        iptr[ix] = ((VECTORCH *) ShapePoints)[*mypolystart].vx;
+        iptr[iy] = ((VECTORCH *) ShapePoints)[*mypolystart].vy;
+        iptr[iz] = ((VECTORCH *) ShapePoints)[*mypolystart].vz;
 
-	e_poly.x_low = bigint;
-	e_poly.y_low = bigint;
+        if (iptr[ix] < e_poly.x_low)
+            e_poly.x_low = iptr[ix];
+        if (iptr[iy] < e_poly.y_low)
+            e_poly.y_low = iptr[iy];
+        if (iptr[ix] > e_poly.x_high)
+            e_poly.x_high = iptr[ix];
+        if (iptr[iy] > e_poly.y_high)
+            e_poly.y_high = iptr[iy];
 
-	e_poly.x_high = smallint;
-	e_poly.y_high = smallint;
+        iptr += vsize;
+        mypolystart++;
+    }
 
-	iptr = polypts;
-	mypolystart = &pheader->Poly1stPt;
+    texture_defn_index = (pheader->PolyColour >> TxDefn);
+    txah_ptr = (TXANIMHEADER **) shape_textures[texture_defn_index];
 
-	for(i = 4; i!=0; i--) {
+    /* The first array element is the sequence shadow, which we skip here */
 
-		iptr[ix] = ((VECTORCH*)ShapePoints)[*mypolystart].vx;
-		iptr[iy] = ((VECTORCH*)ShapePoints)[*mypolystart].vy;
-		iptr[iz] = ((VECTORCH*)ShapePoints)[*mypolystart].vz;
+    txah_ptr++;
 
-		if(iptr[ix] < e_poly.x_low) e_poly.x_low = iptr[ix];
-		if(iptr[iy] < e_poly.y_low) e_poly.y_low = iptr[iy];
-		if(iptr[ix] > e_poly.x_high) e_poly.x_high = iptr[ix];
-		if(iptr[iy] > e_poly.y_high) e_poly.y_high = iptr[iy];
+    /* Process the animation sequences */
 
-		iptr += vsize;
-		mypolystart++;
+    while (*txah_ptr) {
+        /* Get the animation header */
 
-	}
+        txah = *txah_ptr++;
 
+        /* Process the animation frames */
 
-	texture_defn_index = (pheader->PolyColour >> TxDefn);
-	txah_ptr = (TXANIMHEADER **) shape_textures[texture_defn_index];
+        if (txah && txah->txa_numframes) {
+            txaf = txah->txa_framedata;
 
+            for (f = txah->txa_numframes; f != 0; f--) {
+                /* Multi-View Sprite? */
 
-	/* The first array element is the sequence shadow, which we skip here */
+                if (sptr->shapeflags & ShapeFlag_MultiViewSprite) {
+                    txf_imageptr = (int *) txaf->txf_image;
+                    num_images = txah->txa_num_mvs_images;
 
-	txah_ptr++;
+                    txf_uvarrayptr = (int **) txaf->txf_uvdata;
 
+                }
 
-	/* Process the animation sequences */
+                /* A standard "Single View" Sprite has just one image */
 
-	while(*txah_ptr) {
+                else {
+                    txf_imageptr = (int *) &txaf->txf_image;
+                    num_images = 1;
 
-		/* Get the animation header */
+                    txf_uvarrayptr = &txaf->txf_uvdata;
+                }
 
-		txah = *txah_ptr++;
+                for (image = 0; image < num_images; image++) {
+#if sr_print
+                    textprint("image %d of %d   \n", (image + 1), num_images);
+#endif
 
-		/* Process the animation frames */
+                    /* Get the image */
 
-		if(txah && txah->txa_numframes) {
+                    ihdr = ImageHeaderPtrs[txf_imageptr[image]];
 
-			txaf = txah->txa_framedata;
+                    /* Get the uv array ptr */
 
-			for(f = txah->txa_numframes; f!=0; f--) {
+                    txf_uvarray = txf_uvarrayptr[image];
 
+                    /* Find the extents of the image, assuming transparency */
 
-				/* Multi-View Sprite? */
-
-				if(sptr->shapeflags & ShapeFlag_MultiViewSprite) {
-
-					txf_imageptr = (int *) txaf->txf_image;
-					num_images = txah->txa_num_mvs_images;
-
-					txf_uvarrayptr = (int **) txaf->txf_uvdata;
-
-				}
-
-				/* A standard "Single View" Sprite has just one image */
-
-				else {
-
-					txf_imageptr = (int *) &txaf->txf_image;
-					num_images = 1;
-
-					txf_uvarrayptr = &txaf->txf_uvdata;
-
-				}
-
-
-				for(image = 0; image < num_images; image++) {
-
-
-					#if sr_print
-					textprint("image %d of %d   \n", (image + 1), num_images);
-					#endif
-
-
-					/* Get the image */
-
-					ihdr = ImageHeaderPtrs[txf_imageptr[image]];
-
-					/* Get the uv array ptr */
-
-					txf_uvarray = txf_uvarrayptr[image];
-
-					/* Find the extents of the image, assuming transparency */
-
-					#if 0
+#if 0
 					FindImageExtents(ihdr, txaf->txf_numuvs, txaf->txf_uvdata, &e, &e_curr);
-					#else
-					FindImageExtents(ihdr, txaf->txf_numuvs, txf_uvarray, &e, &e_curr);
-					#endif
+#else
+                    FindImageExtents(ihdr, txaf->txf_numuvs, txf_uvarray, &e, &e_curr);
+#endif
 
-					/* Convert the image extents to fixed point */
+                    /* Convert the image extents to fixed point */
 
-					#if sr_print
-					textprint("extents = %d, %d\n", e.u_low, e.v_low);
-					textprint("          %d, %d\n", e.u_high, e.v_high);
-					WaitForReturn();
-					#endif
+#if sr_print
+                    textprint("extents = %d, %d\n", e.u_low, e.v_low);
+                    textprint("          %d, %d\n", e.u_high, e.v_high);
+                    WaitForReturn();
+#endif
 
-					e.u_low  <<= 16;
-					e.v_low  <<= 16;
-					e.u_high <<= 16;
-					e.v_high <<= 16;
+                    e.u_low <<= 16;
+                    e.v_low <<= 16;
+                    e.u_high <<= 16;
+                    e.v_high <<= 16;
 
-					/*
+                    /*
 
 					We now have all the information needed to create a NEW UV array and a NEW
 					polygon points XY array.
 
 					*/
 
-					/* Centre of the polygon */
+                    /* Centre of the polygon */
 
-					cen_poly.vx = (e_poly.x_low + e_poly.x_high) / 2;
-					cen_poly.vy = (e_poly.y_low + e_poly.y_high) / 2;
+                    cen_poly.vx = (e_poly.x_low + e_poly.x_high) / 2;
+                    cen_poly.vy = (e_poly.y_low + e_poly.y_high) / 2;
 
-					/* Size of the polygon */
+                    /* Size of the polygon */
 
-					size_poly.vx = e_poly.x_high - e_poly.x_low;
-					size_poly.vy = e_poly.y_high - e_poly.y_low;
+                    size_poly.vx = e_poly.x_high - e_poly.x_low;
+                    size_poly.vy = e_poly.y_high - e_poly.y_low;
 
+                    /* Centre of the current cookie */
 
-					/* Centre of the current cookie */
+                    cen_uv_curr.vx = (e_curr.u_low + e_curr.u_high) / 2;
+                    cen_uv_curr.vy = (e_curr.v_low + e_curr.v_high) / 2;
 
-					cen_uv_curr.vx = (e_curr.u_low + e_curr.u_high) / 2;
-					cen_uv_curr.vy = (e_curr.v_low + e_curr.v_high) / 2;
+                    /* Size of the current cookie */
 
-					/* Size of the current cookie */
+                    size_uv_curr.vx = e_curr.u_high - e_curr.u_low;
+                    size_uv_curr.vy = e_curr.v_high - e_curr.v_low;
 
-					size_uv_curr.vx = e_curr.u_high - e_curr.u_low;
-					size_uv_curr.vy = e_curr.v_high - e_curr.v_low;
+                    /* Centre of the new cookie */
 
+                    cen_uv.vx = (e.u_low + e.u_high) / 2;
+                    cen_uv.vy = (e.v_low + e.v_high) / 2;
 
-					/* Centre of the new cookie */
+                    /* Size of the new cookie */
 
-					cen_uv.vx = (e.u_low + e.u_high) / 2;
-					cen_uv.vy = (e.v_low + e.v_high) / 2;
+                    size_uv.vx = e.u_high - e.u_low;
+                    size_uv.vy = e.v_high - e.v_low;
 
-					/* Size of the new cookie */
+                    /* Write out the new UV data */
 
-					size_uv.vx = e.u_high - e.u_low;
-					size_uv.vy = e.v_high - e.v_low;
-
-
-					/* Write out the new UV data */
-
-					#if 0
+#if 0
 					uvptr = txaf->txf_uvdata;
-					#else
-					uvptr = txf_uvarray;
-					#endif
+#else
+                    uvptr = txf_uvarray;
+#endif
 
-
-					/*
+                    /*
 
 					Convert the duplicate UV array to this new scale
 					ASSUME that the format is "TL, BL, BR, TR"
 
 					*/
 
-					uvptr[0] = e.u_low;
-					uvptr[1] = e.v_low;
+                    uvptr[0] = e.u_low;
+                    uvptr[1] = e.v_low;
 
-					uvptr[2] = e.u_low;
-					uvptr[3] = e.v_high;
+                    uvptr[2] = e.u_low;
+                    uvptr[3] = e.v_high;
 
-					uvptr[4] = e.u_high;
-					uvptr[5] = e.v_high;
+                    uvptr[4] = e.u_high;
+                    uvptr[5] = e.v_high;
 
-					uvptr[6] = e.u_high;
-					uvptr[7] = e.v_low;
+                    uvptr[6] = e.u_high;
+                    uvptr[7] = e.v_low;
 
-
-					/*
+                    /*
 
 					Create the new polygon XY array
 
 					*/
 
-					uvptr += (txaf->txf_numuvs * 2);	/* Advance the pointer past the UV array */
+                    uvptr += (txaf->txf_numuvs * 2); /* Advance the pointer past the UV array */
 
+                    /* Copy the polygon points (XY only) to the UV array space */
 
-					/* Copy the polygon points (XY only) to the UV array space */
+                    iptr = polypts;
+                    iptr2 = uvptr;
 
-					iptr  = polypts;
-					iptr2 = uvptr;
+                    for (i = 4; i != 0; i--) {
+                        iptr2[0] = iptr[ix];
+                        iptr2[1] = iptr[iy];
 
-					for(i = 4; i!=0; i--) {
+                        iptr += vsize;
+                        iptr2 += 2;
+                    }
 
-						iptr2[0] = iptr[ix];
-						iptr2[1] = iptr[iy];
+                    /* Scale the polygon points */
 
-						iptr  += vsize;
-						iptr2 += 2;
+                    iptr = uvptr;
 
-					}
+                    for (i = 4; i != 0; i--) {
+                        iptr[0] = WideMulNarrowDiv(iptr[0], size_uv.vx, size_uv_curr.vx);
+                        iptr[1] = WideMulNarrowDiv(iptr[1], size_uv.vy, size_uv_curr.vy);
 
+                        iptr += 2;
+                    }
 
-					/* Scale the polygon points */
+                    /* The translation vector in UV space */
 
-					iptr = uvptr;
+                    tv.vx = cen_uv.vx - cen_uv_curr.vx;
+                    tv.vy = cen_uv.vy - cen_uv_curr.vy;
 
-					for(i = 4; i!=0; i--) {
+                    /* And now in world space */
 
-						iptr[0] = WideMulNarrowDiv(iptr[0], size_uv.vx, size_uv_curr.vx);
-						iptr[1] = WideMulNarrowDiv(iptr[1], size_uv.vy, size_uv_curr.vy);
+                    tv.vx = WideMulNarrowDiv(tv.vx, size_poly.vx, size_uv_curr.vx);
+                    tv.vy = WideMulNarrowDiv(tv.vy, size_poly.vy, size_uv_curr.vy);
 
-						iptr += 2;
+                    /* Translate the polygon points */
 
-					}
+                    iptr = uvptr;
 
+                    for (i = 4; i != 0; i--) {
+                        iptr[0] += tv.vx;
+                        iptr[1] += tv.vy;
 
-					/* The translation vector in UV space */
+                        iptr += 2;
+                    }
 
-					tv.vx = cen_uv.vx - cen_uv_curr.vx;
-					tv.vy = cen_uv.vy - cen_uv_curr.vy;
+#if sr_print
+                    textprint(" (image done)\n");
+#endif
+                }
 
+#if sr_print
+                textprint("\n");
+#endif
 
-					/* And now in world space */
+                /* Next Texture Animation Frame */
 
-					tv.vx = WideMulNarrowDiv(tv.vx, size_poly.vx, size_uv_curr.vx);
-					tv.vy = WideMulNarrowDiv(tv.vy, size_poly.vy, size_uv_curr.vy);
+                txaf++;
+            }
+        }
+    }
 
-
-					/* Translate the polygon points */
-
-					iptr = uvptr;
-
-					for(i = 4; i!=0; i--) {
-
-						iptr[0] += tv.vx;
-						iptr[1] += tv.vy;
-
-						iptr += 2;
-
-					}
-
-
-					#if sr_print
-					textprint(" (image done)\n");
-					#endif
-
-
-				}
-
-
-				#if sr_print
-				textprint("\n");
-				#endif
-
-
-				/* Next Texture Animation Frame */
-
-				txaf++;
-
-			}
-
-		}
-
-	}
-
-
-	#if sr_print
-	textprint("\nResize done\n\n");
-	#endif
-
+#if sr_print
+    textprint("\nResize done\n\n");
+#endif
 }
-
 
 /*
 
@@ -1114,126 +984,114 @@ void SpriteResizing(SHAPEHEADER *sptr)
 
 */
 
-void FindImageExtents(IMAGEHEADER *ihdr, int numuvs, int *uvdata, IMAGEEXTENTS *e, IMAGEEXTENTS *e_curr)
+void FindImageExtents(
+    IMAGEHEADER *ihdr, int numuvs, int *uvdata, IMAGEEXTENTS *e, IMAGEEXTENTS *e_curr)
 
 {
+    int i;
+    int *uvptr;
+    int u, v;
+    int startu, endu;
+    int startv, endv;
 
-	int i;
-	int *uvptr;
-	int u, v;
-	int startu, endu;
-	int startv, endv;
+    /* Find the current UV extents */
 
+    e_curr->u_low = bigint;
+    e_curr->v_low = bigint;
 
-	/* Find the current UV extents */
+    e_curr->u_high = smallint;
+    e_curr->v_high = smallint;
 
-	e_curr->u_low = bigint;
-	e_curr->v_low = bigint;
+    uvptr = uvdata;
 
-	e_curr->u_high = smallint;
-	e_curr->v_high = smallint;
+    for (i = numuvs; i != 0; i--) {
+        if (uvptr[0] < e_curr->u_low)
+            e_curr->u_low = uvptr[0];
+        if (uvptr[1] < e_curr->v_low)
+            e_curr->v_low = uvptr[1];
 
-	uvptr = uvdata;
+        if (uvptr[0] > e_curr->u_high)
+            e_curr->u_high = uvptr[0];
+        if (uvptr[1] > e_curr->v_high)
+            e_curr->v_high = uvptr[1];
 
-	for(i = numuvs; i!=0; i--) {
+        uvptr += 2;
+    }
 
-		if(uvptr[0] < e_curr->u_low) e_curr->u_low = uvptr[0];
-		if(uvptr[1] < e_curr->v_low) e_curr->v_low = uvptr[1];
+    /* Look for the actual UV extents, assuming that colour 0 is transparent */
 
-		if(uvptr[0] > e_curr->u_high) e_curr->u_high = uvptr[0];
-		if(uvptr[1] > e_curr->v_high) e_curr->v_high = uvptr[1];
+    switch (VideoModeType) {
+    case VideoModeType_8:
 
-		uvptr += 2;
+    {
+        TEXTURE *tptr = ihdr->ImagePtr;
+        TEXTURE texel;
 
-	}
+        /* Search for u_low and v_low */
 
+        e->u_low = bigint;
+        e->v_low = bigint;
 
-	/* Look for the actual UV extents, assuming that colour 0 is transparent */
+        startv = e_curr->v_low >> 16;
+        endv = e_curr->v_high >> 16;
+        startu = e_curr->u_low >> 16;
+        endu = e_curr->u_high >> 16;
 
-	switch(VideoModeType) {
+        for (v = startv; v <= endv; v++) {
+            for (u = startu; u <= endu; u++) {
+                texel = tptr[(v * ihdr->ImageWidth) + u];
 
-		case VideoModeType_8:
+                if (texel) {
+                    if (u < e->u_low)
+                        e->u_low = u;
+                    if (v < e->v_low)
+                        e->v_low = v;
+                }
+            }
+        }
 
-			{
+        if (e->u_low == bigint)
+            e->u_low = e_curr->u_low;
+        if (e->v_low == bigint)
+            e->v_low = e_curr->v_low;
 
-				TEXTURE *tptr = ihdr->ImagePtr;
-				TEXTURE texel;
+        /* Search for u_high and v_high */
 
+        e->u_high = smallint;
+        e->v_high = smallint;
 
-				/* Search for u_low and v_low */
+        for (v = endv; v >= startv; v--) {
+            for (u = endu; u >= startu; u--) {
+                texel = tptr[(v * ihdr->ImageWidth) + u];
 
-				e->u_low = bigint;
-				e->v_low = bigint;
+                if (texel) {
+                    if (u > e->u_high)
+                        e->u_high = u;
+                    if (v > e->v_high)
+                        e->v_high = v;
+                }
+            }
+        }
 
-				startv = e_curr->v_low  >> 16;
-				endv   = e_curr->v_high >> 16;
-				startu = e_curr->u_low  >> 16;
-				endu   = e_curr->u_high >> 16;
+        if (e->u_high == smallint)
+            e->u_high = e_curr->u_high;
+        if (e->v_high == smallint)
+            e->v_high = e_curr->v_high;
 
-				for(v = startv; v <= endv; v++) {
+    }
 
-					for(u = startu; u <= endu; u++) {
+    break;
 
-						texel = tptr[(v * ihdr->ImageWidth) + u];
+    case VideoModeType_15:
+        break;
 
-						if(texel) {
+    case VideoModeType_24:
+        break;
 
-							if(u < e->u_low) e->u_low = u;
-							if(v < e->v_low) e->v_low = v;
-
-						}
-
-					}
-
-				}
-
-				if(e->u_low == bigint) e->u_low = e_curr->u_low;
-				if(e->v_low == bigint) e->v_low = e_curr->v_low;
-
-
-				/* Search for u_high and v_high */
-
-				e->u_high = smallint;
-				e->v_high = smallint;
-
-				for(v = endv; v >= startv; v--) {
-
-					for(u = endu; u >= startu;  u--) {
-
-						texel = tptr[(v * ihdr->ImageWidth) + u];
-
-						if(texel) {
-
-							if(u > e->u_high) e->u_high = u;
-							if(v > e->v_high) e->v_high = v;
-
-						}
-
-					}
-
-				}
-
-				if(e->u_high == smallint) e->u_high = e_curr->u_high;
-				if(e->v_high == smallint) e->v_high = e_curr->v_high;
-
-			}
-
-			break;
-
-		case VideoModeType_15:
-			break;
-
-		case VideoModeType_24:
-			break;
-
-		case VideoModeType_8T:
-			break;
-
-	}
-
+    case VideoModeType_8T:
+        break;
+    }
 }
-
-
 
 /*
 
@@ -1241,40 +1099,34 @@ void FindImageExtents(IMAGEHEADER *ihdr, int numuvs, int *uvdata, IMAGEEXTENTS *
 
 */
 
-
-IMAGEHEADER* GetImageHeader(void)
+IMAGEHEADER *GetImageHeader(void)
 {
+    IMAGEHEADER *iheader;
 
-	IMAGEHEADER *iheader;
+#ifdef MaxImageGroups
 
-	#ifdef MaxImageGroups
+    /* NumImages always points to the correct point in the array */
+    do {
+        iheader = NextFreeImageHeaderPtr[CurrentImageGroup]++;
+    } while (IsImageInUse(CurrentImageGroup, NumImagesArray[CurrentImageGroup]++) ? ++NumImages : 0);
 
-	/* NumImages always points to the correct point in the array */
-	do
-	{
-		iheader = NextFreeImageHeaderPtr[CurrentImageGroup]++;
-	}
-	while (IsImageInUse(CurrentImageGroup,NumImagesArray[CurrentImageGroup]++) ? ++NumImages : 0);
-	
-	GLOBALASSERT(NumImagesArray[CurrentImageGroup] < MaxImages);
+    GLOBALASSERT(NumImagesArray[CurrentImageGroup] < MaxImages);
 
-	#else
+#else
 
-	iheader = NextFreeImageHeaderPtr++;
-	GLOBALASSERT(NumImages < MaxImages);
+    iheader = NextFreeImageHeaderPtr++;
+    GLOBALASSERT(NumImages < MaxImages);
 
-	#endif
-	
-	/* ensure flags are zero */
-	memset(iheader,0,sizeof(IMAGEHEADER));
+#endif
 
-	ImageHeaderPtrs[NumImages] = iheader;
-	NumImages++;
-	
-	return iheader;
+    /* ensure flags are zero */
+    memset(iheader, 0, sizeof(IMAGEHEADER));
 
+    ImageHeaderPtrs[NumImages] = iheader;
+    NumImages++;
+
+    return iheader;
 }
-
 
 /*
 
@@ -1325,305 +1177,283 @@ void ReturnTextureMemory(TEXTURE *txptr)
 }
 #endif
 
-static void DeallocateImageHeader(IMAGEHEADER * ihptr)
+static void DeallocateImageHeader(IMAGEHEADER *ihptr)
 {
-	if (ihptr->hBackup)
-	{
-		if (ihptr->DDSurface)
-		{
-			GLOBALASSERT(!ihptr->D3DTexture);
-			ATRemoveSurface(ihptr->DDSurface);
-		}
-		else if (ihptr->D3DTexture)
-		{
-			GLOBALASSERT(!ihptr->DDSurface);
-			ATRemoveTexture(ihptr->D3DTexture);
-		}
-		
-		AwDestroyBackupTexture(ihptr->hBackup);
-		ihptr->hBackup = 0;
-	}
-	
-	if (ihptr->ImagePtr) 
-	{
-		DeallocateMem(ihptr->ImagePtr);
-		ihptr->ImagePtr = 0;
-	}
+    if (ihptr->hBackup) {
+        if (ihptr->DDSurface) {
+            GLOBALASSERT(!ihptr->D3DTexture);
+            ATRemoveSurface(ihptr->DDSurface);
+        } else if (ihptr->D3DTexture) {
+            GLOBALASSERT(!ihptr->DDSurface);
+            ATRemoveTexture(ihptr->D3DTexture);
+        }
 
-	if (ihptr->DDSurface)
-	{
-		ReleaseDDSurface(ihptr->DDSurface);
-		ihptr->DDSurface = (void*) 0;
-	}
+        AwDestroyBackupTexture(ihptr->hBackup);
+        ihptr->hBackup = 0;
+    }
 
-	if (ihptr->D3DTexture)
-	{
-		ReleaseD3DTexture(ihptr->D3DTexture);
-		ihptr->D3DTexture = (void*) 0;
-		ihptr->D3DHandle = /* (void*) */ 0;
-	}
+    if (ihptr->ImagePtr) {
+        DeallocateMem(ihptr->ImagePtr);
+        ihptr->ImagePtr = 0;
+    }
+
+    if (ihptr->DDSurface) {
+        ReleaseDDSurface(ihptr->DDSurface);
+        ihptr->DDSurface = (void *) 0;
+    }
+
+    if (ihptr->D3DTexture) {
+        ReleaseD3DTexture(ihptr->D3DTexture);
+        ihptr->D3DTexture = (void *) 0;
+        ihptr->D3DHandle = /* (void*) */ 0;
+    }
 }
 
-static void MinimizeImageHeader(IMAGEHEADER * ihptr)
+static void MinimizeImageHeader(IMAGEHEADER *ihptr)
 {
-	if (ihptr->DDSurface)
-	{
-		ReleaseDDSurface(ihptr->DDSurface);
-		ihptr->DDSurface = (void*) 0;
-	}
+    if (ihptr->DDSurface) {
+        ReleaseDDSurface(ihptr->DDSurface);
+        ihptr->DDSurface = (void *) 0;
+    }
 
-	if (ihptr->D3DTexture)
-	{
-		ReleaseD3DTexture(ihptr->D3DTexture);
-		ihptr->D3DTexture = (void*) 0;
-		ihptr->D3DHandle = /* (void*) */ 0;
-	}
+    if (ihptr->D3DTexture) {
+        ReleaseD3DTexture(ihptr->D3DTexture);
+        ihptr->D3DTexture = (void *) 0;
+        ihptr->D3DHandle = /* (void*) */ 0;
+    }
 }
 
-static void RestoreImageHeader(IMAGEHEADER * ihptr)
+static void RestoreImageHeader(IMAGEHEADER *ihptr)
 {
-	if (ScanDrawDirectDraw != ScanDrawMode)
-		ReloadImageIntoD3DImmediateSurface(ihptr);
+    if (ScanDrawDirectDraw != ScanDrawMode)
+        ReloadImageIntoD3DImmediateSurface(ihptr);
 }
 
 #ifdef MaxImageGroups
 
 void SetCurrentImageGroup(unsigned int group)
 {
-	GLOBALASSERT(group < MaxImageGroups);
-	CurrentImageGroup = group;
-	NumImages = group*MaxImages + NumImagesArray[group];
+    GLOBALASSERT(group < MaxImageGroups);
+    CurrentImageGroup = group;
+    NumImages = group * MaxImages + NumImagesArray[group];
 }
 
 int DeallocateCurrentImages(void)
 {
-	int i;
-	IMAGEHEADER *ihptr;
+    int i;
+    IMAGEHEADER *ihptr;
 
-	if (NumImagesArray[CurrentImageGroup])
-	{
-		ihptr = &ImageHeaderArray[CurrentImageGroup*MaxImages];
-		for (i = 0; i < NumImagesArray[CurrentImageGroup]; ++i)
-		{
-			if (CanDeleteImage(CurrentImageGroup,i))
-				DeallocateImageHeader(ihptr);
-			++ihptr;
-		}		
-		NumImagesArray[CurrentImageGroup] = 0;
-		NumImages = CurrentImageGroup * MaxImages;
-		NextFreeImageHeaderPtr[CurrentImageGroup] = &ImageHeaderArray[CurrentImageGroup*MaxImages];
-		ImageGroupFreed(CurrentImageGroup);
-	}
+    if (NumImagesArray[CurrentImageGroup]) {
+        ihptr = &ImageHeaderArray[CurrentImageGroup * MaxImages];
+        for (i = 0; i < NumImagesArray[CurrentImageGroup]; ++i) {
+            if (CanDeleteImage(CurrentImageGroup, i))
+                DeallocateImageHeader(ihptr);
+            ++ihptr;
+        }
+        NumImagesArray[CurrentImageGroup] = 0;
+        NumImages = CurrentImageGroup * MaxImages;
+        NextFreeImageHeaderPtr[CurrentImageGroup] = &ImageHeaderArray[CurrentImageGroup * MaxImages];
+        ImageGroupFreed(CurrentImageGroup);
+    }
 
-	return Yes; /* ok for the moment */
+    return Yes; /* ok for the moment */
 }
 
 void NowDeleteImage(int img_group, int img_num_offset)
 {
-	DeallocateImageHeader(&ImageHeaderArray[img_group*MaxImages+img_num_offset]);
+    DeallocateImageHeader(&ImageHeaderArray[img_group * MaxImages + img_num_offset]);
 }
 
 int DeallocateAllImages(void)
 {
-	int i, j;
-	IMAGEHEADER *ihptr;
+    int i, j;
+    IMAGEHEADER *ihptr;
 
-	for (j=0; j<MaxImageGroups; ++j)
-	{
-		if (NumImagesArray[j])
-		{
-			ihptr = &ImageHeaderArray[j*MaxImages];
-			for (i = 0; i<NumImagesArray[j]; ++i)
-			{
-				if (CanDeleteImage(j,i))
-					DeallocateImageHeader(ihptr);
-				++ihptr;
-			}		
-			NumImagesArray[j] = 0;
-		}
-		ImageGroupFreed(j);
-	}
-	NumImages = CurrentImageGroup * MaxImages;
-	NextFreeImageHeaderPtr[CurrentImageGroup] = &ImageHeaderArray[CurrentImageGroup*MaxImages];
+    for (j = 0; j < MaxImageGroups; ++j) {
+        if (NumImagesArray[j]) {
+            ihptr = &ImageHeaderArray[j * MaxImages];
+            for (i = 0; i < NumImagesArray[j]; ++i) {
+                if (CanDeleteImage(j, i))
+                    DeallocateImageHeader(ihptr);
+                ++ihptr;
+            }
+            NumImagesArray[j] = 0;
+        }
+        ImageGroupFreed(j);
+    }
+    NumImages = CurrentImageGroup * MaxImages;
+    NextFreeImageHeaderPtr[CurrentImageGroup] = &ImageHeaderArray[CurrentImageGroup * MaxImages];
 
-	return Yes; /* ok for the moment */
+    return Yes; /* ok for the moment */
 }
 
-static void MinimizeImageCallback(int i, void * gP)
+static void MinimizeImageCallback(int i, void *gP)
 {
-	int g = *(int *)gP;
-	MinimizeImageHeader(ImageHeaderPtrs[g*MaxImages+i]);
+    int g = *(int *) gP;
+    MinimizeImageHeader(ImageHeaderPtrs[g * MaxImages + i]);
 }
 
 int MinimizeAllImages(void)
 {
-	int i, j;
-	IMAGEHEADER *ihptr;
+    int i, j;
+    IMAGEHEADER *ihptr;
 
-	for (j=0; j<MaxImageGroups; ++j)
-	{
-		if (NumImagesArray[j])
-		{
-			ihptr = &ImageHeaderArray[j*MaxImages];
-			for (i = 0; i<NumImagesArray[j]; ++i)
-			{
-				MinimizeImageHeader(ihptr);
-				++ihptr;
-			}		
-		}
-		EnumLeftoverImages(j,NumImagesArray[j],MinimizeImageCallback,&j);
-	}
+    for (j = 0; j < MaxImageGroups; ++j) {
+        if (NumImagesArray[j]) {
+            ihptr = &ImageHeaderArray[j * MaxImages];
+            for (i = 0; i < NumImagesArray[j]; ++i) {
+                MinimizeImageHeader(ihptr);
+                ++ihptr;
+            }
+        }
+        EnumLeftoverImages(j, NumImagesArray[j], MinimizeImageCallback, &j);
+    }
 
-	return Yes; /* ok for the moment */
+    return Yes; /* ok for the moment */
 }
 
-static void RestoreImageCallback(int i, void * gP)
+static void RestoreImageCallback(int i, void *gP)
 {
-	int g = *(int *)gP;
-	RestoreImageHeader(ImageHeaderPtrs[g*MaxImages+i]);
+    int g = *(int *) gP;
+    RestoreImageHeader(ImageHeaderPtrs[g * MaxImages + i]);
 }
 
 int RestoreAllImages(void)
 {
-	int i, j;
-	IMAGEHEADER *ihptr;
+    int i, j;
+    IMAGEHEADER *ihptr;
 
-	for (j=0; j<MaxImageGroups; ++j)
-	{
-		if (NumImagesArray[j])
-		{
-			ihptr = &ImageHeaderArray[j*MaxImages];
-			for (i = 0; i<NumImagesArray[j]; ++i)
-			{
-				RestoreImageHeader(ihptr);
-				++ihptr;
-			}		
-		}
-		EnumLeftoverImages(j,NumImagesArray[j],RestoreImageCallback,&j);
-	}
+    for (j = 0; j < MaxImageGroups; ++j) {
+        if (NumImagesArray[j]) {
+            ihptr = &ImageHeaderArray[j * MaxImages];
+            for (i = 0; i < NumImagesArray[j]; ++i) {
+                RestoreImageHeader(ihptr);
+                ++ihptr;
+            }
+        }
+        EnumLeftoverImages(j, NumImagesArray[j], RestoreImageCallback, &j);
+    }
 
-	return Yes; /* ok for the moment */
+    return Yes; /* ok for the moment */
 }
 
 #if debug
 
 struct ImageGroupDebugInfo
 {
-	int num_texels;
-	int num_images;
-	int num_shared;
-	int num_leftover;
+    int num_texels;
+    int num_images;
+    int num_shared;
+    int num_leftover;
 };
 
 static struct ImageGroupDebugInfo db_gp_info[MaxImageGroups];
 
-static void DbShareImgCallback(int imgnum, void * user)
+static void DbShareImgCallback(int imgnum, void *user)
 {
-	int g = *(int *)user;
-	
-	++db_gp_info[g].num_shared;
+    int g = *(int *) user;
+
+    ++db_gp_info[g].num_shared;
 }
 
-static void DbLeftoverImgCallback(int i, void * user)
+static void DbLeftoverImgCallback(int i, void *user)
 {
-	int g = *(int *)user;
-	
-	++db_gp_info[g].num_leftover;
+    int g = *(int *) user;
 
-	db_gp_info[g].num_texels += ImageHeaderPtrs[g*MaxImages+i]->ImageWidth * ImageHeaderPtrs[g*MaxImages+i]->ImageHeight;
+    ++db_gp_info[g].num_leftover;
+
+    db_gp_info[g].num_texels += ImageHeaderPtrs[g * MaxImages + i]->ImageWidth
+                                * ImageHeaderPtrs[g * MaxImages + i]->ImageHeight;
 }
 
 void ImageGroupsDebugPrintInit(void)
 {
-	int g;
-	for (g=0; g<MaxImageGroups; g++)
-	{
-		int i;
-		
-		db_gp_info[g].num_texels = 0;
-		db_gp_info[g].num_images = NumImagesArray[g];
-		db_gp_info[g].num_shared = 0;
-		db_gp_info[g].num_leftover = 0;
+    int g;
+    for (g = 0; g < MaxImageGroups; g++) {
+        int i;
 
-		EnumSharedImages(g,NumImagesArray[g],DbShareImgCallback,&g);
-		EnumLeftoverImages(g,NumImagesArray[g],DbLeftoverImgCallback,&g);
+        db_gp_info[g].num_texels = 0;
+        db_gp_info[g].num_images = NumImagesArray[g];
+        db_gp_info[g].num_shared = 0;
+        db_gp_info[g].num_leftover = 0;
 
-		for (i=0; i<NumImagesArray[g]; ++i)
-		{
-			db_gp_info[g].num_texels += ImageHeaderPtrs[g*MaxImages+i]->ImageWidth * ImageHeaderPtrs[g*MaxImages+i]->ImageHeight;
-		}
-	}
+        EnumSharedImages(g, NumImagesArray[g], DbShareImgCallback, &g);
+        EnumLeftoverImages(g, NumImagesArray[g], DbLeftoverImgCallback, &g);
+
+        for (i = 0; i < NumImagesArray[g]; ++i) {
+            db_gp_info[g].num_texels += ImageHeaderPtrs[g * MaxImages + i]->ImageWidth
+                                        * ImageHeaderPtrs[g * MaxImages + i]->ImageHeight;
+        }
+    }
 }
 
 void ImageGroupsDebugPrint(void)
 {
-	int g;
-	textprint("IMAGE GROUP DEBUG INFO\nGP  N_IMG  N_SHR  N_LFT  N_TEXELS\n");
-	for (g=0; g<MaxImageGroups; ++g)
-	{
-		textprint("%2d  %5d  %5d  %5d  %8d\n",g,db_gp_info[g].num_images,db_gp_info[g].num_shared,db_gp_info[g].num_leftover,db_gp_info[g].num_texels);
-	}
+    int g;
+    textprint("IMAGE GROUP DEBUG INFO\nGP  N_IMG  N_SHR  N_LFT  N_TEXELS\n");
+    for (g = 0; g < MaxImageGroups; ++g) {
+        textprint(
+            "%2d  %5d  %5d  %5d  %8d\n",
+            g,
+            db_gp_info[g].num_images,
+            db_gp_info[g].num_shared,
+            db_gp_info[g].num_leftover,
+            db_gp_info[g].num_texels);
+    }
 }
 
 #endif
-	
+
 #else
 
 int DeallocateAllImages(void)
 {
-	int i;
-	IMAGEHEADER *ihptr;
+    int i;
+    IMAGEHEADER *ihptr;
 
-	if (NumImages)
-	{
-		ihptr = ImageHeaderArray;
-		for (i = NumImages; i!=0; i--)
-		{
-			DeallocateImageHeader(ihptr++);
-		}		
-		NumImages = 0;
-		NextFreeImageHeaderPtr = ImageHeaderArray;
-	}
+    if (NumImages) {
+        ihptr = ImageHeaderArray;
+        for (i = NumImages; i != 0; i--) {
+            DeallocateImageHeader(ihptr++);
+        }
+        NumImages = 0;
+        NextFreeImageHeaderPtr = ImageHeaderArray;
+    }
 
-	return Yes; /* ok for the moment */
+    return Yes; /* ok for the moment */
 }
 
 int MinimizeAllImages(void)
 {
-	int i;
-	IMAGEHEADER *ihptr;
+    int i;
+    IMAGEHEADER *ihptr;
 
-	if (NumImages)
-	{
-		ihptr = ImageHeaderArray;
-		for (i = NumImages; i!=0; i--)
-		{
-			MinimizeImageHeader(ihptr++);
-		}		
-	}
+    if (NumImages) {
+        ihptr = ImageHeaderArray;
+        for (i = NumImages; i != 0; i--) {
+            MinimizeImageHeader(ihptr++);
+        }
+    }
 
-	return Yes; /* ok for the moment */
+    return Yes; /* ok for the moment */
 }
 
 int RestoreAllImages(void)
 {
-	int i;
-	IMAGEHEADER *ihptr;
+    int i;
+    IMAGEHEADER *ihptr;
 
-	if (NumImages)
-	{
-		ihptr = ImageHeaderArray;
-		for (i = NumImages; i!=0; i--)
-		{
-			RestoreImageHeader(ihptr++);
-		}		
-	}
+    if (NumImages) {
+        ihptr = ImageHeaderArray;
+        for (i = NumImages; i != 0; i--) {
+            RestoreImageHeader(ihptr++);
+        }
+    }
 
-	return Yes; /* ok for the moment */
+    return Yes; /* ok for the moment */
 }
 
 #endif
-
 
 #ifdef RIFF_SYSTEM
 
@@ -1646,39 +1476,36 @@ to see if the image is already loaded.
 Jake.
 */
 
-int GetExistingImageNum(char const * fname)
+int GetExistingImageNum(char const *fname)
 {
-	int i;
-	IMAGEHEADER * iharrayptr;
-	
-	#ifdef MaxImageGroups
+    int i;
+    IMAGEHEADER *iharrayptr;
 
-	int g;
+#ifdef MaxImageGroups
 
-	for (g=0; g<MaxImageGroups; ++g)
-	{
-		for (i=0, iharrayptr = &ImageHeaderArray[g*MaxImages]; i<NumImagesArray[g]; ++i, ++iharrayptr)
-		{
-			if (!stricmp(iharrayptr->ImageName,fname))
-			{
-				if (g!=CurrentImageGroup)
-					MarkImageInUseByGroup(g,i,CurrentImageGroup);
-				return i+g*MaxImages;
-			}
-		}
-	}
+    int g;
 
-	#else
-	
-	for (i=0, iharrayptr = ImageHeaderArray; i<NumImages; ++i, ++iharrayptr)
-	{
-		if (!stricmp(iharrayptr->ImageName,fname)) return i;
-	}
+    for (g = 0; g < MaxImageGroups; ++g) {
+        for (i = 0, iharrayptr = &ImageHeaderArray[g * MaxImages]; i < NumImagesArray[g];
+             ++i, ++iharrayptr) {
+            if (!stricmp(iharrayptr->ImageName, fname)) {
+                if (g != CurrentImageGroup)
+                    MarkImageInUseByGroup(g, i, CurrentImageGroup);
+                return i + g * MaxImages;
+            }
+        }
+    }
 
-	#endif
+#else
 
-	return GEI_NOTLOADED;
-}
+    for (i = 0, iharrayptr = ImageHeaderArray; i < NumImages; ++i, ++iharrayptr) {
+        if (!stricmp(iharrayptr->ImageName, fname))
+            return i;
+    }
 
 #endif
 
+    return GEI_NOTLOADED;
+}
+
+#endif

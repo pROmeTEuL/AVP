@@ -9,11 +9,9 @@
 #define max(a, b) (((a) > (b)) ? (a) : (b))
 #endif
 
-
 #if SUPPORT_MMX
 #include "mmx_math.h"
 #endif
-
 
 #ifdef __cplusplus
 extern "C" {
@@ -31,12 +29,12 @@ extern "C" {
 	a Saturn they are unnecessary.
 */
 
-#define OUR_ABS(x)                (((x) < 0) ? -(x) : (x))
-#define OUR_SIGN(x)	             (((x) < 0) ? -1 : +1)
-#define OUR_INT_TO_FIXED(x)	 	 (int) ((x) * (65536))
-#define OUR_FIXED_TO_INT(x)		 (int) ((x) / (65536))
-#define OUR_MUL_INT(a, b)	       ((a) * (b))
-#define OUR_ISR(a, shift)		    ((a) >> (shift))
+#define OUR_ABS(x) (((x) < 0) ? -(x) : (x))
+#define OUR_SIGN(x) (((x) < 0) ? -1 : +1)
+#define OUR_INT_TO_FIXED(x) (int) ((x) * (65536))
+#define OUR_FIXED_TO_INT(x) (int) ((x) / (65536))
+#define OUR_MUL_INT(a, b) ((a) * (b))
+#define OUR_ISR(a, shift) ((a) >> (shift))
 
 /*
 
@@ -51,7 +49,6 @@ extern "C" {
 
 */
 
-
 /*
 	These functions have been checked for suitability for 
 	a Pentium and look as if they would pair up okay.
@@ -63,15 +60,14 @@ extern "C" {
 	platform.
 */
 
-
 #if defined(_MSC_VER) && 0 /* inline assember for the Microsoft compiler */
 
 /* ADD */
 
 static void ADD_LL(LONGLONGCH *a, LONGLONGCH *b, LONGLONGCH *c)
 {
-	_asm
-	{
+    _asm
+    {
 		mov esi,a
 		mov edi,b
 		mov ebx,c
@@ -81,30 +77,30 @@ static void ADD_LL(LONGLONGCH *a, LONGLONGCH *b, LONGLONGCH *c)
 		adc	edx,[edi+4]
 		mov	[ebx],eax
 		mov	[ebx+4],edx
-	}
+    }
 }
 
 /* ADD ++ */
 
 static void ADD_LL_PP(LONGLONGCH *c, LONGLONGCH *a)
 {
-	_asm
-	{
+    _asm
+    {
 		mov edi,c
 		mov esi,a
 		mov	eax,[esi]
 		mov	edx,[esi+4]
 		add	[edi],eax
 		adc	[edi+4],edx
-	}
+    }
 }
 
 /* SUB */
 
 static void SUB_LL(LONGLONGCH *a, LONGLONGCH *b, LONGLONGCH *c)
 {
-	_asm
-	{
+    _asm
+    {
 		mov esi,a
 		mov edi,b
 		mov ebx,c
@@ -114,22 +110,22 @@ static void SUB_LL(LONGLONGCH *a, LONGLONGCH *b, LONGLONGCH *c)
 		sbb	edx,[edi+4]
 		mov	[ebx],eax
 		mov	[ebx+4],edx
-	}
+    }
 }
 
 /* SUB -- */
 
 static void SUB_LL_MM(LONGLONGCH *c, LONGLONGCH *a)
 {
-	_asm
-	{
+    _asm
+    {
 		mov edi,c
 		mov esi,a
 		mov	eax,[esi]
 		mov	edx,[esi+4]
 		sub	[edi],eax
 		sbb	[edi+4],edx
-	}
+    }
 }
 
 /*
@@ -142,14 +138,14 @@ static void SUB_LL_MM(LONGLONGCH *c, LONGLONGCH *a)
 
 static void MUL_I_WIDE(int a, int b, LONGLONGCH *c)
 {
-	_asm
-	{
+    _asm
+    {
 		mov eax,a
 		mov ebx,c
 		imul b
 		mov	[ebx],eax
 		mov	[ebx+4],edx
-	}
+    }
 }
 
 /*
@@ -162,9 +158,9 @@ static void MUL_I_WIDE(int a, int b, LONGLONGCH *c)
 
 static int CMP_LL(LONGLONGCH *a, LONGLONGCH *b)
 {
-	int retval = 0;
-	_asm
-	{
+    int retval = 0;
+    _asm
+    {
 		mov ebx,a
 		mov ecx,b
 		mov	eax,[ebx]
@@ -181,45 +177,45 @@ static int CMP_LL(LONGLONGCH *a, LONGLONGCH *b)
 		jge	llgs
 		neg	retval
 		llgs:
-	}
-	return retval;
+    }
+    return retval;
 }
 
 /* EQUALS */
 
 static void EQUALS_LL(LONGLONGCH *a, LONGLONGCH *b)
 {
-	_asm
-	{
+    _asm
+    {
 		mov edi,a
 		mov esi,b
 		mov	eax,[esi]
 		mov	edx,[esi+4]
 		mov	[edi],eax
 		mov	[edi+4],edx
-	}
+    }
 }
 
 /* NEGATE */
 
 static void NEG_LL(LONGLONGCH *a)
 {
-	_asm
-	{
+    _asm
+        {
 		mov esi,a
 		not	dword ptr[esi]
 		not	dword ptr[esi+4]
 		add	dword ptr[esi],1
 		adc	dword ptr[esi+4],0
-	}
+        }
 }
 
 /* ASR */
 
 static void ASR_LL(LONGLONGCH *a, int shift)
 {
-	_asm
-	{
+    _asm
+    {
 		mov esi,a
 		mov eax,shift
 		and	eax,eax
@@ -230,22 +226,22 @@ static void ASR_LL(LONGLONGCH *a, int shift)
 		dec	eax
 		jne	asrlp
 		asrdn:
-	}
+    }
 }
 
 /* Convert int to LONGLONGCH */
 
 static void IntToLL(LONGLONGCH *a, int *b)
 {
-	_asm
-	{
+    _asm
+    {
 		mov esi,b
 		mov edi,a
 		mov	eax,[esi]
 		cdq
 		mov	[edi],eax
 		mov	[edi+4],edx
-	}
+    }
 }
 
 /*
@@ -276,15 +272,15 @@ static void IntToLL(LONGLONGCH *a, int *b)
 
 static int MUL_FIXED(int a, int b)
 {
-	int retval;
-	_asm
-	{
+    int retval;
+    _asm
+    {
 		mov eax,a
 		imul b
 		shrd eax,edx,16
 		mov retval,eax
-	}
-	return retval;
+    }
+    return retval;
 }
 
 /*
@@ -295,9 +291,9 @@ static int MUL_FIXED(int a, int b)
 
 static int DIV_FIXED(int a, int b)
 {
-	int retval;
-	_asm
-	{
+    int retval;
+    _asm
+    {
 		mov eax,a
 		cdq
 		rol eax,16
@@ -305,8 +301,8 @@ static int DIV_FIXED(int a, int b)
 		xor ax,ax
 		idiv b
 		mov retval,eax
-	}
-	return retval;
+    }
+    return retval;
 }
 
 /*
@@ -314,7 +310,6 @@ static int DIV_FIXED(int a, int b)
  Multiply and Divide Functions.
 
 */
-
 
 /*
 
@@ -334,16 +329,16 @@ static int DIV_FIXED(int a, int b)
 
 static int NarrowDivide(LONGLONGCH *a, int b)
 {
-	int retval;
-	_asm
-	{
+    int retval;
+    _asm
+    {
 		mov esi,a
 		mov	eax,[esi]
 		mov	edx,[esi+4]
 		idiv	b
 		mov retval,eax
-	}
-	return retval;
+    }
+    return retval;
 }
 
 /*
@@ -356,15 +351,15 @@ static int NarrowDivide(LONGLONGCH *a, int b)
 
 static int WideMulNarrowDiv(int a, int b, int c)
 {
-	int retval;
-	_asm
-	{
+    int retval;
+    _asm
+    {
 		mov eax,a
 		imul b
 		idiv c
 		mov retval,eax
-	}
-	return retval;
+    }
+    return retval;
 }
 
 /*
@@ -415,8 +410,8 @@ typedef struct matrixch {
 
 static void RotateVector_ASM(VECTORCH *v, MATRIXCH *m)
 {
-	_asm
-	{
+    _asm
+    {
 		mov esi,v
 		mov edi,m
 
@@ -462,7 +457,7 @@ static void RotateVector_ASM(VECTORCH *v, MATRIXCH *m)
 		mov	[esi + 0],ecx
 		mov	[esi + 4],ebx
 		mov	[esi + 8],ebp
-	}
+    }
 }
 
 /*
@@ -473,8 +468,8 @@ static void RotateVector_ASM(VECTORCH *v, MATRIXCH *m)
 
 static void RotateAndCopyVector_ASM(VECTORCH *v1, VECTORCH *v2, MATRIXCH *m)
 {
-	_asm
-	{
+    _asm
+    {
 		mov esi,v1
 		mov edi,m
 
@@ -521,7 +516,7 @@ static void RotateAndCopyVector_ASM(VECTORCH *v1, VECTORCH *v2, MATRIXCH *m)
 		mov	[edx + 0],ecx
 		mov	[edx + 4],ebx
 		mov	[edx + 8],ebp
-	}
+    }
 }
 
 /*
@@ -537,17 +532,16 @@ static long temp2;
 
 static int SqRoot32(int A)
 {
-	_asm
-	{
+    _asm
+    {
 		finit
 		fild A
 		fsqrt
 		fistp temp2
 		fwait
-	}
-	return (int)temp2;
+    }
+    return (int) temp2;
 }
-
 
 /*
 
@@ -561,11 +555,11 @@ static int itmp;
 
 static void FloatToInt(void)
 {
-	_asm
-	{
+    _asm
+    {
 		fld fptmp
 		fistp itmp
-	}
+    }
 }
 
 /*
@@ -574,10 +568,12 @@ static void FloatToInt(void)
 
 */
 
-#define f2i(a, b) { \
-fptmp = (b); \
-FloatToInt(); \
-a = itmp;}
+#define f2i(a, b) \
+    { \
+        fptmp = (b); \
+        FloatToInt(); \
+        a = itmp; \
+    }
 
 #else
 
@@ -612,10 +608,12 @@ void FloatToInt();
 extern float fti_fptmp;
 extern int fti_itmp;
 
-#define f2i(a, b) { \
-fti_fptmp = (b); \
-FloatToInt(); \
-a = fti_itmp;}
+#define f2i(a, b) \
+    { \
+        fti_fptmp = (b); \
+        FloatToInt(); \
+        a = fti_itmp; \
+    }
 
 #endif
 
@@ -627,23 +625,24 @@ void RotVect(VECTORCH *v, MATRIXCH *m);
 
 #if SUPPORT_MMX
 
-#define RotateVector(v,m) (use_mmx_math ? MMX_VectorTransform((v),(m)) : _RotateVector((v),(m)))
-#define RotateAndCopyVector(v_in,v_out,m) (use_mmx_math ? MMX_VectorTransformed((v_out),(v_in),(m)) : _RotateAndCopyVector((v_in),(v_out),(m)))
-#define Dot(v1,v2) (use_mmx_math ? MMXInline_VectorDot((v1),(v2)) : _Dot((v1),(v2)))
-#define DotProduct(v1,v2) (use_mmx_math ? MMX_VectorDot((v1),(v2)) : _DotProduct((v1),(v2)))
+#define RotateVector(v, m) (use_mmx_math ? MMX_VectorTransform((v), (m)) : _RotateVector((v), (m)))
+#define RotateAndCopyVector(v_in, v_out, m) \
+    (use_mmx_math ? MMX_VectorTransformed((v_out), (v_in), (m)) \
+                  : _RotateAndCopyVector((v_in), (v_out), (m)))
+#define Dot(v1, v2) (use_mmx_math ? MMXInline_VectorDot((v1), (v2)) : _Dot((v1), (v2)))
+#define DotProduct(v1, v2) (use_mmx_math ? MMX_VectorDot((v1), (v2)) : _DotProduct((v1), (v2)))
 
 #else /* ! SUPPORT_MMX */
 
-#define RotateVector(v,m) (_RotateVector((v),(m)))
-#define RotateAndCopyVector(v_in,v_out,m) (_RotateAndCopyVector((v_in),(v_out),(m)))
-#define Dot(v1,v2) (_Dot((v1),(v2)))
-#define DotProduct(v1,v2) (_DotProduct((v1),(v2)))
+#define RotateVector(v, m) (_RotateVector((v), (m)))
+#define RotateAndCopyVector(v_in, v_out, m) (_RotateAndCopyVector((v_in), (v_out), (m)))
+#define Dot(v1, v2) (_Dot((v1), (v2)))
+#define DotProduct(v1, v2) (_DotProduct((v1), (v2)))
 
 #endif /* ? SUPPORT_MMX */
 
 #ifdef __cplusplus
 }
 #endif
-
 
 #endif

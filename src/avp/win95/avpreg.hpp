@@ -2,14 +2,11 @@
 #define _avpreg_h 1
 
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif
 
-
-extern char* AvpCDPath;
+extern char *AvpCDPath;
 void GetPathFromRegistry();
-
 
 #ifdef __cplusplus
 };

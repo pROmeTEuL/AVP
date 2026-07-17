@@ -33,15 +33,15 @@
 
 /* If you do not set the DB_LEVEL, it is set for you: to 3 */
 #ifndef DB_LEVEL
-	#define DB_LEVEL 3
+#define DB_LEVEL 3
 #endif
 
 /* N.B. If NDEBUG is set, it over-rides DB_LEVEL and switches off all
  * debugging.
  */
 #ifdef NDEBUG
-	#undef DB_LEVEL
-	#define DB_LEVEL	0
+#undef DB_LEVEL
+#define DB_LEVEL 0
 #endif
 
 /* Some db macros can be made optional dependent on the setting of the
@@ -82,203 +82,220 @@ extern "C" {
 /* C O N S T A N T S **************************************************	*/
 
 /* Possible values for the global variable, db_display_type. */
-#define DB_DOS			0
-#define DB_WINDOWS		1
-#define DB_DIRECTDRAW	2
+#define DB_DOS 0
+#define DB_WINDOWS 1
+#define DB_DIRECTDRAW 2
 
 /* Possible values for the bltOrFlip field of db_dd_mode_tag structure. */
-#define DB_FLIP	0
-#define DB_BLT	1
+#define DB_FLIP 0
+#define DB_BLT 1
 
 /* M A C R O S ********************************************************	*/
 
 #if (!defined(DB_NOASSUME)) && defined(_MSC_VER) && (_MSC_VER >= 1200)
-	#define _db_assume(x) __assume(x)
+#define _db_assume(x) __assume(x)
 #else
-	#define _db_assume(x) ((void)0)
+#define _db_assume(x) ((void) 0)
 #endif
 
 #if DB_LEVEL >= 1
-	/* Fn like macro. */
-	#define db_set_mode(md, miP) db_set_mode_ex(md, miP, NULL)
-	#define db_set_log_file(strP) db_set_log_file_ex(strP)
+/* Fn like macro. */
+#define db_set_mode(md, miP) db_set_mode_ex(md, miP, NULL)
+#define db_set_log_file(strP) db_set_log_file_ex(strP)
 #else
-	#define db_set_mode(md, miP) ((void) 0)
-	#define db_set_log_file(strP) ((void) 0)
+#define db_set_mode(md, miP) ((void) 0)
+#define db_set_log_file(strP) ((void) 0)
 #endif
 
 /* Final use macros after testing of DB_LEVEL / db_option. */
-#define db_assert_final(expr) \
-	((expr) ? ((void) 0) : db_assert_fail(#expr, __FILE__, __LINE__))
-	
+#define db_assert_final(expr) ((expr) ? ((void) 0) : db_assert_fail(#expr, __FILE__, __LINE__))
+
 /* Macros whose compilation is conditional on the value of DB_LEVEL. */
 #if DB_LEVEL >= 1
-	#define db_assert1(expr)            db_assert_final(expr)
-	#define db_onlyassert1(expr)        db_assert_final(expr)
-	#define db_verify1(expr)            db_assert_final(expr)
-	#define db_print1(x, y, strP)       db_print_fired(x, y, strP)
-	#define db_msg1(strP)               db_msg_fired(strP)
-	#define db_log1(strP)               db_log_fired(strP)
-	#define db_code1(code)              code
-	#define db_printf1(params)          db_printf_fired params
-	#define db_msgf1(params)            db_msgf_fired params
-	#define db_logf1(params)            db_logf_fired params
+#define db_assert1(expr) db_assert_final(expr)
+#define db_onlyassert1(expr) db_assert_final(expr)
+#define db_verify1(expr) db_assert_final(expr)
+#define db_print1(x, y, strP) db_print_fired(x, y, strP)
+#define db_msg1(strP) db_msg_fired(strP)
+#define db_log1(strP) db_log_fired(strP)
+#define db_code1(code) code
+#define db_printf1(params) db_printf_fired params
+#define db_msgf1(params) db_msgf_fired params
+#define db_logf1(params) db_logf_fired params
 #else
-	#define db_assert1(expr)            _db_assume(expr)
-	#define db_onlyassert1(__ignore)    ((void) 0)
-	#define db_verify1(expr)            (expr)
-	#define db_print1(x, y, __ignore)   ((void) 0)
-	#define db_msg1(__ignore)           _db_assume(0)
-	#define db_log1(__ignore)           ((void) 0)
-	#define db_code1(__ignore)		    
-	#define db_printf1(x, y, __ignore)  ((void) 0)
-	#define db_msgf1(__ignore)          _db_assume(0)
-	#define db_logf1(__ignore)          ((void) 0)
+#define db_assert1(expr) _db_assume(expr)
+#define db_onlyassert1(__ignore) ((void) 0)
+#define db_verify1(expr) (expr)
+#define db_print1(x, y, __ignore) ((void) 0)
+#define db_msg1(__ignore) _db_assume(0)
+#define db_log1(__ignore) ((void) 0)
+#define db_code1(__ignore)
+#define db_printf1(x, y, __ignore) ((void) 0)
+#define db_msgf1(__ignore) _db_assume(0)
+#define db_logf1(__ignore) ((void) 0)
 #endif
 #if DB_LEVEL >= 2
-	#define db_assert2(expr)            db_assert_final(expr)
-	#define db_onlyassert2(expr)        db_assert_final(expr)
-	#define db_verify2(expr)            db_assert_final(expr)
-	#define db_print2(x, y, strP)       db_print_fired(x, y, strP)
-	#define db_msg2(strP)               db_msg_fired(strP)
-	#define db_log2(strP)               db_log_fired(strP)
-	#define db_code2(code)              code
-	#define db_printf2(params)          db_printf_fired params
-	#define db_msgf2(params)            db_msgf_fired params
-	#define db_logf2(params)            db_logf_fired params
+#define db_assert2(expr) db_assert_final(expr)
+#define db_onlyassert2(expr) db_assert_final(expr)
+#define db_verify2(expr) db_assert_final(expr)
+#define db_print2(x, y, strP) db_print_fired(x, y, strP)
+#define db_msg2(strP) db_msg_fired(strP)
+#define db_log2(strP) db_log_fired(strP)
+#define db_code2(code) code
+#define db_printf2(params) db_printf_fired params
+#define db_msgf2(params) db_msgf_fired params
+#define db_logf2(params) db_logf_fired params
 #else
-	#define db_assert2(expr)            _db_assume(expr)
-	#define db_onlyassert2(__ignore)    ((void) 0)
-	#define db_verify2(expr)            (expr)
-	#define db_print2(x, y, __ignore)   ((void) 0)
-	#define db_msg2(__ignore)           _db_assume(0)
-	#define db_log2(__ignore)           ((void) 0)
-	#define db_code2(__ignore)		    
-	#define db_printf2(x, y, __ignore)  ((void) 0)
-	#define db_msgf2(__ignore)          _db_assume(0)
-	#define db_logf2(__ignore)          ((void) 0)
+#define db_assert2(expr) _db_assume(expr)
+#define db_onlyassert2(__ignore) ((void) 0)
+#define db_verify2(expr) (expr)
+#define db_print2(x, y, __ignore) ((void) 0)
+#define db_msg2(__ignore) _db_assume(0)
+#define db_log2(__ignore) ((void) 0)
+#define db_code2(__ignore)
+#define db_printf2(x, y, __ignore) ((void) 0)
+#define db_msgf2(__ignore) _db_assume(0)
+#define db_logf2(__ignore) ((void) 0)
 #endif
 #if DB_LEVEL >= 3
-	#define db_assert3(expr)            db_assert_final(expr)
-	#define db_onlyassert3(expr)        db_assert_final(expr)
-	#define db_verify3(expr)            db_assert_final(expr)
-	#define db_print3(x, y, strP)       db_print_fired(x, y, strP)
-	#define db_msg3(strP)               db_msg_fired(strP)
-	#define db_log3(strP)               db_log_fired(strP)
-	#define db_code3(code)              code
-	#define db_printf3(params)          db_printf_fired params
-	#define db_msgf3(params)            db_msgf_fired params
-	#define db_logf3(params)            db_logf_fired params
+#define db_assert3(expr) db_assert_final(expr)
+#define db_onlyassert3(expr) db_assert_final(expr)
+#define db_verify3(expr) db_assert_final(expr)
+#define db_print3(x, y, strP) db_print_fired(x, y, strP)
+#define db_msg3(strP) db_msg_fired(strP)
+#define db_log3(strP) db_log_fired(strP)
+#define db_code3(code) code
+#define db_printf3(params) db_printf_fired params
+#define db_msgf3(params) db_msgf_fired params
+#define db_logf3(params) db_logf_fired params
 #else
-	#define db_assert3(expr)            _db_assume(expr)
-	#define db_onlyassert3(__ignore)    ((void) 0)
-	#define db_verify3(expr)            (expr)
-	#define db_print3(x, y, __ignore)   ((void) 0)
-	#define db_msg3(__ignore)           _db_assume(0)
-	#define db_log3(__ignore)           ((void) 0)
-	#define db_code3(__ignore)		    
-	#define db_printf3(x, y, __ignore)  ((void) 0)
-	#define db_msgf3(__ignore)          _db_assume(0)
-	#define db_logf3(__ignore)          ((void) 0)
+#define db_assert3(expr) _db_assume(expr)
+#define db_onlyassert3(__ignore) ((void) 0)
+#define db_verify3(expr) (expr)
+#define db_print3(x, y, __ignore) ((void) 0)
+#define db_msg3(__ignore) _db_assume(0)
+#define db_log3(__ignore) ((void) 0)
+#define db_code3(__ignore)
+#define db_printf3(x, y, __ignore) ((void) 0)
+#define db_msgf3(__ignore) _db_assume(0)
+#define db_logf3(__ignore) ((void) 0)
 #endif
 #if DB_LEVEL >= 4
-	#define db_assert4(expr)            db_assert_final(expr)
-	#define db_onlyassert4(expr)        db_assert_final(expr)
-	#define db_verify4(expr)            db_assert_final(expr)
-	#define db_print4(x, y, strP)       db_print_fired(x, y, strP)
-	#define db_msg4(strP)               db_msg_fired(strP)
-	#define db_log4(strP)               db_log_fired(strP)
-	#define db_code4(code)              code
-	#define db_printf4(params)          db_printf_fired params
-	#define db_msgf4(params)            db_msgf_fired params
-	#define db_logf4(params)            db_logf_fired params
+#define db_assert4(expr) db_assert_final(expr)
+#define db_onlyassert4(expr) db_assert_final(expr)
+#define db_verify4(expr) db_assert_final(expr)
+#define db_print4(x, y, strP) db_print_fired(x, y, strP)
+#define db_msg4(strP) db_msg_fired(strP)
+#define db_log4(strP) db_log_fired(strP)
+#define db_code4(code) code
+#define db_printf4(params) db_printf_fired params
+#define db_msgf4(params) db_msgf_fired params
+#define db_logf4(params) db_logf_fired params
 #else
-	#define db_assert4(expr)            _db_assume(expr)
-	#define db_onlyassert4(__ignore)    ((void) 0)
-	#define db_verify4(expr)            (expr)
-	#define db_print4(x, y, __ignore)   ((void) 0)
-	#define db_msg4(__ignore)           _db_assume(0)
-	#define db_log4(__ignore)           ((void) 0)
-	#define db_code4(__ignore)		    
-	#define db_printf4(x, y, __ignore)  ((void) 0)
-	#define db_msgf4(__ignore)          _db_assume(0)
-	#define db_logf4(__ignore)          ((void) 0)
+#define db_assert4(expr) _db_assume(expr)
+#define db_onlyassert4(__ignore) ((void) 0)
+#define db_verify4(expr) (expr)
+#define db_print4(x, y, __ignore) ((void) 0)
+#define db_msg4(__ignore) _db_assume(0)
+#define db_log4(__ignore) ((void) 0)
+#define db_code4(__ignore)
+#define db_printf4(x, y, __ignore) ((void) 0)
+#define db_msgf4(__ignore) _db_assume(0)
+#define db_logf4(__ignore) ((void) 0)
 #endif
 #if DB_LEVEL >= 5
-	#define db_assert5(expr)            db_assert_final(expr)
-	#define db_onlyassert5(expr)        db_assert_final(expr)
-	#define db_verify5(expr)            db_assert_final(expr)
-	#define db_print5(x, y, strP)       db_print_fired(x, y, strP)
-	#define db_msg5(strP)               db_msg_fired(strP)
-	#define db_log5(strP)               db_log_fired(strP)
-	#define db_code5(code)              code
-	#define db_printf5(params)          db_printf_fired params
-	#define db_msgf5(params)            db_msgf_fired params
-	#define db_logf5(params)            db_logf_fired params
+#define db_assert5(expr) db_assert_final(expr)
+#define db_onlyassert5(expr) db_assert_final(expr)
+#define db_verify5(expr) db_assert_final(expr)
+#define db_print5(x, y, strP) db_print_fired(x, y, strP)
+#define db_msg5(strP) db_msg_fired(strP)
+#define db_log5(strP) db_log_fired(strP)
+#define db_code5(code) code
+#define db_printf5(params) db_printf_fired params
+#define db_msgf5(params) db_msgf_fired params
+#define db_logf5(params) db_logf_fired params
 #else
-	#define db_assert5(expr)            _db_assume(expr)
-	#define db_onlyassert5(__ignore)    ((void) 0)
-	#define db_verify5(expr)            (expr)
-	#define db_print5(x, y, __ignore)   ((void) 0)
-	#define db_msg5(__ignore)           _db_assume(0)
-	#define db_log5(__ignore)           ((void) 0)
-	#define db_code5(__ignore)		    
-	#define db_printf5(x, y, __ignore)  ((void) 0)
-	#define db_msgf5(__ignore)          _db_assume(0)
-	#define db_logf5(__ignore)          ((void) 0)
+#define db_assert5(expr) _db_assume(expr)
+#define db_onlyassert5(__ignore) ((void) 0)
+#define db_verify5(expr) (expr)
+#define db_print5(x, y, __ignore) ((void) 0)
+#define db_msg5(__ignore) _db_assume(0)
+#define db_log5(__ignore) ((void) 0)
+#define db_code5(__ignore)
+#define db_printf5(x, y, __ignore) ((void) 0)
+#define db_msgf5(__ignore) _db_assume(0)
+#define db_logf5(__ignore) ((void) 0)
 #endif
 
 /* Macros which fire if db_option is non-zero (and NDEBUG is not
  * defined).
  */
 #ifndef NDEBUG
-	#define db_assert_opt(expr)         if(db_option) db_assert_final(expr)
-	#define db_onlyassert_opt(expr)     if(db_option) db_assert_final(expr)
-	#define db_verify_opt(expr)         ((db_option) ? db_assert_final(expr) : (expr))
-	#define db_print_opt(x, y, strP)    if(db_option) db_print_fired(x, y, strP)
-	#define db_msg_opt(strP)            if(db_option) db_msg_fired(strP)
-	#define db_log_opt(strP)            if(db_option) db_log_fired(strP)
-	#define db_code_opt(code)           if(db_option) code
-	#define db_printf_opt(params)       if(db_option) db_printf_fired params
-	#define db_msgf_opt(params)         if(db_option) db_msgf_fired params
-	#define db_logf_opt(params)         if(db_option) db_logf_fired params
+#define db_assert_opt(expr) \
+    if (db_option) \
+    db_assert_final(expr)
+#define db_onlyassert_opt(expr) \
+    if (db_option) \
+    db_assert_final(expr)
+#define db_verify_opt(expr) ((db_option) ? db_assert_final(expr) : (expr))
+#define db_print_opt(x, y, strP) \
+    if (db_option) \
+    db_print_fired(x, y, strP)
+#define db_msg_opt(strP) \
+    if (db_option) \
+    db_msg_fired(strP)
+#define db_log_opt(strP) \
+    if (db_option) \
+    db_log_fired(strP)
+#define db_code_opt(code) \
+    if (db_option) \
+    code
+#define db_printf_opt(params) \
+    if (db_option) \
+    db_printf_fired params
+#define db_msgf_opt(params) \
+    if (db_option) \
+    db_msgf_fired params
+#define db_logf_opt(params) \
+    if (db_option) \
+    db_logf_fired params
 #else
-	#define db_assert_opt(expr)         _db_assume(expr)
-	#define db_onlyassert_opt(__ignore) ((void) 0)
-	#define db_verify_opt(expr)         (expr)
-	#define db_print_opt(x,y,__ignore)  ((void) 0)
-	#define db_msg_opt(__ignore)        _db_assume(0)
-	#define db_log_opt(__ignore)        ((void) 0)
-	#define db_code_opt(code)           
-	#define db_printf_opt(params)       ((void) 0)
-	#define db_msgf_opt(params)         _db_assume(0)
-	#define db_logf_opt(params)         ((void) 0)			
+#define db_assert_opt(expr) _db_assume(expr)
+#define db_onlyassert_opt(__ignore) ((void) 0)
+#define db_verify_opt(expr) (expr)
+#define db_print_opt(x, y, __ignore) ((void) 0)
+#define db_msg_opt(__ignore) _db_assume(0)
+#define db_log_opt(__ignore) ((void) 0)
+#define db_code_opt(code)
+#define db_printf_opt(params) ((void) 0)
+#define db_msgf_opt(params) _db_assume(0)
+#define db_logf_opt(params) ((void) 0)
 #endif
 
 /* Macros for setting and getting db_option. */
 #ifndef NDEBUG
-	#define db_option_set(status)	db_option = (status)
-	#define db_option_on()			db_option = 1
-	#define db_option_off()			db_option = 0
-	#define db_option_get()			(db_option)
+#define db_option_set(status) db_option = (status)
+#define db_option_on() db_option = 1
+#define db_option_off() db_option = 0
+#define db_option_get() (db_option)
 #else
-	#define db_option_set(__ignore)		((void) 0)
-	#define db_option_on()				((void) 0)
-	#define db_option_off()				((void) 0)
-	#define db_option_get()				(0)
+#define db_option_set(__ignore) ((void) 0)
+#define db_option_on() ((void) 0)
+#define db_option_off() ((void) 0)
+#define db_option_get() (0)
 #endif
 
 /* T Y P E S ********************************************************** */
 
 struct db_dd_mode_tag
 {
-	void *directDrawP;
-	void *visibleSurfaceP;
-	void *drawSurfaceP;
-	int width, height, bitsPerPixel;
-	unsigned short foreCol, backCol;
-	int bltOrFlip;
-	int bltXOffset, bltYOffset;
+    void *directDrawP;
+    void *visibleSurfaceP;
+    void *drawSurfaceP;
+    int width, height, bitsPerPixel;
+    unsigned short foreCol, backCol;
+    int bltOrFlip;
+    int bltXOffset, bltYOffset;
 };
 
 /* P R O T O S ******************************************************** */
@@ -341,7 +358,7 @@ extern void DbUseBrakepoints(BOOL use_brakepoints);
  */
 extern void db_uninit(void);
 
- /* G L O B A L S ******************************************************	*/
+/* G L O B A L S ******************************************************	*/
 
 /* Should we expand _opt type macros? */
 extern int db_option;

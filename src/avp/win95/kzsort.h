@@ -6,18 +6,18 @@
 
 struct KItem
 {
-	POLYHEADER *PolyPtr;
+    POLYHEADER *PolyPtr;
 
-	int SortKey;
+    int SortKey;
 };
 
 struct KObject
 {
-	DISPLAYBLOCK *DispPtr;
+    DISPLAYBLOCK *DispPtr;
 
-	int SortKey;
+    int SortKey;
 
-	int DrawBeforeEnvironment;
+    int DrawBeforeEnvironment;
 };
 
 /* render with new z-sort */
@@ -26,5 +26,5 @@ extern void KRenderItems(VIEWDESCRIPTORBLOCK *VDBPtr);
 /* generic item shape function */
 extern void KShapeItemsInstr(SHAPEINSTR *shapeinstrptr);
 extern void OutputKItem(int *shapeitemptr);
-							
+
 extern void RenderThisDisplayblock(DISPLAYBLOCK *dbPtr);

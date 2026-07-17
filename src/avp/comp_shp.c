@@ -61,74 +61,56 @@ Generate map block using reference into
 
 #define NUM_MAR_SHAPES 14
 
-int maxshapes=0;
-SHAPEHEADER ** mainshapelist=0;
+int maxshapes = 0;
+SHAPEHEADER **mainshapelist = 0;
 
 /* compiled in shapes that do not exist as yet*/
 
-SHAPEHEADER* MarineCompiledShapes[] = {
-	&CUBE_header,
-	&CUBE_header,
-    &CUBE_header,			/*MarinePlayer*/
-    &CUBE_header,            /*PredatorPlayer*/
-	&CUBE_header,			/*AlienPlayer*/
-	&CUBE_header, /* was &ALIEN_header, but the textures are no longer there. The old alien should be fully purged. << keywords: BUG FIXME OPTIMIZEME OPTIMISEME ERROR MISTAKE HACK >> */
-	&CUBE_header,
-	&CUBE_header,
-	&CUBE_header,
-    &CUBE_header,		/* player crouch shape */
-    &CUBE_header,			/* player lying down shape */
-	&CUBE_header,
-	&CUBE_header,
-	&CUBE_header,
-	&CUBE_header,
-	&CUBE_header,
-	&CUBE_header,
-	&CUBE_header,
-	&CUBE_header,
-	&CUBE_header,
-	&CUBE_header,
-	&CUBE_header,
-	&CUBE_header,			/* alien generator */
+SHAPEHEADER *MarineCompiledShapes[] = {
+    &CUBE_header, &CUBE_header, &CUBE_header, /*MarinePlayer*/
+    &CUBE_header,                             /*PredatorPlayer*/
+    &CUBE_header,                             /*AlienPlayer*/
+    &CUBE_header, /* was &ALIEN_header, but the textures are no longer there. The old alien should be fully purged. << keywords: BUG FIXME OPTIMIZEME OPTIMISEME ERROR MISTAKE HACK >> */
+    &CUBE_header, &CUBE_header, &CUBE_header, &CUBE_header, /* player crouch shape */
+    &CUBE_header,                                           /* player lying down shape */
+    &CUBE_header, &CUBE_header, &CUBE_header, &CUBE_header,
+    &CUBE_header, &CUBE_header, &CUBE_header, &CUBE_header,
+    &CUBE_header, &CUBE_header, &CUBE_header, &CUBE_header, /* alien generator */
 };
-
 
 #define STARTOF_PRECOMPILEDSHAPES 0
 int load_precompiled_shapes(void)
 {
-	static int done = 0;
-	int i,j = 0;
-	
-	if(!mainshapelist)
-	{
-		maxshapes=750;
-		/*I'm not using AllocateMem because I'll have to realloc this later*/
-		mainshapelist=(SHAPEHEADER**)malloc(sizeof(SHAPEHEADER*)*maxshapes);
-		LOCALASSERT(mainshapelist);
-		if(!mainshapelist)
-		{
-	   		ReleaseDirect3D();
-			exit(0x74363); 
-		}
-		for(i=0;i<maxshapes;i++)
-		{
-			mainshapelist[i]=0;
-		}
-	}
-	
-	i=STARTOF_PRECOMPILEDSHAPES;
+    static int done = 0;
+    int i, j = 0;
 
-	if (done) return i+NUM_MAR_SHAPES;
+    if (!mainshapelist) {
+        maxshapes = 750;
+        /*I'm not using AllocateMem because I'll have to realloc this later*/
+        mainshapelist = (SHAPEHEADER **) malloc(sizeof(SHAPEHEADER *) * maxshapes);
+        LOCALASSERT(mainshapelist);
+        if (!mainshapelist) {
+            ReleaseDirect3D();
+            exit(0x74363);
+        }
+        for (i = 0; i < maxshapes; i++) {
+            mainshapelist[i] = 0;
+        }
+    }
+
+    i = STARTOF_PRECOMPILEDSHAPES;
+
+    if (done)
+        return i + NUM_MAR_SHAPES;
 
     /* KJL 11:43:36 09/24/96 - load some marine stuff hacked in 'cos the old way was even worse */
-	while(j < NUM_MAR_SHAPES)
-	{
-		mainshapelist[i] = MarineCompiledShapes[j];
-		i++;
-		j++;
-	}
-	
-	done = 1;
-	
-	return i;
+    while (j < NUM_MAR_SHAPES) {
+        mainshapelist[i] = MarineCompiledShapes[j];
+        i++;
+        j++;
+    }
+
+    done = 1;
+
+    return i;
 }

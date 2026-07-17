@@ -2,16 +2,16 @@
 #define _INCLUDED_AWTEXLD_H_
 
 #ifdef __cplusplus
-	extern "C" {
-	#define _AWTL_DEFAULTPARM(v) = (v)
+extern "C" {
+#define _AWTL_DEFAULTPARM(v) = (v)
 #else /* ! __cplusplus */
-	#define _AWTL_DEFAULTPARM(v)
+#define _AWTL_DEFAULTPARM(v)
 #endif /* ? __cplusplus */
 
 #ifdef _MSC_VER
-	#define _AWTL_VARARG __cdecl
+#define _AWTL_VARARG __cdecl
 #else
-	#define _AWTL_VARARG
+#define _AWTL_VARARG
 #endif
 
 #include "aw.h"
@@ -20,66 +20,89 @@
 /* return codes & error codes */
 /******************************/
 
-typedef
-enum AwTlErc
-{
-	/* General Errors */
-	  AW_TLE_OK /* apparent success */
-	, AW_TLE_DXERROR /* unexpected DirectX error - see awTlLastDxErr */
-	, AW_TLE_BADPARMS /* parameters passed to function were invalid, or requested unsupported functionality */
-	, AW_TLE_NOINIT /* initialization functions have not been successfully called */
-	/* File reading errors */
-	, AW_TLE_CANTOPENFILE /* file open failed - see awTlLastWinErr for the Windows error code */
-	, AW_TLE_CANTREADFILE /* unexpected error reading file - see awTlLastWinErr for the Windows error code */
-	, AW_TLE_EOFMET /* unexpected end of file encountered */
-	, AW_TLE_BADFILEFORMAT /* file format identifier not recognized */
-	, AW_TLE_BADFILEDATA /* file data not consistent */
-	/* Conversion errors */
-	, AW_TLE_CANTPALETTIZE /* texture format is palettized; file data is not */
-	, AW_TLE_IMAGETOOLARGE /* image size is larger in one or both dimensions than maximum texture size */
-	, AW_TLE_CANTRELOAD /* loading a new texture into an existing surface failed because the existing surface is an unsuitable size, etc. */
-}
-	AW_TL_ERC;
-
+typedef enum AwTlErc {
+    /* General Errors */
+    AW_TLE_OK /* apparent success */
+    ,
+    AW_TLE_DXERROR /* unexpected DirectX error - see awTlLastDxErr */
+    ,
+    AW_TLE_BADPARMS /* parameters passed to function were invalid, or requested unsupported functionality */
+    ,
+    AW_TLE_NOINIT /* initialization functions have not been successfully called */
+    /* File reading errors */
+    ,
+    AW_TLE_CANTOPENFILE /* file open failed - see awTlLastWinErr for the Windows error code */
+    ,
+    AW_TLE_CANTREADFILE /* unexpected error reading file - see awTlLastWinErr for the Windows error code */
+    ,
+    AW_TLE_EOFMET /* unexpected end of file encountered */
+    ,
+    AW_TLE_BADFILEFORMAT /* file format identifier not recognized */
+    ,
+    AW_TLE_BADFILEDATA /* file data not consistent */
+    /* Conversion errors */
+    ,
+    AW_TLE_CANTPALETTIZE /* texture format is palettized; file data is not */
+    ,
+    AW_TLE_IMAGETOOLARGE /* image size is larger in one or both dimensions than maximum texture size */
+    ,
+    AW_TLE_CANTRELOAD /* loading a new texture into an existing surface failed because the existing surface is an unsuitable size, etc. */
+} AW_TL_ERC;
 
 /*********/
 /* Flags */
 /*********/
 
-enum
-{
-	  AW_TLF_DEFAULT     = 0x00000000U /* no flags set */
-	, AW_TLF_TRANSP      = 0x00000001U /* src data has transparency */
-	, AW_TLF_PREVSRC     = 0x00000002U /* in AwRestoreTexture, use previously stored source data flags (AW_TLF_TRANSP only) */
-	, AW_TLF_COMPRESS    = 0x00000004U /* use ALLOCONLOAD flag */
-	, AW_TLF_CHROMAKEY   = 0x00000008U /* use chroma keying for transparency when the texture format has an alpha channel */
-	, AW_TLF_VIDMEM      = 0x00000010U /* use Video memory for surfaces which are not textures */
-	, AW_TLF_PREVSRCALL  = 0x00000020U /* in AwRestoreTexture, use ALL previously stored flags, except AW_TLF_CHECKLOST and AW_TLF_SKIPNOTLOST */
-	, AW_TLF_TEXTURE     = 0x00000040U /* in AwCreateSurface, create a surface in the texture format with the texture flag set */
-	, AW_TLF_MINSIZE     = 0x00000080U /* with the 'a' option, ensure all surfaces/textures created are at least as big as the rectangle specified even if the rect is partially off the image */
-	, AW_TLF_CHECKLOST   = 0x00000100U /* checks for lost surfaces and calls restore on them */
-	, AW_TLF_SKIPNOTLOST = 0x00000200U /* if the above flag also is specified, does not bother trying to restore surfaces which weren't lost */
-	
-	, _AW_TLF_FORCE32BITENUM = 0x0fffffffU /* probably entirely unnecessary */
+enum {
+    AW_TLF_DEFAULT = 0x00000000U /* no flags set */
+    ,
+    AW_TLF_TRANSP = 0x00000001U /* src data has transparency */
+    ,
+    AW_TLF_PREVSRC
+    = 0x00000002U /* in AwRestoreTexture, use previously stored source data flags (AW_TLF_TRANSP only) */
+    ,
+    AW_TLF_COMPRESS = 0x00000004U /* use ALLOCONLOAD flag */
+    ,
+    AW_TLF_CHROMAKEY
+    = 0x00000008U /* use chroma keying for transparency when the texture format has an alpha channel */
+    ,
+    AW_TLF_VIDMEM = 0x00000010U /* use Video memory for surfaces which are not textures */
+    ,
+    AW_TLF_PREVSRCALL
+    = 0x00000020U /* in AwRestoreTexture, use ALL previously stored flags, except AW_TLF_CHECKLOST and AW_TLF_SKIPNOTLOST */
+    ,
+    AW_TLF_TEXTURE
+    = 0x00000040U /* in AwCreateSurface, create a surface in the texture format with the texture flag set */
+    ,
+    AW_TLF_MINSIZE
+    = 0x00000080U /* with the 'a' option, ensure all surfaces/textures created are at least as big as the rectangle specified even if the rect is partially off the image */
+    ,
+    AW_TLF_CHECKLOST = 0x00000100U /* checks for lost surfaces and calls restore on them */
+    ,
+    AW_TLF_SKIPNOTLOST
+    = 0x00000200U /* if the above flag also is specified, does not bother trying to restore surfaces which weren't lost */
+
+    ,
+    _AW_TLF_FORCE32BITENUM = 0x0fffffffU /* probably entirely unnecessary */
 };
 
 /* SBF - alt_tab junk */
-#define ATIncludeSurfaceDb(p, d, s) fprintf(stderr, "ATIncludeSurfaceDb: %s/%d: %s\n", __FILE__, __LINE__, s)
-#define ATIncludeTextureDb(p, d, s) fprintf(stderr, "ATIncludeTextureDb: %s/%d: %s\n", __FILE__, __LINE__, s)
-void ATIncludeSurface(DDSurface * pSurface, AW_BACKUPTEXTUREHANDLE hBackup);
-void ATRemoveSurface(DDSurface * pSurface);
-void ATRemoveTexture(D3DTexture * pTexture);
-
+#define ATIncludeSurfaceDb(p, d, s) \
+    fprintf(stderr, "ATIncludeSurfaceDb: %s/%d: %s\n", __FILE__, __LINE__, s)
+#define ATIncludeTextureDb(p, d, s) \
+    fprintf(stderr, "ATIncludeTextureDb: %s/%d: %s\n", __FILE__, __LINE__, s)
+void ATIncludeSurface(DDSurface *pSurface, AW_BACKUPTEXTUREHANDLE hBackup);
+void ATRemoveSurface(DDSurface *pSurface);
+void ATRemoveTexture(D3DTexture *pTexture);
 
 extern AW_TL_ERC awTlLastErr;
 
-extern D3DTexture * AwCreateTexture(char const * _argFormatS, ...);
-extern DDSurface * AwCreateSurface(char const * _argFormatS, ...);
+extern D3DTexture *AwCreateTexture(char const *_argFormatS, ...);
+extern DDSurface *AwCreateSurface(char const *_argFormatS, ...);
 
 extern AW_TL_ERC AwDestroyBackupTexture(AW_BACKUPTEXTUREHANDLE _bH);
 
-
-typedef int (* AW_TL_PFN_CALLBACK) (void *);
+typedef int (*AW_TL_PFN_CALLBACK)(void *);
 
 /* Structure for receiving specific regions of an image in a surface or texture.
  * A pointer to an array of thise structures is passed to the AwCreate...
@@ -101,21 +124,21 @@ typedef int (* AW_TL_PFN_CALLBACK) (void *);
  */
 struct AwCreateGraphicRegion
 {
-	unsigned left, top, right, bottom; /* rectangle to cut from the original image */
-	unsigned width, height; /* width and height of the resulting surface or texture */
+    unsigned left, top, right, bottom; /* rectangle to cut from the original image */
+    unsigned width, height;            /* width and height of the resulting surface or texture */
 #if 0
 	union /* DDSurface or D3DTexture pointer depending on the context used */
 	{
 		DDSurface * pSurface; /* Direct Draw Surface object pointer */
 		D3DTexture * pTexture; /* Direct 3D Texture object pointer */
 	};
-#endif	
+#endif
 };
 
 /* typedef to save typing 'struct' when not using C++ */
 typedef struct AwCreateGraphicRegion AW_CREATEGRAPHICREGION;
 
-extern char const * AwTlErrorToString(AW_TL_ERC _AWTL_DEFAULTPARM(awTlLastErr));
+extern char const *AwTlErrorToString(AW_TL_ERC _AWTL_DEFAULTPARM(awTlLastErr));
 
 #if 0
 
@@ -192,7 +215,8 @@ extern char const * AwTlErrorToString(AW_TL_ERC _AWTL_DEFAULTPARM(awTlLastErr));
 /***********************************************************************************/
 
 /* Version 2.1 */
-#define AW_TL_VERSION 210 /* Preprocessor constant can be used to determine the version of this code */
+#define AW_TL_VERSION \
+    210 /* Preprocessor constant can be used to determine the version of this code */
 
 /*
 Version History:
@@ -222,15 +246,15 @@ version AW_TL_VERSION
 
 #ifdef __cplusplus
 	extern "C" {
-	#define _AWTL_DEFAULTPARM(v) = (v)
+#define _AWTL_DEFAULTPARM(v) = (v)
 #else /* ! __cplusplus */
-	#define _AWTL_DEFAULTPARM(v)
+#define _AWTL_DEFAULTPARM(v)
 #endif /* ? __cplusplus */
 
 #ifdef _MSC_VER
-	#define _AWTL_VARARG __cdecl
+#define _AWTL_VARARG __cdecl
 #else
-	#define _AWTL_VARARG
+#define _AWTL_VARARG
 #endif
 
 /******************************/
@@ -263,14 +287,14 @@ extern HRESULT awTlLastDxErr;
 extern DWORD awTlLastWinErr;
 
 #ifdef NDEBUG
-	#define AwTlErrorToString ThisIsADebugFunction! /* generate compiler error */
-	#define AwDxErrorToString ThisIsADebugFunction! /* generate compiler error */
-	#define AwWinErrorToString ThisIsADebugFunction! /* generate compiler error */
-#else /* ! NDEBUG */
+#define AwTlErrorToString ThisIsADebugFunction ! /* generate compiler error */
+#define AwDxErrorToString ThisIsADebugFunction ! /* generate compiler error */
+#define AwWinErrorToString ThisIsADebugFunction !/* generate compiler error */
+#else                                            /* ! NDEBUG */
 	extern char const * AwTlErrorToString(AW_TL_ERC _AWTL_DEFAULTPARM(awTlLastErr));
 	extern char const * AwDxErrorToString(HRESULT _AWTL_DEFAULTPARM(awTlLastDxErr));
 	extern char const * AwWinErrorToString(DWORD _AWTL_DEFAULTPARM(awTlLastWinErr));
-#endif /* ? NDEBUG */
+#endif                                           /* ? NDEBUG */
 
 /*********/
 /* Flags */
@@ -399,7 +423,8 @@ extern AW_TL_ERC AwSetDDObject(DDObject * _ddP);
 			function were incorrect
 */
 extern AW_TL_ERC AwSetTextureFormat2(LPDDPIXELFORMAT _ddpfP);
-#define AwSetTextureFormat(_descP) (AwSetTextureFormat2((_descP) ? &(_descP)->ddpfPixelFormat : NULL))
+#define AwSetTextureFormat(_descP) \
+    (AwSetTextureFormat2((_descP) ? &(_descP)->ddpfPixelFormat : NULL))
 
 /* AwSetAdditionalTextureFormat2(LPDDPIXELFORMAT _ddpfP, unsigned _maxAlphaBits, int _canDoTransp, unsigned _maxColours)
 
@@ -449,7 +474,9 @@ extern AW_TL_ERC AwSetTextureFormat2(LPDDPIXELFORMAT _ddpfP);
 			function were incorrect
 */
 extern AW_TL_ERC AwSetAdditionalTextureFormat2(LPDDPIXELFORMAT _ddpfP, unsigned _maxAlphaBits, int _canDoTransp, unsigned _maxColours);
-#define AwSetAdditionalTextureFormat(_descP, _maxAlphaBits, _canDoTransp, _maxColours) (AwSetAdditionalTextureFormat2((_descP) ? &(_descP->ddpfPixelFormat) : NULL,_maxAlphaBits,_canDoTransp,_maxColours))
+#define AwSetAdditionalTextureFormat(_descP, _maxAlphaBits, _canDoTransp, _maxColours) \
+    (AwSetAdditionalTextureFormat2( \
+        (_descP) ? &(_descP->ddpfPixelFormat) : NULL, _maxAlphaBits, _canDoTransp, _maxColours))
 
 /* AwSetSurfaceFormat2(LPDDPIXELFORMAT _ddpfP)
 
@@ -458,7 +485,8 @@ extern AW_TL_ERC AwSetAdditionalTextureFormat2(LPDDPIXELFORMAT _ddpfP, unsigned 
 		what format surfaces for blitting should be in
 */
 extern AW_TL_ERC AwSetSurfaceFormat2(LPDDPIXELFORMAT _ddpfP);
-#define AwSetSurfaceFormat(_descP) (AwSetSurfaceFormat2((_descP) ? &(_descP)->ddpfPixelFormat : NULL))
+#define AwSetSurfaceFormat(_descP) \
+    (AwSetSurfaceFormat2((_descP) ? &(_descP)->ddpfPixelFormat : NULL))
 
 /* AwGetTextureSize(unsigned * _widthP, unsigned * _heightP, unsigned _width, unsigned _height)
 
@@ -677,18 +705,9 @@ extern AW_TL_ERC AwDestroyBackupTexture(AW_BACKUPTEXTUREHANDLE _bH);
 
 #endif
 
-
-
-
-
-
-
-
-
-
 /* End Wrappers */
 #ifdef __cplusplus
-	}
+}
 #endif /* __cplusplus */
 
 #endif /* ! _INCLUDED_AWTEXLD_H_ */

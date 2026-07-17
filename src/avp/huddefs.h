@@ -8,9 +8,9 @@
 #ifndef _huddefs_h
 #define _huddefs_h 1
 
-	#ifdef __cplusplus
-		extern "C" {
-	#endif
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*KJL****************************************************************************************
 * 										D E F I N E S 										*
@@ -22,18 +22,18 @@
 * 65536*65536 will probably cause an overflow in the preprocessor so I've used floats to  *
 * avoid this.                                                                             *
 **************************************************************************************KJL*/
-#define MOTIONTRACKER_RANGE					((int)((float)30000*(float)GlobalScale))
-#define MOTIONTRACKER_RANGE_SQUARED 		(MOTIONTRACKER_RANGE*MOTIONTRACKER_RANGE)
-#define MOTIONTRACKER_SCALE					(int)((65536.0*65536.0)/(float)MOTIONTRACKER_RANGE)
-#define MOTIONTRACKER_SPEED					(MUL_FIXED((65536*2),MotionTrackerSpeed))
-#define MOTIONTRACKER_MAXBLIPS				10
-#define MOTIONTRACKER_SMALLESTSCANLINESIZE	2200
+#define MOTIONTRACKER_RANGE ((int) ((float) 30000 * (float) GlobalScale))
+#define MOTIONTRACKER_RANGE_SQUARED (MOTIONTRACKER_RANGE * MOTIONTRACKER_RANGE)
+#define MOTIONTRACKER_SCALE (int) ((65536.0 * 65536.0) / (float) MOTIONTRACKER_RANGE)
+#define MOTIONTRACKER_SPEED (MUL_FIXED((65536 * 2), MotionTrackerSpeed))
+#define MOTIONTRACKER_MAXBLIPS 10
+#define MOTIONTRACKER_SMALLESTSCANLINESIZE 2200
 
 typedef struct
 {
-	int X;
-	int Y;
-	int Brightness;
+    int X;
+    int Y;
+    int Brightness;
 } BLIP_TYPE;
 /*KJL*************************************************
 * Speed at which gunsight moves when smart-targeting *
@@ -42,21 +42,19 @@ typedef struct
 
 #define SMART_TARGETING_RANGE 1000000
 
-
 /*KJL*********************************************
 * Numerical digits which occur in the marine HUD *
 *********************************************KJL*/
-enum MARINE_HUD_DIGIT
-{
-	MARINE_HUD_MOTIONTRACKER_UNITS=0,
+enum MARINE_HUD_DIGIT {
+    MARINE_HUD_MOTIONTRACKER_UNITS = 0,
     MARINE_HUD_MOTIONTRACKER_TENS,
     MARINE_HUD_MOTIONTRACKER_HUNDREDS,
     MARINE_HUD_MOTIONTRACKER_THOUSANDS,
-    
+
     MARINE_HUD_HEALTH_UNITS,
     MARINE_HUD_HEALTH_TENS,
     MARINE_HUD_HEALTH_HUNDREDS,
-    
+
     MARINE_HUD_ENERGY_UNITS,
     MARINE_HUD_ENERGY_TENS,
     MARINE_HUD_ENERGY_HUNDREDS,
@@ -64,41 +62,40 @@ enum MARINE_HUD_DIGIT
     MARINE_HUD_ARMOUR_UNITS,
     MARINE_HUD_ARMOUR_TENS,
     MARINE_HUD_ARMOUR_HUNDREDS,
-    
+
     MARINE_HUD_PRIMARY_AMMO_ROUNDS_UNITS,
     MARINE_HUD_PRIMARY_AMMO_ROUNDS_TENS,
     MARINE_HUD_PRIMARY_AMMO_ROUNDS_HUNDREDS,
 
-	MARINE_HUD_PRIMARY_AMMO_MAGAZINES_UNITS,
+    MARINE_HUD_PRIMARY_AMMO_MAGAZINES_UNITS,
     MARINE_HUD_PRIMARY_AMMO_MAGAZINES_TENS,
-    
+
     MARINE_HUD_SECONDARY_AMMO_ROUNDS_UNITS,
     MARINE_HUD_SECONDARY_AMMO_ROUNDS_TENS,
     MARINE_HUD_SECONDARY_AMMO_ROUNDS_HUNDREDS,
 
-	MARINE_HUD_SECONDARY_AMMO_MAGAZINES_UNITS,
+    MARINE_HUD_SECONDARY_AMMO_MAGAZINES_UNITS,
     MARINE_HUD_SECONDARY_AMMO_MAGAZINES_TENS,
 
-	MAX_NO_OF_MARINE_HUD_DIGITS
+    MAX_NO_OF_MARINE_HUD_DIGITS
 };
 /*KJL***********************************************
 * Numerical digits which occur in the predator HUD *
 ***********************************************KJL*/
-enum PREDATOR_HUD_DIGIT
-{
+enum PREDATOR_HUD_DIGIT {
     PREDATOR_HUD_ARMOUR_1,
     PREDATOR_HUD_ARMOUR_2,
     PREDATOR_HUD_ARMOUR_3,
     PREDATOR_HUD_ARMOUR_4,
     PREDATOR_HUD_ARMOUR_5,
-    
+
     PREDATOR_HUD_HEALTH_1,
-	PREDATOR_HUD_HEALTH_2,
+    PREDATOR_HUD_HEALTH_2,
     PREDATOR_HUD_HEALTH_3,
     PREDATOR_HUD_HEALTH_4,
     PREDATOR_HUD_HEALTH_5,
-    
-	/*
+
+    /*
 	PREDATOR_HUD_THREATDISPLAY_1,
 	PREDATOR_HUD_THREATDISPLAY_2,
 	PREDATOR_HUD_THREATDISPLAY_3,
@@ -108,41 +105,38 @@ enum PREDATOR_HUD_DIGIT
 	PREDATOR_HUD_THREATDISPLAY_7,
 	PREDATOR_HUD_THREATDISPLAY_8,
 	*/
-	MAX_NO_OF_PREDATOR_HUD_DIGITS
+    MAX_NO_OF_PREDATOR_HUD_DIGITS
 };
 
-enum ALIEN_HUD_DIGIT
-{
+enum ALIEN_HUD_DIGIT {
     ALIEN_HUD_HEALTH_UNITS,
     ALIEN_HUD_HEALTH_TENS,
     ALIEN_HUD_HEALTH_HUNDREDS,
 
-	MAX_NO_OF_ALIEN_HUD_DIGITS
+    MAX_NO_OF_ALIEN_HUD_DIGITS
 };
 
 extern char ValueOfHUDDigit[];
 
-enum GUNSIGHT_SHAPE
-{
-	GUNSIGHT_CROSSHAIR=0,
+enum GUNSIGHT_SHAPE {
+    GUNSIGHT_CROSSHAIR = 0,
     GUNSIGHT_GREENBOX,
     GUNSIGHT_REDBOX,
     GUNSIGHT_REDDIAMOND,
-    
+
     MAX_NO_OF_GUNSIGHT_SHAPES
 };
 
-enum COMMON_HUD_DIGIT_ID
-{
-	COMMON_HUD_DIGIT_HEALTH_UNITS,
-	COMMON_HUD_DIGIT_HEALTH_TENS,
-	COMMON_HUD_DIGIT_HEALTH_HUNDREDS,
+enum COMMON_HUD_DIGIT_ID {
+    COMMON_HUD_DIGIT_HEALTH_UNITS,
+    COMMON_HUD_DIGIT_HEALTH_TENS,
+    COMMON_HUD_DIGIT_HEALTH_HUNDREDS,
 
-	COMMON_HUD_DIGIT_ARMOUR_UNITS,
-	COMMON_HUD_DIGIT_ARMOUR_TENS,
-	COMMON_HUD_DIGIT_ARMOUR_HUNDREDS,
+    COMMON_HUD_DIGIT_ARMOUR_UNITS,
+    COMMON_HUD_DIGIT_ARMOUR_TENS,
+    COMMON_HUD_DIGIT_ARMOUR_HUNDREDS,
 
-	MAX_NO_OF_COMMON_HUD_DIGITS
+    MAX_NO_OF_COMMON_HUD_DIGITS
 };
 
 /*KJL****************************************************************************************
@@ -171,7 +165,7 @@ extern void PlatformSpecificEnteringHUD(void);
 /*KJL**************************************************
 * Made to complement PlatformSpecificExitingHUD() fn. *
 **************************************************KJL*/
-	
+
 extern void BLTMotionTrackerToHUD(int scanLineSize);
 /*KJL******************************************************************************************
 * draw motion tracker with its expanding scanline                                             *
@@ -213,7 +207,6 @@ extern void BLTGunSightToScreen(int screenX, int screenY, enum GUNSIGHT_SHAPE gu
 * gunsightShape determines which sight to blit to screen.           *
 ****************************************************************KJL*/
 
-
 extern void InitHUD(void);
 
 extern void BLTAlienOverlayToHUD(void);
@@ -226,16 +219,13 @@ extern void BLTPredatorOverlayToHUD(void);
 * Draw simple graphic overlay *
 **************************KJL*/
 
-
 extern void KillHUD(void);
 /*KJL*********************
 * Free memory of HUD gfx *
 *********************KJL*/
 
-
-
 /* KJL 11:00:22 05/20/97 - On-screen messaging system */
-#define ON_SCREEN_MESSAGE_LIFETIME (ONE_FIXED*2)
+#define ON_SCREEN_MESSAGE_LIFETIME (ONE_FIXED * 2)
 
 extern void NewOnScreenMessage(unsigned char *messagePtr);
 /*KJL********************************************************************
@@ -244,8 +234,8 @@ extern void NewOnScreenMessage(unsigned char *messagePtr);
 * still being displayed will be overwritten.                            *
 ********************************************************************KJL*/
 
-	#ifdef __cplusplus
-		};	/* end of C-Linkage spec */
-	#endif
+#ifdef __cplusplus
+}; /* end of C-Linkage spec */
+#endif
 
 #endif /* one-time only guard */

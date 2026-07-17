@@ -12,8 +12,8 @@
 #include "3dc.h"
 #include "conssym.hpp"
 
-	#define UseLocalAssert Yes
-	#include "ourasert.h"
+#define UseLocalAssert Yes
+#include "ourasert.h"
 
 /* Version settings ************************************************/
 
@@ -25,10 +25,9 @@
 
 /* Imported data ***************************************************/
 #ifdef __cplusplus
-	extern "C"
-	{
+extern "C" {
 #endif
-		#if 0
+#if 0
 		extern OurBool			DaveDebugOn;
 		extern FDIEXTENSIONTAG	FDIET_Dummy;
 		extern IFEXTENSIONTAG	IFET_Dummy;
@@ -39,15 +38,13 @@
 		extern UncompressedGlobalPlotAtomID UGPAID_StandardNull;
 		extern IFCOLOUR			IFColour_Dummy;
  		extern IFVECTOR			IFVec_Zero;
-		#endif
+#endif
 #ifdef __cplusplus
-	};
+};
 #endif
 
-
-
 /* Exported globals ************************************************/
-	/*static*/ List <ConsoleSymbol*> ConsoleSymbol :: List_pConsoleSym;
+/*static*/ List<ConsoleSymbol *> ConsoleSymbol ::List_pConsoleSym;
 
 /* Internal type definitions ***************************************/
 
@@ -60,33 +57,20 @@
 // public:
 
 // protected:
-ConsoleSymbol :: ConsoleSymbol
-(
-	ProjChar* pProjCh_ToUse
-) :	pSCString_Symbol
-	(
-		new SCString( pProjCh_ToUse )
-			// constructor for the SCString adds the required reference
-	)
+ConsoleSymbol ::ConsoleSymbol(ProjChar *pProjCh_ToUse)
+    : pSCString_Symbol(new SCString(pProjCh_ToUse)
+                       // constructor for the SCString adds the required reference
+      )
 {
-    List_pConsoleSym . add_entry
-    (
-    	this
-    );
+    List_pConsoleSym.add_entry(this);
 }
 
-ConsoleSymbol :: ~ConsoleSymbol()
+ConsoleSymbol ::~ConsoleSymbol()
 {
-	pSCString_Symbol ->R_Release();
+    pSCString_Symbol->R_Release();
 
-	// remove from the list
-    List_pConsoleSym . delete_entry
-    (
-    	this
-    );
+    // remove from the list
+    List_pConsoleSym.delete_entry(this);
 }
-
-
-
 
 /* Internal function definitions ***********************************/

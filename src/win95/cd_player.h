@@ -4,7 +4,6 @@
 /* KJL 12:40:35 07/05/98 - This is code derived from Patrick's original stuff &
 moved into it's own file. */
 
-
 /* Patrick 10/6/97 --------------------------------------------------------------
   SUPPORT FOR CDDA SYSTEM
   -----------------------------------------------------------------------------*/
@@ -12,20 +11,18 @@ moved into it's own file. */
 /* Patrick 10/6/97 --------------------------------------------------------------
   Some Volume defines
   -----------------------------------------------------------------------------*/
-#define CDDA_VOLUME_MAX		(127)		
-#define CDDA_VOLUME_MIN		(0)
-#define CDDA_VOLUME_DEFAULT	(127)
+#define CDDA_VOLUME_MAX (127)
+#define CDDA_VOLUME_MIN (0)
+#define CDDA_VOLUME_DEFAULT (127)
 #define CDDA_VOLUME_RESTOREPREGAMEVALUE (-100)
 
 /* Patrick 10/6/97 --------------------------------------------------------------
   Enumeration of CD player states
   -----------------------------------------------------------------------------*/
-typedef enum cdoperationstates
-{
-	CDOp_Idle,
-	CDOp_Playing,
-}
-CDOPERATIONSTATES;
+typedef enum cdoperationstates {
+    CDOp_Idle,
+    CDOp_Playing,
+} CDOPERATIONSTATES;
 
 /* Patrick 10/6/97 --------------------------------------------------------------
   CDDA_Start/End are used to initialise and de-initialise the CDDA system.
@@ -66,22 +63,19 @@ extern void CDDA_SwitchOff(void);
 extern int CDDA_IsOn(void);
 extern int CDDA_IsPlaying(void);
 
-
-
-enum CDCOMMANDID
-{
-	CDCOMMANDID_Start,
-	CDCOMMANDID_End,
-	CDCOMMANDID_Play,
-	CDCOMMANDID_PlayLoop,
-	CDCOMMANDID_ChangeVolume,
-	CDCOMMANDID_Stop,
+enum CDCOMMANDID {
+    CDCOMMANDID_Start,
+    CDCOMMANDID_End,
+    CDCOMMANDID_Play,
+    CDCOMMANDID_PlayLoop,
+    CDCOMMANDID_ChangeVolume,
+    CDCOMMANDID_Stop,
 };
 
 /* CDDA SUPPORT */
 
-#define VOLUME_CDDA_MAXPLAT			(65535)
-#define VOLUME_CDDA_MINPLAT			(0)	
+#define VOLUME_CDDA_MAXPLAT (65535)
+#define VOLUME_CDDA_MINPLAT (0)
 
 /* Patrick 10/6/97 -------------------------------------------------------------
   Start and end functions provide any platform specific initialisation for
@@ -98,7 +92,7 @@ extern void PlatEndCDDA(void);
 extern int PlatPlayCDDA(int track);
 extern int PlatStopCDDA(void);
 extern int PlatChangeCDDAVolume(int volume);
-int PlatGetNumberOfCDTracks(int* numTracks);
+int PlatGetNumberOfCDTracks(int *numTracks);
 /* Patrick 10/6/97 -------------------------------------------------------------
   Management functions are provided for platform specific detection of changes
   in the cd player state (ie finishing a track, or an error).  The basic 
@@ -107,8 +101,6 @@ int PlatGetNumberOfCDTracks(int* numTracks);
   ----------------------------------------------------------------------------*/
 extern void PlatCDDAManagement(void);
 extern void PlatCDDAManagementCallBack(WPARAM flags, LONG deviceId);
-
-
 
 extern int CDPlayerVolume;
 

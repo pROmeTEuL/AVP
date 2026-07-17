@@ -29,146 +29,123 @@
 #ifndef _reflist_hpp
 #define _reflist_hpp 1
 
-	#if defined( _MSC_VER )
-		#pragma once
-	#endif
+#if defined(_MSC_VER)
+#pragma once
+#endif
 
-	#ifndef list_template_hpp
-	#include "list_tem.hpp"
-	#endif
+#ifndef list_template_hpp
+#include "list_tem.hpp"
+#endif
 
-	#ifndef _refobj
-	#include "refobj.hpp"
-	#endif
+#ifndef _refobj
+#include "refobj.hpp"
+#endif
 
-extern char const* reflist_fail_destructor;
-
+extern char const *reflist_fail_destructor;
 
 /* Type definitions *****************************************************/
 
 // nb templates cannot have C linkage
-template <class RC> class RefList
+template<class RC>
+class RefList
 {
 private:
-	List<RC*> List_pRC;
-	
+    List<RC *> List_pRC;
+
 public:
-	// {{{ Constructors:
-	RefList() : List_pRC()
-	{
-	}
-	// }}}
+    // {{{ Constructors:
+    RefList()
+        : List_pRC()
+    {}
+    // }}}
 
-	// {{{ Destructor
-	~RefList()
-	{
-		EmptyYourself();
-	}
-	// }}}
+    // {{{ Destructor
+    ~RefList() { EmptyYourself(); }
+    // }}}
 
-	// {{{
-	int NumEntries(void) const
-	{
-		return List_pRC . size();
-	}
-	// }}}
+    // {{{
+    int NumEntries(void) const { return List_pRC.size(); }
+    // }}}
 
-	// {{{ Inserting new members
-	void AddToFront(RC& theRC)
-	{
-		theRC . R_AddRef();
+    // {{{ Inserting new members
+    void AddToFront(RC &theRC)
+    {
+        theRC.R_AddRef();
 
-		List_pRC . add_entry_start( &theRC );
-	}
-	void AddToEnd(RC& theRC)
-	{
-		theRC . R_AddRef();
+        List_pRC.add_entry_start(&theRC);
+    }
+    void AddToEnd(RC &theRC)
+    {
+        theRC.R_AddRef();
 
-		List_pRC . add_entry_end( &theRC );
-	}
-	// }}}
+        List_pRC.add_entry_end(&theRC);
+    }
+    // }}}
 
-	// {{{ Accessing & removing existing members; see notes at top of header
-	RC* ReadFirst(void) const
-	{
-		if (List_pRC . size() >0 )
-		{
-			return List_pRC . first_entry();
-		}
-		else
-		{
-			return NULL;
-		}
-	}
-	RC* ReadFinal(void) const
-	{
-		if (List_pRC . size() >0 )
-		{
-			return List_pRC . last_entry();
-		}
-		else
-		{
-			return NULL;
-		}
-	}
-	RC* GetYourFirst(void)
-	{
-		if (List_pRC . size() >0 )
-		{
-			RC* pReturn = List_pRC . first_entry();
+    // {{{ Accessing & removing existing members; see notes at top of header
+    RC *ReadFirst(void) const
+    {
+        if (List_pRC.size() > 0) {
+            return List_pRC.first_entry();
+        } else {
+            return NULL;
+        }
+    }
+    RC *ReadFinal(void) const
+    {
+        if (List_pRC.size() > 0) {
+            return List_pRC.last_entry();
+        } else {
+            return NULL;
+        }
+    }
+    RC *GetYourFirst(void)
+    {
+        if (List_pRC.size() > 0) {
+            RC *pReturn = List_pRC.first_entry();
 
-			List_pRC . delete_first_entry();
-				// note that a reference is still owned; ownership is transferred to the caller
+            List_pRC.delete_first_entry();
+            // note that a reference is still owned; ownership is transferred to the caller
 
-			return pReturn;
-		}
-		else
-		{
-			return NULL;
-		}
-	}
-	RC* GetYourFinal(void)
-	{
-		if (List_pRC . size() >0 )
-		{
-			RC* pReturn = List_pRC . last_entry();
+            return pReturn;
+        } else {
+            return NULL;
+        }
+    }
+    RC *GetYourFinal(void)
+    {
+        if (List_pRC.size() > 0) {
+            RC *pReturn = List_pRC.last_entry();
 
-			List_pRC . delete_last_entry();
-				// note that a reference is still owned; ownership is transferred to the caller
+            List_pRC.delete_last_entry();
+            // note that a reference is still owned; ownership is transferred to the caller
 
-			return pReturn;
-		}
-		else
-		{
-			return NULL;
-		}
-	}
-	void EmptyYourself(void)
-	{
-		// Destroys the list, releasing all refs
-		while ( List_pRC . size() > 0 )
-		{
-			RC* pRC = List_pRC . first_entry();
+            return pReturn;
+        } else {
+            return NULL;
+        }
+    }
+    void EmptyYourself(void)
+    {
+        // Destroys the list, releasing all refs
+        while (List_pRC.size() > 0) {
+            RC *pRC = List_pRC.first_entry();
 
-			List_pRC . delete_first_entry();
+            List_pRC.delete_first_entry();
 
-			#ifndef NDEBUG
-			if ( !pRC )
-			{
-				fail( reflist_fail_destructor );
-			}
-			#endif
+#ifndef NDEBUG
+            if (!pRC) {
+                fail(reflist_fail_destructor);
+            }
+#endif
 
-			pRC -> R_Release();			
-		}
-	}
-	// }}}
-
+            pRC->R_Release();
+        }
+    }
+    // }}}
 
 }; // end of template <class RC> class RefList
 
-
 /* End of the header ****************************************************/
-
 
 #endif

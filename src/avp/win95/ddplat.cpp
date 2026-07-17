@@ -26,12 +26,9 @@ extern "C" {
 #include "awtexld.h"
 #include "ffstdio.h"
 
-
-
 #include "d3d_hud.h"
 
-extern "C++" 
-{
+extern "C++" {
 #include "r2base.h"
 #include "indexfnt.hpp"
 
@@ -49,10 +46,7 @@ int BackdropImage;
 //#define UseLocalAssert Yes
 //#include "ourasert.h"
 
-
 int UsingDataBase = 0;
-
-
 
 /* HUD globals */
 extern SCREENDESCRIPTORBLOCK ScreenDescriptorBlock;
@@ -75,12 +69,9 @@ enum HUD_RES_ID HUDResolution;
 /* display co-ords, etc. */
 #include "hud_data.h"
 
-
-
-static struct DDGraphicTag PauseDDInfo;															
+static struct DDGraphicTag PauseDDInfo;
 static struct DDGraphicTag E3FontDDInfo;
 
-    
 /*KJL****************************************************************************************
 *                                    P R O T O T Y P E S	                                *
 ****************************************************************************************KJL*/
@@ -101,10 +92,9 @@ static void BLTPredatorDigitToHUD(char digit, int x, int y, int font);
 #endif
 
 void BLTGunSightToScreen(int screenX, int screenY, enum GUNSIGHT_SHAPE gunsightShape);
-void BLTWeaponToHUD(PLAYER_WEAPON_DATA* weaponPtr);
-int CueWeaponFrameFromSequence(struct WeaponFrameTag *weaponFramePtr, int timeOutCounter, int weaponIDNumber);
-
-
+void BLTWeaponToHUD(PLAYER_WEAPON_DATA *weaponPtr);
+int CueWeaponFrameFromSequence(
+    struct WeaponFrameTag *weaponFramePtr, int timeOutCounter, int weaponIDNumber);
 
 void BLTPredatorNumericsToHUD(void);
 
@@ -125,10 +115,9 @@ extern void LoadCommonTextures(void);
 *                                     F U N C T I O N S	                                    *
 ****************************************************************************************KJL*/
 
-
 void LoadDDGraphic(struct DDGraphicTag *DDGfxPtr, char *Filename)
 {
-	fprintf(stderr, "LoadDDGraphic(%p, %s)\n", DDGfxPtr, Filename);
+    fprintf(stderr, "LoadDDGraphic(%p, %s)\n", DDGfxPtr, Filename);
 }
 
 /****************************************
@@ -136,17 +125,17 @@ void LoadDDGraphic(struct DDGraphicTag *DDGfxPtr, char *Filename)
 ****************************************/
 void PlatformSpecificInitMarineHUD(void)
 {
-// SBF
-//	if ((ScanDrawMode != ScanDrawDirectDraw) && (ZBufferOn==ZBufferMode))
+    // SBF
+    //	if ((ScanDrawMode != ScanDrawDirectDraw) && (ZBufferOn==ZBufferMode))
 
-	{
-		D3D_InitialiseMarineHUD();
-		LoadCommonTextures();
-//		ChromeImageNumber = CL_LoadImageOnce("Common\\chromelike.RIM",LIO_D3DTEXTURE|LIO_RELATIVEPATH|LIO_RESTORABLE);
-		return;
-	}
+    {
+        D3D_InitialiseMarineHUD();
+        LoadCommonTextures();
+        //		ChromeImageNumber = CL_LoadImageOnce("Common\\chromelike.RIM",LIO_D3DTEXTURE|LIO_RELATIVEPATH|LIO_RESTORABLE);
+        return;
+    }
 
-#if 0 // SBF - unused	
+#if 0  // SBF - unused	
 	//SelectGenTexDirectory(ITI_TEXTURE);
 
 	/* set game mode: different, though for multiplayer game */
@@ -255,31 +244,28 @@ void PlatformSpecificInitMarineHUD(void)
 	MT_BlipWidth = HUDDDInfo[MARINE_HUD_GFX_MOTIONTRACKERBLIP].SrcRect.right;
 
 
-	LoadDDGraphic(&PauseDDInfo,"paused");	
+	LoadDDGraphic(&PauseDDInfo,"paused");
 #endif // SBF
 }
 
 void PlatformSpecificInitPredatorHUD(void)
 {
-	//SelectGenTexDirectory(ITI_TEXTURE);
-	/* set game mode: different, though for multiplayer game */
-	if(AvP.Network==I_No_Network)
-	{
-		cl_pszGameMode = "predator";
-		/* load in sfx */
-		LoadCommonTextures();
-	}
-	else
-	{
-		cl_pszGameMode = "multip";
-		/* load in sfx */
-		LoadCommonTextures();
-		//load marine stuff as well
-		D3D_InitialiseMarineHUD();
-	}
-	return;
+    //SelectGenTexDirectory(ITI_TEXTURE);
+    /* set game mode: different, though for multiplayer game */
+    if (AvP.Network == I_No_Network) {
+        cl_pszGameMode = "predator";
+        /* load in sfx */
+        LoadCommonTextures();
+    } else {
+        cl_pszGameMode = "multip";
+        /* load in sfx */
+        LoadCommonTextures();
+        //load marine stuff as well
+        D3D_InitialiseMarineHUD();
+    }
+    return;
 
-#if 0 // SBF - unused
+#if 0  // SBF - unused
 	int gfxID = NO_OF_PREDATOR_HUD_GFX;
 	
 	if (ScreenDescriptorBlock.SDB_Width>=640)
@@ -312,32 +298,28 @@ void PlatformSpecificInitPredatorHUD(void)
 		}
 		LoadDDGraphic(&E3FontDDInfo,"e3font");	
 	}
-  	LoadDDGraphic(&PauseDDInfo,"paused");	
+  	LoadDDGraphic(&PauseDDInfo,"paused");
 #endif // SBF
 }
 
-
 void PlatformSpecificInitAlienHUD(void)
 {
-	//SelectGenTexDirectory(ITI_TEXTURE);
-	/* set game mode: different, though for multiplayer game */
-	if(AvP.Network==I_No_Network)
-	{
-		cl_pszGameMode = "alien";
-		LoadCommonTextures();
-	}
-	else
-	{
-		cl_pszGameMode = "multip";
-		/* load in sfx */
-		LoadCommonTextures();
-		//load marine stuff as well
-		D3D_InitialiseMarineHUD();
-	}
+    //SelectGenTexDirectory(ITI_TEXTURE);
+    /* set game mode: different, though for multiplayer game */
+    if (AvP.Network == I_No_Network) {
+        cl_pszGameMode = "alien";
+        LoadCommonTextures();
+    } else {
+        cl_pszGameMode = "multip";
+        /* load in sfx */
+        LoadCommonTextures();
+        //load marine stuff as well
+        D3D_InitialiseMarineHUD();
+    }
 
-	return;
+    return;
 
-#if 0 // SBF - unused	
+#if 0  // SBF - unused	
 	int gfxID = NO_OF_ALIEN_HUD_GFX;
 
 	if (ScreenDescriptorBlock.SDB_Width==640)
@@ -371,149 +353,133 @@ void PlatformSpecificInitAlienHUD(void)
 		}
 		LoadDDGraphic(&E3FontDDInfo,"e3font");	
 	}
-	LoadDDGraphic(&PauseDDInfo,"paused");	
+	LoadDDGraphic(&PauseDDInfo,"paused");
 #endif // SBF
 }
-
 
 /*JH 14/5/97*****************************
 *            KILLING THE HUD            *
 ************************************JH**/
 
-
 void PlatformSpecificKillMarineHUD(void)
 {
-	int gfxID = NO_OF_MARINE_HUD_GFX;
-	
-	while(gfxID--)			      
-    {
-		if (HUDDDInfo[gfxID].hBackup)
-		{
-			ATRemoveSurface(HUDDDInfo[gfxID].LPDDS);
-			AwDestroyBackupTexture( HUDDDInfo[gfxID].hBackup );
-		}
-		if (HUDDDInfo[gfxID].LPDDS)
-//			HUDDDInfo[gfxID].LPDDS->Release();
-			fprintf(stderr, "PlatformSpecificKillMarineHUD: HUDDDInfo[gfxID].LPDDS\n");
-			
-		HUDDDInfo[gfxID].LPDDS = 0;
-		HUDDDInfo[gfxID].hBackup = 0;
-	}
-	
-	if (PauseDDInfo.hBackup)
-	{
-		ATRemoveSurface(PauseDDInfo.LPDDS);
-		AwDestroyBackupTexture( PauseDDInfo.hBackup );
-	}
-	if (PauseDDInfo.LPDDS)
-//		PauseDDInfo.LPDDS->Release();	
-		fprintf(stderr, "PlatformSpecificKillMarineHUD: PauseDDInfo.LPDDS\n");
-		
-	PauseDDInfo.LPDDS = 0;
-	PauseDDInfo.hBackup = 0;
-	
-	if (E3FontDDInfo.hBackup)
-	{
-		ATRemoveSurface(E3FontDDInfo.LPDDS);
-		AwDestroyBackupTexture( E3FontDDInfo.hBackup );
-	}
-	if (E3FontDDInfo.LPDDS)
-//		E3FontDDInfo.LPDDS->Release();	
-		fprintf(stderr, "PlatformSpecificKillMarineHUD: E3FontDDInfo.LPDDS\n");
-		
-	E3FontDDInfo.LPDDS = 0;
-	E3FontDDInfo.hBackup = 0;
+    int gfxID = NO_OF_MARINE_HUD_GFX;
+
+    while (gfxID--) {
+        if (HUDDDInfo[gfxID].hBackup) {
+            ATRemoveSurface(HUDDDInfo[gfxID].LPDDS);
+            AwDestroyBackupTexture(HUDDDInfo[gfxID].hBackup);
+        }
+        if (HUDDDInfo[gfxID].LPDDS)
+            //			HUDDDInfo[gfxID].LPDDS->Release();
+            fprintf(stderr, "PlatformSpecificKillMarineHUD: HUDDDInfo[gfxID].LPDDS\n");
+
+        HUDDDInfo[gfxID].LPDDS = 0;
+        HUDDDInfo[gfxID].hBackup = 0;
+    }
+
+    if (PauseDDInfo.hBackup) {
+        ATRemoveSurface(PauseDDInfo.LPDDS);
+        AwDestroyBackupTexture(PauseDDInfo.hBackup);
+    }
+    if (PauseDDInfo.LPDDS)
+        //		PauseDDInfo.LPDDS->Release();
+        fprintf(stderr, "PlatformSpecificKillMarineHUD: PauseDDInfo.LPDDS\n");
+
+    PauseDDInfo.LPDDS = 0;
+    PauseDDInfo.hBackup = 0;
+
+    if (E3FontDDInfo.hBackup) {
+        ATRemoveSurface(E3FontDDInfo.LPDDS);
+        AwDestroyBackupTexture(E3FontDDInfo.hBackup);
+    }
+    if (E3FontDDInfo.LPDDS)
+        //		E3FontDDInfo.LPDDS->Release();
+        fprintf(stderr, "PlatformSpecificKillMarineHUD: E3FontDDInfo.LPDDS\n");
+
+    E3FontDDInfo.LPDDS = 0;
+    E3FontDDInfo.hBackup = 0;
 }
 
 void PlatformSpecificKillPredatorHUD(void)
 {
-	/* load HUD gfx */
-	int gfxID = NO_OF_PREDATOR_HUD_GFX;
+    /* load HUD gfx */
+    int gfxID = NO_OF_PREDATOR_HUD_GFX;
 
-	while(gfxID--)			      
-    {
-		if (HUDDDInfo[gfxID].hBackup)
-		{
-			ATRemoveSurface(HUDDDInfo[gfxID].LPDDS);
-			AwDestroyBackupTexture( HUDDDInfo[gfxID].hBackup );
-		}
-		if (HUDDDInfo[gfxID].LPDDS)
-//			HUDDDInfo[gfxID].LPDDS->Release();
-			fprintf(stderr, "PlatformSpecificKillPredatorHUD: HUDDDInfo[gfxID].LPDDS\n");
-			
-		HUDDDInfo[gfxID].LPDDS = 0;
-		HUDDDInfo[gfxID].hBackup = 0;
-	}
-	
-	if (PauseDDInfo.hBackup)
-	{
-		ATRemoveSurface(PauseDDInfo.LPDDS);
-		AwDestroyBackupTexture( PauseDDInfo.hBackup );
-	}
-	if (PauseDDInfo.LPDDS)
-//		PauseDDInfo.LPDDS->Release();	
-		fprintf(stderr, "PlatformSpecificKillPredatorHUD: PauseDDInfo.LPDDS\n");
-		
-	PauseDDInfo.LPDDS = 0;
-	PauseDDInfo.hBackup = 0;
-	
-	if (E3FontDDInfo.hBackup)
-	{
-		ATRemoveSurface(E3FontDDInfo.LPDDS);
-		AwDestroyBackupTexture( E3FontDDInfo.hBackup );
-	}
-	if (E3FontDDInfo.LPDDS)
-//		E3FontDDInfo.LPDDS->Release();	
-		fprintf(stderr, "PlatformSpecificKillPredatorHUD: E3FontDDInfo.LPDDS\n");
-		
-	E3FontDDInfo.LPDDS = 0;
-	E3FontDDInfo.hBackup = 0;
+    while (gfxID--) {
+        if (HUDDDInfo[gfxID].hBackup) {
+            ATRemoveSurface(HUDDDInfo[gfxID].LPDDS);
+            AwDestroyBackupTexture(HUDDDInfo[gfxID].hBackup);
+        }
+        if (HUDDDInfo[gfxID].LPDDS)
+            //			HUDDDInfo[gfxID].LPDDS->Release();
+            fprintf(stderr, "PlatformSpecificKillPredatorHUD: HUDDDInfo[gfxID].LPDDS\n");
+
+        HUDDDInfo[gfxID].LPDDS = 0;
+        HUDDDInfo[gfxID].hBackup = 0;
+    }
+
+    if (PauseDDInfo.hBackup) {
+        ATRemoveSurface(PauseDDInfo.LPDDS);
+        AwDestroyBackupTexture(PauseDDInfo.hBackup);
+    }
+    if (PauseDDInfo.LPDDS)
+        //		PauseDDInfo.LPDDS->Release();
+        fprintf(stderr, "PlatformSpecificKillPredatorHUD: PauseDDInfo.LPDDS\n");
+
+    PauseDDInfo.LPDDS = 0;
+    PauseDDInfo.hBackup = 0;
+
+    if (E3FontDDInfo.hBackup) {
+        ATRemoveSurface(E3FontDDInfo.LPDDS);
+        AwDestroyBackupTexture(E3FontDDInfo.hBackup);
+    }
+    if (E3FontDDInfo.LPDDS)
+        //		E3FontDDInfo.LPDDS->Release();
+        fprintf(stderr, "PlatformSpecificKillPredatorHUD: E3FontDDInfo.LPDDS\n");
+
+    E3FontDDInfo.LPDDS = 0;
+    E3FontDDInfo.hBackup = 0;
 }
-
 
 void PlatformSpecificKillAlienHUD(void)
 {
-	int gfxID = NO_OF_ALIEN_HUD_GFX;
-	while(gfxID--)			      
-    {
-		if (HUDDDInfo[gfxID].hBackup)
-		{
-			ATRemoveSurface(HUDDDInfo[gfxID].LPDDS);
-			AwDestroyBackupTexture( HUDDDInfo[gfxID].hBackup );
-		}
-		if (HUDDDInfo[gfxID].LPDDS)
-//			HUDDDInfo[gfxID].LPDDS->Release();
-			fprintf(stderr, "PlatformSpecificKillAlienHUD: HUDDDInfo[gfxID].LPDDS\n");
-			
-		HUDDDInfo[gfxID].LPDDS = 0;
-		HUDDDInfo[gfxID].hBackup = 0;
-	}
-	
-	if (PauseDDInfo.hBackup)
-	{
-		ATRemoveSurface(PauseDDInfo.LPDDS);
-		AwDestroyBackupTexture( PauseDDInfo.hBackup );
-	}
-	if (PauseDDInfo.LPDDS)
-//		PauseDDInfo.LPDDS->Release();	
-		fprintf(stderr, "PlatformSpecificKillAlienHUD: PauseDDInfo.LPDDS\n");
-		
-	PauseDDInfo.LPDDS = 0;
-	PauseDDInfo.hBackup = 0;
-	
-	if (E3FontDDInfo.hBackup)
-	{
-		ATRemoveSurface(E3FontDDInfo.LPDDS);
-		AwDestroyBackupTexture( E3FontDDInfo.hBackup );
-	}
-	if (E3FontDDInfo.LPDDS)
-//		E3FontDDInfo.LPDDS->Release();	
-		fprintf(stderr, "PlatformSpecificKillAlienHUD: E3FontDDInfo.LPDDS\n");
-		
-	E3FontDDInfo.LPDDS = 0;
-	E3FontDDInfo.hBackup = 0;
-}
+    int gfxID = NO_OF_ALIEN_HUD_GFX;
+    while (gfxID--) {
+        if (HUDDDInfo[gfxID].hBackup) {
+            ATRemoveSurface(HUDDDInfo[gfxID].LPDDS);
+            AwDestroyBackupTexture(HUDDDInfo[gfxID].hBackup);
+        }
+        if (HUDDDInfo[gfxID].LPDDS)
+            //			HUDDDInfo[gfxID].LPDDS->Release();
+            fprintf(stderr, "PlatformSpecificKillAlienHUD: HUDDDInfo[gfxID].LPDDS\n");
 
+        HUDDDInfo[gfxID].LPDDS = 0;
+        HUDDDInfo[gfxID].hBackup = 0;
+    }
+
+    if (PauseDDInfo.hBackup) {
+        ATRemoveSurface(PauseDDInfo.LPDDS);
+        AwDestroyBackupTexture(PauseDDInfo.hBackup);
+    }
+    if (PauseDDInfo.LPDDS)
+        //		PauseDDInfo.LPDDS->Release();
+        fprintf(stderr, "PlatformSpecificKillAlienHUD: PauseDDInfo.LPDDS\n");
+
+    PauseDDInfo.LPDDS = 0;
+    PauseDDInfo.hBackup = 0;
+
+    if (E3FontDDInfo.hBackup) {
+        ATRemoveSurface(E3FontDDInfo.LPDDS);
+        AwDestroyBackupTexture(E3FontDDInfo.hBackup);
+    }
+    if (E3FontDDInfo.LPDDS)
+        //		E3FontDDInfo.LPDDS->Release();
+        fprintf(stderr, "PlatformSpecificKillAlienHUD: E3FontDDInfo.LPDDS\n");
+
+    E3FontDDInfo.LPDDS = 0;
+    E3FontDDInfo.hBackup = 0;
+}
 
 /*********************/
 /* RUNTIME HUD STUFF */
@@ -535,14 +501,13 @@ void PlatformSpecificExitingHUD(void)
 
 void PlatformSpecificEnteringHUD(void)
 {
-	/* JH 13/5/97 */
-	/* Flush the ZBuffer so the weapons don't sink into the wall! */
-	#if SupportZBuffering
-	if ((ScanDrawMode != ScanDrawDirectDraw) && (ZBufferMode != ZBufferOff))
-	{
-		//		FlushD3DZBuffer();
-	}
-	#endif
+/* JH 13/5/97 */
+/* Flush the ZBuffer so the weapons don't sink into the wall! */
+#if SupportZBuffering
+    if ((ScanDrawMode != ScanDrawDirectDraw) && (ZBufferMode != ZBufferOff)) {
+        //		FlushD3DZBuffer();
+    }
+#endif
 
 #if 0
 	/* KJL 11:37:49 06/14/97 - reinit execute buffer */
@@ -559,67 +524,48 @@ void PlatformSpecificEnteringHUD(void)
 **********************KJL*/
 void BLTMotionTrackerToHUD(int scanLineSize)
 {
- //	if (VideoModeType_8 != VideoModeTypeScreen) return;
-	if ((ScanDrawMode != ScanDrawDirectDraw) && (ZBufferOn==ZBufferMode))
-	{
-		D3D_BLTMotionTrackerToHUD(scanLineSize);
-	}
-	return;
-	
+    //	if (VideoModeType_8 != VideoModeTypeScreen) return;
+    if ((ScanDrawMode != ScanDrawDirectDraw) && (ZBufferOn == ZBufferMode)) {
+        D3D_BLTMotionTrackerToHUD(scanLineSize);
+    }
+    return;
 }
 
 void BLTMotionTrackerBlipToHUD(int x, int y, int brightness)
 {
-	if ((ScanDrawMode != ScanDrawDirectDraw) && (ZBufferOn==ZBufferMode))
-	{
-		D3D_BLTMotionTrackerBlipToHUD(x,y,brightness);
-	}
-	return;
-
+    if ((ScanDrawMode != ScanDrawDirectDraw) && (ZBufferOn == ZBufferMode)) {
+        D3D_BLTMotionTrackerBlipToHUD(x, y, brightness);
+    }
+    return;
 }
-
 
 /*KJL*******************
 * Draw numerics to HUD *
 *******************KJL*/
 extern void BLTMarineNumericsToHUD(enum MARINE_HUD_DIGIT digitsToDraw)
 {
-   	int digit = digitsToDraw;
+    int digit = digitsToDraw;
     struct DigitPropertiesTag *propertiesPtr;
 
-	
-	if (HUDResolution == HUD_RES_LO)
-	{
-		propertiesPtr = &LoresMarineHUDDigitProperties[digit];
-	}
-	else if (HUDResolution == HUD_RES_MED)
-	{
-		propertiesPtr = &MedresMarineHUDDigitProperties[digit];
-	}
-	else
-	{
-		propertiesPtr = &HiresMarineHUDDigitProperties[digit];
-	}
-
-    do
-	{
-    	/* paranoia check */
-    	LOCALASSERT(ValueOfHUDDigit[digit]>=0 && ValueOfHUDDigit[digit]<=9);
-		
-		if ((ScanDrawMode != ScanDrawDirectDraw) && (ZBufferOn==ZBufferMode))
-		{
-	    	D3D_BLTDigitToHUD
-			(
-				ValueOfHUDDigit[digit],
-				propertiesPtr->X,
-			    propertiesPtr->Y,
-		        propertiesPtr->Font
-		    );
-		}
-		propertiesPtr--;
+    if (HUDResolution == HUD_RES_LO) {
+        propertiesPtr = &LoresMarineHUDDigitProperties[digit];
+    } else if (HUDResolution == HUD_RES_MED) {
+        propertiesPtr = &MedresMarineHUDDigitProperties[digit];
+    } else {
+        propertiesPtr = &HiresMarineHUDDigitProperties[digit];
     }
-    while(digit--);
-}	
+
+    do {
+        /* paranoia check */
+        LOCALASSERT(ValueOfHUDDigit[digit] >= 0 && ValueOfHUDDigit[digit] <= 9);
+
+        if ((ScanDrawMode != ScanDrawDirectDraw) && (ZBufferOn == ZBufferMode)) {
+            D3D_BLTDigitToHUD(
+                ValueOfHUDDigit[digit], propertiesPtr->X, propertiesPtr->Y, propertiesPtr->Font);
+        }
+        propertiesPtr--;
+    } while (digit--);
+}
 
 #if 0 /* SBF - TODO: remove */
 static void BLTDigitToHUD(char digit, int x, int y, int font)
@@ -690,19 +636,16 @@ static void BLTDigitToHUD(char digit, int x, int y, int font)
 	}
 */
 	fprintf(stderr, "BLTDigitToHUD(%d, %d, %d, %d)\n", digit, x, y, font);	
-}		  
+}
 #endif
-
 
 void BLTGunSightToScreen(int screenX, int screenY, enum GUNSIGHT_SHAPE gunsightShape)
 {
-	if ((ScanDrawMode != ScanDrawDirectDraw) && (ZBufferOn==ZBufferMode))
-	{
-		D3D_BLTGunSightToHUD(screenX,screenY,gunsightShape);
-		return;
-	}
+    if ((ScanDrawMode != ScanDrawDirectDraw) && (ZBufferOn == ZBufferMode)) {
+        D3D_BLTGunSightToHUD(screenX, screenY, gunsightShape);
+        return;
+    }
 }
-
 
 #if 0 /* SBF - TODO: remove this directdraw code */
 
@@ -1355,13 +1298,7 @@ int BLTFontOffsetToHUD(PFFONT* font , int xdest, int ydest, int offset)
 	return(font->srcRect[offset].right - font->srcRect[offset].left);
 }
 
-
-
 #endif // SBF
-
-
-
-
 
 void YClipMotionTrackerVertices(struct VertexTag *v1, struct VertexTag *v2);
 void XClipMotionTrackerVertices(struct VertexTag *v1, struct VertexTag *v2);
@@ -1421,13 +1358,13 @@ static void DrawMotionTrackerPoly(void)
 	vertex[1].Y += MotionTrackerCentreY;
 	vertex[2].Y += MotionTrackerCentreY;
 	vertex[3].Y += MotionTrackerCentreY;
-	#if 0
+#if 0
 	textprint("%d %d   %d %d\n%d %d   %d %d\n%d %d   %d %d\n%d %d   %d %d\n",
 		vertex[0].X,vertex[0].Y,vertex[0].U,vertex[0].V,
 		vertex[1].X,vertex[1].Y,vertex[1].U,vertex[1].V,
 		vertex[2].X,vertex[2].Y,vertex[2].U,vertex[2].V,
 		vertex[3].X,vertex[3].Y,vertex[3].U,vertex[3].V);
-	#endif
+#endif
 	
 	/* dodgy offset 'cos I'm not x clipping */
 	if (vertex[0].X==-1) vertex[0].X = 0;
@@ -1469,78 +1406,80 @@ static void DrawMotionTrackerPoly(void)
 
 void YClipMotionTrackerVertices(struct VertexTag *v1, struct VertexTag *v2)
 {
-	char vertex1Inside=0,vertex2Inside=0;
+    char vertex1Inside = 0, vertex2Inside = 0;
 
-	if (v1->Y<0) vertex1Inside = 1;
-	if (v2->Y<0) vertex2Inside = 1;
+    if (v1->Y < 0)
+        vertex1Inside = 1;
+    if (v2->Y < 0)
+        vertex2Inside = 1;
 
-	/* if both vertices inside clip region no clipping required */
-	if (vertex1Inside && vertex2Inside) return;
+    /* if both vertices inside clip region no clipping required */
+    if (vertex1Inside && vertex2Inside)
+        return;
 
-	/* if both vertices outside clip region no action required 
+    /* if both vertices outside clip region no action required 
 	(the other lines will be clipped) */
-	if (!vertex1Inside && !vertex2Inside) return;
+    if (!vertex1Inside && !vertex2Inside)
+        return;
 
-	/* okay, let's clip */
-	if (vertex1Inside)
-	{
-		int lambda = DIV_FIXED(v1->Y,v2->Y - v1->Y);
+    /* okay, let's clip */
+    if (vertex1Inside) {
+        int lambda = DIV_FIXED(v1->Y, v2->Y - v1->Y);
 
-		v2->X = v1->X - MUL_FIXED(v2->X - v1->X,lambda);
-		v2->Y=0;
+        v2->X = v1->X - MUL_FIXED(v2->X - v1->X, lambda);
+        v2->Y = 0;
 
-		v2->U = v1->U - MUL_FIXED(v2->U - v1->U,lambda);
-		v2->V = v1->V - MUL_FIXED(v2->V - v1->V,lambda);
-	}
-	else
-	{
-		int lambda = DIV_FIXED(v2->Y,v1->Y - v2->Y);
+        v2->U = v1->U - MUL_FIXED(v2->U - v1->U, lambda);
+        v2->V = v1->V - MUL_FIXED(v2->V - v1->V, lambda);
+    } else {
+        int lambda = DIV_FIXED(v2->Y, v1->Y - v2->Y);
 
-		v1->X = v2->X - MUL_FIXED(v1->X - v2->X,lambda);
-		v1->Y=0;
+        v1->X = v2->X - MUL_FIXED(v1->X - v2->X, lambda);
+        v1->Y = 0;
 
-		v1->U = v2->U - MUL_FIXED(v1->U - v2->U,lambda);
-		v1->V = v2->V - MUL_FIXED(v1->V - v2->V,lambda);
-	}
+        v1->U = v2->U - MUL_FIXED(v1->U - v2->U, lambda);
+        v1->V = v2->V - MUL_FIXED(v1->V - v2->V, lambda);
+    }
 }
 void XClipMotionTrackerVertices(struct VertexTag *v1, struct VertexTag *v2)
 {
-	char vertex1Inside=0,vertex2Inside=0;
+    char vertex1Inside = 0, vertex2Inside = 0;
 
-	if (v1->X>0) vertex1Inside = 1;
-	if (v1->X>0) vertex1Inside = 1;
+    if (v1->X > 0)
+        vertex1Inside = 1;
+    if (v1->X > 0)
+        vertex1Inside = 1;
 
-	/* if both vertices inside clip region no clipping required */
-	if (vertex1Inside && vertex2Inside) return;
+    /* if both vertices inside clip region no clipping required */
+    if (vertex1Inside && vertex2Inside)
+        return;
 
-	/* if both vertices outside clip region no action required 
+    /* if both vertices outside clip region no action required 
 	(the other lines will be clipped) */
-	if (!vertex1Inside && !vertex2Inside) return;
+    if (!vertex1Inside && !vertex2Inside)
+        return;
 
-	/* okay, let's clip */
-	if (vertex1Inside)
-	{
-		int lambda = DIV_FIXED(v1->X,v2->X - v1->X);
+    /* okay, let's clip */
+    if (vertex1Inside) {
+        int lambda = DIV_FIXED(v1->X, v2->X - v1->X);
 
-		v2->Y = v1->Y - MUL_FIXED(v2->Y - v1->Y,lambda);
-		v2->X=0;
+        v2->Y = v1->Y - MUL_FIXED(v2->Y - v1->Y, lambda);
+        v2->X = 0;
 
-		v2->U = v1->U - MUL_FIXED(v2->U - v1->U,lambda);
-		v2->V = v1->V - MUL_FIXED(v2->V - v1->V,lambda);
-	}
-	else
-	{
-		int lambda = DIV_FIXED(v2->X,v1->X - v2->X);
+        v2->U = v1->U - MUL_FIXED(v2->U - v1->U, lambda);
+        v2->V = v1->V - MUL_FIXED(v2->V - v1->V, lambda);
+    } else {
+        int lambda = DIV_FIXED(v2->X, v1->X - v2->X);
 
-		v1->Y = v2->Y - MUL_FIXED(v1->Y - v2->Y,lambda);
-		v1->X=0;
+        v1->Y = v2->Y - MUL_FIXED(v1->Y - v2->Y, lambda);
+        v1->X = 0;
 
-		v1->U = v2->U - MUL_FIXED(v1->U - v2->U,lambda);
-		v1->V = v2->V - MUL_FIXED(v1->V - v2->V,lambda);
-	}
-}				    
+        v1->U = v2->U - MUL_FIXED(v1->U - v2->U, lambda);
+        v1->V = v2->V - MUL_FIXED(v1->V - v2->V, lambda);
+    }
+}
 
-#if 0 // SBF - unused
+#if 0  // SBF - unused
 static void SetupScanlinePoly(char const *filenamePtr, int width)
 {
 	int imageNumber;
@@ -1567,4 +1506,4 @@ static void SetupScanlinePoly(char const *filenamePtr, int width)
 }
 #endif // SBF
 
-}; // extern 
+}; // extern

@@ -31,7 +31,7 @@
 #define _rentrntq 1
 
 #ifdef __cplusplus
-	extern "C" {
+extern "C" {
 #endif
 
 /* Version settings *****************************************************/
@@ -45,27 +45,19 @@
 /* Exported globals *****************************************************/
 
 /* Function prototypes **************************************************/
-	/* Functions callable within the Windows procedure */
-	extern void RE_ENTRANT_QUEUE_WinProc_AddMessage_WM_CHAR
-	(
-		char Ch
-	);
+/* Functions callable within the Windows procedure */
+extern void RE_ENTRANT_QUEUE_WinProc_AddMessage_WM_CHAR(char Ch);
 
-	extern void RE_ENTRANT_QUEUE_WinProc_AddMessage_WM_KEYDOWN
-	(
-		WPARAM wParam
-	);
+extern void RE_ENTRANT_QUEUE_WinProc_AddMessage_WM_KEYDOWN(WPARAM wParam);
 
-	/* Functions callable from the WinMain() body of code */
-	extern void RE_ENTRANT_QUEUE_WinMain_FlushMessages(void);
-	extern void RE_ENTRANT_QUEUE_WinMain_FlushMessagesWithoutProcessing(void);
-
+/* Functions callable from the WinMain() body of code */
+extern void RE_ENTRANT_QUEUE_WinMain_FlushMessages(void);
+extern void RE_ENTRANT_QUEUE_WinMain_FlushMessagesWithoutProcessing(void);
 
 /* End of the header ****************************************************/
 
-
 #ifdef __cplusplus
-	};
+};
 #endif
 
 #endif

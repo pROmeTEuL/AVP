@@ -3,29 +3,28 @@
 
 typedef struct
 {
-	IMAGEHEADER *ImagePtr;
-	int SoundVolume;
-	int IsTriggeredPlotFMV;
-	int StaticImageDrawn;
+    IMAGEHEADER *ImagePtr;
+    int SoundVolume;
+    int IsTriggeredPlotFMV;
+    int StaticImageDrawn;
 
-	int MessageNumber;
+    int MessageNumber;
 
-	// disabled direct3d stuff
-	//LPDIRECTDRAWSURFACE SrcSurface;
-	//LPDIRECT3DTEXTURE SrcTexture;
-	//LPDIRECT3DTEXTURE DestTexture;
-	PALETTEENTRY SrcPalette[256];
-	
-	// buffer used for opengl texture uploads
-	unsigned char* PalettedBuf;
-	unsigned char* RGBBuf;
-	
-	int RedScale;
-	int GreenScale;
-	int BlueScale;
+    // disabled direct3d stuff
+    //LPDIRECTDRAWSURFACE SrcSurface;
+    //LPDIRECT3DTEXTURE SrcTexture;
+    //LPDIRECT3DTEXTURE DestTexture;
+    PALETTEENTRY SrcPalette[256];
+
+    // buffer used for opengl texture uploads
+    unsigned char *PalettedBuf;
+    unsigned char *RGBBuf;
+
+    int RedScale;
+    int GreenScale;
+    int BlueScale;
 
 } FMVTEXTURE;
-
 
 extern int NextFMVTextureFrame(FMVTEXTURE *ftPtr, void *bufferPtr);
 extern void UpdateFMVTexturePalette(FMVTEXTURE *ftPtr);

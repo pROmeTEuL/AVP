@@ -24,156 +24,156 @@
 	but can't because of heritage code (and heritage libraries).
 */
 
-	#ifndef _dcontext_hpp
-		#include "dcontext.hpp"
-	#endif
+#ifndef _dcontext_hpp
+#include "dcontext.hpp"
+#endif
 
 struct LogFile : public R_DumpContext
 {
 private:
-	char * fname;
-	List<char *> unwritten;
-	int ever_written;
-	void FlushOut(FILE * fp);
+    char *fname;
+    List<char *> unwritten;
+    int ever_written;
+    void FlushOut(FILE *fp);
 
 public:
-	LogFile(char const * const _fname);
-	virtual ~LogFile();
-	LogFile & operator = (LogFile const & l);
-	LogFile(LogFile const & l);
+    LogFile(char const *const _fname);
+    virtual ~LogFile();
+    LogFile &operator=(LogFile const &l);
+    LogFile(LogFile const &l);
 
-	// {{{ Virtual dump implementations:
-	inline int dputs(char const * const buf)
-	{
-		if (!fname) return EOF;
-		FILE * fp = fopen(fname,"a");
-		if (!fp)
-		{
-			if (!ever_written) return EOF;
-			char * newtxt = new char [strlen(buf)+1];
-			strcpy(newtxt,buf);
-			unwritten.add_entry_end(newtxt);
-			return 0;
-		}
-		if (unwritten.size()) FlushOut(fp);
-		ever_written = 1;
-		int rv = fputs(buf,fp);
-		fclose(fp);
-		return rv;
-	}
+    // {{{ Virtual dump implementations:
+    inline int dputs(char const *const buf)
+    {
+        if (!fname)
+            return EOF;
+        FILE *fp = fopen(fname, "a");
+        if (!fp) {
+            if (!ever_written)
+                return EOF;
+            char *newtxt = new char[strlen(buf) + 1];
+            strcpy(newtxt, buf);
+            unwritten.add_entry_end(newtxt);
+            return 0;
+        }
+        if (unwritten.size())
+            FlushOut(fp);
+        ever_written = 1;
+        int rv = fputs(buf, fp);
+        fclose(fp);
+        return rv;
+    }
 
-	inline int dprintf(char const * format, ... )
-	{
-		if (!fname) return -1;
-		FILE * fp = fopen(fname,"a");
-		if (!fp && !ever_written) return -1;
-		va_list ap;
-		va_start(ap, format);
-		int rv;
-		if (fp)
-		{
-			if (unwritten.size()) FlushOut(fp);
-			rv = vfprintf(fp,format,ap);
-			ever_written = 1;
-		}
-		else
-		{
-			char buf[4096];
-			rv = vsprintf(buf,format,ap);
-			char * newtxt = new char [strlen(buf)+1];
-			strcpy(newtxt,buf);
-			unwritten.add_entry_end(newtxt);
-		}
-		va_end(ap);
-		if (fp) fclose(fp);
-		return rv;
-	}
+    inline int dprintf(char const *format, ...)
+    {
+        if (!fname)
+            return -1;
+        FILE *fp = fopen(fname, "a");
+        if (!fp && !ever_written)
+            return -1;
+        va_list ap;
+        va_start(ap, format);
+        int rv;
+        if (fp) {
+            if (unwritten.size())
+                FlushOut(fp);
+            rv = vfprintf(fp, format, ap);
+            ever_written = 1;
+        } else {
+            char buf[4096];
+            rv = vsprintf(buf, format, ap);
+            char *newtxt = new char[strlen(buf) + 1];
+            strcpy(newtxt, buf);
+            unwritten.add_entry_end(newtxt);
+        }
+        va_end(ap);
+        if (fp)
+            fclose(fp);
+        return rv;
+    }
 
-	inline int vdprintf(char const * format, va_list ap)
-	{
-		if (!fname) return -1;
-		FILE * fp = fopen(fname,"a");
-		if (!fp && !ever_written) return -1;
+    inline int vdprintf(char const *format, va_list ap)
+    {
+        if (!fname)
+            return -1;
+        FILE *fp = fopen(fname, "a");
+        if (!fp && !ever_written)
+            return -1;
 
-		int rv;
-		if (fp)
-		{
-			if (unwritten.size()) FlushOut(fp);
-			rv = vfprintf(fp,format,ap);
-			ever_written = 1;
-			fclose(fp);
-		}
-		else
-		{
-			char buf[4096];
-			rv = vsprintf(buf,format,ap);
-			char * newtxt = new char [strlen(buf)+1];
-			strcpy(newtxt,buf);
-			unwritten.add_entry_end(newtxt);
-		}
-		return rv;
-	}
-	// }}}
+        int rv;
+        if (fp) {
+            if (unwritten.size())
+                FlushOut(fp);
+            rv = vfprintf(fp, format, ap);
+            ever_written = 1;
+            fclose(fp);
+        } else {
+            char buf[4096];
+            rv = vsprintf(buf, format, ap);
+            char *newtxt = new char[strlen(buf) + 1];
+            strcpy(newtxt, buf);
+            unwritten.add_entry_end(newtxt);
+        }
+        return rv;
+    }
+    // }}}
 
-	// {{{ Deprecated logging functions:
-	inline int lputs(char const * const buf)
-	{
-		return dputs(buf);
-	}
+    // {{{ Deprecated logging functions:
+    inline int lputs(char const *const buf) { return dputs(buf); }
 
-	inline int lprintf(char const * format, ... )
-	{
-		if (!fname) return -1;
-		FILE * fp = fopen(fname,"a");
-		if (!fp && !ever_written) return -1;
-		va_list ap;
-		va_start(ap, format);
-		int rv;
-		if (fp)
-		{
-			if (unwritten.size()) FlushOut(fp);
-			rv = vfprintf(fp,format,ap);
-			ever_written = 1;
-		}
-		else
-		{
-			char buf[4096];
-			rv = vsprintf(buf,format,ap);
-			char * newtxt = new char [strlen(buf)+1];
-			strcpy(newtxt,buf);
-			unwritten.add_entry_end(newtxt);
-		}
-		va_end(ap);
-		if (fp) fclose(fp);
-		return rv;
-	}
+    inline int lprintf(char const *format, ...)
+    {
+        if (!fname)
+            return -1;
+        FILE *fp = fopen(fname, "a");
+        if (!fp && !ever_written)
+            return -1;
+        va_list ap;
+        va_start(ap, format);
+        int rv;
+        if (fp) {
+            if (unwritten.size())
+                FlushOut(fp);
+            rv = vfprintf(fp, format, ap);
+            ever_written = 1;
+        } else {
+            char buf[4096];
+            rv = vsprintf(buf, format, ap);
+            char *newtxt = new char[strlen(buf) + 1];
+            strcpy(newtxt, buf);
+            unwritten.add_entry_end(newtxt);
+        }
+        va_end(ap);
+        if (fp)
+            fclose(fp);
+        return rv;
+    }
 
-	inline int vlprintf(char const * format, va_list ap)
-	{
-		if (!fname) return -1;
-		FILE * fp = fopen(fname,"a");
-		if (!fp && !ever_written) return -1;
+    inline int vlprintf(char const *format, va_list ap)
+    {
+        if (!fname)
+            return -1;
+        FILE *fp = fopen(fname, "a");
+        if (!fp && !ever_written)
+            return -1;
 
-		int rv;
-		if (fp)
-		{
-			if (unwritten.size()) FlushOut(fp);
-			rv = vfprintf(fp,format,ap);
-			ever_written = 1;
-			fclose(fp);
-		}
-		else
-		{
-			char buf[4096];
-			rv = vsprintf(buf,format,ap);
-			char * newtxt = new char [strlen(buf)+1];
-			strcpy(newtxt,buf);
-			unwritten.add_entry_end(newtxt);
-		}
-		return rv;
-	}
-	// }}}
-
+        int rv;
+        if (fp) {
+            if (unwritten.size())
+                FlushOut(fp);
+            rv = vfprintf(fp, format, ap);
+            ever_written = 1;
+            fclose(fp);
+        } else {
+            char buf[4096];
+            rv = vsprintf(buf, format, ap);
+            char *newtxt = new char[strlen(buf) + 1];
+            strcpy(newtxt, buf);
+            unwritten.add_entry_end(newtxt);
+        }
+        return rv;
+    }
+    // }}}
 };
 
 #endif // ! _included_debuglog_hpp_

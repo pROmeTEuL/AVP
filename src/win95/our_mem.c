@@ -2,7 +2,7 @@
 
 #include <stdlib.h>
 
-#define UseLocalAssert  No
+#define UseLocalAssert No
 
 #include "ourasert.h"
 
@@ -21,12 +21,12 @@ void DeallocMem(void *__ptr);
 
 void *AllocMem(size_t __size)
 {
-	GLOBALASSERT(__size>0);
-	#if debug
-	alloc_cnt++;	
-	#endif
+    GLOBALASSERT(__size > 0);
+#if debug
+    alloc_cnt++;
+#endif
 
-	return malloc(__size);
+    return malloc(__size);
 };
 
 /* Note: Never use DeallocMem directly !  */
@@ -36,19 +36,17 @@ void *AllocMem(size_t __size)
 
 void DeallocMem(void *__ptr)
 {
-	#if debug
-	deall_cnt++;
-	#endif
+#if debug
+    deall_cnt++;
+#endif
 
-	if(__ptr) free(__ptr);
+    if (__ptr)
+        free(__ptr);
 
-	#if debug
-	else {
-
-		textprint("ERROR - freeing null ptr\n");
-		WaitForReturn();
-
-	}
-	#endif
+#if debug
+    else {
+        textprint("ERROR - freeing null ptr\n");
+        WaitForReturn();
+    }
+#endif
 };
-

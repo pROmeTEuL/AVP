@@ -22,177 +22,171 @@
 #define UseLocalAssert Yes
 #include "ourasert.h"
 
-extern int FrisbeeSight_FrustrumReject(STRATEGYBLOCK *sbPtr,VECTORCH *localOffset,STRATEGYBLOCK *target);
+extern int FrisbeeSight_FrustrumReject(
+    STRATEGYBLOCK *sbPtr, VECTORCH *localOffset, STRATEGYBLOCK *target);
 
 int NPCCanSeeTarget(STRATEGYBLOCK *sbPtr, STRATEGYBLOCK *target, int viewRange)
 {
-	int frustrum_test;
-	/* connect eyeposition to head */
-	VECTORCH eyePosition = {0,-1500,0};
+    int frustrum_test;
+    /* connect eyeposition to head */
+    VECTORCH eyePosition = {0, -1500, 0};
 
-	LOCALASSERT(target);
-	LOCALASSERT(sbPtr);
+    LOCALASSERT(target);
+    LOCALASSERT(sbPtr);
 
-	if (target->containingModule==NULL) {
-		return(0);
-	}
+    if (target->containingModule == NULL) {
+        return (0);
+    }
 
-	if (sbPtr->containingModule==NULL) {
-		return(0);
-	}
-	
-	if ((target->SBdptr==NULL)||(sbPtr->SBdptr==NULL)) {
-		if ((IsModuleVisibleFromModule(target->containingModule,sbPtr->containingModule))) {
-			return(1);
-		} else {
-			return(0);
-		}
-	} else {
+    if (sbPtr->containingModule == NULL) {
+        return (0);
+    }
 
-		switch (sbPtr->I_SBtype) {
-			case I_BehaviourFrisbee:
-				{
-					MATRIXCH WtoL;
-					VECTORCH offset, sourcepos, targetpos;
-					FRISBEE_BEHAV_BLOCK *frisbeeStatusPointer;
-	    			SECTION_DATA *disc_sec;
+    if ((target->SBdptr == NULL) || (sbPtr->SBdptr == NULL)) {
+        if ((IsModuleVisibleFromModule(target->containingModule, sbPtr->containingModule))) {
+            return (1);
+        } else {
+            return (0);
+        }
+    } else {
+        switch (sbPtr->I_SBtype) {
+        case I_BehaviourFrisbee: {
+            MATRIXCH WtoL;
+            VECTORCH offset, sourcepos, targetpos;
+            FRISBEE_BEHAV_BLOCK *frisbeeStatusPointer;
+            SECTION_DATA *disc_sec;
 
-					LOCALASSERT(sbPtr);
-					LOCALASSERT(sbPtr->containingModule); 
-					frisbeeStatusPointer = (FRISBEE_BEHAV_BLOCK *)(sbPtr->SBdataptr);    
-				    LOCALASSERT(frisbeeStatusPointer);	          		
-					/* Arc reject. */
-			
-					disc_sec=GetThisSectionData(frisbeeStatusPointer->HModelController.section_data,"Mdisk");
+            LOCALASSERT(sbPtr);
+            LOCALASSERT(sbPtr->containingModule);
+            frisbeeStatusPointer = (FRISBEE_BEHAV_BLOCK *) (sbPtr->SBdataptr);
+            LOCALASSERT(frisbeeStatusPointer);
+            /* Arc reject. */
 
-					if (disc_sec) {
-						WtoL=disc_sec->SecMat;
-						sourcepos=disc_sec->World_Offset;
-					} else {
-						WtoL=sbPtr->DynPtr->OrientMat;
-						GetTargetingPointOfObject_Far(sbPtr,&sourcepos);
-					}
+            disc_sec
+                = GetThisSectionData(frisbeeStatusPointer->HModelController.section_data, "Mdisk");
 
-					GetTargetingPointOfObject_Far(target,&targetpos);
- 					
-					offset.vx=sourcepos.vx-targetpos.vx;
-					offset.vy=sourcepos.vy-targetpos.vy;
-					offset.vz=sourcepos.vz-targetpos.vz;
-					
-					TransposeMatrixCH(&WtoL);
-					RotateVector(&offset,&WtoL);
+            if (disc_sec) {
+                WtoL = disc_sec->SecMat;
+                sourcepos = disc_sec->World_Offset;
+            } else {
+                WtoL = sbPtr->DynPtr->OrientMat;
+                GetTargetingPointOfObject_Far(sbPtr, &sourcepos);
+            }
 
-					frustrum_test=FrisbeeSight_FrustrumReject(sbPtr,&offset,target);
-				}
-				break;
-			case I_BehaviourMarine:
-			case I_BehaviourSeal:
-				{
-					MATRIXCH WtoL;
-					VECTORCH offset, sourcepos, targetpos;
-					MARINE_STATUS_BLOCK *marineStatusPointer;
-	    			SECTION_DATA *head_sec;
+            GetTargetingPointOfObject_Far(target, &targetpos);
 
-					LOCALASSERT(sbPtr);
-					LOCALASSERT(sbPtr->containingModule); 
-					marineStatusPointer = (MARINE_STATUS_BLOCK *)(sbPtr->SBdataptr);    
-				    LOCALASSERT(marineStatusPointer);	          		
-					/* Arc reject. */
-			
-					head_sec=GetThisSectionData(marineStatusPointer->HModelController.section_data,"head");
+            offset.vx = sourcepos.vx - targetpos.vx;
+            offset.vy = sourcepos.vy - targetpos.vy;
+            offset.vz = sourcepos.vz - targetpos.vz;
 
-					if (head_sec) {
-						WtoL=head_sec->SecMat;
-						sourcepos=head_sec->World_Offset;
-					} else {
-						WtoL=sbPtr->DynPtr->OrientMat;
-						GetTargetingPointOfObject_Far(sbPtr,&sourcepos);
-					}
+            TransposeMatrixCH(&WtoL);
+            RotateVector(&offset, &WtoL);
 
-					GetTargetingPointOfObject_Far(target,&targetpos);
- 					
-					offset.vx=sourcepos.vx-targetpos.vx;
-					offset.vy=sourcepos.vy-targetpos.vy;
-					offset.vz=sourcepos.vz-targetpos.vz;
-					
-					TransposeMatrixCH(&WtoL);
-					RotateVector(&offset,&WtoL);
+            frustrum_test = FrisbeeSight_FrustrumReject(sbPtr, &offset, target);
+        } break;
+        case I_BehaviourMarine:
+        case I_BehaviourSeal: {
+            MATRIXCH WtoL;
+            VECTORCH offset, sourcepos, targetpos;
+            MARINE_STATUS_BLOCK *marineStatusPointer;
+            SECTION_DATA *head_sec;
 
-					frustrum_test=MarineSight_FrustrumReject(sbPtr,&offset,target);
-				}
-				break;
-			case I_BehaviourXenoborg:
-				{
-					MATRIXCH WtoL;
-					VECTORCH offset, sourcepos, targetpos;
-					XENO_STATUS_BLOCK *xenoStatusPointer;
-	    			SECTION_DATA *head_sec;
+            LOCALASSERT(sbPtr);
+            LOCALASSERT(sbPtr->containingModule);
+            marineStatusPointer = (MARINE_STATUS_BLOCK *) (sbPtr->SBdataptr);
+            LOCALASSERT(marineStatusPointer);
+            /* Arc reject. */
 
-					LOCALASSERT(sbPtr);
-					LOCALASSERT(sbPtr->containingModule); 
-					xenoStatusPointer = (XENO_STATUS_BLOCK *)(sbPtr->SBdataptr);    
-				    LOCALASSERT(xenoStatusPointer);	          		
-					/* Arc reject. */
-			
-					head_sec=GetThisSectionData(xenoStatusPointer->HModelController.section_data,"head");
+            head_sec
+                = GetThisSectionData(marineStatusPointer->HModelController.section_data, "head");
 
-					if (head_sec) {
-						WtoL=head_sec->SecMat;
-						sourcepos=head_sec->World_Offset;
-					} else {
-						WtoL=sbPtr->DynPtr->OrientMat;
-						GetTargetingPointOfObject_Far(sbPtr,&sourcepos);
-					}
+            if (head_sec) {
+                WtoL = head_sec->SecMat;
+                sourcepos = head_sec->World_Offset;
+            } else {
+                WtoL = sbPtr->DynPtr->OrientMat;
+                GetTargetingPointOfObject_Far(sbPtr, &sourcepos);
+            }
 
-					GetTargetingPointOfObject_Far(target,&targetpos);
- 					
-					offset.vx=sourcepos.vx-targetpos.vx;
-					offset.vy=sourcepos.vy-targetpos.vy;
-					offset.vz=sourcepos.vz-targetpos.vz;
-					
-					TransposeMatrixCH(&WtoL);
-					RotateVector(&offset,&WtoL);
+            GetTargetingPointOfObject_Far(target, &targetpos);
 
-					frustrum_test=XenoSight_FrustrumReject(sbPtr,&offset);
-				}
-				break;
-			case I_BehaviourAutoGun:
-				{
-					/* Less pretentious, based on the SB. */
-					MATRIXCH WtoL;
-					VECTORCH offset, sourcepos, targetpos;
-					/* Arc reject. */
-			
-					WtoL=sbPtr->DynPtr->OrientMat;
-					GetTargetingPointOfObject_Far(sbPtr,&sourcepos);
-					GetTargetingPointOfObject_Far(target,&targetpos);
- 					
-					offset.vx=sourcepos.vx-targetpos.vx;
-					offset.vy=sourcepos.vy-targetpos.vy;
-					offset.vz=sourcepos.vz-targetpos.vz;
-					
-					TransposeMatrixCH(&WtoL);
-					RotateVector(&offset,&WtoL);
+            offset.vx = sourcepos.vx - targetpos.vx;
+            offset.vy = sourcepos.vy - targetpos.vy;
+            offset.vz = sourcepos.vz - targetpos.vz;
 
-					frustrum_test=AGunSight_FrustrumReject(&offset);
-				}
-				break;
-			default:
-				frustrum_test=1;
-				break;
-		}
-		
-		if (frustrum_test) {
+            TransposeMatrixCH(&WtoL);
+            RotateVector(&offset, &WtoL);
 
-			RotateVector(&eyePosition,&(sbPtr->DynPtr->OrientMat));
+            frustrum_test = MarineSight_FrustrumReject(sbPtr, &offset, target);
+        } break;
+        case I_BehaviourXenoborg: {
+            MATRIXCH WtoL;
+            VECTORCH offset, sourcepos, targetpos;
+            XENO_STATUS_BLOCK *xenoStatusPointer;
+            SECTION_DATA *head_sec;
 
-			eyePosition.vx += sbPtr->DynPtr->Position.vx;
-			eyePosition.vy += sbPtr->DynPtr->Position.vy;
-			eyePosition.vz += sbPtr->DynPtr->Position.vz;
+            LOCALASSERT(sbPtr);
+            LOCALASSERT(sbPtr->containingModule);
+            xenoStatusPointer = (XENO_STATUS_BLOCK *) (sbPtr->SBdataptr);
+            LOCALASSERT(xenoStatusPointer);
+            /* Arc reject. */
 
-			return IsThisObjectVisibleFromThisPosition_WithIgnore(target->SBdptr,sbPtr->SBdptr,&eyePosition,NPC_MAX_VIEWRANGE);
-		}
-	}
+            head_sec = GetThisSectionData(xenoStatusPointer->HModelController.section_data, "head");
 
-	return(0);
+            if (head_sec) {
+                WtoL = head_sec->SecMat;
+                sourcepos = head_sec->World_Offset;
+            } else {
+                WtoL = sbPtr->DynPtr->OrientMat;
+                GetTargetingPointOfObject_Far(sbPtr, &sourcepos);
+            }
+
+            GetTargetingPointOfObject_Far(target, &targetpos);
+
+            offset.vx = sourcepos.vx - targetpos.vx;
+            offset.vy = sourcepos.vy - targetpos.vy;
+            offset.vz = sourcepos.vz - targetpos.vz;
+
+            TransposeMatrixCH(&WtoL);
+            RotateVector(&offset, &WtoL);
+
+            frustrum_test = XenoSight_FrustrumReject(sbPtr, &offset);
+        } break;
+        case I_BehaviourAutoGun: {
+            /* Less pretentious, based on the SB. */
+            MATRIXCH WtoL;
+            VECTORCH offset, sourcepos, targetpos;
+            /* Arc reject. */
+
+            WtoL = sbPtr->DynPtr->OrientMat;
+            GetTargetingPointOfObject_Far(sbPtr, &sourcepos);
+            GetTargetingPointOfObject_Far(target, &targetpos);
+
+            offset.vx = sourcepos.vx - targetpos.vx;
+            offset.vy = sourcepos.vy - targetpos.vy;
+            offset.vz = sourcepos.vz - targetpos.vz;
+
+            TransposeMatrixCH(&WtoL);
+            RotateVector(&offset, &WtoL);
+
+            frustrum_test = AGunSight_FrustrumReject(&offset);
+        } break;
+        default:
+            frustrum_test = 1;
+            break;
+        }
+
+        if (frustrum_test) {
+            RotateVector(&eyePosition, &(sbPtr->DynPtr->OrientMat));
+
+            eyePosition.vx += sbPtr->DynPtr->Position.vx;
+            eyePosition.vy += sbPtr->DynPtr->Position.vy;
+            eyePosition.vz += sbPtr->DynPtr->Position.vz;
+
+            return IsThisObjectVisibleFromThisPosition_WithIgnore(
+                target->SBdptr, sbPtr->SBdptr, &eyePosition, NPC_MAX_VIEWRANGE);
+        }
+    }
+
+    return (0);
 }

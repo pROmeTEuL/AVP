@@ -27,17 +27,15 @@
 #endif
 
 #define UseLocalAssert Yes
-#include "ourasert.h" 
-
-
+#include "ourasert.h"
 
 /* VERSION DEFINES */
-#define LogStringTables		No
+#define LogStringTables No
 
 #define MAX_ENTRIES_PER_STRING_TABLE (200)
-#define LimitedStringLengths	Yes
+#define LimitedStringLengths Yes
 #if LimitedStringLengths
-#define MAX_STRING_LENGTH			(30000)
+#define MAX_STRING_LENGTH (30000)
 #endif
 
 /* TYPE DEFINITIONS */
@@ -108,13 +106,12 @@ void STRUTIL_Destroy(void)
 
 }
 #endif
-									
-void STRUTIL_SC_WriteTerminator(ProjChar* pProjCh)
+
+void STRUTIL_SC_WriteTerminator(ProjChar *pProjCh)
 {
-	/* Supplied as a function in case we switch to double-byte character sets */
+    /* Supplied as a function in case we switch to double-byte character sets */
 
-	*pProjCh='\0';
-
+    *pProjCh = '\0';
 }
 
 #if 0
@@ -130,70 +127,58 @@ void STRUTIL_MC_WriteTerminator
 }
 #endif
 
-
 /* Ansi to HHTS conversion ********************************************/
-OurBool STRUTIL_ANSI_To_ProjChar
-(
-	ProjChar* pProjCh_Out,
-	unsigned int MaxSize, /* includes NULL-terminator; truncates after this */
-	
-	LPTSTR lptszANSI_In
-)
+OurBool STRUTIL_ANSI_To_ProjChar(
+    ProjChar *pProjCh_Out,
+    unsigned int MaxSize, /* includes NULL-terminator; truncates after this */
+
+    LPTSTR lptszANSI_In)
 {
-	/* PRECONDITION */
-	{
-		GLOBALASSERT(pProjCh_Out);
-		GLOBALASSERT(lptszANSI_In);
-	}
+    /* PRECONDITION */
+    {
+        GLOBALASSERT(pProjCh_Out);
+        GLOBALASSERT(lptszANSI_In);
+    }
 
-	/* CODE */
-	{
-		/* For the moment: */
-		return STRUTIL_SC_SafeCopy
-		(
-			pProjCh_Out,
-			MaxSize,
+    /* CODE */
+    {
+        /* For the moment: */
+        return STRUTIL_SC_SafeCopy(
+            pProjCh_Out,
+            MaxSize,
 
-			lptszANSI_In
-		);
-	}
+            lptszANSI_In);
+    }
 }
 
-OurBool STRUTIL_ProjChar_To_ANSI
-(
-	LPTSTR lptszANSI_Out,
-	unsigned int MaxSize, /* includes NULL-terminator; truncates after this */
+OurBool STRUTIL_ProjChar_To_ANSI(
+    LPTSTR lptszANSI_Out,
+    unsigned int MaxSize, /* includes NULL-terminator; truncates after this */
 
-ProjChar* pProjCh_In		
-)
+    ProjChar *pProjCh_In)
 {
-	/* PRECONDITION */
-	{
-		GLOBALASSERT(lptszANSI_Out);
-		GLOBALASSERT(pProjCh_In);
-	}
+    /* PRECONDITION */
+    {
+        GLOBALASSERT(lptszANSI_Out);
+        GLOBALASSERT(pProjCh_In);
+    }
 
-	/* CODE */
-	{
-		/* For the moment: */
-		return STRUTIL_SC_SafeCopy
-		(
-			lptszANSI_Out,
-			MaxSize,
+    /* CODE */
+    {
+        /* For the moment: */
+        return STRUTIL_SC_SafeCopy(
+            lptszANSI_Out,
+            MaxSize,
 
-			pProjCh_In
-		);
-	}
+            pProjCh_In);
+    }
 }
 
-unsigned int STRUTIL_SC_Strlen
-(
-	const ProjChar* String
-)
+unsigned int STRUTIL_SC_Strlen(const ProjChar *String)
 {
-	GLOBALASSERT(String);
+    GLOBALASSERT(String);
 
-	return strlen(String);
+    return strlen(String);
 }
 
 #if 0
@@ -213,59 +198,43 @@ unsigned int STRUTIL_MC_Strlen
 }
 #endif
 
-
-ProjChar* STRUTIL_SC_StrCpy
-(
-	ProjChar* pProjCh_Dst,
-	const ProjChar* pProjCh_Src
-)
+ProjChar *STRUTIL_SC_StrCpy(ProjChar *pProjCh_Dst, const ProjChar *pProjCh_Src)
 {
-	GLOBALASSERT(pProjCh_Dst);
-	GLOBALASSERT(pProjCh_Src);
+    GLOBALASSERT(pProjCh_Dst);
+    GLOBALASSERT(pProjCh_Src);
 
-	return (strcpy(pProjCh_Dst,pProjCh_Src));
+    return (strcpy(pProjCh_Dst, pProjCh_Src));
 }
 
-void STRUTIL_SC_FastCat
-(
-	ProjChar* pProjCh_Dst,
-	const ProjChar* pProjCh_Src_0,
-	const ProjChar* pProjCh_Src_1			
-)
+void STRUTIL_SC_FastCat(
+    ProjChar *pProjCh_Dst, const ProjChar *pProjCh_Src_0, const ProjChar *pProjCh_Src_1)
 {
-	/* This function assumes the destination area is large enough;
+    /* This function assumes the destination area is large enough;
 	it copies Src0 followed by Src1 to the dest area.
 	*/
 
-	/* PRECONDITION */
-	{
-		GLOBALASSERT( pProjCh_Dst );
-		GLOBALASSERT( pProjCh_Src_0 );
-		GLOBALASSERT( pProjCh_Src_1 );
-	}
+    /* PRECONDITION */
+    {
+        GLOBALASSERT(pProjCh_Dst);
+        GLOBALASSERT(pProjCh_Src_0);
+        GLOBALASSERT(pProjCh_Src_1);
+    }
 
-	/* CODE */
-	{
-		while ( *pProjCh_Src_0 )
-		{
-			*( pProjCh_Dst++ ) = *( pProjCh_Src_0++ );
-		}
-		while ( *pProjCh_Src_1 )
-		{
-			*( pProjCh_Dst++ ) = *( pProjCh_Src_1++ );
-		}
+    /* CODE */
+    {
+        while (*pProjCh_Src_0) {
+            *(pProjCh_Dst++) = *(pProjCh_Src_0++);
+        }
+        while (*pProjCh_Src_1) {
+            *(pProjCh_Dst++) = *(pProjCh_Src_1++);
+        }
 
-		/* Write terminator */
-		*pProjCh_Dst = 0;
-	}
+        /* Write terminator */
+        *pProjCh_Dst = 0;
+    }
 }
 
-
-OurBool STRUTIL_SC_Strequal
-(
-	const ProjChar* String1,
-	const ProjChar* String2
-)
+OurBool STRUTIL_SC_Strequal(const ProjChar *String1, const ProjChar *String2)
 {
 #if 0
 	DAVELOG("Comparing strings");
@@ -273,69 +242,29 @@ OurBool STRUTIL_SC_Strequal
 	DAVELOG(String2);
 #endif
 
-	while 
-	(
-		(*String1!='\0')
-		&&
-		(*String2!='\0')
-	)
-	{
-		if
-		(
-			(*String1)
-			!=
-			(*String2)
-		)
-		{
-			return No;
-		}
-		String1++;
-		String2++;
-	}
+    while ((*String1 != '\0') && (*String2 != '\0')) {
+        if ((*String1) != (*String2)) {
+            return No;
+        }
+        String1++;
+        String2++;
+    }
 
-	return 
-	(
-		(*String1)
-		==
-		(*String2)
-	);
+    return ((*String1) == (*String2));
 }
 
-OurBool STRUTIL_SC_Strequal_Insensitive
-(
-	const ProjChar* String1,
-	const ProjChar* String2
-)
+OurBool STRUTIL_SC_Strequal_Insensitive(const ProjChar *String1, const ProjChar *String2)
 {
+    while ((*String1 != '\0') && (*String2 != '\0')) {
+        if ((tolower(*String1)) != (tolower(*String2))) {
+            return No;
+        }
+        String1++;
+        String2++;
+    }
 
-	while 
-	(
-		(*String1!='\0')
-		&&
-		(*String2!='\0')
-	)
-	{
-		if
-		(
-			(tolower(*String1))
-			!=
-			(tolower(*String2))
-		)
-		{
-			return No;
-		}
-		String1++;
-		String2++;
-	}
-
-	return 
-	(
-		(tolower(*String1))
-		==
-		(tolower(*String2))
-	);
+    return ((tolower(*String1)) == (tolower(*String2)));
 }
-
 
 #if 0
 void STRUTIL_MC_MakeMCTS
@@ -369,66 +298,44 @@ void STRUTIL_MC_MakeMCTS
 }
 #endif
 
-void STRUTIL_SC_SafeCat
-(
-	ProjChar* pProjCh_Dst,
-	unsigned int MaxSize,
+void STRUTIL_SC_SafeCat(
+    ProjChar *pProjCh_Dst,
+    unsigned int MaxSize,
 
-	const ProjChar* pProjCh_Add
-)
+    const ProjChar *pProjCh_Add)
 {
-	/* PRECONDITION */
-	{
-		GLOBALASSERT(pProjCh_Dst);
-		GLOBALASSERT(pProjCh_Add);
-		GLOBALASSERT(MaxSize>0);
-	}
+    /* PRECONDITION */
+    {
+        GLOBALASSERT(pProjCh_Dst);
+        GLOBALASSERT(pProjCh_Add);
+        GLOBALASSERT(MaxSize > 0);
+    }
 
-	/* CODE */
-	{
-		unsigned int MaxNonTerminatingCharsToUse = (MaxSize - 1);
+    /* CODE */
+    {
+        unsigned int MaxNonTerminatingCharsToUse = (MaxSize - 1);
 
-		while
-		(
-			(*pProjCh_Dst)
-			&&
-			(MaxNonTerminatingCharsToUse>0)
-		)
-		{
-			pProjCh_Dst++;
-			MaxNonTerminatingCharsToUse--;
-		}
+        while ((*pProjCh_Dst) && (MaxNonTerminatingCharsToUse > 0)) {
+            pProjCh_Dst++;
+            MaxNonTerminatingCharsToUse--;
+        }
 
-		while
-		(
-			(*pProjCh_Add)
-			&&
-			(MaxNonTerminatingCharsToUse>0)
-		)
-		{
-			*pProjCh_Dst = *pProjCh_Add;
+        while ((*pProjCh_Add) && (MaxNonTerminatingCharsToUse > 0)) {
+            *pProjCh_Dst = *pProjCh_Add;
 
-			pProjCh_Add++;
-			pProjCh_Dst++;
+            pProjCh_Add++;
+            pProjCh_Dst++;
 
-			MaxNonTerminatingCharsToUse--;
+            MaxNonTerminatingCharsToUse--;
 
-			STRUTIL_SC_WriteTerminator(pProjCh_Dst);
-		}
-	}
+            STRUTIL_SC_WriteTerminator(pProjCh_Dst);
+        }
+    }
 }
 
-size_t STRUTIL_SC_NumBytes
-(
-	const ProjChar* String
-)
+size_t STRUTIL_SC_NumBytes(const ProjChar *String)
 {
-	return
-	(
-		sizeof(ProjChar)
-		*
-		(STRUTIL_SC_Strlen(String)+1)
-	);
+    return (sizeof(ProjChar) * (STRUTIL_SC_Strlen(String) + 1));
 }
 
 #if 0
@@ -613,7 +520,7 @@ OurBool fValidHHMCTS(HHMCTC* MCString)
 			MCString++;
 		}
 
-		#if LimitedStringLengths
+#if LimitedStringLengths
 		{
 			if (CharCount>=MAX_STRING_LENGTH)
 			{
@@ -625,11 +532,11 @@ OurBool fValidHHMCTS(HHMCTC* MCString)
 				return Yes;
 			}
 		}
-		#else
+#else
 		{
 			return Yes;
 		}
-		#endif
+#endif
 
 	}
 }
@@ -649,37 +556,28 @@ HHMCTC STRUTIL_SC_To_MC
 }
 #endif
 
-OurBool STRUTIL_SC_SafeCopy
-(
-	ProjChar* pProjCh_Dst,
-	unsigned int MaxSize,
+OurBool STRUTIL_SC_SafeCopy(
+    ProjChar *pProjCh_Dst,
+    unsigned int MaxSize,
 
-	const ProjChar* pProjCh_Src
-)
+    const ProjChar *pProjCh_Src)
 {
-	GLOBALASSERT(pProjCh_Dst);
-	GLOBALASSERT(MaxSize > 0);
-	GLOBALASSERT(pProjCh_Src);
+    GLOBALASSERT(pProjCh_Dst);
+    GLOBALASSERT(MaxSize > 0);
+    GLOBALASSERT(pProjCh_Src);
 
-	{
-		unsigned int MaxNonTerminatingCharsToCopy = (MaxSize - 1);
+    {
+        unsigned int MaxNonTerminatingCharsToCopy = (MaxSize - 1);
 
-		while
-		(
-			(MaxNonTerminatingCharsToCopy > 0 )
-			&&
-			(*pProjCh_Src != 0)
-		)
-		{
-			MaxNonTerminatingCharsToCopy--;
-			*(pProjCh_Dst++) = *(pProjCh_Src++);
-		}
+        while ((MaxNonTerminatingCharsToCopy > 0) && (*pProjCh_Src != 0)) {
+            MaxNonTerminatingCharsToCopy--;
+            *(pProjCh_Dst++) = *(pProjCh_Src++);
+        }
 
-		STRUTIL_SC_WriteTerminator(pProjCh_Dst);
+        STRUTIL_SC_WriteTerminator(pProjCh_Dst);
 
-		return ( STRUTIL_SC_fIsTerminator(pProjCh_Src) );
-	}
-
+        return (STRUTIL_SC_fIsTerminator(pProjCh_Src));
+    }
 }
 
 #if 0
@@ -701,9 +599,9 @@ OurBool STRUTIL_MC_SafeCopy
 
 	/* CODE */
 	{
-		#if 1
+#if 1
 		HHMCTC* pHHMCTC_StoredDst = pHHMCTC_Dst;
-		#endif
+#endif
 
 		{
 			unsigned int MaxNonTerminatingCharsToCopy = (MaxSize - 1);
@@ -721,7 +619,7 @@ OurBool STRUTIL_MC_SafeCopy
 
 			STRUTIL_MC_WriteTerminator(pHHMCTC_Dst);
 
-				#if 0
+#if 0
 				{
 					char temp[256];
 					sprintf
@@ -743,7 +641,7 @@ OurBool STRUTIL_MC_SafeCopy
 					}
 					DAVELOG(temp);
 				}
-				#endif
+#endif
 
 			return ( STRUTIL_MC_fIsTerminator(pHHMCTC_Src) );
 
@@ -753,13 +651,10 @@ OurBool STRUTIL_MC_SafeCopy
 }
 #endif
 
-OurBool STRUTIL_SC_fIsTerminator
-(
-	const ProjChar* pProjCh
-)
+OurBool STRUTIL_SC_fIsTerminator(const ProjChar *pProjCh)
 {
-	GLOBALASSERT(pProjCh);
-	return (*pProjCh == '\0');
+    GLOBALASSERT(pProjCh);
+    return (*pProjCh == '\0');
 }
 
 #if 0
@@ -830,6 +725,5 @@ HHMCTC* STRUTIL_MC_FastCat
 		return pHHMCTC_Dst;
 	}
 }
-
 
 #endif

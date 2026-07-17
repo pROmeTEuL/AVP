@@ -22,26 +22,26 @@ extern "C" {
   ----------------------------------------------------------------------------*/
 typedef struct soundsampledata
 {
-  	int loaded;
-	int activeInstances;	 
-	int volume;		
-	int pitch;					
+    int loaded;
+    int activeInstances;
+    int volume;
+    int pitch;
 
-//	LPDIRECTSOUNDBUFFER dsBufferP;
-	int dsBufferP;
-	void *buffer;
-	
-	unsigned int flags;
-	int dsFrequency;
-	char * wavName;
-	int length; //time in fixed point seconds
-	
-}SOUNDSAMPLEDATA;
+    //	LPDIRECTSOUNDBUFFER dsBufferP;
+    int dsBufferP;
+    void *buffer;
+
+    unsigned int flags;
+    int dsFrequency;
+    char *wavName;
+    int length; //time in fixed point seconds
+
+} SOUNDSAMPLEDATA;
 
 /* Defines for the flags. */
-#define SAMPLE_IN_HW	0x00000001
-#define SAMPLE_IN_SW	0x00000002
-#define SAMPLE_IN_3D	0x00000004
+#define SAMPLE_IN_HW 0x00000001
+#define SAMPLE_IN_SW 0x00000002
+#define SAMPLE_IN_3D 0x00000004
 
 /* Patrick 5/6/97 -------------------------------------------------------------
   Data structure for a playing (active) sound. The first eight fields must be
@@ -49,43 +49,43 @@ typedef struct soundsampledata
   ----------------------------------------------------------------------------*/
 typedef struct activesoundsample
 {
-	SOUNDINDEX soundIndex;
-	ACTIVESOUNDPRIORITY priority;	
-	int volume;
-	int	pitch;
-	int *externalRef;			
-	unsigned int loop :1;		
-	unsigned int threedee :1;
-	unsigned int paused :1;
-	unsigned int marine_ignore	:1;
-	unsigned int reverb_off :1;
-	SOUND3DDATA threedeedata;
-	
-//	LPDIRECTSOUNDBUFFER dsBufferP;
-//	LPDIRECTSOUND3DBUFFER ds3DBufferP;
-//	LPKSPROPERTYSET	PropSetP;
-	int dsBufferP;
-	int ds3DBufferP;
-	float PropSetP_pos[3];
-	float PropSetP_vel[3];
-	
-	void *buffer;
-	void *buffer3d;
-	void *propset;	
-}ACTIVESOUNDSAMPLE;
+    SOUNDINDEX soundIndex;
+    ACTIVESOUNDPRIORITY priority;
+    int volume;
+    int pitch;
+    int *externalRef;
+    unsigned int loop : 1;
+    unsigned int threedee : 1;
+    unsigned int paused : 1;
+    unsigned int marine_ignore : 1;
+    unsigned int reverb_off : 1;
+    SOUND3DDATA threedeedata;
+
+    //	LPDIRECTSOUNDBUFFER dsBufferP;
+    //	LPDIRECTSOUND3DBUFFER ds3DBufferP;
+    //	LPKSPROPERTYSET	PropSetP;
+    int dsBufferP;
+    int ds3DBufferP;
+    float PropSetP_pos[3];
+    float PropSetP_vel[3];
+
+    void *buffer;
+    void *buffer3d;
+    void *propset;
+} ACTIVESOUNDSAMPLE;
 
 /* Patrick 5/6/97 -------------------------------------------------------------
   Data structures for WAV headers and chuncks
   ----------------------------------------------------------------------------*/
 typedef struct pwavchunkheader
 {
-	char chunkName[4];
-	int chunkLength;	
+    char chunkName[4];
+    int chunkLength;
 } PWAVCHUNKHEADER;
 
 typedef struct pwavriffheader
 {
-	char type[4];
+    char type[4];
 } PWAVRIFFHEADER;
 
 void InitialiseBaseFrequency(SOUNDINDEX soundNum);
@@ -165,28 +165,28 @@ extern int PlatDontUse3DSoundHW();
   Defines for max number of sounds, and instances of sounds, allowed;
   also maximum and minimum volume, pitch, and pan values for platform.
   ----------------------------------------------------------------------------*/
-#define SOUND_MAXACTIVE			(120)
-#define SOUND_MAXACTIVE_SW		(20)
-#define SOUND_MAXINSTANCES		(20)
-#define SOUND_MAXSIZE 			(250000)	/* biggest sample we will allow to be loaded */
+#define SOUND_MAXACTIVE (120)
+#define SOUND_MAXACTIVE_SW (20)
+#define SOUND_MAXINSTANCES (20)
+#define SOUND_MAXSIZE (250000) /* biggest sample we will allow to be loaded */
 
 #define SOUND_DEACTIVATERANGE (10000 * GlobalScale)
 
-#define VOLUME_MAXPLAT			(0)			/* attenuation values, in db's */
-#define VOLUME_MINPLAT			(-10000)	
-#define VOLUME_PLAT2DSCALE		(96)		/* in 128ths of the original volume */
+#define VOLUME_MAXPLAT (0) /* attenuation values, in db's */
+#define VOLUME_MINPLAT (-10000)
+#define VOLUME_PLAT2DSCALE (96) /* in 128ths of the original volume */
 
 /* frequency values are those accepted by ds. Pitch is measured in semi-tones,
 and is applied relative to the loaded frequency of the sound */
-#define FREQUENCY_MAXPLAT			(100000)
-#define FREQUENCY_MINPLAT			(100)
-#define PITCH_MAXPLAT				(6144)
-#define PITCH_MINPLAT				(-6144)
-#define PITCH_DEFAULTPLAT			(0)
+#define FREQUENCY_MAXPLAT (100000)
+#define FREQUENCY_MINPLAT (100)
+#define PITCH_MAXPLAT (6144)
+#define PITCH_MINPLAT (-6144)
+#define PITCH_DEFAULTPLAT (0)
 
-#define PAN_MAXPLAT					(1200) 	   
-#define PAN_MINPLAT					(-1200)
-#define PAN_3DDAMPDISTANCE			(1000)
+#define PAN_MAXPLAT (1200)
+#define PAN_MINPLAT (-1200)
+#define PAN_3DDAMPDISTANCE (1000)
 
 /* NB ds supports pan +- 10000: */
 
@@ -198,14 +198,14 @@ and is applied relative to the loaded frequency of the sound */
   by PAN_MAXPLAT and PAN_MINPLAT (ie panattenuation*(1024)<=PAN_MAXPLAT), 
   assuming symetrical range.
   ----------------------------------------------------------------------------*/
-#define VOLUME_3DATTENUATION	(4)
+#define VOLUME_3DATTENUATION (4)
 
 /* Patrick 5/6/97 -------------------------------------------------------------
   Global references to sound management data areas, and blank instances of data
   structures storted in those areas    
   ----------------------------------------------------------------------------*/
-extern SOUNDSAMPLEDATA GameSounds[];		   
-extern ACTIVESOUNDSAMPLE ActiveSounds[]; 
+extern SOUNDSAMPLEDATA GameSounds[];
+extern ACTIVESOUNDSAMPLE ActiveSounds[];
 extern SOUNDSAMPLEDATA BlankGameSound;
 extern ACTIVESOUNDSAMPLE BlankActiveSound;
 

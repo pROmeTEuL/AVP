@@ -4,7 +4,7 @@
 
 #ifdef __cplusplus
 
-	extern "C" {
+extern "C" {
 
 #endif
 
@@ -16,22 +16,24 @@
 #if 1
 #define DBGMALLOC 0
 #else
-	#ifdef _DEBUG /* standard compiler command line debugging-ON switch */
-		#define DBGMALLOC 1
-	#elif defined(NDEBUG) /* standard compiler command line debugging-OFF switch */
-		#define DBGMALLOC 0
-	#elif defined(_DBGMALLOC) /* alternate compiler command line switch */
-		#define DBGMALLOC _DBGMALLOC
-	#else /* default switch */
-		#define DBGMALLOC 1
-	#endif
+#ifdef _DEBUG /* standard compiler command line debugging-ON switch */
+#define DBGMALLOC 1
+#elif defined(NDEBUG) /* standard compiler command line debugging-OFF switch */
+#define DBGMALLOC 0
+#elif defined(_DBGMALLOC) /* alternate compiler command line switch */
+#define DBGMALLOC _DBGMALLOC
+#else /* default switch */
+#define DBGMALLOC 1
+#endif
 #endif
 
 /* parameters for DumpMallocInfo */
-#define PARTIALDUMP 0    /* print outstanding mallocs number and total memory allocated */
-#define DUMPTOSCREEN  1  /* print all outstanding mallocs to screen */
-#define DUMPTOFILE 2     /* write outstanding malloc details to file (filename defined with MALLOCDUMPFILE) */
-#define CPPGLOBAL 0x100000 /* line numbers offset by this value if the malloc is as part of a constructor for a C++ global whose dealloc may not be recorded */
+#define PARTIALDUMP 0  /* print outstanding mallocs number and total memory allocated */
+#define DUMPTOSCREEN 1 /* print all outstanding mallocs to screen */
+#define DUMPTOFILE \
+    2 /* write outstanding malloc details to file (filename defined with MALLOCDUMPFILE) */
+#define CPPGLOBAL \
+    0x100000 /* line numbers offset by this value if the malloc is as part of a constructor for a C++ global whose dealloc may not be recorded */
 
 /* JH - 30.5.97
 I noticed that the MALLOC_RECORD structure has char[40]
@@ -53,16 +55,16 @@ extern void DeallocMem(void *__ptr);
 extern void record_free(void *ptr, char string[], unsigned long lineno);
 extern void *record_malloc(long size, char string[], unsigned long lineno);
 #else /* new prototypes to take just pointers - dunno if it's really necessary */
-extern void record_free(void *ptr, char const * string, unsigned long lineno);
-extern void *record_malloc(long size, char const * string, unsigned long lineno);
+extern void record_free(void *ptr, char const *string, unsigned long lineno);
+extern void *record_malloc(long size, char const *string, unsigned long lineno);
 #endif
 extern void DumpMallocInfo(int type);
 extern void DumpBoundsCheckInfo(int type);
 extern void DumpInfo(int type);
 
 #if DBGMALLOC
-#define AllocateMem(x) record_malloc(x,__FILE__, __LINE__) 
-#define DeallocateMem(x) record_free(x,__FILE__, __LINE__)
+#define AllocateMem(x) record_malloc(x, __FILE__, __LINE__)
+#define DeallocateMem(x) record_free(x, __FILE__, __LINE__)
 
 #ifdef __cplusplus
 
@@ -105,66 +107,50 @@ extern "C++" {
 
 extern int __cpp_new_recording;
 
-inline void * operator new(size_t s, char const * file, unsigned long line)
+inline void *operator new(size_t s, char const *file, unsigned long line)
 {
-	return
-		__cpp_new_recording
-			? record_malloc(s,file,line)
-			: record_malloc(s,file,line+CPPGLOBAL)
-		;
+    return __cpp_new_recording ? record_malloc(s, file, line)
+                               : record_malloc(s, file, line + CPPGLOBAL);
 }
-inline void * operator new(size_t s)
+inline void *operator new(size_t s)
 {
-	return
-		__cpp_new_recording
-			? record_malloc(s,"Unknown file (C++ new)",0)
-			: record_malloc(s,"Unknown file (C++ new)",CPPGLOBAL)
-		;
+    return __cpp_new_recording ? record_malloc(s, "Unknown file (C++ new)", 0)
+                               : record_malloc(s, "Unknown file (C++ new)", CPPGLOBAL);
 }
-inline void operator delete(void * p)
+inline void operator delete(void *p)
 {
-	record_free(p,"Unknown file (C++ delete)",0);
+    record_free(p, "Unknown file (C++ delete)", 0);
 }
 #ifndef _MSC_VER
-inline void * operator new[](size_t s, char const * file, unsigned long line)
+inline void *operator new[](size_t s, char const *file, unsigned long line)
 {
-	return
-		__cpp_new_recording
-			? record_malloc(s,file,line)
-			: record_malloc(s,file,line+CPPGLOBAL)
-		;
+    return __cpp_new_recording ? record_malloc(s, file, line)
+                               : record_malloc(s, file, line + CPPGLOBAL);
 }
-inline void * operator new[](size_t s)
+inline void *operator new[](size_t s)
 {
-	return
-		__cpp_new_recording
-			? record_malloc(s,"Unknown file (C++ new[])",0)
-			: record_malloc(s,"Unknown file (C++ new[])",CPPGLOBAL)
-		;
+    return __cpp_new_recording ? record_malloc(s, "Unknown file (C++ new[])", 0)
+                               : record_malloc(s, "Unknown file (C++ new[])", CPPGLOBAL);
 }
-inline void operator delete[](void * p)
+inline void operator delete[](void *p)
 {
-	record_free(p,"Unknown file (C++ delete[])",0);
+    record_free(p, "Unknown file (C++ delete[])", 0);
 }
 #endif
 
-#define new new(__FILE__,__LINE__)
-
+#define new new (__FILE__, __LINE__)
 }
 
 #endif
 
 #else
-#define AllocateMem(x) AllocMem(x) 
-#define DeallocateMem(x) DeallocMem(x) 
+#define AllocateMem(x) AllocMem(x)
+#define DeallocateMem(x) DeallocMem(x)
 #endif
-
 
 #ifdef __cplusplus
-
-	};
+};
 
 #endif
-
 
 #endif

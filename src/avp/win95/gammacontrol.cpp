@@ -1,5 +1,4 @@
-extern "C"
-{
+extern "C" {
 
 #include "3dc.h"
 #include "module.h"
@@ -13,39 +12,38 @@ unsigned char GammaValues[256];
 
 void InitialiseGammaSettings(int gamma)
 {
-	ActualGammaSetting = gamma+1;
-	RequestedGammaSetting = gamma;
-	UpdateGammaSettings();
+    ActualGammaSetting = gamma + 1;
+    RequestedGammaSetting = gamma;
+    UpdateGammaSettings();
 }
 
 void UpdateGammaSettings(void)
 {
-	if (RequestedGammaSetting==ActualGammaSetting) return;
+    if (RequestedGammaSetting == ActualGammaSetting)
+        return;
 
-	for (int i=0; i<=255; i++)
-	{
-		int u = ((i*65536)/255);
-		int m = MUL_FIXED(u,u);
-		int l = MUL_FIXED(2*u,ONE_FIXED-u);
+    for (int i = 0; i <= 255; i++) {
+        int u = ((i * 65536) / 255);
+        int m = MUL_FIXED(u, u);
+        int l = MUL_FIXED(2 * u, ONE_FIXED - u);
 
-		int a;
-		
-		a = m+MUL_FIXED(RequestedGammaSetting*256,l);
+        int a;
 
+        a = m + MUL_FIXED(RequestedGammaSetting * 256, l);
 
-		m = MUL_FIXED(a,a);
-		l = MUL_FIXED(2*a,ONE_FIXED-a);
+        m = MUL_FIXED(a, a);
+        l = MUL_FIXED(2 * a, ONE_FIXED - a);
 
-		a = m/256+MUL_FIXED(RequestedGammaSetting,l);
+        a = m / 256 + MUL_FIXED(RequestedGammaSetting, l);
 
-		if (a<0) a=0;
-		if (a>255) a=255;
+        if (a < 0)
+            a = 0;
+        if (a > 255)
+            a = 255;
 
-		GammaValues[i]=a;
-	}
+        GammaValues[i] = a;
+    }
 
-	ActualGammaSetting=RequestedGammaSetting;
-
+    ActualGammaSetting = RequestedGammaSetting;
 }
-
 };

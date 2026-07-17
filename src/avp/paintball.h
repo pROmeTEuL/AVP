@@ -6,18 +6,18 @@
 
 typedef struct
 {
-	DISPLAYBLOCK	*TargetDispPtr; 
-	VECTORCH		TargetPosition;
-	VECTORCH		TargetNormal;
+    DISPLAYBLOCK *TargetDispPtr;
+    VECTORCH TargetPosition;
+    VECTORCH TargetNormal;
 
-	enum DECAL_ID	CurrentDecalID;
-	int				CurrentDecalSubclass;
-	int				CurrentDecalSize;
-	int 			CurrentDecalRotation;
+    enum DECAL_ID CurrentDecalID;
+    int CurrentDecalSubclass;
+    int CurrentDecalSize;
+    int CurrentDecalRotation;
 
-	unsigned int  	IsOn :1;
-	unsigned int	DecalIsInverted :1;
-	
+    unsigned int IsOn : 1;
+    unsigned int DecalIsInverted : 1;
+
 } PAINTBALLMODE;
 
 extern PAINTBALLMODE PaintBallMode;

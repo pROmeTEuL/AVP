@@ -6,7 +6,6 @@
 #include "module.h"
 #include "gamedef.h"
 
-
 #include "langenum.h"
 #include "language.h"
 #include "huffman.hpp"
@@ -18,98 +17,90 @@
 #include "ourasert.h"
 #include "avp_menus.h"
 
-
 #ifdef AVP_DEBUG_VERSION
-	#define USE_LANGUAGE_TXT 0
+#define USE_LANGUAGE_TXT 0
 #else
-	#define USE_LANGUAGE_TXT 1
+#define USE_LANGUAGE_TXT 1
 #endif
 
-static char EmptyString[]="";
+static char EmptyString[] = "";
 
-static char *TextStringPtr[MAX_NO_OF_TEXTSTRINGS] = { EmptyString };
+static char *TextStringPtr[MAX_NO_OF_TEXTSTRINGS] = {EmptyString};
 static char *TextBufferPtr;
 
 void InitTextStrings(void)
 {
-	char *filename;
-	char *textPtr;
-	int i;
+    char *filename;
+    char *textPtr;
+    int i;
 
-	/* language select here! */
-	GLOBALASSERT(AvP.Language>=0);
-	GLOBALASSERT(AvP.Language<I_MAX_NO_OF_LANGUAGES);
-	
+    /* language select here! */
+    GLOBALASSERT(AvP.Language >= 0);
+    GLOBALASSERT(AvP.Language < I_MAX_NO_OF_LANGUAGES);
+
 #if MARINE_DEMO
-	filename = "menglish.txt";
+    filename = "menglish.txt";
 #elif ALIEN_DEMO
-	filename = "aenglish.txt";
+    filename = "aenglish.txt";
 #elif USE_LANGUAGE_TXT
-	filename = "language.txt";
+    filename = "language.txt";
 #else
-	filename = LanguageFilename[AvP.Language];
+    filename = LanguageFilename[AvP.Language];
 #endif
-	TextBufferPtr = LoadTextFile(filename);
-		
-	if (TextBufferPtr == NULL) {
-		/* NOTE:
+    TextBufferPtr = LoadTextFile(filename);
+
+    if (TextBufferPtr == NULL) {
+        /* NOTE:
 		   if this load fails, then most likely the game is not 
 		   installed correctly. 
 		   SBF
-		  */ 
-		fprintf(stderr, "ERROR: unable to load %s language text file\n",
-			 filename);
-		exit(1);
-	}
-	
-	if (!strncmp (TextBufferPtr, "REBCRIF1", 8))
-	{
-		textPtr = (char*)HuffmanDecompress((HuffmanPackage*)(TextBufferPtr)); 		
-		DeallocateMem(TextBufferPtr);
-		TextBufferPtr=textPtr;
-	}
-	else
-	{
-		textPtr = TextBufferPtr;
-	}
+		  */
+        fprintf(stderr, "ERROR: unable to load %s language text file\n", filename);
+        exit(1);
+    }
 
-	AddToTable( EmptyString );
+    if (!strncmp(TextBufferPtr, "REBCRIF1", 8)) {
+        textPtr = (char *) HuffmanDecompress((HuffmanPackage *) (TextBufferPtr));
+        DeallocateMem(TextBufferPtr);
+        TextBufferPtr = textPtr;
+    } else {
+        textPtr = TextBufferPtr;
+    }
 
-	for (i=1; i<MAX_NO_OF_TEXTSTRINGS; i++)
-	{	
-		/* scan for a quote mark */
-		while (*textPtr++ != '"') 
-			if (*textPtr == '@') return; /* '@' should be EOF */
+    AddToTable(EmptyString);
 
-		/* now pointing to a text string after quote mark*/
-		TextStringPtr[i] = textPtr;
+    for (i = 1; i < MAX_NO_OF_TEXTSTRINGS; i++) {
+        /* scan for a quote mark */
+        while (*textPtr++ != '"')
+            if (*textPtr == '@')
+                return; /* '@' should be EOF */
 
-		/* scan for a quote mark */
-		while (*textPtr != '"')
-		{	
-			textPtr++;
-		}
+        /* now pointing to a text string after quote mark*/
+        TextStringPtr[i] = textPtr;
 
-		/* change quote mark to zero terminator */
-		*textPtr = 0;
-		textPtr++;
+        /* scan for a quote mark */
+        while (*textPtr != '"') {
+            textPtr++;
+        }
 
-		AddToTable( TextStringPtr[i] );
-	}
+        /* change quote mark to zero terminator */
+        *textPtr = 0;
+        textPtr++;
+
+        AddToTable(TextStringPtr[i]);
+    }
 }
 
 void KillTextStrings(void)
 {
-	UnloadTextFile(LanguageFilename[AvP.Language],TextBufferPtr);
+    UnloadTextFile(LanguageFilename[AvP.Language], TextBufferPtr);
 
-	UnloadTable();
+    UnloadTable();
 }
 
 char *GetTextString(enum TEXTSTRING_ID stringID)
 {
-	LOCALASSERT(stringID<MAX_NO_OF_TEXTSTRINGS);
+    LOCALASSERT(stringID < MAX_NO_OF_TEXTSTRINGS);
 
-	return TextStringPtr[stringID];
+    return TextStringPtr[stringID];
 }
-
-

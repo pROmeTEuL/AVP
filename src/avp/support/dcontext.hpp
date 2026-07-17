@@ -19,12 +19,12 @@
 #ifndef _dcontext
 #define _dcontext 1
 
-	#if defined( _MSC_VER )
-		#pragma once
-	#endif
+#if defined(_MSC_VER)
+#pragma once
+#endif
 
 #ifdef __cplusplus
-	extern "C" {
+extern "C" {
 #endif
 
 /* Version settings *****************************************************/
@@ -34,27 +34,22 @@
 /* Macros ***************************************************************/
 
 /* Type definitions *****************************************************/
-	class R_DumpContext
-	{
-	public:
-		virtual int dputs(char const * const buf) = 0;
-		virtual int dprintf(char const * format, ... ) = 0;
-		virtual int vdprintf(char const * format, va_list ap ) = 0;
-	};
+class R_DumpContext
+{
+public:
+    virtual int dputs(char const *const buf) = 0;
+    virtual int dprintf(char const *format, ...) = 0;
+    virtual int vdprintf(char const *format, va_list ap) = 0;
+};
 
 /* Exported globals *****************************************************/
 
 /* Function prototypes **************************************************/
 
-
-
 /* End of the header ****************************************************/
 
-
 #ifdef __cplusplus
-	};
+};
 #endif
 
 #endif
-
-

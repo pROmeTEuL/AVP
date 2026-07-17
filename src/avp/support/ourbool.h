@@ -9,7 +9,7 @@
 #define _ourbool 1
 
 #ifdef __cplusplus
-	extern "C" {
+extern "C" {
 #endif
 
 /* Version settings *****************************************************/
@@ -19,20 +19,17 @@
 /* Macros ***************************************************************/
 
 /* Type definitions *****************************************************/
-	typedef char OurBool;
-		// marker for an explicitly boolean type (e.g. for a return value)
+typedef char OurBool;
+// marker for an explicitly boolean type (e.g. for a return value)
 
 /* Exported globals *****************************************************/
 
 /* Function prototypes **************************************************/
 
-
-
 /* End of the header ****************************************************/
 
-
 #ifdef __cplusplus
-	};
+};
 #endif
 
 #endif

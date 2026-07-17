@@ -12,14 +12,14 @@
 #include "3dc.h"
 #include "ahudgadg.hpp"
 
-	#if UseGadgets
-		#include "trepgadg.hpp"
-		#include "t_ingadg.hpp"
-		#include "iofocus.h"
-	#endif
+#if UseGadgets
+#include "trepgadg.hpp"
+#include "t_ingadg.hpp"
+#include "iofocus.h"
+#endif
 
-	#define UseLocalAssert Yes
-	#include "ourasert.h"
+#define UseLocalAssert Yes
+#include "ourasert.h"
 
 /* Version settings ************************************************/
 
@@ -31,10 +31,9 @@
 
 /* Imported data ***************************************************/
 #ifdef __cplusplus
-	extern "C"
-	{
+extern "C" {
 #endif
-		#if 0
+#if 0
 		extern OurBool			DaveDebugOn;
 		extern FDIEXTENSIONTAG	FDIET_Dummy;
 		extern IFEXTENSIONTAG	IFET_Dummy;
@@ -45,12 +44,10 @@
 		extern UncompressedGlobalPlotAtomID UGPAID_StandardNull;
 		extern IFCOLOUR			IFColour_Dummy;
  		extern IFVECTOR			IFVec_Zero;
-		#endif
-#ifdef __cplusplus
-	};
 #endif
-
-
+#ifdef __cplusplus
+};
+#endif
 
 /* Exported globals ************************************************/
 
@@ -64,14 +61,10 @@
 #if UseGadgets
 // class AlienHUDGadget : public HUDGadget
 // public:
-void AlienHUDGadget :: Render
-(
-	const struct r2pos& R2Pos,
-	const struct r2rect& R2Rect_Clip,
-	int FixP_Alpha
-)
+void AlienHUDGadget ::Render(
+    const struct r2pos &R2Pos, const struct r2rect &R2Rect_Clip, int FixP_Alpha)
 {
-	#if 0
+#if 0
 	textprint
 	(
 		"AlienHUDGadget :: Render at (%i,%i) clipped (%i,%i,%i,%i) alpha=%i\n",
@@ -83,229 +76,190 @@ void AlienHUDGadget :: Render
 		R2Rect_Clip . y1,
 		FixP_Alpha
 	);
-	#endif
+#endif
 
-	pTextReportGadg -> UpdateLineTimes();
+    pTextReportGadg->UpdateLineTimes();
 
-	struct r2pos R2Pos_TextReport = pTextReportGadg -> GetPos_Rel
-	(
-		R2Rect_Clip
-	);
+    struct r2pos R2Pos_TextReport = pTextReportGadg->GetPos_Rel(R2Rect_Clip);
 
-	GLOBALASSERT( pTextReportGadg );
-	{
-		pTextReportGadg -> Render
-		(
-			R2Pos_TextReport,
-			R2Rect_Clip,
-			FixP_Alpha
-		);
-	}
+    GLOBALASSERT(pTextReportGadg);
+    {
+        pTextReportGadg->Render(R2Pos_TextReport, R2Rect_Clip, FixP_Alpha);
+    }
 
-	// Render the text entry line iff input focus is set to text entry:
-	GLOBALASSERT( pTextEntryGadg );
-	if
-	(
-		IOFOCUS_AcceptTyping()
-	)
-	{
-		// Force the text report gadget onto the screen
-	   	pTextReportGadg	-> ForceOnScreen();
+    // Render the text entry line iff input focus is set to text entry:
+    GLOBALASSERT(pTextEntryGadg);
+    if (IOFOCUS_AcceptTyping()) {
+        // Force the text report gadget onto the screen
+        pTextReportGadg->ForceOnScreen();
 
-		// Render the text entry gadget:
-		pTextEntryGadg -> Render
-		(
-			r2pos
-			(
-				R2Pos_TextReport . x,
-				R2Pos_TextReport . y +  pTextReportGadg -> GetSize
-				(
-					R2Rect_Clip
-				) . h
-			),
-			R2Rect_Clip,
-			FixP_Alpha
-		);
-	}
-	else
-	{
-		// Tell the text entry gadget it's not being rendered
-		// (so it can fade out internally; however nothing will appear on-screen)
-		pTextEntryGadg -> DontRender();
-	}
-
+        // Render the text entry gadget:
+        pTextEntryGadg->Render(
+            r2pos(R2Pos_TextReport.x, R2Pos_TextReport.y + pTextReportGadg->GetSize(R2Rect_Clip).h),
+            R2Rect_Clip,
+            FixP_Alpha);
+    } else {
+        // Tell the text entry gadget it's not being rendered
+        // (so it can fade out internally; however nothing will appear on-screen)
+        pTextEntryGadg->DontRender();
+    }
 }
 
-AlienHUDGadget :: AlienHUDGadget
-(
-) : HUDGadget
-	(
-		#if debug
-		"AlienHUDGadget"
-		#endif
-	)
+AlienHUDGadget ::AlienHUDGadget()
+    : HUDGadget(
+#if debug
+          "AlienHUDGadget"
+#endif
+      )
 {
-	pTextReportGadg = new TextReportGadget();
+    pTextReportGadg = new TextReportGadget();
 
-	pTextEntryGadg = new TextEntryGadget();
-
+    pTextEntryGadg = new TextEntryGadget();
 }
 
-
-AlienHUDGadget :: ~AlienHUDGadget()
+AlienHUDGadget ::~AlienHUDGadget()
 {
-	delete pTextEntryGadg;
-	delete pTextReportGadg;
+    delete pTextEntryGadg;
+    delete pTextReportGadg;
 }
 
-void AlienHUDGadget :: AddTextReport
-(
-	SCString* pSCString_ToAdd
-		// ultimately turn into an MCString
+void AlienHUDGadget ::AddTextReport(
+    SCString *pSCString_ToAdd
+    // ultimately turn into an MCString
 )
 {
-	/* PRECONDITION */
-	{
-		GLOBALASSERT( pSCString_ToAdd );
+    /* PRECONDITION */
+    {
+        GLOBALASSERT(pSCString_ToAdd);
 
-		GLOBALASSERT( pTextReportGadg );
-	}
+        GLOBALASSERT(pTextReportGadg);
+    }
 
-	/* CODE */
-	{
-		pTextReportGadg -> AddTextReport
-		(
-			pSCString_ToAdd
-		);
-	}
+    /* CODE */
+    {
+        pTextReportGadg->AddTextReport(pSCString_ToAdd);
+    }
 }
-void AlienHUDGadget :: ClearTheTextReportQueue(void)
+void AlienHUDGadget ::ClearTheTextReportQueue(void)
 {
-	/* PRECONDITION */
-	{
-		GLOBALASSERT( pTextReportGadg );
-	}
+    /* PRECONDITION */
+    {
+        GLOBALASSERT(pTextReportGadg);
+    }
 
-	/* CODE */
-	{
-		pTextReportGadg -> ClearQueue();
-	}
+    /* CODE */
+    {
+        pTextReportGadg->ClearQueue();
+    }
 }
 
 #if EnableStatusPanels
-void AlienHUDGadget :: RequestStatusPanel
-(
-	enum StatusPanelIndex I_StatusPanel
-)
+void AlienHUDGadget ::RequestStatusPanel(enum StatusPanelIndex I_StatusPanel)
 {
-	/* PRECONDITION */
-	{
-		GLOBALASSERT( I_StatusPanel < NUM_STATUS_PANELS );
-	}
+    /* PRECONDITION */
+    {
+        GLOBALASSERT(I_StatusPanel < NUM_STATUS_PANELS);
+    }
 
-	/* CODE */
-	{
-		// empty for the moment
-	}
+    /* CODE */
+    {
+        // empty for the moment
+    }
 }
 
-void AlienHUDGadget :: NoRequestedPanel(void)
+void AlienHUDGadget ::NoRequestedPanel(void)
 {
-	// empty for the moment
+    // empty for the moment
 }
 #endif // EnableStatusPanels
 
-void AlienHUDGadget :: CharTyped
-(
-	char Ch
-		// note that this _is _ a char
+void AlienHUDGadget ::CharTyped(
+    char Ch
+    // note that this _is _ a char
 )
 {
-	GLOBALASSERT( pTextEntryGadg );
+    GLOBALASSERT(pTextEntryGadg);
 
-	pTextEntryGadg -> CharTyped
-	(
-		Ch
-	);
+    pTextEntryGadg->CharTyped(Ch);
 }
 
-void AlienHUDGadget :: Key_Backspace(void)
+void AlienHUDGadget ::Key_Backspace(void)
 {
-	GLOBALASSERT( pTextEntryGadg );
-	pTextEntryGadg -> Key_Backspace();
+    GLOBALASSERT(pTextEntryGadg);
+    pTextEntryGadg->Key_Backspace();
 }
-void AlienHUDGadget :: Key_End(void)
+void AlienHUDGadget ::Key_End(void)
 {
-	GLOBALASSERT( pTextEntryGadg );
-	pTextEntryGadg -> Key_End();
+    GLOBALASSERT(pTextEntryGadg);
+    pTextEntryGadg->Key_End();
 }
-void AlienHUDGadget :: Key_Home(void)
+void AlienHUDGadget ::Key_Home(void)
 {
-	GLOBALASSERT( pTextEntryGadg );
-	pTextEntryGadg -> Key_Home();
+    GLOBALASSERT(pTextEntryGadg);
+    pTextEntryGadg->Key_Home();
 }
-void AlienHUDGadget :: Key_Left(void)
+void AlienHUDGadget ::Key_Left(void)
 {
-	GLOBALASSERT( pTextEntryGadg );
-	pTextEntryGadg -> Key_Left();
+    GLOBALASSERT(pTextEntryGadg);
+    pTextEntryGadg->Key_Left();
 }
-void AlienHUDGadget :: Key_Up(void)
+void AlienHUDGadget ::Key_Up(void)
 {
-	GLOBALASSERT( pTextEntryGadg );
-	pTextEntryGadg -> Key_Up();
+    GLOBALASSERT(pTextEntryGadg);
+    pTextEntryGadg->Key_Up();
 }
-void AlienHUDGadget :: Key_Right(void)
+void AlienHUDGadget ::Key_Right(void)
 {
-	GLOBALASSERT( pTextEntryGadg );
-	pTextEntryGadg -> Key_Right();
+    GLOBALASSERT(pTextEntryGadg);
+    pTextEntryGadg->Key_Right();
 }
-void AlienHUDGadget :: Key_Down(void)
+void AlienHUDGadget ::Key_Down(void)
 {
-	GLOBALASSERT( pTextEntryGadg );
-	pTextEntryGadg -> Key_Down();
+    GLOBALASSERT(pTextEntryGadg);
+    pTextEntryGadg->Key_Down();
 }
-void AlienHUDGadget :: Key_Delete(void)
+void AlienHUDGadget ::Key_Delete(void)
 {
-	GLOBALASSERT( pTextEntryGadg );
-	pTextEntryGadg -> Key_Delete();
+    GLOBALASSERT(pTextEntryGadg);
+    pTextEntryGadg->Key_Delete();
 }
-void AlienHUDGadget :: Key_Tab(void)
+void AlienHUDGadget ::Key_Tab(void)
 {
-	GLOBALASSERT( pTextEntryGadg );
-	pTextEntryGadg -> Key_Tab();
-}
-
-void AlienHUDGadget :: Jitter(int FixP_Magnitude)
-{
-	// empty for now
+    GLOBALASSERT(pTextEntryGadg);
+    pTextEntryGadg->Key_Tab();
 }
 
-void AlienHUDGadget :: SetString(const char* text)
+void AlienHUDGadget ::Jitter(int FixP_Magnitude)
 {
-	SCString* string = new SCString(text);
-	pTextEntryGadg -> SetString(*string);
-	string->R_Release();
+    // empty for now
 }
 
-
-extern "C"
+void AlienHUDGadget ::SetString(const char *text)
 {
+    SCString *string = new SCString(text);
+    pTextEntryGadg->SetString(*string);
+    string->R_Release();
+}
+
+extern "C" {
 void BringDownConsoleWithSayTypedIn()
 {
-	//bring down console if it isn't already down
-	if(!IOFOCUS_AcceptTyping()) IOFOCUS_Toggle();
-		
-	//put "SAY " in the console
-	((AlienHUDGadget*)HUDGadget :: GetHUD())->SetString("SAY ");
+    //bring down console if it isn't already down
+    if (!IOFOCUS_AcceptTyping())
+        IOFOCUS_Toggle();
+
+    //put "SAY " in the console
+    ((AlienHUDGadget *) HUDGadget ::GetHUD())->SetString("SAY ");
 }
 
 void BringDownConsoleWithSaySpeciesTypedIn()
 {
-	//bring down console if it isn't already down
-	if(!IOFOCUS_AcceptTyping()) IOFOCUS_Toggle();
-		
-	//put "SAY_SPECIES " in the console
-	((AlienHUDGadget*)HUDGadget :: GetHUD())->SetString("SAY_SPECIES ");
+    //bring down console if it isn't already down
+    if (!IOFOCUS_AcceptTyping())
+        IOFOCUS_Toggle();
+
+    //put "SAY_SPECIES " in the console
+    ((AlienHUDGadget *) HUDGadget ::GetHUD())->SetString("SAY_SPECIES ");
 }
 };
 

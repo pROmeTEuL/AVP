@@ -42,15 +42,13 @@
 
 #include "consbind.hpp"
 
-extern "C"
-{
-	#include "weapons.h"
-	#include "avp_menus.h"
+extern "C" {
+#include "weapons.h"
+#include "avp_menus.h"
 };
 
-
-	#define UseLocalAssert Yes
-	#include "ourasert.h"
+#define UseLocalAssert Yes
+#include "ourasert.h"
 
 /* Version settings ************************************************/
 
@@ -62,16 +60,15 @@ extern "C"
 
 /* Imported data ***************************************************/
 #ifdef __cplusplus
-	extern "C"
-	{
+extern "C" {
 #endif
-		extern int DebuggingCommandsActive;
-	
-		extern int bEnableTextprint;
+extern int DebuggingCommandsActive;
 
-		extern SCENE Global_Scene;
+extern int bEnableTextprint;
 
-		#if 0
+extern SCENE Global_Scene;
+
+#if 0
 		extern OurBool			DaveDebugOn;
 		extern FDIEXTENSIONTAG	FDIET_Dummy;
 		extern IFEXTENSIONTAG	IFET_Dummy;
@@ -82,32 +79,29 @@ extern "C"
 		extern UncompressedGlobalPlotAtomID UGPAID_StandardNull;
 		extern IFCOLOUR			IFColour_Dummy;
  		extern IFVECTOR			IFVec_Zero;
-		#endif
-#ifdef __cplusplus
-	};
 #endif
-
-
+#ifdef __cplusplus
+};
+#endif
 
 /* Exported globals ************************************************/
 
 /* Internal type definitions ***************************************/
 
 /* Internal function prototypes ************************************/
-	namespace Cheats
-	{
-		void ToggleImmortality(void);
-		void CommitSuicide(void);
-	};
+namespace Cheats {
+void ToggleImmortality(void);
+void CommitSuicide(void);
+}; // namespace Cheats
 
 /* Internal globals ************************************************/
 
 /* Exported function definitions ***********************************/
-void SCString :: ProcessAnyCheatCodes(void)
+void SCString ::ProcessAnyCheatCodes(void)
 {
-	#if UseGadgets
+#if UseGadgets
 
-	#if 0
+#if 0
 	{
 		char Msg[256];
 		sprintf
@@ -118,245 +112,151 @@ void SCString :: ProcessAnyCheatCodes(void)
 		);
 		GADGET_NewOnScreenMessage(Msg);
 	}
-	#endif
-	// Processing for the "console variable" system:
-	{
-		if
-		(
-			ConsoleVariable :: Process( pProjCh_Val )
-		)
-		{
-			// then this has been processed; stop
-			return;
-		}
-	}
+#endif
+    // Processing for the "console variable" system:
+    {
+        if (ConsoleVariable ::Process(pProjCh_Val)) {
+            // then this has been processed; stop
+            return;
+        }
+    }
 
-	// Processing for the "console commands" system:
-	{
-		if
-		(
-			ConsoleCommand :: Process( pProjCh_Val )
-		)
-		{
-			// then this has been processed; stop
-			return;
-		}
-	}
-	// Expansion-related commands:
-	{
-		if
-		(
-			0 == _strnicmp
-			(
-				pProjCh_Val,
-				"EXP+ ",
-				5
-			)
-		)
-		{
-			TextExpansion :: AddExpansion
-			(
-				pProjCh_Val+5
-					// ProjChar* pProjCh_ToParse
-			);
-			return;
-		}
-		if
-		(
-			0 == _strnicmp
-			(
-				pProjCh_Val,
-				"EXP- ",
-				5
-			)
-		)
-		{
-			TextExpansion :: TryToRemoveExpansion
-			(
-				pProjCh_Val+5
-					// ProjChar* pProjCh_ToParse
-			);
-			return;
-		}
-	}
+    // Processing for the "console commands" system:
+    {
+        if (ConsoleCommand ::Process(pProjCh_Val)) {
+            // then this has been processed; stop
+            return;
+        }
+    }
+    // Expansion-related commands:
+    {
+        if (0 == _strnicmp(pProjCh_Val, "EXP+ ", 5)) {
+            TextExpansion ::AddExpansion(
+                pProjCh_Val + 5
+                // ProjChar* pProjCh_ToParse
+            );
+            return;
+        }
+        if (0 == _strnicmp(pProjCh_Val, "EXP- ", 5)) {
+            TextExpansion ::TryToRemoveExpansion(
+                pProjCh_Val + 5
+                // ProjChar* pProjCh_ToParse
+            );
+            return;
+        }
+    }
 
-	// Key-binding related commands:
-	{
-		if
-		(
-			0 == _strnicmp
-			(
-				pProjCh_Val,
-				"BIND ",
-				5
-			)
-		)
-		{
-			KeyBinding :: ParseBindCommand
-			(
-				pProjCh_Val+5
-					// ProjChar* pProjCh_ToParse
-			);
-			return;
-		}
-		if
-		(
-			0 == _strnicmp
-			(
-				pProjCh_Val,
-				"UNBIND ",
-				7
-			)
-		)
-		{
-			KeyBinding :: ParseUnbindCommand
-			(
-				pProjCh_Val+7
-					// ProjChar* pProjCh_ToParse
-			);
-			return;
-		}
-	}
-	#ifndef AVP_DEBUG_VERSION // allow debug commands without -debug
-	#ifndef AVP_DEBUG_FOR_FOX // allow debug commands without -debug
-	if (DebuggingCommandsActive)
-	#endif
-	#endif
-	{
-		if
-		(
-			#ifndef AVP_DEBUG_VERSION 
-			STRUTIL_SC_Strequal
-			(
-				pProjCh_Val,
-				"GOD" //ProjChar* pProjCh_2
-			)
-			#else // allow case insensitive
-			STRUTIL_SC_Strequal_Insensitive
-			(
-				pProjCh_Val,
-				"GOD" //ProjChar* pProjCh_2
-			)
-			#endif
-		)
-		{
-			Cheats :: ToggleImmortality();
-			return;
-		}
-	}
-	#if CONSOLE_DEBUGGING_COMMANDS_ACTIVATED
-	// Module commands:
-	{
-		if
-		(
-			0 == _strnicmp
-			(
-				pProjCh_Val,
-				"MODULE ",
-				7
-			)
-		)
-		{
-			// Then pass the rest of the string as an argument to the module
-			// teleport code:
+    // Key-binding related commands:
+    {
+        if (0 == _strnicmp(pProjCh_Val, "BIND ", 5)) {
+            KeyBinding ::ParseBindCommand(
+                pProjCh_Val + 5
+                // ProjChar* pProjCh_ToParse
+            );
+            return;
+        }
+        if (0 == _strnicmp(pProjCh_Val, "UNBIND ", 7)) {
+            KeyBinding ::ParseUnbindCommand(
+                pProjCh_Val + 7
+                // ProjChar* pProjCh_ToParse
+            );
+            return;
+        }
+    }
+#ifndef AVP_DEBUG_VERSION // allow debug commands without -debug
+#ifndef AVP_DEBUG_FOR_FOX // allow debug commands without -debug
+    if (DebuggingCommandsActive)
+#endif
+#endif
+    {
+        if (
+#ifndef AVP_DEBUG_VERSION
+            STRUTIL_SC_Strequal(
+                pProjCh_Val,
+                "GOD" //ProjChar* pProjCh_2
+                )
+#else // allow case insensitive
+            STRUTIL_SC_Strequal_Insensitive(
+                pProjCh_Val,
+                "GOD" //ProjChar* pProjCh_2
+                )
+#endif
+        ) {
+            Cheats ::ToggleImmortality();
+            return;
+        }
+    }
+#if CONSOLE_DEBUGGING_COMMANDS_ACTIVATED
+    // Module commands:
+    {
+        if (0 == _strnicmp(pProjCh_Val, "MODULE ", 7)) {
+            // Then pass the rest of the string as an argument to the module
+            // teleport code:
 
-			ModuleCommands :: TryToTeleport
-			(
-				pProjCh_Val+7
-				//char* UpperCasePotentialModuleName
-			);
-			return;
-		}
-		if
-		(
-			0 == _strnicmp
-			(
-				pProjCh_Val,
-				"MOD ",
-				4
-			)
-		)
-		{
-			// Then pass the rest of the string as an argument to the module
-			// teleport code:
+            ModuleCommands ::TryToTeleport(
+                pProjCh_Val + 7
+                //char* UpperCasePotentialModuleName
+            );
+            return;
+        }
+        if (0 == _strnicmp(pProjCh_Val, "MOD ", 4)) {
+            // Then pass the rest of the string as an argument to the module
+            // teleport code:
 
-			ModuleCommands :: TryToTeleport
-			(
-				pProjCh_Val+4
-				//char* UpperCasePotentialModuleName
-			);
-			return;
-		}
-	}
+            ModuleCommands ::TryToTeleport(
+                pProjCh_Val + 4
+                //char* UpperCasePotentialModuleName
+            );
+            return;
+        }
+    }
 
+    if (STRUTIL_SC_Strequal_Insensitive(
+            pProjCh_Val,
+            "SUICIDE" //ProjChar* pProjCh_2
+            )) {
+        Cheats ::CommitSuicide();
+        return;
+    }
 
+    if (STRUTIL_SC_Strequal_Insensitive(
+            pProjCh_Val,
+            "DONE IT" //ProjChar* pProjCh_2
+            )) {
+        MissionObjective ::TestCompleteNext();
+    }
 
-	if
-	(
-		STRUTIL_SC_Strequal_Insensitive
-		(
-			pProjCh_Val,
-			"SUICIDE" //ProjChar* pProjCh_2
-		)
-	)
-	{
-		Cheats :: CommitSuicide();
-		return;
-	}
+    // Unimplemented cheat code ideas:
+    //empty
 
-
-
-
-
-	if
-	(
-		STRUTIL_SC_Strequal_Insensitive
-		(
-			pProjCh_Val,
-			"DONE IT" //ProjChar* pProjCh_2
-		)
-	)
-	{
-		MissionObjective :: TestCompleteNext();
-	}
-
-
-	// Unimplemented cheat code ideas:	
-		//empty
-
-
-	#endif
-	#endif // UseGadgets
+#endif
+#endif // UseGadgets
 }
 
 /* Internal function definitions ***********************************/
 // namespace Cheats
-void Cheats :: ToggleImmortality(void)
+void Cheats ::ToggleImmortality(void)
 {
-	// immortality cheat
-	#if 1
-	if ( PlayerStatusPtr->IsImmortal )
-	{
-		GADGET_NewOnScreenMessage("IMMORTALITY DISABLED");
-		// LOCALISEME();
-		PlayerStatusPtr->IsImmortal = 0;
-	}
-	else
-	{
-		GADGET_NewOnScreenMessage("IMMORTALITY ENABLED");
-		// LOCALISEME();
-		PlayerStatusPtr->IsImmortal = 1;
-	}		
-	#endif
+// immortality cheat
+#if 1
+    if (PlayerStatusPtr->IsImmortal) {
+        GADGET_NewOnScreenMessage("IMMORTALITY DISABLED");
+        // LOCALISEME();
+        PlayerStatusPtr->IsImmortal = 0;
+    } else {
+        GADGET_NewOnScreenMessage("IMMORTALITY ENABLED");
+        // LOCALISEME();
+        PlayerStatusPtr->IsImmortal = 1;
+    }
+#endif
 }
 
-void Cheats :: CommitSuicide(void)
+void Cheats ::CommitSuicide(void)
 {
-	// First, disable immortality:
-	PlayerStatusPtr->IsImmortal = 0;
+    // First, disable immortality:
+    PlayerStatusPtr->IsImmortal = 0;
 
+    // Then apply lots of damage:
 
-	// Then apply lots of damage:		
-
-	CauseDamageToObject(Player->ObStrategyBlock, &certainDeath, ONE_FIXED,NULL);
+    CauseDamageToObject(Player->ObStrategyBlock, &certainDeath, ONE_FIXED, NULL);
 }

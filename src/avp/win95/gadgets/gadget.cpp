@@ -17,8 +17,8 @@
 #include "ahudgadg.hpp"
 #include "indexfnt.hpp"
 #include "trepgadg.hpp"
-	#define UseLocalAssert Yes
-	#include "ourasert.h"
+#define UseLocalAssert Yes
+#include "ourasert.h"
 
 /* Version settings ************************************************/
 
@@ -30,10 +30,9 @@
 
 /* Imported data ***************************************************/
 #ifdef __cplusplus
-	extern "C"
-	{
+extern "C" {
 #endif
-		#if 0
+#if 0
 		extern OurBool			DaveDebugOn;
 		extern FDIEXTENSIONTAG	FDIET_Dummy;
 		extern IFEXTENSIONTAG	IFET_Dummy;
@@ -44,12 +43,10 @@
 		extern UncompressedGlobalPlotAtomID UGPAID_StandardNull;
 		extern IFCOLOUR			IFColour_Dummy;
  		extern IFVECTOR			IFVec_Zero;
-		#endif
-#ifdef __cplusplus
-	};
 #endif
-
-
+#ifdef __cplusplus
+};
+#endif
 
 /* Exported globals ************************************************/
 
@@ -65,34 +62,28 @@
 // class Gadget
 // public:
 
-/*virtual*/ Gadget :: ~Gadget()
+/*virtual*/ Gadget ::~Gadget()
 {
-	// ensure virtual destructor
+    // ensure virtual destructor
 
-	// empty
+    // empty
 }
 
 #if debug
-void Gadget :: Render_Report
-(
-	const struct r2pos& R2Pos,
-	const struct r2rect& R2Rect_Clip,
-	int FixP_Alpha			
-)
+void Gadget ::Render_Report(
+    const struct r2pos &R2Pos, const struct r2rect &R2Rect_Clip, int FixP_Alpha)
 {
-	// use to textprint useful information about a call to "Render"
-	textprint
-	(
-		"%s::Render at(%i,%i) clip(%i,%i,%i,%i) a=%i\n",
-		DebugName,
-		R2Pos . x,
-		R2Pos . y,
-		R2Rect_Clip . x0,
-		R2Rect_Clip . y0,
-		R2Rect_Clip . x1,
-		R2Rect_Clip . y1,
-		FixP_Alpha
-	);
+    // use to textprint useful information about a call to "Render"
+    textprint(
+        "%s::Render at(%i,%i) clip(%i,%i,%i,%i) a=%i\n",
+        DebugName,
+        R2Pos.x,
+        R2Pos.y,
+        R2Rect_Clip.x0,
+        R2Rect_Clip.y0,
+        R2Rect_Clip.x1,
+        R2Rect_Clip.y1,
+        FixP_Alpha);
 }
 #endif
 
@@ -102,60 +93,57 @@ void Gadget :: Render_Report
 
 extern void GADGET_Init(void)
 {
-	/* expects to be called at program boot-up time */
+    /* expects to be called at program boot-up time */
 
-	/* PRECONDITION */
-	{
-		GLOBALASSERT( RootGadget :: GetRoot() == NULL );
-	}
+    /* PRECONDITION */
+    {
+        GLOBALASSERT(RootGadget ::GetRoot() == NULL);
+    }
 
-	/* CODE */
-	{
-		new RootGadget;
-	}
+    /* CODE */
+    {
+        new RootGadget;
+    }
 }
-
 
 extern void GADGET_UnInit(void)
 {
-	/* expects to be called at program shutdown time */
+    /* expects to be called at program shutdown time */
 
-	/* PRECONDITION */
-	{
-		GLOBALASSERT( RootGadget :: GetRoot() );
-	}
+    /* PRECONDITION */
+    {
+        GLOBALASSERT(RootGadget ::GetRoot());
+    }
 
-	/* CODE */
-	{
-		delete RootGadget :: GetRoot();
-	}
+    /* CODE */
+    {
+        delete RootGadget ::GetRoot();
+    }
 }
-
 
 extern void GADGET_Render(void)
 {
-	/* expects to be called within the rendering part of the main loop */
+    /* expects to be called within the rendering part of the main loop */
 
-	/* PRECONDITION */
-	{
-	}
+    /* PRECONDITION */
+    {
+    }
 
-	/* CODE */
-	{
-		#if 0
+    /* CODE */
+    {
+#if 0
 		textprint("GADGET_Render()\n");
-		#endif
+#endif
 
-		// under construction...
-		GLOBALASSERT( RootGadget :: GetRoot() );
-		RootGadget :: GetRoot() -> Render
-		(
-			r2pos :: Origin, // const struct r2pos& R2Pos,
-			r2rect :: PhysicalScreen(), // const struct r2rect& R2Rect_Clip,
-			ONE_FIXED // int FixP_Alpha
-		);
+        // under construction...
+        GLOBALASSERT(RootGadget ::GetRoot());
+        RootGadget ::GetRoot()->Render(
+            r2pos ::Origin,            // const struct r2pos& R2Pos,
+            r2rect ::PhysicalScreen(), // const struct r2rect& R2Rect_Clip,
+            ONE_FIXED                  // int FixP_Alpha
+        );
 
-		#if 0
+#if 0
 		// Test all the fonts:
 		{
 			SCString* pSCString_Test = new SCString("FONT TEST STRING");
@@ -177,104 +165,88 @@ extern void GADGET_Render(void)
 
 			pSCString_Test -> R_Release();
 		}
-		#endif
-	}
+#endif
+    }
 }
-
 
 extern void GADGET_ScreenModeChange_Setup(void)
 {
-	/* expects to be called immediately before anything happens to the screen
+    /* expects to be called immediately before anything happens to the screen
 	mode */
 
-	/* PRECONDITION */
-	{
-	}
+    /* PRECONDITION */
+    {
+    }
 
-	/* CODE */
-	{
-	}
+    /* CODE */
+    {
+    }
 }
-
 
 extern void GADGET_ScreenModeChange_Cleanup(void)
 {
-	/* expects to be called immediately after anything happens to the screen
+    /* expects to be called immediately after anything happens to the screen
 	mode */
 
+    /* PRECONDITION */
+    {
+        GLOBALASSERT(RootGadget ::GetRoot());
+    }
 
-	/* PRECONDITION */
-	{
-		GLOBALASSERT( RootGadget :: GetRoot() );
-	}
-
-	/* CODE */
-	{
-		RootGadget :: GetRoot() -> RefreshHUD();
-	}
+    /* CODE */
+    {
+        RootGadget ::GetRoot()->RefreshHUD();
+    }
 }
 
-extern void GADGET_NewOnScreenMessage( ProjChar* messagePtr )
+extern void GADGET_NewOnScreenMessage(ProjChar *messagePtr)
 {
-	/* PRECONDITION */
-	{
-		GLOBALASSERT( messagePtr );
-		GLOBALASSERT( RootGadget :: GetRoot() );
-	}
+    /* PRECONDITION */
+    {
+        GLOBALASSERT(messagePtr);
+        GLOBALASSERT(RootGadget ::GetRoot());
+    }
 
-	/* CODE */
-	{
-		if ( RootGadget :: GetRoot() -> GetHUD() )
-		{
-			SCString* pSCString_New = new SCString( messagePtr );
+    /* CODE */
+    {
+        if (RootGadget ::GetRoot()->GetHUD()) {
+            SCString *pSCString_New = new SCString(messagePtr);
 
-			RootGadget :: GetRoot() -> GetHUD() -> AddTextReport
-			(
-				pSCString_New
-			);
+            RootGadget ::GetRoot()->GetHUD()->AddTextReport(pSCString_New);
 
-			pSCString_New -> R_Release();
-		}
-	}
-}										
+            pSCString_New->R_Release();
+        }
+    }
+}
 
 extern void RemoveTheConsolePlease(void)
 {
-	AlienHUDGadget *HUD = (AlienHUDGadget*)RootGadget::GetRoot()->GetHUD();
-	HUD->pTextReportGadg->Disappear();
+    AlienHUDGadget *HUD = (AlienHUDGadget *) RootGadget::GetRoot()->GetHUD();
+    HUD->pTextReportGadg->Disappear();
 }
-
 
 #endif // UseGadgets
 
-void SCString :: SendToScreen(void)
+void SCString ::SendToScreen(void)
 {
-	// adds this as a new on-screen message
-	#if UseGadgets
-	/* PRECONDITION */
-	{
-		GLOBALASSERT( RootGadget :: GetRoot() );
-	}
+// adds this as a new on-screen message
+#if UseGadgets
+    /* PRECONDITION */
+    {
+        GLOBALASSERT(RootGadget ::GetRoot());
+    }
 
-	/* CODE */
-	{
-		if ( RootGadget :: GetRoot() -> GetHUD() )
-		{
-			RootGadget :: GetRoot() -> GetHUD() -> AddTextReport
-			(
-				this
-			);
-		}
-	}
-	#else
-	{
-		// do nothing
-	}
-	#endif // UseGadgets
+    /* CODE */
+    {
+        if (RootGadget ::GetRoot()->GetHUD()) {
+            RootGadget ::GetRoot()->GetHUD()->AddTextReport(this);
+        }
+    }
+#else
+    {
+        // do nothing
+    }
+#endif // UseGadgets
 }
-
-
-
-
 
 /* Internal function definitions ***********************************/

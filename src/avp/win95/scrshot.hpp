@@ -6,6 +6,5 @@ extern void ScreenShot();
 extern void HandleScreenShot();
 
 #ifdef __cplusplus
-
 };
 #endif

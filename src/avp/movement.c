@@ -39,83 +39,83 @@
 /* Predators and xenoborgs don't at the moment. */
 
 static const MOVEMENT_DATA Movement_Stats[] = {
-	{
-		MDI_Marine_Mooch_Bored,
-		1500,
-		1500,
-	},
-	{
-		MDI_Marine_Mooch_Alert,
-		1500,
-		1500,
-	},
-	{
-		MDI_Marine_Combat,
-		4000,
-		4000,
-	},
-	{
-		MDI_Marine_Sprint,
-		10000,
-		10000,
-	},
-	{
-		MDI_Civilian_Mooch_Bored,
-		1500,
-		1500,
-	},
-	{
-		MDI_Civilian_Mooch_Alert,
-		1500,
-		1500,
-	},
-	{
-		MDI_Civilian_Combat,
-		4000,
-		4000,
-	},
-	{
-		MDI_Civilian_Sprint,
-		10000,
-		10000,
-	},
-	{
-		MDI_Predator,
-		8000,
-		10000,
-	},
-	{
-		MDI_Casual_Predator,
-		3000,
-		3000,
-	},
-	{
-		MDI_Xenoborg,
-		1000,
-		1000,
-	},
-	{
-		MDI_End,
-		0,
-		0,
-	},
+    {
+        MDI_Marine_Mooch_Bored,
+        1500,
+        1500,
+    },
+    {
+        MDI_Marine_Mooch_Alert,
+        1500,
+        1500,
+    },
+    {
+        MDI_Marine_Combat,
+        4000,
+        4000,
+    },
+    {
+        MDI_Marine_Sprint,
+        10000,
+        10000,
+    },
+    {
+        MDI_Civilian_Mooch_Bored,
+        1500,
+        1500,
+    },
+    {
+        MDI_Civilian_Mooch_Alert,
+        1500,
+        1500,
+    },
+    {
+        MDI_Civilian_Combat,
+        4000,
+        4000,
+    },
+    {
+        MDI_Civilian_Sprint,
+        10000,
+        10000,
+    },
+    {
+        MDI_Predator,
+        8000,
+        10000,
+    },
+    {
+        MDI_Casual_Predator,
+        3000,
+        3000,
+    },
+    {
+        MDI_Xenoborg,
+        1000,
+        1000,
+    },
+    {
+        MDI_End,
+        0,
+        0,
+    },
 };
 
-const MOVEMENT_DATA *GetThisMovementData(MOVEMENT_DATA_INDEX index) {
-	
-	int a;	
-	
-	if (index<0) {
-		return(NULL);
-	}
-	
-	a=0;
-	while (Movement_Stats[a].index!=MDI_End) {
-		if (Movement_Stats[a].index==index) {
-			return(&Movement_Stats[a]);
-		}		
-		a++;	
-		GLOBALASSERT(a<1000);
-	}
-	return(NULL);	
+const MOVEMENT_DATA *GetThisMovementData(MOVEMENT_DATA_INDEX index)
+{
+    int a;
+
+    if (index < 0) {
+        return (NULL);
+    }
+
+    a = 0;
+    while (Movement_Stats[a].index != MDI_End) {
+        if (Movement_Stats[a].index == index) {
+            return (&Movement_Stats[a]);
+        }
+        a++;
+        GLOBALASSERT(a < 1000);
+    }
+    return (NULL);
 }

@@ -3,33 +3,31 @@
 
 typedef struct video_screen_behav_block
 {
-	AVP_BEHAVIOUR_TYPE bhvr_type;
-	BOOL Indestructable;
+    AVP_BEHAVIOUR_TYPE bhvr_type;
+    BOOL Indestructable;
 
-	TXACTRLBLK *inan_tac;//for video screens with anims on them
+    TXACTRLBLK *inan_tac; //for video screens with anims on them
 
-	int destruct_target_request;
-	char destruct_target_ID[SB_NAME_LENGTH];
-	STRATEGYBLOCK* destruct_target_sbptr;
+    int destruct_target_request;
+    char destruct_target_ID[SB_NAME_LENGTH];
+    STRATEGYBLOCK *destruct_target_sbptr;
 
-}VIDEO_SCREEN_BEHAV_BLOCK;
-
+} VIDEO_SCREEN_BEHAV_BLOCK;
 
 typedef struct toolsdata_video_screen
 {
-	struct vectorch position;
-	struct euler orientation;
-	int shapeIndex;	
-	char nameID[SB_NAME_LENGTH];
-	int integrity; // 0-20 (>20 = indestructable)
+    struct vectorch position;
+    struct euler orientation;
+    int shapeIndex;
+    char nameID[SB_NAME_LENGTH];
+    int integrity; // 0-20 (>20 = indestructable)
 
-	int destruct_target_request;
-	char destruct_target_ID[SB_NAME_LENGTH];
+    int destruct_target_request;
+    char destruct_target_ID[SB_NAME_LENGTH];
 
-	
-}TOOLS_DATA_VIDEO_SCREEN;
+} TOOLS_DATA_VIDEO_SCREEN;
 
-void* InitVideoScreen(void* bhdata,STRATEGYBLOCK *sbPtr);
+void *InitVideoScreen(void *bhdata, STRATEGYBLOCK *sbPtr);
 void VideoScreenBehaviour(STRATEGYBLOCK *sbPtr);
 void VideoScreenIsDamaged(STRATEGYBLOCK *sbPtr, DAMAGE_PROFILE *damage, int multiple);
 

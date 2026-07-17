@@ -31,13 +31,13 @@ extern "C" {
  * you must make all buffers at least this big and not use these bytes 
  * yourself.
  */
-#define DPEXT_HEADER_SIZE	( sizeof( struct DpExtHeader) )
+#define DPEXT_HEADER_SIZE (sizeof(struct DpExtHeader))
 
 /* This flag alters the DpExtRecv() function behaviour to allow the user
  * to provide the buffer that the message will be copied to. This is more
  * like the original DirectPlay Receive() fn behaviour than the default.
  */
-#define DPEXT_USER_BUFFER	0x10000000
+#define DPEXT_USER_BUFFER 0x10000000
 
 /* M A C R O S -------------------------------------------------------- */
 
@@ -48,8 +48,8 @@ extern "C" {
  */
 struct DpExtHeader
 {
-	DWORD dwChecksum;	/* Error checking information. 	 */
-	DWORD dwMsgStamp;	/* Contains guaranteed msg info. */
+    DWORD dwChecksum; /* Error checking information. 	 */
+    DWORD dwMsgStamp; /* Contains guaranteed msg info. */
 };
 
 /* G L O B A L S ------------------------------------------------------	*/
@@ -68,21 +68,20 @@ struct DpExtHeader
  */
 extern BOOL DpExtInit(DWORD cGrntdBufs, DWORD cBytesPerBuf, BOOL bErrChcks);
 
-/* Un-initialises the DpExt module. */ 
+/* Un-initialises the DpExt module. */
 extern void DpExtUnInit(void);
 
 /* This fn has the same parameters as the standard DirectPlay Send() fn. 
  * However, you *must* leave DPEXT_HEADER_SIZE bytes free at the start of
  * your data buffer. The dwDataSize byte count must includes these bytes. 
- */ 
-extern HRESULT DpExtSend
-(
-	LPDIRECTPLAY4 lpDP2A,	/* IN: Ptr to IDirectPlay2A (DBCS) interface. */	 
-	DPID idFrom, 			/* IN: ID of sending player (you)	*/
-	DPID idTo,				/* IN: ID of destination player.	*/ 
-	DWORD dwFlags, 			/* IN: DirectPlay Flags.			*/
-	LPVOID lpData,			/* IN: Ptr to start of message. 	*/
-	DWORD dwDataSize		/* IN: Byte count of message. 		*/
+ */
+extern HRESULT DpExtSend(
+    LPDIRECTPLAY4 lpDP2A, /* IN: Ptr to IDirectPlay2A (DBCS) interface. */
+    DPID idFrom,          /* IN: ID of sending player (you)	*/
+    DPID idTo,            /* IN: ID of destination player.	*/
+    DWORD dwFlags,        /* IN: DirectPlay Flags.			*/
+    LPVOID lpData,        /* IN: Ptr to start of message. 	*/
+    DWORD dwDataSize      /* IN: Byte count of message. 		*/
 );
 
 /* This fn has similar parameters to the standard DirectPlay Receive()
@@ -110,14 +109,13 @@ extern HRESULT DpExtSend
  * bytes for header information. Your message proper begins after this 
  * header.
  */
-extern HRESULT DpExtRecv
-(
-	LPDIRECTPLAY4 lpDP2A,	/* IN: Ptr to IDirectPlay2A (DBCS) interface. */
-	LPDPID lpidFrom, 		/* IN/OUT: Ptr to from player id.  	*/
-	LPDPID lpidTo, 			/* IN/OUT: Ptr to to player id.		*/
-	DWORD dwFlags, 			/* IN: DirectPlay flags.			*/
-	LPVOID *lplpData, 		/* IN/OUT: Ptr to ptr to message data.	*/
-	LPDWORD lpdwDataSize	/* IN/OUT: Ptr to byte count of message.	*/
+extern HRESULT DpExtRecv(
+    LPDIRECTPLAY4 lpDP2A, /* IN: Ptr to IDirectPlay2A (DBCS) interface. */
+    LPDPID lpidFrom,      /* IN/OUT: Ptr to from player id.  	*/
+    LPDPID lpidTo,        /* IN/OUT: Ptr to to player id.		*/
+    DWORD dwFlags,        /* IN: DirectPlay flags.			*/
+    LPVOID *lplpData,     /* IN/OUT: Ptr to ptr to message data.	*/
+    LPDWORD lpdwDataSize  /* IN/OUT: Ptr to byte count of message.	*/
 );
 
 /* E N D   W R A P P E R ---------------------------------------------- */

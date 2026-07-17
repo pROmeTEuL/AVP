@@ -3,36 +3,29 @@
 
 #ifdef __cplusplus
 
-	extern "C" {
+extern "C" {
 
 #endif
 
-extern void*  SelfDestructBehaveInit(void* bhdata, STRATEGYBLOCK* sbptr);
-extern void  SelfDestructBehaveFun(STRATEGYBLOCK* sbptr);
-
+extern void *SelfDestructBehaveInit(void *bhdata, STRATEGYBLOCK *sbptr);
+extern void SelfDestructBehaveFun(STRATEGYBLOCK *sbptr);
 
 typedef struct self_destruct_behav_block
 {
-	AVP_BEHAVIOUR_TYPE bhvr_type;
-	int timer; //in fixed point seconds
-	BOOL active;
-}SELF_DESTRUCT_BEHAV_BLOCK;
+    AVP_BEHAVIOUR_TYPE bhvr_type;
+    int timer; //in fixed point seconds
+    BOOL active;
+} SELF_DESTRUCT_BEHAV_BLOCK;
 
 typedef struct self_destruct_tools_template
 {
-	char nameID[SB_NAME_LENGTH];
-	int timer;
-}SELF_DESTRUCT_TOOLS_TEMPLATE;
-
-
-
-
+    char nameID[SB_NAME_LENGTH];
+    int timer;
+} SELF_DESTRUCT_TOOLS_TEMPLATE;
 
 #ifdef __cplusplus
-
-	};
+};
 
 #endif
-
 
 #endif

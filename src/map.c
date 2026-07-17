@@ -7,11 +7,9 @@
 #define UseLocalAssert Yes
 #include "ourasert.h"
 
-
 /*
  externs for commonly used global variables and arrays
 */
-
 
 extern VIEWDESCRIPTORBLOCK *Global_VDB_Ptr;
 
@@ -22,7 +20,6 @@ extern VIEWDESCRIPTORBLOCK *Global_VDB_Ptr;
 DISPLAYBLOCK *dptr_last;
 DISPLAYBLOCK *Player;
 
-
 /*
 		Map Reading Functions
 		Read the map data passed and create the objects on the map
@@ -30,75 +27,62 @@ DISPLAYBLOCK *Player;
 		structures
 */
 
-
-DISPLAYBLOCK* ReadMap(MAPHEADER *mapheader)
+DISPLAYBLOCK *ReadMap(MAPHEADER *mapheader)
 {
-	MAPBLOCK8 *mapblock8ptr;
-	DISPLAYBLOCK *dblockptr = 0;
+    MAPBLOCK8 *mapblock8ptr;
+    DISPLAYBLOCK *dblockptr = 0;
 
+    /* Set up pointers to the map arrays */
+    mapblock8ptr = mapheader->MapType8Objects;
 
-	/* Set up pointers to the map arrays */
-	mapblock8ptr = mapheader->MapType8Objects;
+    /* Map Type #8 Structure */
+    if (mapblock8ptr) {
+        while (mapblock8ptr->MapType != MapType_Term) {
+            dblockptr = CreateActiveObject();
 
+            if (dblockptr) {
+                dblockptr->ObShape = mapblock8ptr->MapShape;
 
- 	/* Map Type #8 Structure */
-	if(mapblock8ptr) {
+                CopyLocation(&mapblock8ptr->MapWorld, &dblockptr->ObWorld);
+                CopyEuler(&mapblock8ptr->MapEuler, &dblockptr->ObEuler);
 
-		while(mapblock8ptr->MapType != MapType_Term) {
+                dblockptr->ObFlags = mapblock8ptr->MapFlags;
+                dblockptr->ObFlags2 = mapblock8ptr->MapFlags2;
+                dblockptr->ObFlags3 = mapblock8ptr->MapFlags3;
 
-			dblockptr = CreateActiveObject();
+                if (mapblock8ptr->MapType == MapType_Player) {
+                    Player = dblockptr;
+                } else {
+                    dblockptr->ObLightType = LightType_PerVertex;
+                    dblockptr->ObFlags |= ObFlag_MultLSrc;
+                }
 
-			if(dblockptr)
-			{
-				dblockptr->ObShape = mapblock8ptr->MapShape;
+                /* KJL 16:55:57 06/05/97 - removing camera stuff */
+                if (mapblock8ptr->MapVDBData)
+                    MapSetVDB(dblockptr, mapblock8ptr->MapVDBData);
 
-				CopyLocation(&mapblock8ptr->MapWorld, &dblockptr->ObWorld);
-				CopyEuler(&mapblock8ptr->MapEuler, &dblockptr->ObEuler);
+                dblockptr->ObLightType = mapblock8ptr->MapLightType;
 
-				dblockptr->ObFlags  = mapblock8ptr->MapFlags;
-				dblockptr->ObFlags2 = mapblock8ptr->MapFlags2;
-				dblockptr->ObFlags3 = mapblock8ptr->MapFlags3;
+                /* KJL 15:23:52 06/07/97 - removed */
+                //				CopyVector(&mapblock8ptr->MapOrigin, &dblockptr->ObOrigin);
+                //				dblockptr->ObSimShapes = mapblock8ptr->MapSimShapes;
+                //				dblockptr->ObViewType = mapblock8ptr->MapViewType;
 
-				if (mapblock8ptr->MapType == MapType_Player)
-				{
-					Player = dblockptr;
-				}
-				else
-				{
-					dblockptr->ObLightType = LightType_PerVertex;
-					dblockptr->ObFlags |= ObFlag_MultLSrc;
-				}
+                MapBlockInit(dblockptr);
 
-/* KJL 16:55:57 06/05/97 - removing camera stuff */
-				if(mapblock8ptr->MapVDBData)
-					MapSetVDB(dblockptr, mapblock8ptr->MapVDBData);
+                CreateEulerMatrix(&dblockptr->ObEuler, &dblockptr->ObMat);
+                TransposeMatrixCH(&dblockptr->ObMat);
 
-				dblockptr->ObLightType = mapblock8ptr->MapLightType;
+                MapPostProcessing(dblockptr);
+            }
 
-/* KJL 15:23:52 06/07/97 - removed */
-//				CopyVector(&mapblock8ptr->MapOrigin, &dblockptr->ObOrigin);
-//				dblockptr->ObSimShapes = mapblock8ptr->MapSimShapes;
-//				dblockptr->ObViewType = mapblock8ptr->MapViewType;
+            dptr_last = dblockptr;
 
-				MapBlockInit(dblockptr);
-
-				CreateEulerMatrix(&dblockptr->ObEuler,&dblockptr->ObMat);
-				TransposeMatrixCH(&dblockptr->ObMat);
-
-				MapPostProcessing(dblockptr);
-			}
-
-			dptr_last = dblockptr;
-
-			mapblock8ptr++;
-
-		}
-
-	}
- 	return dblockptr;
+            mapblock8ptr++;
+        }
+    }
+    return dblockptr;
 }
-
-
 
 /*
 
@@ -109,91 +93,74 @@ DISPLAYBLOCK* ReadMap(MAPHEADER *mapheader)
 
 void MapPostProcessing(DISPLAYBLOCK *dptr)
 {
-	if(dptr)
-	{
-		/*
+    if (dptr) {
+        /*
 
 		Make sure that objects requesting multiple light sources are at
 		least set to "LightType_PerObject"
 
 		*/
-		if(dptr->ObFlags & ObFlag_MultLSrc)
-		{
-			if(dptr->ObLightType == LightType_Infinite)
-				dptr->ObLightType = LightType_PerObject;
-		}
-	}
+        if (dptr->ObFlags & ObFlag_MultLSrc) {
+            if (dptr->ObLightType == LightType_Infinite)
+                dptr->ObLightType = LightType_PerObject;
+        }
+    }
 }
-
 
 void MapSetVDB(DISPLAYBLOCK *dptr, MAPSETVDB *mapvdbdata)
 {
+    VIEWDESCRIPTORBLOCK *vdb;
 
-	VIEWDESCRIPTORBLOCK *vdb;
+    /* TEST */
+    /*LIGHTBLOCK *lptr;*/
 
-	/* TEST */
-	/*LIGHTBLOCK *lptr;*/
+    /* Allocate a VDB */
 
+    vdb = CreateActiveVDB();
 
+    if (vdb) {
+        dptr->ObVDBPtr = vdb; /* Object Block ptr to VDB */
 
-	/* Allocate a VDB */
+        vdb->VDB_ViewObject = dptr; /* VDB ptr to Object Block */
 
-	vdb = CreateActiveVDB();
+        /* VDB Setup */
 
-	if(vdb) {
+        SetVDB(
 
-		dptr->ObVDBPtr = vdb;			/* Object Block ptr to VDB */
+            vdb,
 
-		vdb->VDB_ViewObject = dptr;	/* VDB ptr to Object Block */
+            mapvdbdata->SVDB_Flags,
+            mapvdbdata->SVDB_ViewType,
 
+            mapvdbdata->SVDB_Depth,
 
-		/* VDB Setup */
+            mapvdbdata->SVDB_CentreX,
+            mapvdbdata->SVDB_CentreY,
 
-		SetVDB(
+            mapvdbdata->SVDB_ProjX,
+            mapvdbdata->SVDB_ProjY,
+            mapvdbdata->SVDB_MaxProj,
 
-			vdb,
+            mapvdbdata->SVDB_ClipLeft,
+            mapvdbdata->SVDB_ClipRight,
+            mapvdbdata->SVDB_ClipUp,
+            mapvdbdata->SVDB_ClipDown,
 
-			mapvdbdata->SVDB_Flags,
-			mapvdbdata->SVDB_ViewType,
+            mapvdbdata->SVDB_H1,
+            mapvdbdata->SVDB_H2,
+            mapvdbdata->SVDB_HColour,
 
-			mapvdbdata->SVDB_Depth,
+            mapvdbdata->SVDB_Ambience
 
-			mapvdbdata->SVDB_CentreX,
-			mapvdbdata->SVDB_CentreY,
+        );
 
-			mapvdbdata->SVDB_ProjX,
-			mapvdbdata->SVDB_ProjY,
-			mapvdbdata->SVDB_MaxProj,
+        PlatformSpecificVDBInit(vdb);
 
-			mapvdbdata->SVDB_ClipLeft,
-			mapvdbdata->SVDB_ClipRight,
-			mapvdbdata->SVDB_ClipUp,
-			mapvdbdata->SVDB_ClipDown,
-
-			mapvdbdata->SVDB_H1,
-			mapvdbdata->SVDB_H2,
-			mapvdbdata->SVDB_HColour,
-
-			mapvdbdata->SVDB_Ambience
-
-		);
-
-		PlatformSpecificVDBInit(vdb);
-
-		#if ProjectSpecificVDBs
-		ProjectSpecificVDBInit(vdb);
-		#endif
-
-
-	}
-
+#if ProjectSpecificVDBs
+        ProjectSpecificVDBInit(vdb);
+#endif
+    }
 }
-
-
-
-
-
-
 
 /*
 
@@ -203,43 +170,37 @@ void MapSetVDB(DISPLAYBLOCK *dptr, MAPSETVDB *mapvdbdata)
 
 void MapBlockInit(DISPLAYBLOCK *dptr)
 {
-	SHAPEHEADER *sptr;
+    SHAPEHEADER *sptr;
 
-	/* Get the shape header ptr */
+    /* Get the shape header ptr */
 
-	sptr = GetShapeData(dptr->ObShape);
+    sptr = GetShapeData(dptr->ObShape);
 
+    /* Augmented Z */
 
-	/* Augmented Z */
+    if (sptr->shapeflags & ShapeFlag_AugZ)
+        dptr->ObFlags2 |= ObFlag2_AugZ;
 
-	if(sptr->shapeflags & ShapeFlag_AugZ) dptr->ObFlags2 |= ObFlag2_AugZ;
+    /* Pass address of the shape data header back to the block for others */
 
+    dptr->ObShapeData = sptr;
 
-	/* Pass address of the shape data header back to the block for others */
+    /* Does this shape use a BSP tree or a Z Sort ? */
 
-	dptr->ObShapeData = sptr;
+    dptr->ObFlags |= ObFlag_TypeZ;
 
+    /* Copy shape radius to ODB */
 
-	/* Does this shape use a BSP tree or a Z Sort ? */
+    dptr->ObRadius = sptr->shaperadius;
 
-	dptr->ObFlags |= ObFlag_TypeZ;
+    /* Copy shape xyz extents to ODB */
 
+    dptr->ObMaxX = sptr->shapemaxx;
+    dptr->ObMinX = sptr->shapeminx;
 
-	/* Copy shape radius to ODB */
+    dptr->ObMaxY = sptr->shapemaxy;
+    dptr->ObMinY = sptr->shapeminy;
 
-	dptr->ObRadius = sptr->shaperadius;
-
-	/* Copy shape xyz extents to ODB */
-
-	dptr->ObMaxX = sptr->shapemaxx;
-	dptr->ObMinX = sptr->shapeminx;
-
-	dptr->ObMaxY = sptr->shapemaxy;
-	dptr->ObMinY = sptr->shapeminy;
-
-	dptr->ObMaxZ = sptr->shapemaxz;
-	dptr->ObMinZ = sptr->shapeminz;
-
-
-   
+    dptr->ObMaxZ = sptr->shapemaxz;
+    dptr->ObMinZ = sptr->shapeminz;
 }

@@ -15,9 +15,9 @@
 #include "ahudgadg.hpp"
 //#include "phudgadg.hpp"
 #include "trepgadg.hpp"
-	
-	#define UseLocalAssert Yes
-	#include "ourasert.h"
+
+#define UseLocalAssert Yes
+#include "ourasert.h"
 
 /* Version settings ************************************************/
 
@@ -29,10 +29,9 @@
 
 /* Imported data ***************************************************/
 #ifdef __cplusplus
-	extern "C"
-	{
+extern "C" {
 #endif
-		#if 0
+#if 0
 		extern OurBool			DaveDebugOn;
 		extern FDIEXTENSIONTAG	FDIET_Dummy;
 		extern IFEXTENSIONTAG	IFET_Dummy;
@@ -43,17 +42,15 @@
 		extern UncompressedGlobalPlotAtomID UGPAID_StandardNull;
 		extern IFCOLOUR			IFColour_Dummy;
  		extern IFVECTOR			IFVec_Zero;
-		#endif
-#ifdef __cplusplus
-	};
 #endif
-
-
+#ifdef __cplusplus
+};
+#endif
 
 /* Exported globals ************************************************/
 #if UseGadgets
-	// private:
-	/*static*/ HUDGadget* HUDGadget :: pSingleton;
+// private:
+/*static*/ HUDGadget *HUDGadget ::pSingleton;
 #endif
 
 /* Internal type definitions ***************************************/
@@ -70,18 +67,15 @@
 // public:
 
 // Factory method:
-/*static*/ HUDGadget* HUDGadget :: MakeHUD
-(
-	I_PLAYER_TYPE IPlayerType_ToMake
-)
+/*static*/ HUDGadget *HUDGadget ::MakeHUD(I_PLAYER_TYPE IPlayerType_ToMake)
 {
-	/* PRECONDITION */
-	{
-	}
+    /* PRECONDITION */
+    {
+    }
 
-	/* CODE */
-	{
-		#if 0
+    /* CODE */
+    {
+#if 0
 		switch ( IPlayerType_ToMake )
 		{
 			case I_Marine:
@@ -97,55 +91,52 @@
 				GLOBALASSERT(0);
 				return NULL;
 		}
-		#else
-		return new AlienHUDGadget();
-		#endif
-	}
+#else
+        return new AlienHUDGadget();
+#endif
+    }
 }
-
 
 // Destructor:
-/*virtual*/ HUDGadget :: ~HUDGadget()
+/*virtual*/ HUDGadget ::~HUDGadget()
 {
-	/* PRECONDITION */
-	{
-		GLOBALASSERT( this == pSingleton );
-	}
+    /* PRECONDITION */
+    {
+        GLOBALASSERT(this == pSingleton);
+    }
 
-	/* CODE */
-	{
-		pSingleton = NULL;
-	}
+    /* CODE */
+    {
+        pSingleton = NULL;
+    }
 }
-
 
 // protected:
 // Constructor is protected since an abstract class
-HUDGadget :: HUDGadget
-(
-	#if debug
-	char* DebugName
-	#endif
-) : Gadget
-	(
-		#if debug
-		DebugName
-		#endif		
-	)
+HUDGadget ::HUDGadget(
+#if debug
+    char *DebugName
+#endif
+    )
+    : Gadget(
+#if debug
+          DebugName
+#endif
+      )
 {
-	/* PRECONDITION */
-	{
-		GLOBALASSERT( NULL == pSingleton );
-	}
+    /* PRECONDITION */
+    {
+        GLOBALASSERT(NULL == pSingleton);
+    }
 
-	/* CODE */
-	{
-		#if 0
+    /* CODE */
+    {
+#if 0
 		pSCString_Current = NULL;
-		#endif
+#endif
 
-		pSingleton = this;
-	}
+        pSingleton = this;
+    }
 }
 #endif // UseGadgets
 

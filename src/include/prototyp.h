@@ -7,21 +7,15 @@
 
 */
 
-
 #include "shpanim.h"
 
 #ifdef __cplusplus
 
-	extern "C" {
+extern "C" {
 
 #endif
 
-
-
 #include "mem3dc.h"
-
-
-
 
 /*
 
@@ -32,108 +26,103 @@
 extern const int sine[4096];
 extern const int cosine[4096];
 
-
-typedef struct vectorch {
-
-	int vx;
-	int vy;
-	int vz;
+typedef struct vectorch
+{
+    int vx;
+    int vy;
+    int vz;
 
 } VECTORCH;
 
-typedef struct quat {
-
-	int quatw;
-	int quatx;
-	int quaty;
-	int quatz;
+typedef struct quat
+{
+    int quatw;
+    int quatx;
+    int quaty;
+    int quatz;
 
 } QUAT;
 
-typedef struct vectorchf {
-
-	float vx;
-	float vy;
-	float vz;
+typedef struct vectorchf
+{
+    float vx;
+    float vy;
+    float vz;
 
 } VECTORCHF;
 
 void FNormalise(VECTORCHF *n);
 
-typedef struct vector2d {
-
-	int vx;
-	int vy;
+typedef struct vector2d
+{
+    int vx;
+    int vy;
 
 } VECTOR2D;
 
-typedef struct vector2df {
-
-	float vx;
-	float vy;
+typedef struct vector2df
+{
+    float vx;
+    float vy;
 
 } VECTOR2DF;
 
 void FNormalise2d(VECTOR2DF *n);
 
-typedef struct line {
-
-	VECTORCH v0;
-	VECTORCH v1;
+typedef struct line
+{
+    VECTORCH v0;
+    VECTORCH v1;
 
 } LINE;
 
-
-
-typedef struct euler {
-
-	int EulerX;
-	int EulerY;
-	int EulerZ;
+typedef struct euler
+{
+    int EulerX;
+    int EulerY;
+    int EulerZ;
 
 } EULER;
 
+typedef struct angularvelocity
+{
+    EULER AngV;
 
-typedef struct angularvelocity {
-
-	EULER AngV;
-
-	int PitchCount;
-	int YawCount;
-	int RollCount;
+    int PitchCount;
+    int YawCount;
+    int RollCount;
 
 } ANGULARVELOCITY;
 
+typedef struct matrixch
+{
+    int mat11;
+    int mat12;
+    int mat13;
 
-typedef struct matrixch {
+    int mat21;
+    int mat22;
+    int mat23;
 
-	int mat11;
-	int mat12;
-	int mat13;
-
-	int mat21;
-	int mat22;
-	int mat23;
-
-	int mat31;
-	int mat32;
-	int mat33;
+    int mat31;
+    int mat32;
+    int mat33;
 
 } MATRIXCH;
 
-typedef struct matrixchf {
+typedef struct matrixchf
+{
+    float mat11;
+    float mat12;
+    float mat13;
 
-	float mat11;
-	float mat12;
-	float mat13;
+    float mat21;
+    float mat22;
+    float mat23;
 
-	float mat21;
-	float mat22;
-	float mat23;
-
-	float mat31;
-	float mat32;
-	float mat33;
+    float mat31;
+    float mat32;
+    float mat33;
 
 } MATRIXCHF;
 
@@ -143,7 +132,6 @@ typedef struct matrixchf {
 
 struct hmodelcontroller;
 
-
 /*
 
  This structure is used by map function "MapSetVDB()" to pass parameters
@@ -151,39 +139,37 @@ struct hmodelcontroller;
 
 */
 
-typedef struct mapsetvdb {
+typedef struct mapsetvdb
+{
+    int SVDB_Flags;
+    int SVDB_ViewType;
 
-	int SVDB_Flags;
-	int SVDB_ViewType;
+    int SVDB_Depth;
 
-	int SVDB_Depth;
+    int SVDB_CentreX;
+    int SVDB_CentreY;
 
-	int SVDB_CentreX;
-	int SVDB_CentreY;
+    int SVDB_ProjX;
+    int SVDB_ProjY;
+    int SVDB_MaxProj;
 
-	int SVDB_ProjX;
-	int SVDB_ProjY;
-	int SVDB_MaxProj;
+    int SVDB_ClipLeft;
+    int SVDB_ClipRight;
+    int SVDB_ClipUp;
+    int SVDB_ClipDown;
 
-	int SVDB_ClipLeft;
-	int SVDB_ClipRight;
-	int SVDB_ClipUp;
-	int SVDB_ClipDown;
+    int SVDB_H1;
+    int SVDB_H2;
+    int SVDB_HInterval;
+    int SVDB_HColour;
+    int SVDB_Ambience;
 
-	int SVDB_H1;
-	int SVDB_H2;
-	int SVDB_HInterval;
-	int SVDB_HColour;
-	int SVDB_Ambience;
-
-	int SVDB_ObViewState;
-	int SVDB_ObViewDistance;
-	int SVDB_ObPanX;
-	int SVDB_ObPanY;
-
+    int SVDB_ObViewState;
+    int SVDB_ObViewDistance;
+    int SVDB_ObPanX;
+    int SVDB_ObPanY;
 
 } MAPSETVDB;
-
 
 /*
 
@@ -193,13 +179,12 @@ typedef struct mapsetvdb {
 
 */
 
-typedef struct simshapelist {
-
-	int SSL_Threshold;			/* 1st trans. for proj. r */
-	int *SSL_Shapes;				/* ptr to array of shapes */
+typedef struct simshapelist
+{
+    int SSL_Threshold; /* 1st trans. for proj. r */
+    int *SSL_Shapes;   /* ptr to array of shapes */
 
 } SIMSHAPELIST;
-
 
 /*
 
@@ -212,199 +197,183 @@ typedef struct simshapelist {
 
 */
 
+typedef struct mapblock1
+{
+    int MapType;
 
+#if LoadingMapsShapesAndTexturesEtc
 
-typedef struct mapblock1 {
+    int MapFNameIndex;
+    char **MapFNameArray;
+    SHAPEHEADER **MapShapeDataArray;
 
-	int MapType;
-
-	#if LoadingMapsShapesAndTexturesEtc
-
-		int MapFNameIndex;
-		char **MapFNameArray;
-		SHAPEHEADER **MapShapeDataArray;
-
-	#endif
+#endif
 
 } MAPBLOCK1;
 
+typedef struct mapblock2
+{
+    int MapType;
+    int MapShape;
 
-typedef struct mapblock2 {
+#if LoadingMapsShapesAndTexturesEtc
 
-	int MapType;
-	int MapShape;
+    int MapFNameIndex;
+    char **MapFNameArray;
+    SHAPEHEADER **MapShapeDataArray;
 
-	#if LoadingMapsShapesAndTexturesEtc
-
-		int MapFNameIndex;
-		char **MapFNameArray;
-		SHAPEHEADER **MapShapeDataArray;
-
-	#endif
+#endif
 
 } MAPBLOCK2;
 
+typedef struct mapblock3
+{
+    int MapType;
+    int MapShape;
 
-typedef struct mapblock3 {
+#if LoadingMapsShapesAndTexturesEtc
 
-	int MapType;
-	int MapShape;
+    int MapFNameIndex;
+    char **MapFNameArray;
+    SHAPEHEADER **MapShapeDataArray;
 
-	#if LoadingMapsShapesAndTexturesEtc
+#endif
 
-		int MapFNameIndex;
-		char **MapFNameArray;
-		SHAPEHEADER **MapShapeDataArray;
-
-	#endif
-
-	VECTORCH MapWorld;
+    VECTORCH MapWorld;
 
 } MAPBLOCK3;
 
+typedef struct mapblock4
+{
+    int MapType;
+    int MapShape;
 
-typedef struct mapblock4 {
+#if LoadingMapsShapesAndTexturesEtc
 
-	int MapType;
-	int MapShape;
+    int MapFNameIndex;
+    char **MapFNameArray;
+    SHAPEHEADER **MapShapeDataArray;
 
-	#if LoadingMapsShapesAndTexturesEtc
+#endif
 
-		int MapFNameIndex;
-		char **MapFNameArray;
-		SHAPEHEADER **MapShapeDataArray;
+    VECTORCH MapWorld;
 
-	#endif
-
-	VECTORCH MapWorld;
-
-	EULER MapEuler;
+    EULER MapEuler;
 
 } MAPBLOCK4;
 
+typedef struct mapblock5
+{
+    int MapType;
+    int MapShape;
 
-typedef struct mapblock5 {
+#if LoadingMapsShapesAndTexturesEtc
 
-	int MapType;
-	int MapShape;
+    int MapFNameIndex;
+    char **MapFNameArray;
+    SHAPEHEADER **MapShapeDataArray;
 
-	#if LoadingMapsShapesAndTexturesEtc
+#endif
 
-		int MapFNameIndex;
-		char **MapFNameArray;
-		SHAPEHEADER **MapShapeDataArray;
+    VECTORCH MapWorld;
 
-	#endif
+    EULER MapEuler;
 
-	VECTORCH MapWorld;
-
-	EULER MapEuler;
-
-	int MapFlags;
-
+    int MapFlags;
 
 } MAPBLOCK5;
 
+typedef struct mapblock6
+{
+    int MapType;
+    int MapShape;
 
-typedef struct mapblock6 {
+#if LoadingMapsShapesAndTexturesEtc
 
-	int MapType;
-	int MapShape;
+    int MapFNameIndex;
+    char **MapFNameArray;
+    SHAPEHEADER **MapShapeDataArray;
 
-	#if LoadingMapsShapesAndTexturesEtc
+#endif
 
-		int MapFNameIndex;
-		char **MapFNameArray;
-		SHAPEHEADER **MapShapeDataArray;
+    VECTORCH MapWorld;
 
-	#endif
+    EULER MapEuler;
 
-	VECTORCH MapWorld;
+    int MapFlags;
 
-	EULER MapEuler;
+    MAPSETVDB *MapVDBData;
 
-	int MapFlags;
-
-
-	MAPSETVDB *MapVDBData;
-
-	int MapInteriorType;
+    int MapInteriorType;
 
 } MAPBLOCK6;
 
+typedef struct mapblock7
+{
+    int MapType;
+    int MapShape;
 
-typedef struct mapblock7 {
+#if LoadingMapsShapesAndTexturesEtc
 
-	int MapType;
-	int MapShape;
+    int MapFNameIndex;
+    char **MapFNameArray;
+    SHAPEHEADER **MapShapeDataArray;
 
-	#if LoadingMapsShapesAndTexturesEtc
+#endif
 
-		int MapFNameIndex;
-		char **MapFNameArray;
-		SHAPEHEADER **MapShapeDataArray;
+    VECTORCH MapWorld;
 
-	#endif
+    EULER MapEuler;
 
-	VECTORCH MapWorld;
+    int MapFlags;
+    int MapFlags2;
+    int MapFlags3;
 
-	EULER MapEuler;
+    MAPSETVDB *MapVDBData;
 
-	int MapFlags;
-	int MapFlags2;
-	int MapFlags3;
+    int MapInteriorType;
 
+    int MapLightType; /* See LIGHTTYPES */
 
-	MAPSETVDB *MapVDBData;
+    VECTORCH MapOrigin; /* Origin of Rotation */
 
-	int MapInteriorType;
+    SIMSHAPELIST *MapSimShapes;
 
-	int MapLightType;			/* See LIGHTTYPES */
-
-
-	VECTORCH MapOrigin;			/* Origin of Rotation */
-
-	SIMSHAPELIST *MapSimShapes;
-
-	int MapViewType;			/* See "VDB_ViewType" */
-
+    int MapViewType; /* See "VDB_ViewType" */
 
 } MAPBLOCK7;
 
+typedef struct mapblock8
+{
+    int MapType;
+    int MapShape;
 
-typedef struct mapblock8 {
+    VECTORCH MapWorld;
 
-	int MapType;
-	int MapShape;
+    EULER MapEuler;
 
-	VECTORCH MapWorld;
+    int MapFlags;
+    int MapFlags2;
+    int MapFlags3;
 
-	EULER MapEuler;
+    MAPSETVDB *MapVDBData;
 
-	int MapFlags;
-	int MapFlags2;
-	int MapFlags3;
+    int MapInteriorType;
 
-	MAPSETVDB *MapVDBData;
+    int MapLightType; /* See LIGHTTYPES */
 
-	int MapInteriorType;
+    VECTORCH MapOrigin; /* Origin of Rotation */
 
-	int MapLightType;			/* See LIGHTTYPES */
+    SIMSHAPELIST *MapSimShapes;
 
+    int MapViewType; /* See "VDB_ViewType" */
 
-	VECTORCH MapOrigin;			/* Origin of Rotation */
+    struct displayblock **MapMPtr; /* Write our dptr here as mother */
+    struct displayblock **MapDPtr; /* Read our dptr here as daughter */
 
-	SIMSHAPELIST *MapSimShapes;
-
-	int MapViewType;			/* See "VDB_ViewType" */
-
-	struct displayblock **MapMPtr;	/* Write our dptr here as mother */
-	struct displayblock **MapDPtr;	/* Read our dptr here as daughter */
-
-	VECTORCH MapMOffset;					/* Offset from mother */
+    VECTORCH MapMOffset; /* Offset from mother */
 
 } MAPBLOCK8;
-
 
 /*
 
@@ -412,20 +381,18 @@ typedef struct mapblock8 {
 
 */
 
-typedef struct mapheader {
-
-	MAPBLOCK1 *MapType1Objects;
-	MAPBLOCK2 *MapType2Objects;
-	MAPBLOCK3 *MapType3Objects;
-	MAPBLOCK4 *MapType4Objects;
-	MAPBLOCK5 *MapType5Objects;
-	MAPBLOCK6 *MapType6Objects;
-	MAPBLOCK7 *MapType7Objects;
-	MAPBLOCK8 *MapType8Objects;
+typedef struct mapheader
+{
+    MAPBLOCK1 *MapType1Objects;
+    MAPBLOCK2 *MapType2Objects;
+    MAPBLOCK3 *MapType3Objects;
+    MAPBLOCK4 *MapType4Objects;
+    MAPBLOCK5 *MapType5Objects;
+    MAPBLOCK6 *MapType6Objects;
+    MAPBLOCK7 *MapType7Objects;
+    MAPBLOCK8 *MapType8Objects;
 
 } MAPHEADER;
-
-
 
 /*
 
@@ -439,38 +406,37 @@ typedef struct mapheader {
 
 */
 
-typedef struct screendescriptorblock {
+typedef struct screendescriptorblock
+{
+    int SDB_Width;
+    int SDB_Height;
+    int SDB_Depth;
+    int SDB_ScreenDepth;
+    int SDB_Size;
 
-	int SDB_Width;
-	int SDB_Height;
-	int SDB_Depth;
-	int SDB_ScreenDepth;
-	int SDB_Size;
+    int SDB_DiagonalWidth;
 
-	int SDB_DiagonalWidth;
+    int SDB_CentreX;
+    int SDB_CentreY;
 
-	int SDB_CentreX;
-	int SDB_CentreY;
+    int SDB_ProjX;
+    int SDB_ProjY;
+    int SDB_MaxProj;
 
-	int SDB_ProjX;
-	int SDB_ProjY;
-	int SDB_MaxProj;
+    int SDB_ClipLeft;
+    int SDB_ClipRight;
+    int SDB_ClipUp;
+    int SDB_ClipDown;
 
-	int SDB_ClipLeft;
-	int SDB_ClipRight;
-	int SDB_ClipUp;
-	int SDB_ClipDown;
+    int SDB_Flags;
 
-	int SDB_Flags;
+    int SDB_ViewAngle;
+    int SDB_ViewAngleCos;
 
-	int SDB_ViewAngle;
-	int SDB_ViewAngleCos;
-
-	unsigned int TLTSize;
-	unsigned int TLTShift;
+    unsigned int TLTSize;
+    unsigned int TLTShift;
 
 } SCREENDESCRIPTORBLOCK;
-
 
 /*
 
@@ -480,20 +446,20 @@ typedef struct screendescriptorblock {
 
 */
 
-#define SDB_Flag_222                0x00000001		/* 8-bit mode 222 texture palette */
-#define SDB_Flag_Raw256             0x00000002		/* 8-bit mode, no texture remap */
+#define SDB_Flag_222 0x00000001    /* 8-bit mode 222 texture palette */
+#define SDB_Flag_Raw256 0x00000002 /* 8-bit mode, no texture remap */
 
-#define SDB_Flag_MIP                0x00000004		/* Create MIP maps for images */
+#define SDB_Flag_MIP 0x00000004 /* Create MIP maps for images */
 
-#define SDB_Flag_SuperSample2x2     0x00000008		/* 8T and 24 only */
+#define SDB_Flag_SuperSample2x2 0x00000008 /* 8T and 24 only */
 
-#define SDB_Flag_DrawFrontToBack    0x00000010		/* Useful if Z-Buffering */
+#define SDB_Flag_DrawFrontToBack 0x00000010 /* Useful if Z-Buffering */
 
-#define SDB_Flag_TLTPalette         0x00000020      /* 8Raw only, Images may have ih_flag_tlt and the tlt maps colours from an abstract palette to the screen palette */
-#define SDB_Flag_TLTSize            0x00000040      /* The TLTSize member is valid, o/w TLTSize is 256 */
-#define SDB_Flag_TLTShift           0x00000080      /* The TLTShift member is valid because the TLTSize is a power of two */
-
-
+#define SDB_Flag_TLTPalette \
+    0x00000020 /* 8Raw only, Images may have ih_flag_tlt and the tlt maps colours from an abstract palette to the screen palette */
+#define SDB_Flag_TLTSize 0x00000040 /* The TLTSize member is valid, o/w TLTSize is 256 */
+#define SDB_Flag_TLTShift \
+    0x00000080 /* The TLTShift member is valid because the TLTSize is a power of two */
 
 /*
 
@@ -501,13 +467,12 @@ typedef struct screendescriptorblock {
 
 */
 
-typedef struct clipplaneblock {
-
-	VECTORCH CPB_Normal;
-	VECTORCH CPB_POP;
+typedef struct clipplaneblock
+{
+    VECTORCH CPB_Normal;
+    VECTORCH CPB_POP;
 
 } CLIPPLANEBLOCK;
-
 
 /*
 
@@ -515,11 +480,11 @@ typedef struct clipplaneblock {
 
 */
 
-typedef struct clipplanepoints {
-
-	VECTORCH cpp1;
-	VECTORCH cpp2;
-	VECTORCH cpp3;
+typedef struct clipplanepoints
+{
+    VECTORCH cpp1;
+    VECTORCH cpp2;
+    VECTORCH cpp3;
 
 } CLIPPLANEPOINTS;
 
@@ -539,113 +504,113 @@ typedef struct clipplanepoints {
 
 */
 
-typedef struct viewdescriptorblock {
+typedef struct viewdescriptorblock
+{
+    struct viewdescriptorblock *VDB_HigherP;
+    struct viewdescriptorblock *VDB_LowerP;
 
-	struct viewdescriptorblock *VDB_HigherP;
-	struct viewdescriptorblock *VDB_LowerP;
+    int VDB_ViewType; /* To match ObViewType, used by image backdrops */
 
-	int VDB_ViewType;	/* To match ObViewType, used by image backdrops */
+    int VDB_Priority; /* Determines draw order */
 
-	int VDB_Priority;	/* Determines draw order */
+    int VDB_Flags;
 
-	int VDB_Flags;
+    int VDB_ViewAngle;
+    int VDB_ViewAngleCos;
 
-	int VDB_ViewAngle;
-	int VDB_ViewAngleCos;
+    int VDB_Width;
+    int VDB_Height;
+    int VDB_Depth;
+    int VDB_ScreenDepth;
 
-	int VDB_Width;
-	int VDB_Height;
-	int VDB_Depth;
-	int VDB_ScreenDepth;
+    int VDB_CentreX;
+    int VDB_CentreY;
 
-	int VDB_CentreX;
-	int VDB_CentreY;
+    int VDB_ProjX;
+    int VDB_ProjY;
+    int VDB_MaxProj;
 
-	int VDB_ProjX;
-	int VDB_ProjY;
-	int VDB_MaxProj;
+    int VDB_ClipZ;
+    int VDB_ClipLeft;
+    int VDB_ClipRight;
+    int VDB_ClipUp;
+    int VDB_ClipDown;
 
-	int VDB_ClipZ;
-	int VDB_ClipLeft;
-	int VDB_ClipRight;
-	int VDB_ClipUp;
-	int VDB_ClipDown;
+    CLIPPLANEBLOCK VDB_ClipZPlane;
+    CLIPPLANEBLOCK VDB_ClipLeftPlane;
+    CLIPPLANEBLOCK VDB_ClipRightPlane;
+    CLIPPLANEBLOCK VDB_ClipUpPlane;
+    CLIPPLANEBLOCK VDB_ClipDownPlane;
 
-	CLIPPLANEBLOCK VDB_ClipZPlane;
-	CLIPPLANEBLOCK VDB_ClipLeftPlane;
-	CLIPPLANEBLOCK VDB_ClipRightPlane;
-	CLIPPLANEBLOCK VDB_ClipUpPlane;
-	CLIPPLANEBLOCK VDB_ClipDownPlane;
+    struct displayblock *VDB_ViewObject;
 
-	struct displayblock *VDB_ViewObject;
+    VECTORCH VDB_World;
 
-	VECTORCH VDB_World;
+    MATRIXCH VDB_Mat;
+    MATRIXCH VDB_HorizonMat;
+    MATRIXCH VDB_SpriteMat;
 
-	MATRIXCH VDB_Mat;
-	MATRIXCH VDB_HorizonMat;
-	MATRIXCH VDB_SpriteMat;
+    EULER VDB_MatrixEuler;
 
-	EULER VDB_MatrixEuler;
+    int VDB_H1;
+    int VDB_H2;
+    int VDB_HInterval;
 
+    int VDB_HColour;  /* "Sky" */
+    int VDB_HColour8; /* For 8-bit colour indirected modes */
 
-	int VDB_H1;
-	int VDB_H2;
-	int VDB_HInterval;
+    int VDB_HGColour;  /* "Ground" */
+    int VDB_HGColour8; /* For 8-bit colour indirected modes */
 
-	int VDB_HColour;						/* "Sky" */
-	int VDB_HColour8;						/* For 8-bit colour indirected modes */
+    int VDB_Ambience;
 
-	int VDB_HGColour;						/* "Ground" */
-	int VDB_HGColour8;					/* For 8-bit colour indirected modes */
+#if pc_backdrops
+    BACKDROPTYPE VDB_BackdropType;
+    unsigned short VDB_ProjectorXOffsets[MaxScreenWidth];
+#endif
 
-	int VDB_Ambience;
-
-	#if pc_backdrops
-	BACKDROPTYPE VDB_BackdropType;
-	unsigned short VDB_ProjectorXOffsets[MaxScreenWidth];
-	#endif
-
-	#if ProjectSpecificVDBs
-	void* VDB_ProjectSpecificHook;
-	#endif
+#if ProjectSpecificVDBs
+    void *VDB_ProjectSpecificHook;
+#endif
 
 } VIEWDESCRIPTORBLOCK;
 
-
 /* Flags */
 
-#define ViewDB_Flag_SingleBuffer	0x00000001
-#define ViewDB_Flag_DoubleBuffer	0x00000002
-#define ViewDB_Flag_FullSize		0x00000004	/* Use fast screen clear */
-#define ViewDB_Flag_NoBackdrop	0x00000008
+#define ViewDB_Flag_SingleBuffer 0x00000001
+#define ViewDB_Flag_DoubleBuffer 0x00000002
+#define ViewDB_Flag_FullSize 0x00000004 /* Use fast screen clear */
+#define ViewDB_Flag_NoBackdrop 0x00000008
 
-#define ViewDB_Flag_LTrunc			0x00000010	/* Informs the VDB creator		*/
-#define ViewDB_Flag_RTrunc			0x00000020	/* that a physical screen		*/
-#define ViewDB_Flag_UTrunc			0x00000040	/* violation has forced a		*/
-#define ViewDB_Flag_DTrunc			0x00000080	/* truncation of the viewport	*/
+#define ViewDB_Flag_LTrunc 0x00000010 /* Informs the VDB creator		*/
+#define ViewDB_Flag_RTrunc 0x00000020 /* that a physical screen		*/
+#define ViewDB_Flag_UTrunc 0x00000040 /* violation has forced a		*/
+#define ViewDB_Flag_DTrunc 0x00000080 /* truncation of the viewport	*/
 
-#define ViewDB_Flag_Hazing			0x00000100
-#define ViewDB_Flag_DontDraw		0x00000200
-#define ViewDB_Flag_AdjustScale	0x00000400	/* Scale 320x200 definition up to equivalent size for the mode */
-#define ViewDB_Flag_AddSubject	0x00000800	/* For MapSetVDB, telling it to add dptr_last to the dptr */
+#define ViewDB_Flag_Hazing 0x00000100
+#define ViewDB_Flag_DontDraw 0x00000200
+#define ViewDB_Flag_AdjustScale \
+    0x00000400 /* Scale 320x200 definition up to equivalent size for the mode */
+#define ViewDB_Flag_AddSubject \
+    0x00000800 /* For MapSetVDB, telling it to add dptr_last to the dptr */
 
-#define ViewDB_Flag_NeedToFlushZ	0x00001000	/* Cleared by flush function */
+#define ViewDB_Flag_NeedToFlushZ 0x00001000 /* Cleared by flush function */
 
-
-#define ViewDB_Flag_ImageBackdrop 0x00004000	/* This requires a backdrop
+#define ViewDB_Flag_ImageBackdrop \
+    0x00004000 /* This requires a backdrop
 																image array, accessed through
 																"Global_SceneBackdropPtr" */
 
-#define ViewDB_Flag_Horizon		0x00008000	/* Draw a "traditional"
+#define ViewDB_Flag_Horizon \
+    0x00008000 /* Draw a "traditional"
 																Sky/Ground horizon - before
 																the backdrop is drawn */
 
-#define ViewDB_Flag_UseBackdropImageColoursForHorizon	0x00010000
+#define ViewDB_Flag_UseBackdropImageColoursForHorizon 0x00010000
 
-#define ViewDB_Flag_NoScreenClear							0x00020000
+#define ViewDB_Flag_NoScreenClear 0x00020000
 
-#define ViewDB_Flag_NoModules									0x00040000
-
+#define ViewDB_Flag_NoModules 0x00040000
 
 /*
 
@@ -658,21 +623,18 @@ typedef struct viewdescriptorblock {
 
 */
 
-#define ViewDB_Flag_drawtx3das2d	0x00080000
-
+#define ViewDB_Flag_drawtx3das2d 0x00080000
 
 /* test the flags with "& VDB_Trunc" to see if any truncation occurred */
 
-#define VDB_Trunc (ViewDB_Flag_LTrunc | ViewDB_Flag_RTrunc | ViewDB_Flag_UTrunc | ViewDB_Flag_DTrunc)
-
-
+#define VDB_Trunc \
+    (ViewDB_Flag_LTrunc | ViewDB_Flag_RTrunc | ViewDB_Flag_UTrunc | ViewDB_Flag_DTrunc)
 
 /*
 
  Light Source Data Structures
 
 */
-
 
 /*
 
@@ -682,33 +644,32 @@ typedef struct viewdescriptorblock {
 
 typedef enum {
 
-	LightType_Infinite,		/* Default */
-	LightType_PerObject,
-	LightType_PerVertex
+    LightType_Infinite, /* Default */
+    LightType_PerObject,
+    LightType_PerVertex
 
 } LIGHTTYPES;
 
+typedef struct lightblock
+{
+    int LightFlags;
+    int LightType;
 
-typedef struct lightblock {
+    VECTORCH LightWorld; /* World space light position */
 
-	int LightFlags;
-	int LightType;
+    VECTORCH LocalLP; /* Light position in object local space */
 
-	VECTORCH LightWorld;		/* World space light position */
+    int LightBright; /* 0->1 Fixed Point */
+    int LightRange;
 
-	VECTORCH LocalLP;			/* Light position in object local space */
+    int BrightnessOverRange;
 
-	int LightBright;			/* 0->1 Fixed Point */
-	int LightRange;
+    /* these RGB components take values 0-65536 */
+    int RedScale;
+    int GreenScale;
+    int BlueScale;
 
-	int BrightnessOverRange;
-
-	/* these RGB components take values 0-65536 */
-	int RedScale;
-	int GreenScale;
-	int BlueScale;
-
-	int LightBrightStore;
+    int LightBrightStore;
 
 } LIGHTBLOCK;
 
@@ -718,32 +679,31 @@ typedef struct lightblock {
 
 */
 
-#define LFlag_CosAtten			0x00000001		/* Cosine attenuation */
-#define LFlag_CosSpreadAtten	0x00000002		/* Cosine spread attenuation */
-#define LFlag_Omni				0x00000004		/* Omnidirectional */
-#define LFlag_Deallocate		0x00000008		/* Deallocate at frame end */
-#define LFlag_NoShadows			0x00000010		/* Prelighting - No Shadows */
-#define LFlag_Off				0x00000020		/* Prelighting - Light OFF */
+#define LFlag_CosAtten 0x00000001       /* Cosine attenuation */
+#define LFlag_CosSpreadAtten 0x00000002 /* Cosine spread attenuation */
+#define LFlag_Omni 0x00000004           /* Omnidirectional */
+#define LFlag_Deallocate 0x00000008     /* Deallocate at frame end */
+#define LFlag_NoShadows 0x00000010      /* Prelighting - No Shadows */
+#define LFlag_Off 0x00000020            /* Prelighting - Light OFF */
 
-#define LFlag_PreLitSource		0x00000040		/* WARNING: Not obj. specific */
+#define LFlag_PreLitSource 0x00000040 /* WARNING: Not obj. specific */
 
-#define LFlag_WasNotAllocated	0x00000080		/* Supplied by another */
+#define LFlag_WasNotAllocated 0x00000080 /* Supplied by another */
 
-#define LFlag_AbsPos			0x00000100		/* Pos. not rel. to parent */
-#define LFlag_AbsOff			0x00000200		/* Offset not rel. to parent */
+#define LFlag_AbsPos 0x00000100 /* Pos. not rel. to parent */
+#define LFlag_AbsOff 0x00000200 /* Offset not rel. to parent */
 
-#define LFlag_AbsLightDir		0x00000400		/* Light dir. not rel. to p. */
+#define LFlag_AbsLightDir 0x00000400 /* Light dir. not rel. to p. */
 
-#define LFlag_NoSpecular		0x00000800	
+#define LFlag_NoSpecular 0x00000800
 
-#define LFlag_Electrical		0x00001000
-#define LFlag_Thermal			0x00002000
+#define LFlag_Electrical 0x00001000
+#define LFlag_Thermal 0x00002000
 
 /* KJL 16:17:42 01/10/98 - used to specify no specular component to the light;
 avoids unnecessary texture wash-out. */
 
 #if SupportMorphing
-
 
 /*
 
@@ -751,13 +711,12 @@ avoids unnecessary texture wash-out. */
 
 */
 
-typedef struct morphframe {
-
-	int mf_shape1;
-	int mf_shape2;
+typedef struct morphframe
+{
+    int mf_shape1;
+    int mf_shape2;
 
 } MORPHFRAME;
-
 
 /*
 
@@ -765,14 +724,13 @@ typedef struct morphframe {
 
 */
 
-typedef struct morphheader {
-
-	int mph_numframes;
-	int mph_maxframes;
-	MORPHFRAME *mph_frames;
+typedef struct morphheader
+{
+    int mph_numframes;
+    int mph_maxframes;
+    MORPHFRAME *mph_frames;
 
 } MORPHHEADER;
-
 
 /*
 
@@ -780,17 +738,16 @@ typedef struct morphheader {
 
 */
 
-typedef struct morphdisplay {
-
-	int md_lerp;
-	int md_one_minus_lerp;
-	int md_shape1;
-	int md_shape2;
-	SHAPEHEADER *md_sptr1;
-	SHAPEHEADER *md_sptr2;
+typedef struct morphdisplay
+{
+    int md_lerp;
+    int md_one_minus_lerp;
+    int md_shape1;
+    int md_shape2;
+    SHAPEHEADER *md_sptr1;
+    SHAPEHEADER *md_sptr2;
 
 } MORPHDISPLAY;
-
 
 /*
 
@@ -798,19 +755,16 @@ typedef struct morphdisplay {
 
 */
 
-typedef struct morphctrl {
-
-	int ObMorphCurrFrame;
-	int ObMorphFlags;
-	int ObMorphSpeed;
-	MORPHHEADER *ObMorphHeader;
+typedef struct morphctrl
+{
+    int ObMorphCurrFrame;
+    int ObMorphFlags;
+    int ObMorphSpeed;
+    MORPHHEADER *ObMorphHeader;
 
 } MORPHCTRL;
 
-
 #endif /* SupportMorphing */
-
-
 
 /*
 
@@ -820,70 +774,69 @@ typedef struct morphctrl {
 
 typedef struct displayblock
 {
-	int ObShape;
+    int ObShape;
 
-	struct sfxblock *SfxPtr;
+    struct sfxblock *SfxPtr;
 
-	SHAPEHEADER* ObShapeData;
+    SHAPEHEADER *ObShapeData;
 
-	char * name;
-	
-	#if (SupportMorphing && LazyEvaluationForMorphing)
-	VECTORCH *ObMorphedPts;
-	#endif
+    char *name;
 
- 	VECTORCH ObWorld;		/* World Space Location */
-	EULER ObEuler;			/* Euler Orientation */
-	MATRIXCH ObMat;			/* Local -> World Orientation Matrix */
-	
-	int ObFlags;
-	int ObFlags2;
-	int ObFlags3;
+#if (SupportMorphing && LazyEvaluationForMorphing)
+    VECTORCH *ObMorphedPts;
+#endif
 
-	/* Lights */
- 	int ObNumLights;
-	LIGHTBLOCK *ObLights[MaxObjectLights];
- 
-	#if SupportModules
-	struct module *ObMyModule;	/* This is our module */
-	struct module *ObModule;	/* We are in this module */
-	#endif
+    VECTORCH ObWorld; /* World Space Location */
+    EULER ObEuler;    /* Euler Orientation */
+    MATRIXCH ObMat;   /* Local -> World Orientation Matrix */
 
-	VECTORCH ObView;			/* View Space Location */
- 
-	struct viewdescriptorblock *ObVDBPtr;
- 
-  	/* Lights */
- 	int ObLightType;								/* See LIGHTTYPES above */
- 
-	/* Extent */
- 	int ObRadius;		/* max(sqr(x^2+y^2+z^2)) */
- 	int ObMaxX;
-	int ObMinX;
- 	int ObMaxY;
-	int ObMinY;
- 	int ObMaxZ;
-	int ObMinZ;
+    int ObFlags;
+    int ObFlags2;
+    int ObFlags3;
 
-	struct txactrlblk *ObTxAnimCtrlBlks;
+    /* Lights */
+    int ObNumLights;
+    LIGHTBLOCK *ObLights[MaxObjectLights];
 
-	EXTRAITEMDATA *ObEIDPtr;				/* Overrides shape EID pointer */
+#if SupportModules
+    struct module *ObMyModule; /* This is our module */
+    struct module *ObModule;   /* We are in this module */
+#endif
 
-	#if SupportMorphing
-	MORPHCTRL *ObMorphCtrl;				/* Structure provided by project */
-	#endif
+    VECTORCH ObView; /* View Space Location */
 
-	/* The Strategy Block Pointer */
- 	struct strategyblock *ObStrategyBlock;	/* Defined in stratdef.h */
- 	
-	SHAPEANIMATIONCONTROLLER * ShapeAnimControlBlock;
+    struct viewdescriptorblock *ObVDBPtr;
 
-	struct hmodelcontroller * HModelControlBlock;
-	
-	unsigned int SpecialFXFlags;	
-											 
+    /* Lights */
+    int ObLightType; /* See LIGHTTYPES above */
+
+    /* Extent */
+    int ObRadius; /* max(sqr(x^2+y^2+z^2)) */
+    int ObMaxX;
+    int ObMinX;
+    int ObMaxY;
+    int ObMinY;
+    int ObMaxZ;
+    int ObMinZ;
+
+    struct txactrlblk *ObTxAnimCtrlBlks;
+
+    EXTRAITEMDATA *ObEIDPtr; /* Overrides shape EID pointer */
+
+#if SupportMorphing
+    MORPHCTRL *ObMorphCtrl; /* Structure provided by project */
+#endif
+
+    /* The Strategy Block Pointer */
+    struct strategyblock *ObStrategyBlock; /* Defined in stratdef.h */
+
+    SHAPEANIMATIONCONTROLLER *ShapeAnimControlBlock;
+
+    struct hmodelcontroller *HModelControlBlock;
+
+    unsigned int SpecialFXFlags;
+
 } DISPLAYBLOCK;
-
 
 /*
 
@@ -891,44 +844,32 @@ typedef struct displayblock
 
 */
 
-#define ObFlag_InRange			0x00000001
-#define ObFlag_OnScreen			0x00000002
-#define ObFlag_NotVis			0x00000004
+#define ObFlag_InRange 0x00000001
+#define ObFlag_OnScreen 0x00000002
+#define ObFlag_NotVis 0x00000004
 
-
-
-
-#define ObFlag_VertexHazing	0x00000020	/* For I_Gouraud, interpolate hue
+#define ObFlag_VertexHazing \
+    0x00000020 /* For I_Gouraud, interpolate hue
 															across the polygon */
 
+#define ObFlag_TypeZ 0x00000080 /* Shape uses Z Sort */
 
-#define ObFlag_TypeZ				0x00000080	/* Shape uses Z Sort */
+#define ObFlag_SortFarZ 0x00008000 /* Z + Radius */
 
+#define ObFlag_ArbRot 0x00010000 /* Internal use ONLY */
 
+#define ObFlag_MultLSrc 0x00020000    /* Use Multiple Light Sources */
+#define ObFlag_NoInfLSrc 0x00040000   /* Ignore Infinite Light Sources */
+#define ObFlag_OnlyInfLSrc 0x00080000 /* Only Infinite Light Sources */
 
+#define ObFlag_ZBuffer 0x08000000 /* Request item z-buffering */
 
-#define ObFlag_SortFarZ			0x00008000	/* Z + Radius */
-
-#define ObFlag_ArbRot			0x00010000	/* Internal use ONLY */
-
-#define ObFlag_MultLSrc			0x00020000	/* Use Multiple Light Sources */
-#define ObFlag_NoInfLSrc		0x00040000	/* Ignore Infinite Light Sources */
-#define ObFlag_OnlyInfLSrc		0x00080000	/* Only Infinite Light Sources */
-
-
-
-
-
-
-#define ObFlag_ZBuffer			0x08000000	/* Request item z-buffering */
-
-#define ObFlag_BFCRO				0x10000000	/* Back Face Cull Rot. Optimise */
-#define ObFlag_RSP				0x20000000	/* Radius Space Partitioning -
+#define ObFlag_BFCRO 0x10000000 /* Back Face Cull Rot. Optimise */
+#define ObFlag_RSP \
+    0x20000000 /* Radius Space Partitioning -
 															requires RFC data in shape */
 
-
-#define ObFlag_ParrallelBFC   0x80000000  /* Roxby's scu dsp flag */
-
+#define ObFlag_ParrallelBFC 0x80000000 /* Roxby's scu dsp flag */
 
 /*
 
@@ -936,43 +877,26 @@ typedef struct displayblock
 
 */
 
-#define ObFlag2_Deallocate		0x00000001	/* Deallocate block at frame end */
-#define ObFlag2_ObjLevelHaze	0x00000002	/* Hazing at object level */
+#define ObFlag2_Deallocate 0x00000001   /* Deallocate block at frame end */
+#define ObFlag2_ObjLevelHaze 0x00000002 /* Hazing at object level */
 
+#define ObFlag2_AugZ 0x00000008 /* Augmented Z-Sort */
 
-#define ObFlag2_AugZ				0x00000008	/* Augmented Z-Sort */
+#define ObFlag2_NoBFC 0x00000400 /* Disables Back Face Cull */
 
+#define ObFlag2_NotYetPos 0x00080000 /* Internal, for sub-objects */
 
-
-
-#define ObFlag2_NoBFC			0x00000400	/* Disables Back Face Cull */
-
-
-
-
-#define ObFlag2_NotYetPos		0x00080000	/* Internal, for sub-objects */
-
-
-#define ObFlag2_NoSubObjectUpdate 0x00200000	/* If you are using your own
+#define ObFlag2_NoSubObjectUpdate \
+    0x00200000 /* If you are using your own
 																functions to position and
 																orient sub-objects, set this
 																flag and the sub-object in
 																question will be ignored by
 																the update function */
 
+#define ObFlag2_SortNearZ 0x20000000 /* Z - Radius */
 
-
-
-
-
-#define ObFlag2_SortNearZ	0x20000000				/* Z - Radius */
-
-
-
-
-#define ObFlag2_SortD	0x80000000		/* Use distance rather than Z */
-
-
+#define ObFlag2_SortD 0x80000000 /* Use distance rather than Z */
 
 /*
 
@@ -980,32 +904,32 @@ typedef struct displayblock
 
 */
 
-#define ObFlag3_DynamicModuleObject 0x00000001	/* Allocate module objects
+#define ObFlag3_DynamicModuleObject \
+    0x00000001 /* Allocate module objects
 																	around this object as if
 																	it were a camera */
 
-#define ObFlag3_ObjectSortedItems	0x00000002	/* Used by the Global Sort */
+#define ObFlag3_ObjectSortedItems 0x00000002 /* Used by the Global Sort */
 
-#define ObFlag3_NoLightDot				0x00000004	/* Surface/Point is lit the
+#define ObFlag3_NoLightDot \
+    0x00000004 /* Surface/Point is lit the
 																	same from all angles */
 
+#define ObFlag3_Teleport 0x00000040 /* No motion vector! */
 
-#define ObFlag3_Teleport				0x00000040	/* No motion vector! */
+#define ObFlag3_SurfaceAlignDeluxe 0x00000080 /* Better but slower */
 
-#define ObFlag3_SurfaceAlignDeluxe	0x00000080	/* Better but slower */
+#define ObFlag3_PreLit 0x00000100 /* Not source specific */
 
-#define ObFlag3_PreLit					0x00000100	/* Not source specific */
-
-#define ObFlag3_JustCreated			0x00000200	/* Teleport status for just
+#define ObFlag3_JustCreated \
+    0x00000200 /* Teleport status for just
 																	one frame */
 
-#define ObFlag3_DontDrawIfOurModuleIsNotVis 0x00000400	/* If the module we
+#define ObFlag3_DontDrawIfOurModuleIsNotVis \
+    0x00000400                           /* If the module we
 																				visible, don't
 																				draw us */
-#define ObFlag3_AlwaysDynamic			0x00000800	/* Overrides auto-detect */
-
-
-
+#define ObFlag3_AlwaysDynamic 0x00000800 /* Overrides auto-detect */
 
 #if SupportMorphing
 
@@ -1015,9 +939,9 @@ typedef struct displayblock
 
 */
 
-#define mph_flag_play					0x00000001
-#define mph_flag_reverse				0x00000002
-#define mph_flag_noloop	 				0x00000004
+#define mph_flag_play 0x00000001
+#define mph_flag_reverse 0x00000002
+#define mph_flag_noloop 0x00000004
 
 /*
 
@@ -1029,14 +953,12 @@ typedef struct displayblock
 
 */
 
-#define mph_flag_start					0x00000008
-#define mph_flag_end						0x00000010
-#define mph_flag_finished				0x00000020
-#define mph_flag_looped					0x00000040
+#define mph_flag_start 0x00000008
+#define mph_flag_end 0x00000010
+#define mph_flag_finished 0x00000020
+#define mph_flag_looped 0x00000040
 
 #endif
-
-
 
 /*
 
@@ -1044,15 +966,15 @@ typedef struct displayblock
 
 */
 
-typedef struct p2d {
-
-	VECTOR2D point2d;
+typedef struct p2d
+{
+    VECTOR2D point2d;
 
 } P2D;
 
-typedef struct p3d {
-
-	VECTORCH point3d;
+typedef struct p3d
+{
+    VECTORCH point3d;
 
 } P3D;
 
@@ -1062,17 +984,17 @@ typedef struct p3d {
 
 */
 
-typedef struct p2d_gouraud {
-
-	VECTOR2D point2d;
-	int i2d;
+typedef struct p2d_gouraud
+{
+    VECTOR2D point2d;
+    int i2d;
 
 } P2D_GOURAUD;
 
-typedef struct p3d_gouraud {
-
-	VECTORCH point3d;
-	int i3d;
+typedef struct p3d_gouraud
+{
+    VECTORCH point3d;
+    int i3d;
 
 } P3D_GOURAUD;
 
@@ -1082,21 +1004,19 @@ typedef struct p3d_gouraud {
 
 */
 
-typedef struct p2d_phong {
-
-	VECTOR2D point2d;
-	VECTORCH phong_normal2d;
+typedef struct p2d_phong
+{
+    VECTOR2D point2d;
+    VECTORCH phong_normal2d;
 
 } P2D_PHONG;
 
-
-typedef struct p3d_phong {
-
-	VECTORCH point3d;
-	VECTORCH phong_normal3d;
+typedef struct p3d_phong
+{
+    VECTORCH point3d;
+    VECTORCH phong_normal3d;
 
 } P3D_PHONG;
-
 
 /*
 
@@ -1104,23 +1024,21 @@ typedef struct p3d_phong {
 
 */
 
-typedef struct p2d_texture2d {
-
-	VECTOR2D point2d;
-	int u2d_2d;
-	int v2d_2d;
+typedef struct p2d_texture2d
+{
+    VECTOR2D point2d;
+    int u2d_2d;
+    int v2d_2d;
 
 } P2D_TEXTURE2D;
 
-
-typedef struct p3d_texture2d {
-
-	VECTORCH point3d;
-	int u3d_2d;
-	int v3d_2d;
+typedef struct p3d_texture2d
+{
+    VECTORCH point3d;
+    int u3d_2d;
+    int v3d_2d;
 
 } P3D_TEXTURE2D;
-
 
 /*
 
@@ -1130,27 +1048,25 @@ typedef struct p3d_texture2d {
 
 #if SupportZBuffering
 
-typedef struct p2d_texture2d_zb {
-
-	VECTOR2D point2d;
-	int u2d_2d;
-	int v2d_2d;
-	float z2d_2d;
+typedef struct p2d_texture2d_zb
+{
+    VECTOR2D point2d;
+    int u2d_2d;
+    int v2d_2d;
+    float z2d_2d;
 
 } P2D_TEXTURE2D_ZB;
 
-
-typedef struct p3d_texture2d_zb {
-
-	VECTORCH point3d;
-	int u3d_2d;
-	int v3d_2d;
-	float z3d_2d;
+typedef struct p3d_texture2d_zb
+{
+    VECTORCH point3d;
+    int u3d_2d;
+    int v3d_2d;
+    float z3d_2d;
 
 } P3D_TEXTURE2D_ZB;
 
 #endif
-
 
 /*
 
@@ -1162,41 +1078,39 @@ typedef struct p3d_texture2d_zb {
 
 #if int3dtextures
 
-typedef struct p2d_texture3d {
-
-	VECTOR2D point2d;
-	int u2d_tx3d;
-	int v2d_tx3d;
-	int z2d_tx3d;
+typedef struct p2d_texture3d
+{
+    VECTOR2D point2d;
+    int u2d_tx3d;
+    int v2d_tx3d;
+    int z2d_tx3d;
 
 } P2D_TEXTURE3D;
 
-
-typedef struct p3d_texture3d {
-
-	VECTORCH point3d;
-	int u3d_tx3d;
-	int v3d_tx3d;
+typedef struct p3d_texture3d
+{
+    VECTORCH point3d;
+    int u3d_tx3d;
+    int v3d_tx3d;
 
 } P3D_TEXTURE3D;
 
 #else
 
-typedef struct p2d_texture3d {
-
-	VECTOR2D point2d;
-	float u2d_tx3d;
-	float v2d_tx3d;
-	float z2d_tx3d;
+typedef struct p2d_texture3d
+{
+    VECTOR2D point2d;
+    float u2d_tx3d;
+    float v2d_tx3d;
+    float z2d_tx3d;
 
 } P2D_TEXTURE3D;
 
-
-typedef struct p3d_texture3d {
-
-	VECTORCH point3d;
-	int u3d_tx3d;
-	int v3d_tx3d;
+typedef struct p3d_texture3d
+{
+    VECTORCH point3d;
+    int u3d_tx3d;
+    int v3d_tx3d;
 
 } P3D_TEXTURE3D;
 
@@ -1210,25 +1124,23 @@ typedef struct p3d_texture3d {
 
 */
 
-typedef struct p2d_gouraudtexture2d {
-
-	VECTOR2D point2d;
-	int u2d_2d;
-	int v2d_2d;
-	int i2d_2d;
+typedef struct p2d_gouraudtexture2d
+{
+    VECTOR2D point2d;
+    int u2d_2d;
+    int v2d_2d;
+    int i2d_2d;
 
 } P2D_GOURAUDTEXTURE2D;
 
-
-typedef struct p3d_gouraudtexture2d {
-
-	VECTORCH point3d;
-	int u3d_2d;
-	int v3d_2d;
-	int i3d_2d;
+typedef struct p3d_gouraudtexture2d
+{
+    VECTORCH point3d;
+    int u3d_2d;
+    int v3d_2d;
+    int i3d_2d;
 
 } P3D_GOURAUDTEXTURE2D;
-
 
 /*
 
@@ -1238,29 +1150,27 @@ typedef struct p3d_gouraudtexture2d {
 
 #if SupportZBuffering
 
-typedef struct p2d_gouraudtexture2d_zb {
-
-	VECTOR2D point2d;
-	int u2d_gtx2d;
-	int v2d_gtx2d;
-	int i2d_gtx2d;
-	float z2d_gtx2d;
+typedef struct p2d_gouraudtexture2d_zb
+{
+    VECTOR2D point2d;
+    int u2d_gtx2d;
+    int v2d_gtx2d;
+    int i2d_gtx2d;
+    float z2d_gtx2d;
 
 } P2D_GOURAUDTEXTURE2D_ZB;
 
-
-typedef struct p3d_gouraudtexture2d_zb {
-
-	VECTORCH point3d;
-	int u3d_gtx2d;
-	int v3d_gtx2d;
-	int i3d_gtx2d;
-	float z3d_gtx2d;
+typedef struct p3d_gouraudtexture2d_zb
+{
+    VECTORCH point3d;
+    int u3d_gtx2d;
+    int v3d_gtx2d;
+    int i3d_gtx2d;
+    float z3d_gtx2d;
 
 } P3D_GOURAUDTEXTURE2D_ZB;
 
 #endif
-
 
 #if SupportGouraud3dTextures
 
@@ -1270,29 +1180,26 @@ typedef struct p3d_gouraudtexture2d_zb {
 
 */
 
-typedef struct p2d_gouraudtexture3d {
-
-	VECTOR2D point2d;
-	float u2d_gtx3d;
-	float v2d_gtx3d;
-	float z2d_gtx3d;
-	int i2d_gtx3d;
+typedef struct p2d_gouraudtexture3d
+{
+    VECTOR2D point2d;
+    float u2d_gtx3d;
+    float v2d_gtx3d;
+    float z2d_gtx3d;
+    int i2d_gtx3d;
 
 } P2D_GOURAUDTEXTURE3D;
 
-
-typedef struct p3d_gouraudtexture3d {
-
-	VECTORCH point3d;
-	int u3d_gtx3d;
-	int v3d_gtx3d;
-	int i3d_gtx3d;
+typedef struct p3d_gouraudtexture3d
+{
+    VECTORCH point3d;
+    int u3d_gtx3d;
+    int v3d_gtx3d;
+    int i3d_gtx3d;
 
 } P3D_GOURAUDTEXTURE3D;
 
-#endif	/* SupportGouraud3dTextures */
-
-
+#endif /* SupportGouraud3dTextures */
 
 /*
 
@@ -1303,20 +1210,18 @@ typedef struct p3d_gouraudtexture3d {
 
 */
 
-
 /*
 
  I_Polygon
 
 */
 
-typedef struct i_polygon_pt {
-
-	int i_x;
-	int i_y;
+typedef struct i_polygon_pt
+{
+    int i_x;
+    int i_y;
 
 } I_POLYGON_PT;
-
 
 /*
 
@@ -1326,11 +1231,11 @@ typedef struct i_polygon_pt {
 
 #if ZBufferTest
 
-typedef struct i_polygon_zbuffer_pt {
-
-	int i_x;
-	int i_y;
-	int i_z;
+typedef struct i_polygon_zbuffer_pt
+{
+    int i_x;
+    int i_y;
+    int i_z;
 
 } I_POLYGON_ZBUFFER_PT;
 
@@ -1338,16 +1243,15 @@ typedef struct i_polygon_zbuffer_pt {
 
 #if SupportZBuffering
 
-typedef struct i_polygon_zbuffer_pt {
-
-	int i_x;
-	int i_y;
-	float i_z;
+typedef struct i_polygon_zbuffer_pt
+{
+    int i_x;
+    int i_y;
+    float i_z;
 
 } I_POLYGON_ZBUFFER_PT;
 
 #endif
-
 
 /*
 
@@ -1355,14 +1259,13 @@ typedef struct i_polygon_zbuffer_pt {
 
 */
 
-typedef struct i_gouraudpolygon_pt {
-
-	int i_x;
-	int i_y;
-	int i_int;
+typedef struct i_gouraudpolygon_pt
+{
+    int i_x;
+    int i_y;
+    int i_int;
 
 } I_GOURAUDPOLYGON_PT;
-
 
 /*
 
@@ -1372,12 +1275,12 @@ typedef struct i_gouraudpolygon_pt {
 
 #if ZBufferTest
 
-typedef struct i_gouraudpolygon_zbuffer_pt {
-
-	int i_x;
-	int i_y;
-	int i_int;
-	int i_gz;
+typedef struct i_gouraudpolygon_zbuffer_pt
+{
+    int i_x;
+    int i_y;
+    int i_int;
+    int i_gz;
 
 } I_GOURAUDPOLYGON_ZBUFFER_PT;
 
@@ -1385,17 +1288,16 @@ typedef struct i_gouraudpolygon_zbuffer_pt {
 
 #if SupportZBuffering
 
-typedef struct i_gouraudpolygon_zbuffer_pt {
-
-	int i_x;
-	int i_y;
-	int i_int;
-	float i_gz;
+typedef struct i_gouraudpolygon_zbuffer_pt
+{
+    int i_x;
+    int i_y;
+    int i_int;
+    float i_gz;
 
 } I_GOURAUDPOLYGON_ZBUFFER_PT;
 
 #endif
-
 
 /*
 
@@ -1403,30 +1305,29 @@ typedef struct i_gouraudpolygon_zbuffer_pt {
 
 */
 
-typedef struct i_phongpolygon_pt {
+typedef struct i_phongpolygon_pt
+{
+    int i_x;
+    int i_y;
 
-	int i_x;
-	int i_y;
-
-	VECTORCH i_n;
+    VECTORCH i_n;
 
 } I_PHONGPOLYGON_PT;
 
 #if SupportZBuffering
 
-typedef struct i_phongpolygon_zbuffer_pt {
+typedef struct i_phongpolygon_zbuffer_pt
+{
+    int i_x;
+    int i_y;
 
-	int i_x;
-	int i_y;
+    VECTORCH i_n;
 
-	VECTORCH i_n;
-
-	float i_pz;
+    float i_pz;
 
 } I_PHONGPOLYGON_ZBUFFER_PT;
 
 #endif
-
 
 /*
 
@@ -1434,32 +1335,31 @@ typedef struct i_phongpolygon_zbuffer_pt {
 
 */
 
-typedef struct i_2dtexturepolygon_pt {
+typedef struct i_2dtexturepolygon_pt
+{
+    int i_x;
+    int i_y;
 
-	int i_x;
-	int i_y;
-
-	int i_u;
-	int i_v;
+    int i_u;
+    int i_v;
 
 } I_2DTEXTUREPOLYGON_PT;
 
 #if SupportZBuffering
 
-typedef struct i_2dtexturepolygon_zbuffer_pt {
+typedef struct i_2dtexturepolygon_zbuffer_pt
+{
+    int i_x;
+    int i_y;
 
-	int i_x;
-	int i_y;
+    int i_u;
+    int i_v;
 
-	int i_u;
-	int i_v;
-
-	float i_tx2dz;
+    float i_tx2dz;
 
 } I_2DTEXTUREPOLYGON_ZBUFFER_PT;
 
 #endif
-
 
 /*
 
@@ -1471,27 +1371,27 @@ typedef struct i_2dtexturepolygon_zbuffer_pt {
 
 #if int3dtextures
 
-typedef struct i_3dtexturepolygon_pt {
+typedef struct i_3dtexturepolygon_pt
+{
+    int i_x;
+    int i_y;
 
-	int i_x;
-	int i_y;
-
-	int i_tx3d_u;
-	int i_tx3d_v;
-	int i_tx3d_z;
+    int i_tx3d_u;
+    int i_tx3d_v;
+    int i_tx3d_z;
 
 } I_3DTEXTUREPOLYGON_PT;
 
 #else
 
-typedef struct i_3dtexturepolygon_pt {
+typedef struct i_3dtexturepolygon_pt
+{
+    int i_x;
+    int i_y;
 
-	int i_x;
-	int i_y;
-
-	float i_tx3d_u;
-	float i_tx3d_v;
-	float i_tx3d_z;
+    float i_tx3d_u;
+    float i_tx3d_v;
+    float i_tx3d_z;
 
 } I_3DTEXTUREPOLYGON_PT;
 
@@ -1499,14 +1399,14 @@ typedef struct i_3dtexturepolygon_pt {
 
 #if SupportZBuffering
 
-typedef struct i_3dtexturepolygon_zbuffer_pt {
+typedef struct i_3dtexturepolygon_zbuffer_pt
+{
+    int i_x;
+    int i_y;
 
-	int i_x;
-	int i_y;
-
-	float i_tx3d_u;
-	float i_tx3d_v;
-	float i_tx3d_z;
+    float i_tx3d_u;
+    float i_tx3d_v;
+    float i_tx3d_z;
 
 } I_3DTEXTUREPOLYGON_ZBUFFER_PT;
 
@@ -1514,44 +1414,41 @@ typedef struct i_3dtexturepolygon_zbuffer_pt {
 
 #endif
 
-
 /*
 
  I_Gouraud2dTexturePolygon
 
 */
 
-typedef struct i_gouraud2dtexturepolygon_pt {
+typedef struct i_gouraud2dtexturepolygon_pt
+{
+    int i_x;
+    int i_y;
 
-	int i_x;
-	int i_y;
+    int i_u;
+    int i_v;
 
-	int i_u;
-	int i_v;
-
-	int i_i;
+    int i_i;
 
 } I_GOURAUD2DTEXTUREPOLYGON_PT;
 
-
 #if SupportZBuffering
 
-typedef struct i_gouraud2dtexturepolygon_zbuffer_pt {
+typedef struct i_gouraud2dtexturepolygon_zbuffer_pt
+{
+    int i_x;
+    int i_y;
 
-	int i_x;
-	int i_y;
+    int i_u;
+    int i_v;
 
-	int i_u;
-	int i_v;
+    int i_i;
 
-	int i_i;
-
-	float i_gtx2dz;
+    float i_gtx2dz;
 
 } I_GOURAUD2DTEXTUREPOLYGON_ZBUFFER_PT;
 
 #endif
-
 
 #if SupportGouraud3dTextures
 
@@ -1561,21 +1458,20 @@ typedef struct i_gouraud2dtexturepolygon_zbuffer_pt {
 
 */
 
-typedef struct i_gouraud3dtexturepolygon_pt {
+typedef struct i_gouraud3dtexturepolygon_pt
+{
+    int i_x;
+    int i_y;
 
-	int i_x;
-	int i_y;
+    float i_gtx3d_u;
+    float i_gtx3d_v;
+    float i_gtx3d_z;
 
-	float i_gtx3d_u;
-	float i_gtx3d_v;
-	float i_gtx3d_z;
-
-	int i_gtx3d_i;
+    int i_gtx3d_i;
 
 } I_GOURAUD3DTEXTUREPOLYGON_PT;
 
-#endif	/* SupportGouraud3dTextures */
-
+#endif /* SupportGouraud3dTextures */
 
 /*
 
@@ -1585,40 +1481,39 @@ typedef struct i_gouraud3dtexturepolygon_pt {
 
 */
 
-typedef struct clip_point {
-
-	VECTORCH ClipPoint;
-	VECTORCH ClipNormal;
-	TEXEL ClipTexel;
-	int ClipInt;
-	int ClipZBuffer;
+typedef struct clip_point
+{
+    VECTORCH ClipPoint;
+    VECTORCH ClipNormal;
+    TEXEL ClipTexel;
+    int ClipInt;
+    int ClipZBuffer;
 
 } CLIP_POINT;
-
 
 #if support3dtextures
 
 #if int3dtextures
 
-typedef struct clip_point_f {
-
-	VECTORCH ClipPointF;
-	VECTORCH ClipNormalF;
-	TEXELF ClipTexelF;
-	int ClipIntF;
-	int ClipZBufferF;
+typedef struct clip_point_f
+{
+    VECTORCH ClipPointF;
+    VECTORCH ClipNormalF;
+    TEXELF ClipTexelF;
+    int ClipIntF;
+    int ClipZBufferF;
 
 } CLIP_POINT_F;
 
 #else
 
-typedef struct clip_point_f {
-
-	VECTORCH ClipPointF;
-	VECTORCH ClipNormalF;
-	TEXELF ClipTexelF;
-	int ClipIntF;
-	float ClipZBufferF;
+typedef struct clip_point_f
+{
+    VECTORCH ClipPointF;
+    VECTORCH ClipNormalF;
+    TEXELF ClipTexelF;
+    int ClipIntF;
+    float ClipZBufferF;
 
 } CLIP_POINT_F;
 
@@ -1626,23 +1521,19 @@ typedef struct clip_point_f {
 
 #endif
 
-
 #if SupportGouraud3dTextures
 
-typedef struct clip_point_gtx3d {
-
-	VECTORCH ClipPointF;
-	VECTORCH ClipNormalF;
-	TEXELGTX3D ClipTexelF;
-	int ClipIntF;
-	float ClipZBufferF;
+typedef struct clip_point_gtx3d
+{
+    VECTORCH ClipPointF;
+    VECTORCH ClipNormalF;
+    TEXELGTX3D ClipTexelF;
+    int ClipIntF;
+    float ClipZBufferF;
 
 } CLIP_POINT_GTX3D;
 
 #endif
-
-
-
 
 /*
 
@@ -1654,25 +1545,25 @@ typedef struct clip_point_gtx3d {
 
 */
 
-typedef struct i_polygon_scan {
-
-	int ips_colour;
-	int ips_x1;
-	int ips_x2;
-	int ips_y;
+typedef struct i_polygon_scan
+{
+    int ips_colour;
+    int ips_x1;
+    int ips_x2;
+    int ips_y;
 
 } I_POLYGON_SCAN;
 
 #if ZBufferTest
 
-typedef struct i_polygon_zbuffer_scan {
-
-	int ips_colour;
-	int ips_x1;
-	int ips_x2;
-	int ips_y;
-	int ips_z1;
-	int ips_z2;
+typedef struct i_polygon_zbuffer_scan
+{
+    int ips_colour;
+    int ips_x1;
+    int ips_x2;
+    int ips_y;
+    int ips_z1;
+    int ips_z2;
 
 } I_POLYGON_ZBUFFER_SCAN;
 
@@ -1680,46 +1571,45 @@ typedef struct i_polygon_zbuffer_scan {
 
 #if SupportZBuffering
 
-typedef struct i_polygon_zbuffer_scan {
-
-	int ips_colour;
-	int ips_x1;
-	int ips_x2;
-	int ips_y;
-	float ips_z1;
-	float ips_z2;
+typedef struct i_polygon_zbuffer_scan
+{
+    int ips_colour;
+    int ips_x1;
+    int ips_x2;
+    int ips_y;
+    float ips_z1;
+    float ips_z2;
 
 } I_POLYGON_ZBUFFER_SCAN;
 
 #endif
 
+typedef struct i_gouraudpolygon_scan
+{
+    int igs_c1;
+    int igs_c2;
 
-typedef struct i_gouraudpolygon_scan {
+    int igs_x1;
+    int igs_x2;
 
-	int igs_c1;
-	int igs_c2;
-
-	int igs_x1;
-	int igs_x2;
-
-	int igs_y;
+    int igs_y;
 
 } I_GOURAUDPOLYGON_SCAN;
 
 #if ZBufferTest
 
-typedef struct i_gouraudpolygon_zbuffer_scan {
+typedef struct i_gouraudpolygon_zbuffer_scan
+{
+    int igs_c1;
+    int igs_c2;
 
-	int igs_c1;
-	int igs_c2;
+    int igs_x1;
+    int igs_x2;
 
-	int igs_x1;
-	int igs_x2;
+    int igs_y;
 
-	int igs_y;
-
-	int igs_z1;
-	int igs_z2;
+    int igs_z1;
+    int igs_z2;
 
 } I_GOURAUDPOLYGON_ZBUFFER_SCAN;
 
@@ -1727,131 +1617,128 @@ typedef struct i_gouraudpolygon_zbuffer_scan {
 
 #if SupportZBuffering
 
-typedef struct i_gouraudpolygon_zbuffer_scan {
+typedef struct i_gouraudpolygon_zbuffer_scan
+{
+    int igs_c1;
+    int igs_c2;
 
-	int igs_c1;
-	int igs_c2;
+    int igs_x1;
+    int igs_x2;
 
-	int igs_x1;
-	int igs_x2;
+    int igs_y;
 
-	int igs_y;
-
-	float igs_z1;
-	float igs_z2;
+    float igs_z1;
+    float igs_z2;
 
 } I_GOURAUDPOLYGON_ZBUFFER_SCAN;
 
 #endif
 
+typedef struct i_phongpolygon_scan
+{
+    VECTORCH ips_n1;
+    VECTORCH ips_n2;
 
-typedef struct i_phongpolygon_scan {
+    int ips_x1;
+    int ips_x2;
 
-	VECTORCH ips_n1;
-	VECTORCH ips_n2;
-
-	int ips_x1;
-	int ips_x2;
-
-	int ips_y;
+    int ips_y;
 
 } I_PHONGPOLYGON_SCAN;
 
 #if SupportZBuffering
 
-typedef struct i_phongpolygon_zbuffer_scan {
+typedef struct i_phongpolygon_zbuffer_scan
+{
+    VECTORCH ips_n1;
+    VECTORCH ips_n2;
 
-	VECTORCH ips_n1;
-	VECTORCH ips_n2;
+    int ips_x1;
+    int ips_x2;
 
-	int ips_x1;
-	int ips_x2;
+    int ips_y;
 
-	int ips_y;
-
-	float ips_z1;
-	float ips_z2;
+    float ips_z1;
+    float ips_z2;
 
 } I_PHONGPOLYGON_ZBUFFER_SCAN;
 
 #endif
 
+typedef struct i_2dtexturepolygon_scan
+{
+    int i2s_u1;
+    int i2s_v1;
 
-typedef struct i_2dtexturepolygon_scan {
+    int i2s_u2;
+    int i2s_v2;
 
-	int i2s_u1;
-	int i2s_v1;
+    int i2s_x1;
+    int i2s_x2;
 
-	int i2s_u2;
-	int i2s_v2;
-
-	int i2s_x1;
-	int i2s_x2;
-
-	int i2s_y;
+    int i2s_y;
 
 } I_2DTEXTUREPOLYGON_SCAN;
 
 #if SupportZBuffering
 
-typedef struct i_2dtexturepolygon_zbuffer_scan {
+typedef struct i_2dtexturepolygon_zbuffer_scan
+{
+    int i2s_u1;
+    int i2s_v1;
 
-	int i2s_u1;
-	int i2s_v1;
+    int i2s_u2;
+    int i2s_v2;
 
-	int i2s_u2;
-	int i2s_v2;
+    int i2s_x1;
+    int i2s_x2;
 
-	int i2s_x1;
-	int i2s_x2;
+    int i2s_y;
 
-	int i2s_y;
-
-	float i2s_z1;
-	float i2s_z2;
+    float i2s_z1;
+    float i2s_z2;
 
 } I_2DTEXTUREPOLYGON_ZBUFFER_SCAN;
 
 #endif
 
-
 #if support3dtextures
 
 #if int3dtextures
 
-typedef struct i_3dtexturepolygon_scan {
+typedef struct i_3dtexturepolygon_scan
+{
+    int i3s_u1;
+    int i3s_v1;
+    int i3s_z1;
 
-	int i3s_u1;
-	int i3s_v1;
-	int i3s_z1;
+    int i3s_u2;
+    int i3s_v2;
+    int i3s_z2;
 
-	int i3s_u2;
-	int i3s_v2;
-	int i3s_z2;
+    int i3s_x1;
+    int i3s_x2;
 
-	int i3s_x1;
-	int i3s_x2;
-
-	int i3s_y;
+    int i3s_y;
 
 } I_3DTEXTUREPOLYGON_SCAN;
 
 #else
 
-typedef struct i_3dtexturepolygon_scan {
+typedef struct i_3dtexturepolygon_scan
+{
+    float i3s_u1;
+    float i3s_v1;
+    float i3s_z1;
 
-	float i3s_u1;
-	float i3s_v1;
-	float i3s_z1;
+    float i3s_u2;
+    float i3s_v2;
+    float i3s_z2;
 
-	float i3s_u2;
-	float i3s_v2;
-	float i3s_z2;
+    int i3s_x1;
+    int i3s_x2;
 
-	int i3s_x1;
-	int i3s_x2;
-
-	int i3s_y;
+    int i3s_y;
 
 } I_3DTEXTUREPOLYGON_SCAN;
 
@@ -1859,20 +1746,20 @@ typedef struct i_3dtexturepolygon_scan {
 
 #if SupportZBuffering
 
-typedef struct i_3dtexturepolygon_zbuffer_scan {
+typedef struct i_3dtexturepolygon_zbuffer_scan
+{
+    float i3s_u1;
+    float i3s_v1;
+    float i3s_z1;
 
-	float i3s_u1;
-	float i3s_v1;
-	float i3s_z1;
+    float i3s_u2;
+    float i3s_v2;
+    float i3s_z2;
 
-	float i3s_u2;
-	float i3s_v2;
-	float i3s_z2;
+    int i3s_x1;
+    int i3s_x2;
 
-	int i3s_x1;
-	int i3s_x2;
-
-	int i3s_y;
+    int i3s_y;
 
 } I_3DTEXTUREPOLYGON_ZBUFFER_SCAN;
 
@@ -1880,74 +1767,69 @@ typedef struct i_3dtexturepolygon_zbuffer_scan {
 
 #endif
 
+typedef struct i_gouraud2dtexturepolygon_scan
+{
+    int ig2s_u1;
+    int ig2s_v1;
+    int ig2s_c1;
 
-typedef struct i_gouraud2dtexturepolygon_scan {
+    int ig2s_u2;
+    int ig2s_v2;
+    int ig2s_c2;
 
-	int ig2s_u1;
-	int ig2s_v1;
-	int ig2s_c1;
+    int ig2s_x1;
+    int ig2s_x2;
 
-	int ig2s_u2;
-	int ig2s_v2;
-	int ig2s_c2;
-
-	int ig2s_x1;
-	int ig2s_x2;
-
-	int ig2s_y;
+    int ig2s_y;
 
 } I_GOURAUD2DTEXTUREPOLYGON_SCAN;
 
 #if SupportZBuffering
 
-typedef struct i_gouraud2dtexturepolygon_zbuffer_scan {
+typedef struct i_gouraud2dtexturepolygon_zbuffer_scan
+{
+    int ig2s_u1;
+    int ig2s_v1;
+    int ig2s_c1;
 
-	int ig2s_u1;
-	int ig2s_v1;
-	int ig2s_c1;
+    int ig2s_u2;
+    int ig2s_v2;
+    int ig2s_c2;
 
-	int ig2s_u2;
-	int ig2s_v2;
-	int ig2s_c2;
+    int ig2s_x1;
+    int ig2s_x2;
 
-	int ig2s_x1;
-	int ig2s_x2;
+    int ig2s_y;
 
-	int ig2s_y;
-
-	float ig2s_z1;
-	float ig2s_z2;
+    float ig2s_z1;
+    float ig2s_z2;
 
 } I_GOURAUD2DTEXTUREPOLYGON_ZBUFFER_SCAN;
 
 #endif
 
-
 #if SupportGouraud3dTextures
 
-typedef struct i_gouraud3dtexturepolygon_scan {
+typedef struct i_gouraud3dtexturepolygon_scan
+{
+    float ig3s_u1;
+    float ig3s_v1;
+    float ig3s_z1;
+    int ig3s_c1;
 
-	float ig3s_u1;
-	float ig3s_v1;
-	float ig3s_z1;
-	int ig3s_c1;
+    float ig3s_u2;
+    float ig3s_v2;
+    float ig3s_z2;
+    int ig3s_c2;
 
-	float ig3s_u2;
-	float ig3s_v2;
-	float ig3s_z2;
-	int ig3s_c2;
+    int ig3s_x1;
+    int ig3s_x2;
 
-	int ig3s_x1;
-	int ig3s_x2;
-
-	int ig3s_y;
+    int ig3s_y;
 
 } I_GOURAUD3DTEXTUREPOLYGON_SCAN;
 
-#endif	/* SupportGouraud3dTextures */
-
-
-
+#endif /* SupportGouraud3dTextures */
 
 /*
 
@@ -1957,29 +1839,26 @@ typedef struct i_gouraud3dtexturepolygon_scan {
 
 void ClearScreen(SCREENDESCRIPTORBLOCK *sdb, int Colour);
 
-
 void PlatformSpecificShowViewEntry(VIEWDESCRIPTORBLOCK *vdb, SCREENDESCRIPTORBLOCK *sdb);
 void PlatformSpecificShowViewExit(VIEWDESCRIPTORBLOCK *vdb, SCREENDESCRIPTORBLOCK *sdb);
 void AddShape(DISPLAYBLOCK *dblockptr, VIEWDESCRIPTORBLOCK *VDB_Ptr);
 void PrepareVDBForShowView(VIEWDESCRIPTORBLOCK *VDB_Ptr);
 
-
 void SetupLight(
-	LIGHTBLOCK *lptr,
-	int sl_flags,
-	int sl_type,
-	VECTORCH *sl_world,
-	VECTORCH *sl_dir,
-	int sl_panx,
-	int sl_pany,
-	int sl_bright,
-	int sl_spread,
-	int sl_range
-);
+    LIGHTBLOCK *lptr,
+    int sl_flags,
+    int sl_type,
+    VECTORCH *sl_world,
+    VECTORCH *sl_dir,
+    int sl_panx,
+    int sl_pany,
+    int sl_bright,
+    int sl_spread,
+    int sl_range);
 
 void UpdateObjectLights(DISPLAYBLOCK *dptr);
 
-DISPLAYBLOCK* ReadMap(MAPHEADER *mapptr);
+DISPLAYBLOCK *ReadMap(MAPHEADER *mapptr);
 
 void MapPostProcessing(DISPLAYBLOCK *dptr);
 void ObjectQuatAndMat(DISPLAYBLOCK *dblockptr);
@@ -1991,105 +1870,84 @@ void ProjectSpecificVDBDestroy(VIEWDESCRIPTORBLOCK *vdb);
 void ProjectSpecificVDBInit(VIEWDESCRIPTORBLOCK *vdb);
 #endif
 
-
 void UpdateGame(void);
 
-
-
-
-
-SHAPEHEADER* GetShapeData(int shapenum);
-
+SHAPEHEADER *GetShapeData(int shapenum);
 
 void InitialiseObjectBlocks(void);
 
-DISPLAYBLOCK* AllocateObjectBlock(void);
+DISPLAYBLOCK *AllocateObjectBlock(void);
 void DeallocateObjectBlock(DISPLAYBLOCK *dblockptr);
 
-DISPLAYBLOCK* CreateActiveObject(void);
+DISPLAYBLOCK *CreateActiveObject(void);
 int DestroyActiveObject(DISPLAYBLOCK *dblockptr);
 
-
 void InitialiseStrategyBlocks(void);
-struct strategyblock* AllocateStrategyBlock(void);
+struct strategyblock *AllocateStrategyBlock(void);
 void DeallocateStrategyBlock(struct strategyblock *sptr);
 
-struct strategyblock* CreateActiveStrategyBlock(void);
-int DestroyActiveStrategyBlock(struct strategyblock*dblockptr);
-
-
-
+struct strategyblock *CreateActiveStrategyBlock(void);
+int DestroyActiveStrategyBlock(struct strategyblock *dblockptr);
 
 void InitialiseTxAnimBlocks(void);
-TXACTRLBLK* AllocateTxAnimBlock(void);
+TXACTRLBLK *AllocateTxAnimBlock(void);
 void DeallocateTxAnimBlock(TXACTRLBLK *TxAnimblockptr);
 void AddTxAnimBlock(DISPLAYBLOCK *dptr, TXACTRLBLK *taptr);
-TXANIMHEADER* GetTxAnimHeaderFromShape(TXACTRLBLK *taptr, int shape);
+TXANIMHEADER *GetTxAnimHeaderFromShape(TXACTRLBLK *taptr, int shape);
 void UpdateTxAnim(TXANIMHEADER *txah);
 void ChangeSequence(TXANIMHEADER *txah_old, TXANIMHEADER *txah_new);
 void ControlTextureAnimation(DISPLAYBLOCK *dptr);
 
-
-
-
-
 int DisplayAndLightBlockDeallocation(void);
-
 
 void InitialiseLightBlocks(void);
 
-LIGHTBLOCK* AllocateLightBlock(void);
+LIGHTBLOCK *AllocateLightBlock(void);
 void DeallocateLightBlock(LIGHTBLOCK *lptr);
 
-LIGHTBLOCK* AddLightBlock(DISPLAYBLOCK *dptr, LIGHTBLOCK *lptr_to_add);
+LIGHTBLOCK *AddLightBlock(DISPLAYBLOCK *dptr, LIGHTBLOCK *lptr_to_add);
 void DeleteLightBlock(LIGHTBLOCK *lptr, DISPLAYBLOCK *dptr);
-
-
 
 void VDBClipPlanes(VIEWDESCRIPTORBLOCK *vdb);
 
 void MakeClipPlane(
 
-VIEWDESCRIPTORBLOCK *vdb,
-CLIPPLANEBLOCK *cpb,
-CLIPPLANEPOINTS *cpp);
+    VIEWDESCRIPTORBLOCK *vdb, CLIPPLANEBLOCK *cpb, CLIPPLANEPOINTS *cpp);
 
-void SetVDB(VIEWDESCRIPTORBLOCK *vdb,
+void SetVDB(
+    VIEWDESCRIPTORBLOCK *vdb,
 
-				int fl,
-				int ty,
+    int fl,
+    int ty,
 
-				int d,
+    int d,
 
-				int cx,
-				int cy,
+    int cx,
+    int cy,
 
-				int prx,
-				int pry,
-				int mxp,
+    int prx,
+    int pry,
+    int mxp,
 
-				int cl,
-				int cr,
-				int cu,
-				int cd,
+    int cl,
+    int cr,
+    int cu,
+    int cd,
 
-				int h1,
-				int h2,
-				int hcolour,
-				int ambience
-			);
-
+    int h1,
+    int h2,
+    int hcolour,
+    int ambience);
 
 void InitialiseVDBs(void);
 
-VIEWDESCRIPTORBLOCK* AllocateVDB(void);
+VIEWDESCRIPTORBLOCK *AllocateVDB(void);
 void DeallocateVDB(VIEWDESCRIPTORBLOCK *dblockptr);
 
-VIEWDESCRIPTORBLOCK* CreateActiveVDB(void);
+VIEWDESCRIPTORBLOCK *CreateActiveVDB(void);
 int DestroyActiveVDB(VIEWDESCRIPTORBLOCK *dblockptr);
 
 void PlatformSpecificVDBInit(VIEWDESCRIPTORBLOCK *vdb);
-
 
 /* CDF 4/2/98 */
 int GetOneOverSin(int a);
@@ -2098,13 +1956,9 @@ int _DotProduct(VECTORCH *v1, VECTORCH *v2);
 
 int DotProduct2d(VECTOR2D *v1, VECTOR2D *v2);
 
-
 void MakeNormal(
 
-VECTORCH *v1,
-VECTORCH *v2,
-VECTORCH *v3,
-VECTORCH *v4);
+    VECTORCH *v1, VECTORCH *v2, VECTORCH *v3, VECTORCH *v4);
 
 void GetNormalVector(VECTORCH *v1, VECTORCH *v2, VECTORCH *v3);
 
@@ -2119,13 +1973,10 @@ void Renormalise(VECTORCH *nvector);
 
 int Magnitude(VECTORCH *v);
 
-
-
 int VectorDistance(VECTORCH *v1, VECTORCH *v2);
 int OutcodeVectorDistance(VECTORCH *v1, VECTORCH *v2, int d);
 
 void MatrixFromZVector(VECTORCH *v, MATRIXCH *m);
-
 
 int PointInPolygon(int *point, int *polygon, int c, int ppsize);
 
@@ -2139,9 +1990,6 @@ void MaxLONGLONGCH(LONGLONGCH *llarrayptr, int llarraysize, LONGLONGCH *llmax);
 int MaxInt(int *iarray, int iarraysize);
 int MinInt(int *iarray, int iarraysize);
 
-
-
-
 /*
 
  Some Maths Functions
@@ -2151,19 +1999,14 @@ int MinInt(int *iarray, int iarraysize);
 void CreateEulerMatrix(EULER *e, MATRIXCH *m1);
 void CreateEulerVector(EULER *e, VECTORCH *v);
 
-
-
 void MatrixMultiply(
 
-MATRIXCH *m1,
-MATRIXCH *m2,
-MATRIXCH *m3);
+    MATRIXCH *m1, MATRIXCH *m2, MATRIXCH *m3);
 
 void TransposeMatrixCH(MATRIXCH *m1);
 
 void CopyVector(VECTORCH *v1, VECTORCH *v2);
 void CopyLocation(VECTORCH *v1, VECTORCH *v2);
-
 
 void CopyEuler(EULER *e1, EULER *e2);
 void CopyMatrix(MATRIXCH *m1, MATRIXCH *m2);
@@ -2171,27 +2014,17 @@ void CopyMatrix(MATRIXCH *m1, MATRIXCH *m2);
 void MakeVector(VECTORCH *v1, VECTORCH *v2, VECTORCH *v3);
 void AddVector(VECTORCH *v1, VECTORCH *v2);
 void SubVector(VECTORCH *v1, VECTORCH *v2);
-void QuatToMat(QUAT *q,MATRIXCH *m);
-
+void QuatToMat(QUAT *q, MATRIXCH *m);
 
 void _RotateVector(
 
-	VECTORCH *v,
-	MATRIXCH *m);
-
+    VECTORCH *v, MATRIXCH *m);
 
 void _RotateAndCopyVector(
 
-	VECTORCH *v1,
-	VECTORCH *v2,
-	MATRIXCH *m);
-
+    VECTORCH *v1, VECTORCH *v2, MATRIXCH *m);
 
 void MakeVectorLocal(VECTORCH *v1, VECTORCH *v2, VECTORCH *v3, MATRIXCH *m);
-
-
-
-
 
 void MatrixToEuler(MATRIXCH *m, EULER *e);
 void MatrixToEuler2(MATRIXCH *m, EULER *e);
@@ -2206,7 +2039,6 @@ int FandVD_Distance_3d(VECTORCH *v0, VECTORCH *v1);
 int Distance_2d(VECTOR2D *v0, VECTOR2D *v1);
 int Distance_3d(VECTORCH *v0, VECTORCH *v1);
 
-
 /*
 
  Shape Language Functions
@@ -2219,17 +2051,10 @@ void SetupShapeLanguage(SHAPEHEADER *shapeheaderptr);
 
 void ShapePointsInstr(SHAPEINSTR *shapeinstrptr);
 
-
 void ShapeSpritePointsInstr(SHAPEINSTR *shapeinstrptr);
 void ShapeSpriteRPointsInstr(SHAPEINSTR *shapeinstrptr);
 
-
 void BackFaceCullPointOutcodeFlagging(void);
-
-
-
-
-
 
 /*
 
@@ -2245,19 +2070,17 @@ void RestartLevel();
 void ResetFrameCounter(void);
 void FrameCounterHandler(void);
 
-void DirectWriteD3DLine(VECTOR2D* LineStart, VECTOR2D* LineEnd, int LineColour);
-void* LoadImageIntoDirectDrawSurface(char *fname, IMAGEHEADER *iheader,
-      int ImageLoadMode, BOOL Sysmem);
-void* LoadImageIntoD3DImmediateSurface(char *fname, IMAGEHEADER *iheader,
-      int TextureFileType);
-void* LoadImageIntoD3DTexture(char *fname, IMAGEHEADER *iheader,
-      int TextureFileType);
-void ReloadImageIntoD3DImmediateSurface(IMAGEHEADER* iheader);
-void* ReloadImageIntoD3DTexture(IMAGEHEADER* iheader);
+void DirectWriteD3DLine(VECTOR2D *LineStart, VECTOR2D *LineEnd, int LineColour);
+void *LoadImageIntoDirectDrawSurface(
+    char *fname, IMAGEHEADER *iheader, int ImageLoadMode, BOOL Sysmem);
+void *LoadImageIntoD3DImmediateSurface(char *fname, IMAGEHEADER *iheader, int TextureFileType);
+void *LoadImageIntoD3DTexture(char *fname, IMAGEHEADER *iheader, int TextureFileType);
+void ReloadImageIntoD3DImmediateSurface(IMAGEHEADER *iheader);
+void *ReloadImageIntoD3DTexture(IMAGEHEADER *iheader);
 int GetTextureHandle(IMAGEHEADER *imageHeaderPtr);
 
-void* LoadFontIntoDirectDrawSurface(char *fname, IMAGEHEADER *iheader);
-void ClearScreen(SCREENDESCRIPTORBLOCK* sdb, int Colour);
+void *LoadFontIntoDirectDrawSurface(char *fname, IMAGEHEADER *iheader);
+void ClearScreen(SCREENDESCRIPTORBLOCK *sdb, int Colour);
 
 void InitGame(void);
 void StartGame(void);
@@ -2266,7 +2089,7 @@ void ExitGame(void);
 void InitialiseParallelStrategy(void);
 void UpdateParallelStrategy(void);
 
-unsigned char* AllocateScreenBuffer(int sbuffersize);
+unsigned char *AllocateScreenBuffer(int sbuffersize);
 
 void SetPalette(unsigned char *palette);
 
@@ -2287,25 +2110,21 @@ int InitialiseTextures(void);
 #endif
 
 void MakeShapeTexturesGlobal(SHAPEHEADER *shptr, int TxIndex, int LTxIndex);
-void MakeTxAnimFrameTexturesGlobal(SHAPEHEADER *sptr,
-												POLYHEADER *pheader,
-												int LTxIndex, int TxIndex);
+void MakeTxAnimFrameTexturesGlobal(SHAPEHEADER *sptr, POLYHEADER *pheader, int LTxIndex, int TxIndex);
 
 void SpriteResizing(SHAPEHEADER *sptr);
 
-void FindImageExtents(IMAGEHEADER *ihdr, int numuvs, int *uvdata, IMAGEEXTENTS *e, IMAGEEXTENTS *e_curr);
-
+void FindImageExtents(
+    IMAGEHEADER *ihdr, int numuvs, int *uvdata, IMAGEEXTENTS *e, IMAGEEXTENTS *e_curr);
 
 int GetMVSIndex(TXANIMHEADER *txah, EULER *e);
 
+IMAGEHEADER *GetImageHeader(void);
 
-IMAGEHEADER* GetImageHeader(void);
+void *GetTexture(int texindex);
 
-void* GetTexture(int texindex);
-
-TEXTURE* GetTextureMemory(int txsize);
+TEXTURE *GetTextureMemory(int txsize);
 void ReturnTextureMemory(TEXTURE *txptr);
-
 
 /* Backdrops */
 
@@ -2315,24 +2134,20 @@ int DeallocateBackdrops(SCENE Scene);
 int LoadBackdrop(char *image, IMAGEHEADER *ihdr);
 #endif
 
-
 void GetProjectFilename(char *fname, char *image);
-
 
 void GetDOSFilename(char *fnameptr);
 int CompareFilenameCH(char *string1, char *string2);
 
-TEXTURE* LoadImageCH(char *fname, IMAGEHEADER *iheader);
-TEXTURE* LoadBMP(char *fname, IMAGEHEADER *iheader);
-TEXTURE* LoadPGM(char *fname, IMAGEHEADER *iheader);
+TEXTURE *LoadImageCH(char *fname, IMAGEHEADER *iheader);
+TEXTURE *LoadBMP(char *fname, IMAGEHEADER *iheader);
+TEXTURE *LoadPGM(char *fname, IMAGEHEADER *iheader);
 int LoadPGMPalette(char *fname, unsigned char *palette);
 int LoadPGMPaletteLightingTable(char *filename, unsigned char *palette);
 
 void Create_MIP_Map(IMAGEHEADER *iheader);
 
-
 int NextLowPower2(int i);
-
 
 /* User Input */
 
@@ -2341,21 +2156,17 @@ void ReadUserInput(void);
 void InitMouse(void);
 void ReadMouse(void);
 
-
-
-typedef struct mousedata {
-
-	short MouseDataX;
-	short MouseDataY;
-	unsigned short MouseDataButton;
-	short MouseDataVelX;
-	short MouseDataVelY;
+typedef struct mousedata
+{
+    short MouseDataX;
+    short MouseDataY;
+    unsigned short MouseDataButton;
+    short MouseDataVelX;
+    short MouseDataVelY;
 
 } MOUSEDATA;
 
-
 void ReadKeyboard(void);
-
 
 void WaitForReturn(void);
 
@@ -2366,12 +2177,10 @@ void InitialiseItemLists(void);
 void InitialiseItemPointers(void);
 void InitialiseItemData(void);
 
-void* AllocateItemData(int itemsize);
-
+void *AllocateItemData(int itemsize);
 
 int GetZForZBuffer(int z);
 void FlushZBuffer(VIEWDESCRIPTORBLOCK *vdb);
-
 
 /* Draw Item */
 
@@ -2385,31 +2194,26 @@ void Draw_Item_ZB_2dTexturePolygon(int *itemptr);
 void Draw_Item_ZB_Gouraud2dTexturePolygon(int *itemptr);
 void Draw_Item_ZB_Gouraud3dTexturePolygon(int *itemptr);
 
-
 /*
 
  Texture Animation
 
 */
 
-int* GetTxAnimArrayZ(int shape, int item);
-TXANIMHEADER* GetTxAnimDataZ(int shape, int item, int sequence);
+int *GetTxAnimArrayZ(int shape, int item);
+TXANIMHEADER *GetTxAnimDataZ(int shape, int item, int sequence);
 
 #if SupportBSP
-TXANIMHEADER* GetTxAnimDataBSP(int shape, int node, int item, int sequence);
+TXANIMHEADER *GetTxAnimDataBSP(int shape, int node, int item, int sequence);
 #endif
-
 
 int GT_LL(LONGLONGCH *a, LONGLONGCH *b);
 int LT_LL(LONGLONGCH *a, LONGLONGCH *b);
 
-
 void SetFastRandom(void);
 int FastRandom(void);
 
-
 void DrawPalette(int x0, int y0, int x1, int y1);
-
 
 /*
 
@@ -2419,15 +2223,13 @@ void DrawPalette(int x0, int y0, int x1, int y1);
 
 typedef enum {
 
-	Boundary_Left,
-	Boundary_Right,
-	Boundary_Up,
-	Boundary_Down,
-	Boundary_Z
+    Boundary_Left,
+    Boundary_Right,
+    Boundary_Up,
+    Boundary_Down,
+    Boundary_Z
 
 } CLIP2DBOUNDARIES;
-
-
 
 #if SupportMorphing
 
@@ -2436,20 +2238,13 @@ void UpdateMorphingDptr(DISPLAYBLOCK *dptr);
 void GetMorphDisplay(MORPHDISPLAY *md, DISPLAYBLOCK *dptr);
 void CopyMorphCtrl(MORPHCTRL *src, MORPHCTRL *dst);
 
-VECTORCH* GetMorphedPts(DISPLAYBLOCK *dptr, MORPHDISPLAY *md);
+VECTORCH *GetMorphedPts(DISPLAYBLOCK *dptr, MORPHDISPLAY *md);
 
 #if LazyEvaluationForMorphing
 void FreeMorphArrays(void);
 #endif
 
 #endif
-
-
-
-
-
-
-
 
 /* KJL 15:07:39 01/08/97 - Returns the magnitude of the 
    cross product of two vectors a and b. */
@@ -2463,20 +2258,9 @@ void CrossProduct(VECTORCH *a, VECTORCH *b, VECTORCH *c);
    less than half this. Very fast compared to other approaches. */
 int Approximate3dMagnitude(VECTORCH *v);
 
-
-
-
-
-
-
-
 #ifdef __cplusplus
-
-	};
+};
 
 #endif
-
-
-
 
 #endif

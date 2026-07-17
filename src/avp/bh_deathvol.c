@@ -14,88 +14,88 @@
 #include "ourasert.h"
 
 extern int NumActiveBlocks;
-extern DISPLAYBLOCK* ActiveBlockList[];
+extern DISPLAYBLOCK *ActiveBlockList[];
 extern DAMAGE_PROFILE DeathVolumeDamage;
 extern int NormalFrameTime;
 
-void* DeathVolumeBehaveInit(void* bhdata,STRATEGYBLOCK* sbptr)
+void *DeathVolumeBehaveInit(void *bhdata, STRATEGYBLOCK *sbptr)
 {
-	DEATH_VOLUME_BEHAV_BLOCK* dv_bhv;
-	DEATH_VOLUME_TOOLS_TEMPLATE* dv_tt;
-	
-	GLOBALASSERT(sbptr);
-	GLOBALASSERT(bhdata);
+    DEATH_VOLUME_BEHAV_BLOCK *dv_bhv;
+    DEATH_VOLUME_TOOLS_TEMPLATE *dv_tt;
 
-	dv_bhv=(DEATH_VOLUME_BEHAV_BLOCK*)AllocateMem(sizeof(DEATH_VOLUME_BEHAV_BLOCK));
-	if(!dv_bhv)
-	{
-		memoryInitialisationFailure = 1;
-		return 0;
-	}
-	dv_bhv->bhvr_type=I_BehaviourDeathVolume;
+    GLOBALASSERT(sbptr);
+    GLOBALASSERT(bhdata);
 
-	dv_tt=(DEATH_VOLUME_TOOLS_TEMPLATE*)bhdata;
+    dv_bhv = (DEATH_VOLUME_BEHAV_BLOCK *) AllocateMem(sizeof(DEATH_VOLUME_BEHAV_BLOCK));
+    if (!dv_bhv) {
+        memoryInitialisationFailure = 1;
+        return 0;
+    }
+    dv_bhv->bhvr_type = I_BehaviourDeathVolume;
 
-	//copy stuff from tools template
-	COPY_NAME(sbptr->SBname, dv_tt->nameID);
-	dv_bhv->volume_min=dv_tt->volume_min;
-	dv_bhv->volume_max=dv_tt->volume_max;
-	dv_bhv->damage_per_second=dv_tt->damage_per_second;
-	dv_bhv->active=dv_tt->active;
-	dv_bhv->collision_required=dv_tt->collision_required;
+    dv_tt = (DEATH_VOLUME_TOOLS_TEMPLATE *) bhdata;
 
-	
-	return (void*)dv_bhv;
+    //copy stuff from tools template
+    COPY_NAME(sbptr->SBname, dv_tt->nameID);
+    dv_bhv->volume_min = dv_tt->volume_min;
+    dv_bhv->volume_max = dv_tt->volume_max;
+    dv_bhv->damage_per_second = dv_tt->damage_per_second;
+    dv_bhv->active = dv_tt->active;
+    dv_bhv->collision_required = dv_tt->collision_required;
 
+    return (void *) dv_bhv;
 }
 
-
-
-void DeathVolumeBehaveFun(STRATEGYBLOCK* vol_sbptr)
+void DeathVolumeBehaveFun(STRATEGYBLOCK *vol_sbptr)
 {
-	DEATH_VOLUME_BEHAV_BLOCK* dv_bhv;	
- 	GLOBALASSERT(vol_sbptr);
-	dv_bhv = (DEATH_VOLUME_BEHAV_BLOCK*)vol_sbptr->SBdataptr;
-	GLOBALASSERT((dv_bhv->bhvr_type == I_BehaviourDeathVolume));
-	
-	if(dv_bhv->active)
-	{	
-		int i;
-		STRATEGYBLOCK* sbPtr;
-		DYNAMICSBLOCK* dynPtr;
-		int miny,maxy;
+    DEATH_VOLUME_BEHAV_BLOCK *dv_bhv;
+    GLOBALASSERT(vol_sbptr);
+    dv_bhv = (DEATH_VOLUME_BEHAV_BLOCK *) vol_sbptr->SBdataptr;
+    GLOBALASSERT((dv_bhv->bhvr_type == I_BehaviourDeathVolume));
 
-		for(i=0;i<NumActiveBlocks;i++)
-		{
-			//search for objects that have has a collision this frame
-			//(or all objects if collisions aren't required)
-			DISPLAYBLOCK* dptr = ActiveBlockList[i];
+    if (dv_bhv->active) {
+        int i;
+        STRATEGYBLOCK *sbPtr;
+        DYNAMICSBLOCK *dynPtr;
+        int miny, maxy;
 
-			sbPtr=ActiveBlockList[i]->ObStrategyBlock;
-			if(!sbPtr) continue;
-			if(!sbPtr->DynPtr) continue;
-			dynPtr=sbPtr->DynPtr;
+        for (i = 0; i < NumActiveBlocks; i++) {
+            //search for objects that have has a collision this frame
+            //(or all objects if collisions aren't required)
+            DISPLAYBLOCK *dptr = ActiveBlockList[i];
 
-			if(dv_bhv->collision_required)
-			{
-				if(!dynPtr->CollisionReportPtr) continue;
-			}
+            sbPtr = ActiveBlockList[i]->ObStrategyBlock;
+            if (!sbPtr)
+                continue;
+            if (!sbPtr->DynPtr)
+                continue;
+            dynPtr = sbPtr->DynPtr;
 
-			//is the object within the death volume?
-			//check a vertical line against the death volume's bounding box
-			
-			//first check the object's centre x and centre z values against the volume
-			if(dptr->ObWorld.vx<dv_bhv->volume_min.vx) continue;
-			if(dptr->ObWorld.vx>dv_bhv->volume_max.vx) continue;
-			if(dptr->ObWorld.vz<dv_bhv->volume_min.vz) continue;
-			if(dptr->ObWorld.vz>dv_bhv->volume_max.vz) continue;
+            if (dv_bhv->collision_required) {
+                if (!dynPtr->CollisionReportPtr)
+                    continue;
+            }
 
-			//now check  the object's vertical extents for overlap with the death volume bounding box
-			miny=dptr->ObWorld.vy+dptr->ObMinY;
-			maxy=dptr->ObWorld.vy+dptr->ObMaxY;
-			if(max(miny,dv_bhv->volume_min.vy) > min(maxy,dv_bhv->volume_max.vy)) continue;
+            //is the object within the death volume?
+            //check a vertical line against the death volume's bounding box
 
-			/*
+            //first check the object's centre x and centre z values against the volume
+            if (dptr->ObWorld.vx < dv_bhv->volume_min.vx)
+                continue;
+            if (dptr->ObWorld.vx > dv_bhv->volume_max.vx)
+                continue;
+            if (dptr->ObWorld.vz < dv_bhv->volume_min.vz)
+                continue;
+            if (dptr->ObWorld.vz > dv_bhv->volume_max.vz)
+                continue;
+
+            //now check  the object's vertical extents for overlap with the death volume bounding box
+            miny = dptr->ObWorld.vy + dptr->ObMinY;
+            maxy = dptr->ObWorld.vy + dptr->ObMaxY;
+            if (max(miny, dv_bhv->volume_min.vy) > min(maxy, dv_bhv->volume_max.vy))
+                continue;
+
+            /*
 			if(dynPtr->Position.vx > dv_bhv->volume_min.vx &&
 			   dynPtr->Position.vx < dv_bhv->volume_max.vx &&
 			   dynPtr->Position.vz > dv_bhv->volume_min.vz &&
@@ -103,56 +103,43 @@ void DeathVolumeBehaveFun(STRATEGYBLOCK* vol_sbptr)
 			   dynPtr->Position.vy > dv_bhv->volume_min.vy &&
 			   dynPtr->Position.vy < dv_bhv->volume_max.vy)
 			*/
-			{
-				//finally see if the object is one of the types that can be harmed by the death volume
-				if(sbPtr->I_SBtype==I_BehaviourAlien ||
-				   sbPtr->I_SBtype==I_BehaviourQueenAlien ||
-				   sbPtr->I_SBtype==I_BehaviourFaceHugger ||
-				   sbPtr->I_SBtype==I_BehaviourPredator ||
-				   sbPtr->I_SBtype==I_BehaviourXenoborg ||
-				   sbPtr->I_SBtype==I_BehaviourMarine ||
-				   sbPtr->I_SBtype==I_BehaviourSeal ||
-				   sbPtr->I_SBtype==I_BehaviourPredatorAlien ||
-				   sbPtr->I_SBtype==I_BehaviourAlien ||
-				   sbPtr->I_SBtype==I_BehaviourMarinePlayer ||
-				   sbPtr->I_SBtype==I_BehaviourPredatorPlayer || 
-				   sbPtr->I_SBtype==I_BehaviourAlienPlayer) 
-				{
-					extern DPID myNetworkKillerId;
-					extern DPID AVPDPNetID;
+            {
+                //finally see if the object is one of the types that can be harmed by the death volume
+                if (sbPtr->I_SBtype == I_BehaviourAlien || sbPtr->I_SBtype == I_BehaviourQueenAlien
+                    || sbPtr->I_SBtype == I_BehaviourFaceHugger
+                    || sbPtr->I_SBtype == I_BehaviourPredator
+                    || sbPtr->I_SBtype == I_BehaviourXenoborg
+                    || sbPtr->I_SBtype == I_BehaviourMarine || sbPtr->I_SBtype == I_BehaviourSeal
+                    || sbPtr->I_SBtype == I_BehaviourPredatorAlien
+                    || sbPtr->I_SBtype == I_BehaviourAlien
+                    || sbPtr->I_SBtype == I_BehaviourMarinePlayer
+                    || sbPtr->I_SBtype == I_BehaviourPredatorPlayer
+                    || sbPtr->I_SBtype == I_BehaviourAlienPlayer) {
+                    extern DPID myNetworkKillerId;
+                    extern DPID AVPDPNetID;
 
-					//this is a neutral source of damage (for cooperative multiplayer games)
-					myNetworkKillerId = 0;
-					
-					if(dv_bhv->damage_per_second)
-					{
-						//all new damage volumes.
-						VECTORCH direction={0,-ONE_FIXED,0};
-						DAMAGE_PROFILE damage = DeathVolumeDamage;
-						damage.Penetrative = dv_bhv->damage_per_second;
-						CauseDamageToObject(sbPtr,&damage,NormalFrameTime,&direction);
-					}
-					else
-					{
-						//kill the creature/player
-						VECTORCH direction={0,-ONE_FIXED,0};
-						CauseDamageToObject(sbPtr,&certainDeath,ONE_FIXED,&direction);
-					}
+                    //this is a neutral source of damage (for cooperative multiplayer games)
+                    myNetworkKillerId = 0;
 
-					//reset network killer id
-					myNetworkKillerId = AVPDPNetID;
-		
-				}
-			
-			}
-		}
-		
-		
-	}
+                    if (dv_bhv->damage_per_second) {
+                        //all new damage volumes.
+                        VECTORCH direction = {0, -ONE_FIXED, 0};
+                        DAMAGE_PROFILE damage = DeathVolumeDamage;
+                        damage.Penetrative = dv_bhv->damage_per_second;
+                        CauseDamageToObject(sbPtr, &damage, NormalFrameTime, &direction);
+                    } else {
+                        //kill the creature/player
+                        VECTORCH direction = {0, -ONE_FIXED, 0};
+                        CauseDamageToObject(sbPtr, &certainDeath, ONE_FIXED, &direction);
+                    }
 
+                    //reset network killer id
+                    myNetworkKillerId = AVPDPNetID;
+                }
+            }
+        }
+    }
 }
-
-
 
 /*--------------------**
 ** Loading and Saving **
@@ -161,46 +148,46 @@ void DeathVolumeBehaveFun(STRATEGYBLOCK* vol_sbptr)
 
 typedef struct death_volume_save_block
 {
-	SAVE_BLOCK_STRATEGY_HEADER header;
+    SAVE_BLOCK_STRATEGY_HEADER header;
 
-	BOOL active;
+    BOOL active;
 
-}DEATH_VOLUME_SAVE_BLOCK;
+} DEATH_VOLUME_SAVE_BLOCK;
 
-
-void LoadStrategy_DeathVolume(SAVE_BLOCK_STRATEGY_HEADER* header)
+void LoadStrategy_DeathVolume(SAVE_BLOCK_STRATEGY_HEADER *header)
 {
-	STRATEGYBLOCK* sbPtr;
-	DEATH_VOLUME_BEHAV_BLOCK* dv_bhv;	
-	DEATH_VOLUME_SAVE_BLOCK* block = (DEATH_VOLUME_SAVE_BLOCK*) header; 
+    STRATEGYBLOCK *sbPtr;
+    DEATH_VOLUME_BEHAV_BLOCK *dv_bhv;
+    DEATH_VOLUME_SAVE_BLOCK *block = (DEATH_VOLUME_SAVE_BLOCK *) header;
 
-	//check the size of the save block
-	if(header->size!=sizeof(*block)) return;
+    //check the size of the save block
+    if (header->size != sizeof(*block))
+        return;
 
-	//find the existing strategy block
-	sbPtr = FindSBWithName(header->SBname);
-	if(!sbPtr) return;
+    //find the existing strategy block
+    sbPtr = FindSBWithName(header->SBname);
+    if (!sbPtr)
+        return;
 
-	//make sure the strategy found is of the right type
-	if(sbPtr->I_SBtype != I_BehaviourDeathVolume) return;
+    //make sure the strategy found is of the right type
+    if (sbPtr->I_SBtype != I_BehaviourDeathVolume)
+        return;
 
-	dv_bhv = (DEATH_VOLUME_BEHAV_BLOCK*)sbPtr->SBdataptr;
+    dv_bhv = (DEATH_VOLUME_BEHAV_BLOCK *) sbPtr->SBdataptr;
 
-	//start copying stuff
- 	dv_bhv->active = block->active;
+    //start copying stuff
+    dv_bhv->active = block->active;
 }
 
-void SaveStrategy_DeathVolume(STRATEGYBLOCK* sbPtr)
+void SaveStrategy_DeathVolume(STRATEGYBLOCK *sbPtr)
 {
-	DEATH_VOLUME_SAVE_BLOCK *block;
-	DEATH_VOLUME_BEHAV_BLOCK* dv_bhv;
-	
-	dv_bhv = (DEATH_VOLUME_BEHAV_BLOCK*)sbPtr->SBdataptr;
+    DEATH_VOLUME_SAVE_BLOCK *block;
+    DEATH_VOLUME_BEHAV_BLOCK *dv_bhv;
 
-	GET_STRATEGY_SAVE_BLOCK(block,sbPtr);
+    dv_bhv = (DEATH_VOLUME_BEHAV_BLOCK *) sbPtr->SBdataptr;
 
-	//start copying stuff
- 	block->active = dv_bhv->active;
+    GET_STRATEGY_SAVE_BLOCK(block, sbPtr);
 
+    //start copying stuff
+    block->active = dv_bhv->active;
 }
-

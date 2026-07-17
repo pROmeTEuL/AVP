@@ -23,8 +23,6 @@ extern char *GetTextString(enum TEXTSTRING_ID stringID);
 * the header file langenum.h.                                 *
 **********************************************************KJL*/
 
-
-
 extern char *LoadTextFile(char *filename);
 /*KJL*****************************************************
 * Platform specific function, which loads the named file *
@@ -37,6 +35,5 @@ extern void UnloadTextFile(char *filename, char *bufferPtr);
 * and frees the memory pointed to by the bufferPtr. You may   *
 * not need the filename, but I'm passing it for completeness. *
 **********************************************************KJL*/
-
 
 #endif

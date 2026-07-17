@@ -33,11 +33,13 @@ void ImageGroupsDebugPrintInit(void);
 
 #endif /* debug */
 
-typedef void (*ImageNumberCallbackFunction) (int imgnum, void * user);
+typedef void (*ImageNumberCallbackFunction)(int imgnum, void *user);
 
-void EnumSharedImages(int group_num, int numimages, ImageNumberCallbackFunction callback_fn, void * user);
+void EnumSharedImages(
+    int group_num, int numimages, ImageNumberCallbackFunction callback_fn, void *user);
 
-void EnumLeftoverImages(int group_num, int numimages, ImageNumberCallbackFunction callback_fn, void * user);
+void EnumLeftoverImages(
+    int group_num, int numimages, ImageNumberCallbackFunction callback_fn, void *user);
 
 #ifdef __cplusplus
 }

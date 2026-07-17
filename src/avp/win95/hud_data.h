@@ -7,51 +7,50 @@ a header file to make things clearer. */
 static struct DDGraphicTag HUDDDInfo[NO_OF_MARINE_HUD_GFX];
 
 /* MARINE LO RES (width = 320) */
-static struct DigitPropertiesTag LoresMarineHUDDigitProperties[] =
-{
-	/* motion tracker digits, units first, thousands last */
-	/* these are relative to motion tracker centre! */
-	{9, -2, MARINE_HUD_FONT_MT_SMALL},	  
-	{3, -2, MARINE_HUD_FONT_MT_SMALL},	  
-	{-8, -2, MARINE_HUD_FONT_MT_BIG},
-    {-17, -2,MARINE_HUD_FONT_MT_BIG},	
-  
-   	/* -ve values are relative to right side of the screen */
-  	/* marine health, units first */
-  	{28,10, MARINE_HUD_FONT_BLUE},
-	{19,10, MARINE_HUD_FONT_BLUE},
-	{10,10, MARINE_HUD_FONT_BLUE},
-  		
-  	/* marine energy, units first */
-  	{28,25, MARINE_HUD_FONT_BLUE},
-	{19,25, MARINE_HUD_FONT_BLUE},
-	{10,25, MARINE_HUD_FONT_BLUE},
-   	
-  	/* marine armour, units first */
-  	{28,40, MARINE_HUD_FONT_BLUE},
-	{19,40, MARINE_HUD_FONT_BLUE},
-	{10,40, MARINE_HUD_FONT_BLUE},
- 
-   	/* marine ammo/rounds, units first */
-  	{-22,10, MARINE_HUD_FONT_RED},
-	{-31,10, MARINE_HUD_FONT_RED},
-	{-40,10, MARINE_HUD_FONT_RED},
- 
-   	/* marine ammo/magazines, units first */
-  	{-61,10, MARINE_HUD_FONT_RED},
-	{-70,10, MARINE_HUD_FONT_RED},
-      
-   	/* marine secondary ammo/rounds, units first */
-  	{-22,25, MARINE_HUD_FONT_RED},
-	{-31,25, MARINE_HUD_FONT_RED},
-	{-40,25, MARINE_HUD_FONT_RED},
- 
-   	/* marine secondary ammo/magazines, units first */
-  	{-61,25, MARINE_HUD_FONT_RED},
-	{-70,25, MARINE_HUD_FONT_RED},
+static struct DigitPropertiesTag LoresMarineHUDDigitProperties[] = {
+    /* motion tracker digits, units first, thousands last */
+    /* these are relative to motion tracker centre! */
+    {9, -2, MARINE_HUD_FONT_MT_SMALL},
+    {3, -2, MARINE_HUD_FONT_MT_SMALL},
+    {-8, -2, MARINE_HUD_FONT_MT_BIG},
+    {-17, -2, MARINE_HUD_FONT_MT_BIG},
+
+    /* -ve values are relative to right side of the screen */
+    /* marine health, units first */
+    {28, 10, MARINE_HUD_FONT_BLUE},
+    {19, 10, MARINE_HUD_FONT_BLUE},
+    {10, 10, MARINE_HUD_FONT_BLUE},
+
+    /* marine energy, units first */
+    {28, 25, MARINE_HUD_FONT_BLUE},
+    {19, 25, MARINE_HUD_FONT_BLUE},
+    {10, 25, MARINE_HUD_FONT_BLUE},
+
+    /* marine armour, units first */
+    {28, 40, MARINE_HUD_FONT_BLUE},
+    {19, 40, MARINE_HUD_FONT_BLUE},
+    {10, 40, MARINE_HUD_FONT_BLUE},
+
+    /* marine ammo/rounds, units first */
+    {-22, 10, MARINE_HUD_FONT_RED},
+    {-31, 10, MARINE_HUD_FONT_RED},
+    {-40, 10, MARINE_HUD_FONT_RED},
+
+    /* marine ammo/magazines, units first */
+    {-61, 10, MARINE_HUD_FONT_RED},
+    {-70, 10, MARINE_HUD_FONT_RED},
+
+    /* marine secondary ammo/rounds, units first */
+    {-22, 25, MARINE_HUD_FONT_RED},
+    {-31, 25, MARINE_HUD_FONT_RED},
+    {-40, 25, MARINE_HUD_FONT_RED},
+
+    /* marine secondary ammo/magazines, units first */
+    {-61, 25, MARINE_HUD_FONT_RED},
+    {-70, 25, MARINE_HUD_FONT_RED},
 };
 
-#if 0 /* SBF - unused */
+#if 0  /* SBF - unused */
 static char *LoresMarineHUDGfxFilenamePtr[]=
 {
     {"blips.pg0"}, 	//MARINE_HUD_GFX_MOTIONTRACKERBLIP,
@@ -99,7 +98,7 @@ static struct HUDFontDescTag LoresHUDFontDesc[] =
 };
 #endif
 
-#if 0 /* SBF - unused */
+#if 0  /* SBF - unused */
 static struct LittleMDescTag LoresHUDLittleM =
 {
 	80,8,  // source top,left
@@ -111,51 +110,50 @@ static struct LittleMDescTag LoresHUDLittleM =
 #endif /* SBF */
 
 /* MARINE MED RES (width = 640)  */
-static struct DigitPropertiesTag MedresMarineHUDDigitProperties[] =
-{
-	/* motion tracker digits, units first, thousands last */
-	/* these are relative to motion tracker centre! */
-	{17, -4, MARINE_HUD_FONT_MT_SMALL},	  
-	{9, -4, MARINE_HUD_FONT_MT_SMALL},	  
-	{-9, -4, MARINE_HUD_FONT_MT_BIG},
-    {-25, -4,MARINE_HUD_FONT_MT_BIG},	
-  
-   	/* -ve values are relative to right side of the screen */
-  	/* marine health, units first */
-  	{56,20, MARINE_HUD_FONT_BLUE},
-	{38,20, MARINE_HUD_FONT_BLUE},
-	{20,20, MARINE_HUD_FONT_BLUE},
-  		
-  	/* marine energy, units first */
-  	{56,50, MARINE_HUD_FONT_BLUE},
-	{38,50, MARINE_HUD_FONT_BLUE},
-	{20,50, MARINE_HUD_FONT_BLUE},
-   	
-  	/* marine armour, units first */
-  	{56,80, MARINE_HUD_FONT_BLUE},
-	{38,80, MARINE_HUD_FONT_BLUE},
-	{20,80, MARINE_HUD_FONT_BLUE},
- 
-   	/* marine ammo/rounds, units first */
-  	{-44,20, MARINE_HUD_FONT_RED},
-	{-62,20, MARINE_HUD_FONT_RED},
-	{-80,20, MARINE_HUD_FONT_RED},
- 
-   	/* marine ammo/magazines, units first */
-  	{-122,20, MARINE_HUD_FONT_RED},
-	{-140,20, MARINE_HUD_FONT_RED},
-      
-   	/* marine secondary ammo/rounds, units first */
-  	{-44,50, MARINE_HUD_FONT_RED},
-	{-62,50, MARINE_HUD_FONT_RED},
-	{-80,50, MARINE_HUD_FONT_RED},
- 
-   	/* marine secondary ammo/magazines, units first */
-  	{-122,50, MARINE_HUD_FONT_RED},
-	{-140,50, MARINE_HUD_FONT_RED},
+static struct DigitPropertiesTag MedresMarineHUDDigitProperties[] = {
+    /* motion tracker digits, units first, thousands last */
+    /* these are relative to motion tracker centre! */
+    {17, -4, MARINE_HUD_FONT_MT_SMALL},
+    {9, -4, MARINE_HUD_FONT_MT_SMALL},
+    {-9, -4, MARINE_HUD_FONT_MT_BIG},
+    {-25, -4, MARINE_HUD_FONT_MT_BIG},
+
+    /* -ve values are relative to right side of the screen */
+    /* marine health, units first */
+    {56, 20, MARINE_HUD_FONT_BLUE},
+    {38, 20, MARINE_HUD_FONT_BLUE},
+    {20, 20, MARINE_HUD_FONT_BLUE},
+
+    /* marine energy, units first */
+    {56, 50, MARINE_HUD_FONT_BLUE},
+    {38, 50, MARINE_HUD_FONT_BLUE},
+    {20, 50, MARINE_HUD_FONT_BLUE},
+
+    /* marine armour, units first */
+    {56, 80, MARINE_HUD_FONT_BLUE},
+    {38, 80, MARINE_HUD_FONT_BLUE},
+    {20, 80, MARINE_HUD_FONT_BLUE},
+
+    /* marine ammo/rounds, units first */
+    {-44, 20, MARINE_HUD_FONT_RED},
+    {-62, 20, MARINE_HUD_FONT_RED},
+    {-80, 20, MARINE_HUD_FONT_RED},
+
+    /* marine ammo/magazines, units first */
+    {-122, 20, MARINE_HUD_FONT_RED},
+    {-140, 20, MARINE_HUD_FONT_RED},
+
+    /* marine secondary ammo/rounds, units first */
+    {-44, 50, MARINE_HUD_FONT_RED},
+    {-62, 50, MARINE_HUD_FONT_RED},
+    {-80, 50, MARINE_HUD_FONT_RED},
+
+    /* marine secondary ammo/magazines, units first */
+    {-122, 50, MARINE_HUD_FONT_RED},
+    {-140, 50, MARINE_HUD_FONT_RED},
 };
 
-#if 0 /* SBF - unused */
+#if 0  /* SBF - unused */
 static char *MedresMarineHUDGfxFilenamePtr[]=
 {
     {"blipsHRz.pg0"}, 	//MARINE_HUD_GFX_MOTIONTRACKERBLIP,
@@ -203,7 +201,7 @@ static struct HUDFontDescTag MedresHUDFontDesc[] =
 };
 #endif
 
-#if 0 /* SBF - unused */
+#if 0  /* SBF - unused */
 static struct LittleMDescTag MedresHUDLittleM =
 {
 	120,14,  // source top,left
@@ -214,56 +212,51 @@ static struct LittleMDescTag MedresHUDLittleM =
 };
 #endif /* SBF */
 
-
-
-
-
 /* MARINE HI RES (width = 800)  */
-static struct DigitPropertiesTag HiresMarineHUDDigitProperties[] =
-{
-	/* motion tracker digits, units first, thousands last */
-	/* these are relative to motion tracker centre! */
-	{17, -4, MARINE_HUD_FONT_MT_SMALL},	  
-	{5, -4, MARINE_HUD_FONT_MT_SMALL},	  
-	{-16, -4, MARINE_HUD_FONT_MT_BIG},
-    {-32, -4,MARINE_HUD_FONT_MT_BIG},	
-  
-   	/* -ve values are relative to right side of the screen */
-  	/* marine health, units first */
-  	{60,20, MARINE_HUD_FONT_BLUE},
-	{40,20, MARINE_HUD_FONT_BLUE},
-	{20,20, MARINE_HUD_FONT_BLUE},
-  		
-  	/* marine energy, units first */
-  	{60,55, MARINE_HUD_FONT_BLUE},
-	{40,55, MARINE_HUD_FONT_BLUE},
-	{20,55, MARINE_HUD_FONT_BLUE},
-   	
-  	/* marine armour, units first */
-  	{60,90, MARINE_HUD_FONT_BLUE},
-	{40,90, MARINE_HUD_FONT_BLUE},
-	{20,90, MARINE_HUD_FONT_BLUE},
- 
-   	/* marine ammo/rounds, units first */
-  	{-44,20, MARINE_HUD_FONT_RED},
-	{-64,20, MARINE_HUD_FONT_RED},
-	{-84,20, MARINE_HUD_FONT_RED},
- 
-   	/* marine ammo/magazines, units first */
-  	{-122,20, MARINE_HUD_FONT_RED},
-	{-142,20, MARINE_HUD_FONT_RED},
-      
-   	/* marine secondary ammo/rounds, units first */
-  	{-44,55, MARINE_HUD_FONT_RED},
-	{-64,55, MARINE_HUD_FONT_RED},
-	{-84,55, MARINE_HUD_FONT_RED},
- 
-   	/* marine secondary ammo/magazines, units first */
-  	{-122,55, MARINE_HUD_FONT_RED},
-	{-142,55, MARINE_HUD_FONT_RED},
+static struct DigitPropertiesTag HiresMarineHUDDigitProperties[] = {
+    /* motion tracker digits, units first, thousands last */
+    /* these are relative to motion tracker centre! */
+    {17, -4, MARINE_HUD_FONT_MT_SMALL},
+    {5, -4, MARINE_HUD_FONT_MT_SMALL},
+    {-16, -4, MARINE_HUD_FONT_MT_BIG},
+    {-32, -4, MARINE_HUD_FONT_MT_BIG},
+
+    /* -ve values are relative to right side of the screen */
+    /* marine health, units first */
+    {60, 20, MARINE_HUD_FONT_BLUE},
+    {40, 20, MARINE_HUD_FONT_BLUE},
+    {20, 20, MARINE_HUD_FONT_BLUE},
+
+    /* marine energy, units first */
+    {60, 55, MARINE_HUD_FONT_BLUE},
+    {40, 55, MARINE_HUD_FONT_BLUE},
+    {20, 55, MARINE_HUD_FONT_BLUE},
+
+    /* marine armour, units first */
+    {60, 90, MARINE_HUD_FONT_BLUE},
+    {40, 90, MARINE_HUD_FONT_BLUE},
+    {20, 90, MARINE_HUD_FONT_BLUE},
+
+    /* marine ammo/rounds, units first */
+    {-44, 20, MARINE_HUD_FONT_RED},
+    {-64, 20, MARINE_HUD_FONT_RED},
+    {-84, 20, MARINE_HUD_FONT_RED},
+
+    /* marine ammo/magazines, units first */
+    {-122, 20, MARINE_HUD_FONT_RED},
+    {-142, 20, MARINE_HUD_FONT_RED},
+
+    /* marine secondary ammo/rounds, units first */
+    {-44, 55, MARINE_HUD_FONT_RED},
+    {-64, 55, MARINE_HUD_FONT_RED},
+    {-84, 55, MARINE_HUD_FONT_RED},
+
+    /* marine secondary ammo/magazines, units first */
+    {-122, 55, MARINE_HUD_FONT_RED},
+    {-142, 55, MARINE_HUD_FONT_RED},
 };
 
-#if 0 /* SBF - unused */
+#if 0  /* SBF - unused */
 static char *HiresMarineHUDGfxFilenamePtr[]=
 {
     {"blipsHRz.pg0"}, 	//MARINE_HUD_GFX_MOTIONTRACKERBLIP,
@@ -429,4 +422,3 @@ static struct DigitPropertiesTag MedresAlienHUDDigitProperties[] =
 #endif
 
 #endif /* SBF */
-

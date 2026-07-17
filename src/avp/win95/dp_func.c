@@ -11,36 +11,33 @@
 #include "dp_sprh.h"
 #include "dplayext.h"
 #include "equipmnt.h"
-#include "pldnet.h"			   
+#include "pldnet.h"
 #include "dp_func.h"
 
 #define UseLocalAssert Yes
 #include "ourasert.h"
 
-
 /* KJL 14:58:18 03/07/98 - AvP's Guid */
 // {379CCA80-8BDD-11d0-A078-004095E16EA5}
-static const GUID AvPGuid = 
-{ 0x379cca80, 0x8bdd, 0x11d0, { 0xa0, 0x78, 0x0, 0x40, 0x95, 0xe1, 0x6e, 0xa5 } };
+static const GUID AvPGuid
+    = {0x379cca80, 0x8bdd, 0x11d0, {0xa0, 0x78, 0x0, 0x40, 0x95, 0xe1, 0x6e, 0xa5}};
 
-
-LPDPLCONNECTION	glpdplConnection;	// connection settings
+LPDPLCONNECTION glpdplConnection; // connection settings
 
 /* Some important globals */
 #if 0
 LPDIRECTPLAY3A lpDPlay3AAVP;
 #endif
 
-LPGUID					glpGuid = (LPGUID)&AvPGuid;
-LPDIRECTPLAY4			glpDP	= NULL;		// directplay object pointer
-LPDPSESSIONDESC2		glpdpSD;			// current session description
+LPGUID glpGuid = (LPGUID) &AvPGuid;
+LPDIRECTPLAY4 glpDP = NULL; // directplay object pointer
+LPDPSESSIONDESC2 glpdpSD;   // current session description
 
 DPID AVPDPNetID;
 DPNAME AVPDPplayerName;
 
-
-BOOL				gbUseProtocol=0;		// DirectPlay Protocol messaging
-BOOL				gbAsyncSupported=0;	// asynchronous sends supported
+BOOL gbUseProtocol = 0;    // DirectPlay Protocol messaging
+BOOL gbAsyncSupported = 0; // asynchronous sends supported
 
 #if 0
 /*
@@ -91,12 +88,12 @@ void CheckCaps(void)
  */
 HRESULT DPlayClose(void)
 {
-	HRESULT hr=E_FAIL;
+    HRESULT hr = E_FAIL;
 
-	if (glpDP) 
-		hr = IDirectPlayX_Close(glpDP);
-	
-	return hr;
+    if (glpDP)
+        hr = IDirectPlayX_Close(glpDP);
+
+    return hr;
 }
 
 /*
@@ -108,39 +105,43 @@ HRESULT DPlayClose(void)
  */
 HRESULT DPlayCreate(LPVOID lpCon)
 {
-	HRESULT hr=E_FAIL;
+    HRESULT hr = E_FAIL;
 
-	// release if already exists
-	if (glpDP) IDirectPlayX_Release(glpDP);
-	glpDP=NULL;
+    // release if already exists
+    if (glpDP)
+        IDirectPlayX_Release(glpDP);
+    glpDP = NULL;
 
-
-	// create a DirectPlay4(A) interface
-	hr = CoCreateInstance(&CLSID_DirectPlay, NULL, CLSCTX_INPROC_SERVER,
+    // create a DirectPlay4(A) interface
+    hr = CoCreateInstance(
+        &CLSID_DirectPlay,
+        NULL,
+        CLSCTX_INPROC_SERVER,
 #ifdef UNICODE
-						  &IID_IDirectPlay4, (LPVOID *) &glpDP);
+        &IID_IDirectPlay4,
+        (LPVOID *) &glpDP);
 #else
-						  &IID_IDirectPlay4A, (LPVOID *) &glpDP);
+        &IID_IDirectPlay4A,
+        (LPVOID *) &glpDP);
 #endif
-	if (FAILED(hr))
-		return (hr);
+    if (FAILED(hr))
+        return (hr);
 
 #if 1
-	// initialize w/address
-	if (lpCon)
-	{
-		hr = IDirectPlayX_InitializeConnection(glpDP, lpCon, 0);
-		if (FAILED(hr))
-			goto FAILURE;
-	}
-	return hr;
+    // initialize w/address
+    if (lpCon) {
+        hr = IDirectPlayX_InitializeConnection(glpDP, lpCon, 0);
+        if (FAILED(hr))
+            goto FAILURE;
+    }
+    return hr;
 
 FAILURE:
-	IDirectPlayX_Release(glpDP);
-	glpDP = NULL;
+    IDirectPlayX_Release(glpDP);
+    glpDP = NULL;
 #endif
 
-	return hr;
+    return hr;
 }
 
 /*
@@ -149,26 +150,25 @@ FAILURE:
  * Wrapper for DirectPlay CreatePlayer API. 
  */
 
-HRESULT DPlayCreatePlayer(LPDPID lppidID, LPTSTR lptszPlayerName, HANDLE hEvent, 
-						  LPVOID lpData, DWORD dwDataSize)
+HRESULT DPlayCreatePlayer(
+    LPDPID lppidID, LPTSTR lptszPlayerName, HANDLE hEvent, LPVOID lpData, DWORD dwDataSize)
 {
-	HRESULT hr=E_FAIL;
-	DPNAME name;
-	
-	ZeroMemory(&name,sizeof(name));
-	name.dwSize = sizeof(DPNAME);
+    HRESULT hr = E_FAIL;
+    DPNAME name;
+
+    ZeroMemory(&name, sizeof(name));
+    name.dwSize = sizeof(DPNAME);
 
 #ifdef UNICODE
-	name.lpszShortName = lptszPlayerName;
+    name.lpszShortName = lptszPlayerName;
 #else
-	name.lpszShortNameA = lptszPlayerName;
+    name.lpszShortNameA = lptszPlayerName;
 #endif
 
-	if (glpDP)
-		hr = IDirectPlayX_CreatePlayer(glpDP, lppidID, &name, hEvent, lpData, 
-									  dwDataSize, 0);
-									
-	return hr;
+    if (glpDP)
+        hr = IDirectPlayX_CreatePlayer(glpDP, lppidID, &name, hEvent, lpData, dwDataSize, 0);
+
+    return hr;
 }
 
 /*
@@ -176,41 +176,41 @@ HRESULT DPlayCreatePlayer(LPDPID lppidID, LPTSTR lptszPlayerName, HANDLE hEvent,
  *
  * Wrapper for DirectPlay CreateSession API.Uses the global application guid (glpGuid).
  */
-HRESULT DPlayCreateSession(LPTSTR lptszSessionName,int maxPlayers,int dwUser1,int dwUser2)
+HRESULT DPlayCreateSession(LPTSTR lptszSessionName, int maxPlayers, int dwUser1, int dwUser2)
 {
-	HRESULT hr = E_FAIL;
-	DPSESSIONDESC2 dpDesc;
+    HRESULT hr = E_FAIL;
+    DPSESSIONDESC2 dpDesc;
 
-	if (!glpDP)
-		return DPERR_NOINTERFACE;
+    if (!glpDP)
+        return DPERR_NOINTERFACE;
 
-	ZeroMemory(&dpDesc, sizeof(dpDesc));
-	dpDesc.dwSize = sizeof(dpDesc);
-	dpDesc.dwFlags = DPSESSION_MIGRATEHOST | DPSESSION_KEEPALIVE;
-	if (gbUseProtocol)
-		dpDesc.dwFlags |= DPSESSION_DIRECTPLAYPROTOCOL;
+    ZeroMemory(&dpDesc, sizeof(dpDesc));
+    dpDesc.dwSize = sizeof(dpDesc);
+    dpDesc.dwFlags = DPSESSION_MIGRATEHOST | DPSESSION_KEEPALIVE;
+    if (gbUseProtocol)
+        dpDesc.dwFlags |= DPSESSION_DIRECTPLAYPROTOCOL;
 
 #ifdef UNICODE
-	dpDesc.lpszSessionName = lptszSessionName;
+    dpDesc.lpszSessionName = lptszSessionName;
 #else
-	dpDesc.lpszSessionNameA = lptszSessionName;
+    dpDesc.lpszSessionNameA = lptszSessionName;
 #endif
-	dpDesc.dwMaxPlayers=maxPlayers;
+    dpDesc.dwMaxPlayers = maxPlayers;
 
-	dpDesc.dwUser1 = dwUser1;
-	dpDesc.dwUser2 = dwUser2;
+    dpDesc.dwUser1 = dwUser1;
+    dpDesc.dwUser2 = dwUser2;
 
-	// set the application guid
-	if (glpGuid)
-		dpDesc.guidApplication = *glpGuid;
+    // set the application guid
+    if (glpGuid)
+        dpDesc.guidApplication = *glpGuid;
 
-	hr = IDirectPlayX_Open(glpDP, &dpDesc, DPOPEN_CREATE);
+    hr = IDirectPlayX_Open(glpDP, &dpDesc, DPOPEN_CREATE);
 
-	// Check for Async message support
-//	if (SUCCEEDED(hr))
-//		CheckCaps();
+    // Check for Async message support
+    //	if (SUCCEEDED(hr))
+    //		CheckCaps();
 
-	return hr;
+    return hr;
 }
 
 /*
@@ -220,12 +220,12 @@ HRESULT DPlayCreateSession(LPTSTR lptszSessionName,int maxPlayers,int dwUser1,in
  */
 HRESULT DPlayDestroyPlayer(DPID pid)
 {
-	HRESULT hr=E_FAIL;
-	
-	if (glpDP)
-		hr = IDirectPlayX_DestroyPlayer(glpDP, pid);
+    HRESULT hr = E_FAIL;
 
-	return hr;
+    if (glpDP)
+        hr = IDirectPlayX_DestroyPlayer(glpDP, pid);
+
+    return hr;
 }
 
 /*
@@ -233,15 +233,15 @@ HRESULT DPlayDestroyPlayer(DPID pid)
  *
  * Wrapper for DirectPlay API EnumPlayers
  */
-HRESULT DPlayEnumPlayers(LPGUID lpSessionGuid, LPDPENUMPLAYERSCALLBACK2 lpEnumCallback, 
-						 LPVOID lpContext, DWORD dwFlags)
+HRESULT DPlayEnumPlayers(
+    LPGUID lpSessionGuid, LPDPENUMPLAYERSCALLBACK2 lpEnumCallback, LPVOID lpContext, DWORD dwFlags)
 {
-	HRESULT hr=E_FAIL;
+    HRESULT hr = E_FAIL;
 
-	if (glpDP)
-		hr = IDirectPlayX_EnumPlayers(glpDP, lpSessionGuid, lpEnumCallback, lpContext, dwFlags);
+    if (glpDP)
+        hr = IDirectPlayX_EnumPlayers(glpDP, lpSessionGuid, lpEnumCallback, lpContext, dwFlags);
 
-	return hr;
+    return hr;
 }
 
 /*
@@ -249,23 +249,21 @@ HRESULT DPlayEnumPlayers(LPGUID lpSessionGuid, LPDPENUMPLAYERSCALLBACK2 lpEnumCa
  *
  * Wrapper for DirectPlay EnumSessions API.
  */
-HRESULT DPlayEnumSessions(DWORD dwTimeout, LPDPENUMSESSIONSCALLBACK2 lpEnumCallback, 
-						  LPVOID lpContext, DWORD dwFlags)
+HRESULT DPlayEnumSessions(
+    DWORD dwTimeout, LPDPENUMSESSIONSCALLBACK2 lpEnumCallback, LPVOID lpContext, DWORD dwFlags)
 {
-	HRESULT hr = E_FAIL;
-	DPSESSIONDESC2 dpDesc;
+    HRESULT hr = E_FAIL;
+    DPSESSIONDESC2 dpDesc;
 
-	ZeroMemory(&dpDesc, sizeof(dpDesc));
-	dpDesc.dwSize = sizeof(dpDesc);
-	if (glpGuid)
-		dpDesc.guidApplication = *glpGuid;
+    ZeroMemory(&dpDesc, sizeof(dpDesc));
+    dpDesc.dwSize = sizeof(dpDesc);
+    if (glpGuid)
+        dpDesc.guidApplication = *glpGuid;
 
-	if (glpDP)
-		hr = IDirectPlayX_EnumSessions(glpDP, &dpDesc, dwTimeout, lpEnumCallback,
-										lpContext, dwFlags);
+    if (glpDP)
+        hr = IDirectPlayX_EnumSessions(glpDP, &dpDesc, dwTimeout, lpEnumCallback, lpContext, dwFlags);
 
-
-	return hr;
+    return hr;
 }
 
 /*
@@ -275,12 +273,12 @@ HRESULT DPlayEnumSessions(DWORD dwTimeout, LPDPENUMSESSIONSCALLBACK2 lpEnumCallb
  */
 HRESULT DPlayGetPlayerData(DPID pid, LPVOID lpData, LPDWORD lpdwDataSize, DWORD dwFlags)
 {
-	HRESULT hr=E_FAIL;
+    HRESULT hr = E_FAIL;
 
-	if (glpDP) 
-		hr = IDirectPlayX_GetPlayerData(glpDP, pid, lpData, lpdwDataSize, dwFlags);
+    if (glpDP)
+        hr = IDirectPlayX_GetPlayerData(glpDP, pid, lpData, lpdwDataSize, dwFlags);
 
-	return hr;
+    return hr;
 }
 
 /*
@@ -290,36 +288,30 @@ HRESULT DPlayGetPlayerData(DPID pid, LPVOID lpData, LPDWORD lpdwDataSize, DWORD 
  */
 HRESULT DPlayGetSessionDesc(void)
 {
-	HRESULT hr=E_FAIL;
-	DWORD dwSize;
+    HRESULT hr = E_FAIL;
+    DWORD dwSize;
 
-	// free old session desc, if any
-	if (glpdpSD)
-	{
-		free(glpdpSD);
-		glpdpSD = NULL;
-	}
+    // free old session desc, if any
+    if (glpdpSD) {
+        free(glpdpSD);
+        glpdpSD = NULL;
+    }
 
-	if (glpDP)
-	{
-		// first get the size for the session desc
-		if ((hr = IDirectPlayX_GetSessionDesc(glpDP, NULL, &dwSize)) == DPERR_BUFFERTOOSMALL)
-		{
-			// allocate memory for it
-			glpdpSD = (LPDPSESSIONDESC2) malloc(dwSize);
-			if (glpdpSD)
-			{
-				// now get the session desc
-				hr = IDirectPlayX_GetSessionDesc(glpDP, glpdpSD, &dwSize);
-			}
-			else
-			{
-				hr = E_OUTOFMEMORY;
-			}
-		}
-	}
+    if (glpDP) {
+        // first get the size for the session desc
+        if ((hr = IDirectPlayX_GetSessionDesc(glpDP, NULL, &dwSize)) == DPERR_BUFFERTOOSMALL) {
+            // allocate memory for it
+            glpdpSD = (LPDPSESSIONDESC2) malloc(dwSize);
+            if (glpdpSD) {
+                // now get the session desc
+                hr = IDirectPlayX_GetSessionDesc(glpDP, glpdpSD, &dwSize);
+            } else {
+                hr = E_OUTOFMEMORY;
+            }
+        }
+    }
 
-	return hr;
+    return hr;
 }
 
 /*
@@ -329,7 +321,7 @@ HRESULT DPlayGetSessionDesc(void)
  */
 BOOL IsDPlay(void)
 {
-	return (glpDP ? TRUE:FALSE);
+    return (glpDP ? TRUE : FALSE);
 }
 
 /*
@@ -339,48 +331,48 @@ BOOL IsDPlay(void)
  */
 HRESULT DPlayOpenSession(LPGUID lpSessionGuid)
 {
-	HRESULT hr = E_FAIL;
-	DPSESSIONDESC2 dpDesc;
+    HRESULT hr = E_FAIL;
+    DPSESSIONDESC2 dpDesc;
 
-	if (!glpDP)
-		return DPERR_NOINTERFACE;
+    if (!glpDP)
+        return DPERR_NOINTERFACE;
 
-	ZeroMemory(&dpDesc, sizeof(dpDesc));
-	dpDesc.dwSize = sizeof(dpDesc);
-	if (gbUseProtocol)
-		dpDesc.dwFlags = DPSESSION_DIRECTPLAYPROTOCOL;
+    ZeroMemory(&dpDesc, sizeof(dpDesc));
+    dpDesc.dwSize = sizeof(dpDesc);
+    if (gbUseProtocol)
+        dpDesc.dwFlags = DPSESSION_DIRECTPLAYPROTOCOL;
 
-	// set the session guid
-	if (lpSessionGuid)
-		dpDesc.guidInstance = *lpSessionGuid;
-	// set the application guid
-	if (glpGuid)
-		dpDesc.guidApplication = *glpGuid;
+    // set the session guid
+    if (lpSessionGuid)
+        dpDesc.guidInstance = *lpSessionGuid;
+    // set the application guid
+    if (glpGuid)
+        dpDesc.guidApplication = *glpGuid;
 
-	// open it
-	hr = IDirectPlayX_Open(glpDP, &dpDesc, DPOPEN_JOIN);
+    // open it
+    hr = IDirectPlayX_Open(glpDP, &dpDesc, DPOPEN_JOIN);
 
-	// Check for Async message support
-//	if (SUCCEEDED(hr))
-//		CheckCaps();
+    // Check for Async message support
+    //	if (SUCCEEDED(hr))
+    //		CheckCaps();
 
-	return hr;
+    return hr;
 }
-
 
 /*
  * DPlayReceive
  *
  * Wrapper for DirectPlay Receive API
  */
-HRESULT DPlayReceive(LPDPID lpidFrom, LPDPID lpidTo, DWORD dwFlags, LPVOID lpData, LPDWORD lpdwDataSize)
+HRESULT DPlayReceive(
+    LPDPID lpidFrom, LPDPID lpidTo, DWORD dwFlags, LPVOID lpData, LPDWORD lpdwDataSize)
 {
-	HRESULT hr = E_FAIL;
+    HRESULT hr = E_FAIL;
 
-	if (glpDP)
-		hr = IDirectPlayX_Receive(glpDP, lpidFrom, lpidTo, dwFlags, lpData, lpdwDataSize);
-	
-	return hr;
+    if (glpDP)
+        hr = IDirectPlayX_Receive(glpDP, lpidFrom, lpidTo, dwFlags, lpData, lpdwDataSize);
+
+    return hr;
 }
 
 /*
@@ -390,29 +382,26 @@ HRESULT DPlayReceive(LPDPID lpidFrom, LPDPID lpidTo, DWORD dwFlags, LPVOID lpDat
  */
 HRESULT DPlayRelease(void)
 {
-	HRESULT hr = E_FAIL;
+    HRESULT hr = E_FAIL;
 
-	if (glpDP)
-	{
-		// free session desc, if any
-		if (glpdpSD) 
-		{
-			free(glpdpSD);
-			glpdpSD = NULL;
-		}
+    if (glpDP) {
+        // free session desc, if any
+        if (glpdpSD) {
+            free(glpdpSD);
+            glpdpSD = NULL;
+        }
 
-		// free connection settings structure, if any (lobby stuff)
-		if (glpdplConnection)
-		{
-			free(glpdplConnection);
-			glpdplConnection = NULL;
-		}
-		// release dplay
-		hr = IDirectPlayX_Release(glpDP);
-		glpDP = NULL;
-	}
+        // free connection settings structure, if any (lobby stuff)
+        if (glpdplConnection) {
+            free(glpdplConnection);
+            glpdplConnection = NULL;
+        }
+        // release dplay
+        hr = IDirectPlayX_Release(glpDP);
+        glpDP = NULL;
+    }
 
-	return hr;
+    return hr;
 }
 
 /*
@@ -422,20 +411,19 @@ HRESULT DPlayRelease(void)
  */
 HRESULT DPlaySend(DPID idFrom, DPID idTo, DWORD dwFlags, LPVOID lpData, DWORD dwDataSize)
 {
-	HRESULT hr = DPERR_NOINTERFACE;
+    HRESULT hr = DPERR_NOINTERFACE;
 
-	if (glpDP)
-	{
-		if (dwFlags & DPSEND_ASYNC)
-			// We don't specify a priority or timeout.  Would have to check
-			// GetCaps() first to see if they were supported
-			hr = IDirectPlayX_SendEx(glpDP, idFrom, idTo, dwFlags, lpData,
-									 dwDataSize, 0, 0, NULL, NULL);
-		else
-			hr = IDirectPlayX_Send(glpDP, idFrom, idTo, dwFlags, lpData, dwDataSize);
-	}
+    if (glpDP) {
+        if (dwFlags & DPSEND_ASYNC)
+            // We don't specify a priority or timeout.  Would have to check
+            // GetCaps() first to see if they were supported
+            hr = IDirectPlayX_SendEx(
+                glpDP, idFrom, idTo, dwFlags, lpData, dwDataSize, 0, 0, NULL, NULL);
+        else
+            hr = IDirectPlayX_Send(glpDP, idFrom, idTo, dwFlags, lpData, dwDataSize);
+    }
 
-	return hr;
+    return hr;
 }
 
 /*
@@ -445,11 +433,10 @@ HRESULT DPlaySend(DPID idFrom, DPID idTo, DWORD dwFlags, LPVOID lpData, DWORD dw
  */
 HRESULT DPlaySetPlayerData(DPID pid, LPVOID lpData, DWORD dwSize, DWORD dwFlags)
 {
-	HRESULT hr=E_FAIL;
+    HRESULT hr = E_FAIL;
 
-	if (glpDP)
-		hr = IDirectPlayX_SetPlayerData(glpDP, pid, lpData, dwSize, dwFlags);
-	
-	return hr;
+    if (glpDP)
+        hr = IDirectPlayX_SetPlayerData(glpDP, pid, lpData, dwSize, dwFlags);
+
+    return hr;
 }
-

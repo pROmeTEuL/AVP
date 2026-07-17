@@ -7,12 +7,12 @@
 #ifndef _modcmds
 #define _modcmds 1
 
-	#ifndef MODULE_INCLUDED
-	#include "module.h"
-	#endif
+#ifndef MODULE_INCLUDED
+#include "module.h"
+#endif
 
 #ifdef __cplusplus
-	extern "C" {
+extern "C" {
 #endif
 
 /* Version settings *****************************************************/
@@ -26,25 +26,21 @@
 /* Exported globals *****************************************************/
 
 /* Function prototypes **************************************************/
-	namespace ModuleCommands
-	{
-		void ListModules(void);
-		
-		void TryToTeleport(char* UpperCasePotentialModuleName);
+namespace ModuleCommands {
+void ListModules(void);
 
-		MODULE* FindModule(char* UpperCasePotentialModuleName);
-			// allowed to return NULL if no match
+void TryToTeleport(char *UpperCasePotentialModuleName);
 
-		void TeleportPlayerToModule(MODULE* pModule_Dst);
-	};
-	
+MODULE *FindModule(char *UpperCasePotentialModuleName);
+// allowed to return NULL if no match
 
+void TeleportPlayerToModule(MODULE *pModule_Dst);
+}; // namespace ModuleCommands
 
 /* End of the header ****************************************************/
 
-
 #ifdef __cplusplus
-	};
+};
 #endif
 
 #endif

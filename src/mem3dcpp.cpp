@@ -22,19 +22,19 @@ int __cpp_new_recording = 0;
 class DebugObject
 {
 public:
-	DebugObject();
-	~DebugObject();
+    DebugObject();
+    ~DebugObject();
 };
 
 DebugObject::DebugObject()
 {
-	__cpp_new_recording = 1;
+    __cpp_new_recording = 1;
 }
 
 DebugObject::~DebugObject()
 {
-	__cpp_new_recording = 0;
-	DumpMallocInfo(DUMPTOFILE);
+    __cpp_new_recording = 0;
+    DumpMallocInfo(DUMPTOFILE);
 }
 
 static DebugObject dbo;

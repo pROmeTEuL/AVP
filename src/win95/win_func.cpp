@@ -5,7 +5,7 @@ not project specific.
 
 ****/
 
-// To link code to main C functions 
+// To link code to main C functions
 
 extern "C" {
 
@@ -31,23 +31,22 @@ extern BOOL bActive;
 // interface layer, since Win32 include files are fully
 // available in both C and C++.
 // All functions linking to standard windows code are
-// in win_func.cpp or win_proj.cpp, and all DirectX 
+// in win_func.cpp or win_proj.cpp, and all DirectX
 // interface functions
 // should be in dd_func.cpp (in the Win95 directory)
 // or d3_func.cpp, dp_func.cpp, ds_func.cpp etc.
 // Project specific platfrom functionality for Win95
-// should be in project/win95, in files called 
+// should be in project/win95, in files called
 // dd_proj.cpp etc.
-
 
 // GetTickCount is the standard windows return
 // millisecond time function, which isn't actually
 // accurate to a millisecond.  In order to get FRI
-// to work properly with GetTickCount at high frame 
+// to work properly with GetTickCount at high frame
 // rates, you will have to switch KalmanTimer to Yes
 // at the start of io.c to turn on a filtering algorithm
-// in the frame counter handler.  
-// Alternately, we can use the mm function 
+// in the frame counter handler.
+// Alternately, we can use the mm function
 // timeGetTime to get the time accurate to a millisecond.
 // There is still enough variation in this to make
 // the kalman filter probably worthwhile, however.
@@ -55,17 +54,17 @@ extern BOOL bActive;
 long GetWindowsTickCount(void)
 
 {
-    #if 0
+#if 0
 	return GetTickCount();
-	#else
-	return timeGetTime();
-	#endif
+#else
+    return timeGetTime();
+#endif
 }
 
 // This function is set up using a PeekMessage check,
 // with a return on a failure of GetMessage, on the
 // grounds that it might be more stable than just
-// GetMessage.  But then again, maybe not.  
+// GetMessage.  But then again, maybe not.
 // PM_NOREMOVE means do not take this message out of
 // the queue.  The while loop is designed to ensure
 // that all messages are sent through to the Windows
@@ -83,54 +82,46 @@ BOOL g_bMustRedrawScreen = FALSE;
 
 void CheckForWindowsMessages(void)
 {
-	MSG         msg;
-	extern signed int MouseWheelStatus;
-	
-	MouseWheelStatus = 0;
+    MSG msg;
+    extern signed int MouseWheelStatus;
 
-	// Initialisation for the current embarassingly primitive mouse 
-	// handler...
+    MouseWheelStatus = 0;
 
-	do
-	{
-		while (PeekMessage(&msg, NULL, 0, 0, PM_NOREMOVE))
-		{
-			if (!GetMessage(&msg, NULL, 0, 0))
-				return;
+    // Initialisation for the current embarassingly primitive mouse
+    // handler...
 
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
+    do {
+        while (PeekMessage(&msg, NULL, 0, 0, PM_NOREMOVE)) {
+            if (!GetMessage(&msg, NULL, 0, 0))
+                return;
 
-			#if (!SupportAltTab)
-			// Panic
-			if (!bActive)
-			{
-				// Dubious hack...
-				#if 0
+            TranslateMessage(&msg);
+            DispatchMessage(&msg);
+
+#if (!SupportAltTab)
+            // Panic
+            if (!bActive) {
+// Dubious hack...
+#if 0
 				ExitSystem();
-				#else
-				ReleaseDirect3D();
-				exit(0x00);
-				#endif
-			}
-			#endif
-		}
-		
-		// JH 13/2/98 - if the app is not active we should not return from the message lopp
-		// until the app is re-activated
-		
-		if (!bActive)
-		{
-			ResetFrameCounter();
-			Sleep(0);
-			g_bMustRedrawScreen = TRUE;
-		}
-	}
-		while (!bActive);
+#else
+                ReleaseDirect3D();
+                exit(0x00);
+#endif
+            }
+#endif
+        }
+
+        // JH 13/2/98 - if the app is not active we should not return from the message lopp
+        // until the app is re-activated
+
+        if (!bActive) {
+            ResetFrameCounter();
+            Sleep(0);
+            g_bMustRedrawScreen = TRUE;
+        }
+    } while (!bActive);
 }
-
-
-
 
 // Experimental functions to handle a separate
 // thread to run rasterisation on hardware at low
@@ -151,96 +142,87 @@ void CheckForWindowsMessages(void)
 BOOL SpawnRasterThread()
 
 {
-	DWORD RasterThreadId;
-	// Stack size of new thread in bytes.
-	// For the moment, we will set it to
-	// 128K, the normal size for the engine
-	// process.
-	// Note that this is in bytes.
-	// Note that stack size should grow as 
-	// necessary.  We hope.
-	DWORD StackSize = 128 * 1024;
-
+    DWORD RasterThreadId;
+    // Stack size of new thread in bytes.
+    // For the moment, we will set it to
+    // 128K, the normal size for the engine
+    // process.
+    // Note that this is in bytes.
+    // Note that stack size should grow as
+    // necessary.  We hope.
+    DWORD StackSize = 128 * 1024;
 
     // Create the thread
     RasterThread = CreateThread(
-	   NULL,     // no security
-	   StackSize,        // default stack size
-	   (LPTHREAD_START_ROUTINE) RenderD3DScene,
-	   0,        // no argument for function
-	   0,        // default creation flags
-	   &RasterThreadId); // get thread ID
+        NULL,      // no security
+        StackSize, // default stack size
+        (LPTHREAD_START_ROUTINE) RenderD3DScene,
+        0,                // no argument for function
+        0,                // default creation flags
+        &RasterThreadId); // get thread ID
 
-    if (RasterThread == NULL)
-	  {
-       #if debug
-	   ReleaseDirect3D();
-	   exit(0xabab);
-	   #else
-	   return FALSE;
-       #endif
-	  }
+    if (RasterThread == NULL) {
+#if debug
+        ReleaseDirect3D();
+        exit(0xabab);
+#else
+        return FALSE;
+#endif
+    }
 
-    #if 1
-	// Set the priority on the thread to
-	// below normal, since we want this thread
-	// to be unimportant --- it is only monitoring
-	// the hardware rasteriser.  Hopefully.
-	// Note that this priority value maybe should
-	// be THREAD_PRIORITY_LOWEST or THREAD_PRIORITY_IDLE,
-	// or maybe we shouldn't call this function at all.
-	// Also, we must have a THREAD_SET_INFORMATION
-	// access right associated with the thread for this
-	// to work.  Hopefully, this should be the default
-	// when using CreateThread.
-	SetThreadPriority(RasterThread, 
-	   THREAD_PRIORITY_NORMAL);
-	#endif
+#if 1
+    // Set the priority on the thread to
+    // below normal, since we want this thread
+    // to be unimportant --- it is only monitoring
+    // the hardware rasteriser.  Hopefully.
+    // Note that this priority value maybe should
+    // be THREAD_PRIORITY_LOWEST or THREAD_PRIORITY_IDLE,
+    // or maybe we shouldn't call this function at all.
+    // Also, we must have a THREAD_SET_INFORMATION
+    // access right associated with the thread for this
+    // to work.  Hopefully, this should be the default
+    // when using CreateThread.
+    SetThreadPriority(RasterThread, THREAD_PRIORITY_NORMAL);
+#endif
 
-	return TRUE;
+    return TRUE;
 }
 
 BOOL WaitForRasterThread()
 
 {
     BOOL RetVal;
-	DWORD ThreadStatus;
-	int i;
+    DWORD ThreadStatus;
+    int i;
 
-    // Note that if this is to work the 
+    // Note that if this is to work the
     // rasterisation thread must have a
-	// THREAD_QUERY_INFORMATION access right,
-	// but we believe CreateThread should supply
-	// this as a default.
+    // THREAD_QUERY_INFORMATION access right,
+    // but we believe CreateThread should supply
+    // this as a default.
 
     // Note!!! At some stage we may want to put a
-	// delay loop in the statement below, in the
-	// time honoured Saturn fashion, depending on how
-	// much impact calling GetExitCodeThread has on the
-	// rest of the system - hopefully not much...
+    // delay loop in the statement below, in the
+    // time honoured Saturn fashion, depending on how
+    // much impact calling GetExitCodeThread has on the
+    // rest of the system - hopefully not much...
 
-    do
-	  {
-       RetVal = GetExitCodeThread(RasterThread,
-	                    &ThreadStatus);
-	  }
-	while ((RetVal == TRUE) && 
-	      (ThreadStatus == STILL_ACTIVE));
+    do {
+        RetVal = GetExitCodeThread(RasterThread, &ThreadStatus);
+    } while ((RetVal == TRUE) && (ThreadStatus == STILL_ACTIVE));
 
     // Failed to get a status report on the thread
-	if (RetVal == FALSE)
-	  {
-	   #if debug
-	   ReleaseDirect3D();
-	   exit(0xabbb);
-	   #else
-	   return FALSE;
-	   #endif
-	  }
+    if (RetVal == FALSE) {
+#if debug
+        ReleaseDirect3D();
+        exit(0xabbb);
+#else
+        return FALSE;
+#endif
+    }
 
-	return TRUE;
+    return TRUE;
 }
-
 
 /*
   Pick up processor types,
@@ -257,17 +239,17 @@ BOOL WaitForRasterThread()
 
 static unsigned int GetCPUId(void)
 {
-	unsigned int retval;
-	_asm
-	{
+    unsigned int retval;
+    _asm
+    {
 		mov eax,1
 		_emit 0x0f   ; CPUID (00001111 10100010) - This is a Pentium
 		             ; specific instruction which gets information on the
 		_emit 0xa2   ; processor. A Pentium family processor should set
 		             ; bits 11-8 of eax to 5.
 		mov retval,edx
-	}
-	return retval;
+    }
+    return retval;
 }
 
 #else
@@ -276,54 +258,45 @@ static unsigned int GetCPUId(void)
 
 #endif
 
-
 PROCESSORTYPES ReadProcessorType(void)
 {
-	SYSTEM_INFO SystemInfo;
-	int ProcessorType;
-	PROCESSORTYPES RetVal;
+    SYSTEM_INFO SystemInfo;
+    int ProcessorType;
+    PROCESSORTYPES RetVal;
 
     GetSystemInfo(&SystemInfo);
 
     ProcessorType = SystemInfo.dwProcessorType;
 
-    switch (ProcessorType)
-	  {
-	   case PROCESSOR_INTEL_386:
-		 RetVal = PType_OffBottomOfScale;
-		 break;
+    switch (ProcessorType) {
+    case PROCESSOR_INTEL_386:
+        RetVal = PType_OffBottomOfScale;
+        break;
 
-	   case PROCESSOR_INTEL_486:
-		 RetVal = PType_486;
-		 break;
+    case PROCESSOR_INTEL_486:
+        RetVal = PType_486;
+        break;
 
-	   case PROCESSOR_INTEL_PENTIUM:
-		 if (GetCPUId() & 0x00800000)
-		 	RetVal = PType_PentiumMMX;
-		 else
-		 	RetVal = PType_Pentium;
-		 break;
+    case PROCESSOR_INTEL_PENTIUM:
+        if (GetCPUId() & 0x00800000)
+            RetVal = PType_PentiumMMX;
+        else
+            RetVal = PType_Pentium;
+        break;
 
-       #if 0
+#if 0
 	   case PROCESSOR_INTEL_SOMETHING:
 		 RetVal = PType_Klamath;
 		 break;
-	   #endif
+#endif
 
-	   default:
-	     RetVal = PType_OffTopOfScale;
-		 break;
-	  }
+    default:
+        RetVal = PType_OffTopOfScale;
+        break;
+    }
 
-	return RetVal;
+    return RetVal;
 }
 
-
-
-// End of extern C declaration 
-
+// End of extern C declaration
 };
-
-
-
-

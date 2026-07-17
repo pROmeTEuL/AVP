@@ -2,20 +2,14 @@
   Header File for Player Movement Stuff
   ---------------------------------------------------*/
 
-
 #ifndef _pmove_h_
 #define _pmove_h_ 1
 
-
-
 #ifdef __cplusplus
 
-	extern "C" {
+extern "C" {
 
 #endif
-
-
-
 
 /*--------------Patrick 15/10/96 ---------------------
   Enumeration of player movement states
@@ -26,12 +20,11 @@
   prematurely terminating.  
   ---------------------------------------------------*/
 
-typedef enum player_mov_state
-{
-	PMov_FreeMovement,
-	PMov_SpecialMovement,
-	PMov_AbortingSpecialMovement,
-}PLAYER_MOVEMENT_STATE;
+typedef enum player_mov_state {
+    PMov_FreeMovement,
+    PMov_SpecialMovement,
+    PMov_AbortingSpecialMovement,
+} PLAYER_MOVEMENT_STATE;
 
 /*--------------Patrick 15/10/96 ---------------------
   Enumeration of special move types
@@ -39,25 +32,20 @@ typedef enum player_mov_state
   character type
   ---------------------------------------------------*/
 
-
 /*--------------Patrick 31/10/96 ---------------------
   Enumeration of player's morphing states for crouching
   and lying down.
   ---------------------------------------------------*/
-typedef enum player_morph_state
-{
-	PMph_Standing,
-	PMph_Crouching,
-	PMph_Lying,
-	PMph_StoC,
-	PMph_CtoS,
-	PMph_StoL,
-	PMph_LtoS,
+typedef enum player_morph_state {
+    PMph_Standing,
+    PMph_Crouching,
+    PMph_Lying,
+    PMph_StoC,
+    PMph_CtoS,
+    PMph_StoL,
+    PMph_LtoS,
 
-}PLAYER_MORPH_STATE;
-
-
-
+} PLAYER_MORPH_STATE;
 
 /*--------------Patrick 1/11/96 ---------------------
   this define determines how crouching and lying down 
@@ -66,23 +54,19 @@ typedef enum player_morph_state
   Morphing is better, but doesn't work with the current
   collision system.
   ---------------------------------------------------*/
-#define CrouchByMorphingPlayer	0
-
+#define CrouchByMorphingPlayer 0
 
 /* Prototypes */
-extern void InitPlayerMovementData(STRATEGYBLOCK* sbPtr);
-extern void PlayerBehaviour(STRATEGYBLOCK* sbptr);
-extern void ExecuteFreeMovement(STRATEGYBLOCK* sbPtr);
+extern void InitPlayerMovementData(STRATEGYBLOCK *sbPtr);
+extern void PlayerBehaviour(STRATEGYBLOCK *sbptr);
+extern void ExecuteFreeMovement(STRATEGYBLOCK *sbPtr);
 void ThrowAFlare(void);
 void StartPlayerTaunt(void);
 void NetPlayerRespawn(STRATEGYBLOCK *sbPtr);
 
-
 #ifdef __cplusplus
-
-	}
+}
 
 #endif
-
 
 #endif

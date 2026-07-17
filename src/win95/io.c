@@ -17,8 +17,7 @@
 #define textprintOn Yes
 
 #define DHMtextprint Yes
-	/* define to use Dave Malcolm's replacement textprint routines */
-
+/* define to use Dave Malcolm's replacement textprint routines */
 
 /* As specified by Roxby */
 #define ClearScreenColour 1000
@@ -50,7 +49,6 @@
 */
 
 #define CheckVideoModes No
-
 
 /*
 
@@ -95,88 +93,84 @@ extern IMAGEHEADER ImageHeaderArray[]; /* Array of Image Headers */
 */
 
 /* Timer */
-   long lastTickCount;
+long lastTickCount;
 
-	unsigned char *ScreenBuffer    = 0;		/* Ensure initialised to Null */
+unsigned char *ScreenBuffer = 0; /* Ensure initialised to Null */
 
-	unsigned char LPTestPalette[1024]; /* to cast to lp*/
-	
-	int InputMode;
+unsigned char LPTestPalette[1024]; /* to cast to lp*/
 
-	int VideoMode;
-	int VideoModeType;
-	int VideoModeTypeScreen;
-	int WindowMode;
-	int ScanDrawMode;
-	int ZBufferMode;
-	int DXMemoryMode;
-    unsigned char AttemptVideoModeRestart;
-	VIDEORESTARTMODES VideoRestartMode;
+int InputMode;
 
-    PROCESSORTYPES ProcessorType;
-	BOOL MMXAvailable;
+int VideoMode;
+int VideoModeType;
+int VideoModeTypeScreen;
+int WindowMode;
+int ScanDrawMode;
+int ZBufferMode;
+int DXMemoryMode;
+unsigned char AttemptVideoModeRestart;
+VIDEORESTARTMODES VideoRestartMode;
 
-	unsigned char *TextureLightingTable = 0;
+PROCESSORTYPES ProcessorType;
+BOOL MMXAvailable;
 
-	unsigned char *PaletteRemapTable = 0;
+unsigned char *TextureLightingTable = 0;
 
-	int NumShadingTables    = 0;
+unsigned char *PaletteRemapTable = 0;
 
-	int NumPaletteShadingTables              = 0;
+int NumShadingTables = 0;
 
-	int FrameRate;
-	int NormalFrameTime;
-	int PrevNormalFrameTime;
-	extern int CloakingPhase;
+int NumPaletteShadingTables = 0;
 
-	/* These two are dummy values to get the DOS platform to compile */
+int FrameRate;
+int NormalFrameTime;
+int PrevNormalFrameTime;
+extern int CloakingPhase;
 
-	unsigned char KeyCode;
-	unsigned char KeyASCII;
+/* These two are dummy values to get the DOS platform to compile */
 
+unsigned char KeyCode;
+unsigned char KeyASCII;
 
-	#if SuppressWarnings
-	unsigned char *palette_tmp;
-	static VIEWDESCRIPTORBLOCK* vdb_tmp;
-	static SCREENDESCRIPTORBLOCK* sdb_tmp;
-	#endif
-
-    /* Keyboard */
-	unsigned char KeyboardInput[MAX_NUMBER_OF_INPUT_KEYS];
-    unsigned char GotAnyKey;
-
-    /* Input communication with Windows Procedure */
-    /* Print system */
-
-#if !DHMtextprint
-    PRINTQUEUEITEM PrintQueue[MaxMessages];
-	int MessagesStoredThisFrame;
+#if SuppressWarnings
+unsigned char *palette_tmp;
+static VIEWDESCRIPTORBLOCK *vdb_tmp;
+static SCREENDESCRIPTORBLOCK *sdb_tmp;
 #endif
 
-	int textprintPosX;
-	int textprintPosY;
-	IMAGEHEADER* fontHeader;
+/* Keyboard */
+unsigned char KeyboardInput[MAX_NUMBER_OF_INPUT_KEYS];
+unsigned char GotAnyKey;
 
-	/* Added 28/11/97 by DHM: boolean for run-time switching on/off of textprint */
-	int bEnableTextprint = No;
+/* Input communication with Windows Procedure */
+/* Print system */
 
-	/* Added 28/1/98 by DHM: as above, but applies specifically to textprintXY */
-	int bEnableTextprintXY = Yes;
+#if !DHMtextprint
+PRINTQUEUEITEM PrintQueue[MaxMessages];
+int MessagesStoredThisFrame;
+#endif
 
-	/* Palette */
+int textprintPosX;
+int textprintPosY;
+IMAGEHEADER *fontHeader;
 
-	unsigned char PaletteBuffer[768 + 1];
+/* Added 28/11/97 by DHM: boolean for run-time switching on/off of textprint */
+int bEnableTextprint = No;
+
+/* Added 28/1/98 by DHM: as above, but applies specifically to textprintXY */
+int bEnableTextprintXY = Yes;
+
+/* Palette */
+
+unsigned char PaletteBuffer[768 + 1];
 
 /* Test Palette */
 
 unsigned char TestPalette[768];
 unsigned char TestPalette2[768];
 
-
-
-
 /* KJL 11:48:45 28/01/98 - used to scale NormalFrameTime, so the game can be slowed down */
-int TimeScale=65536;
+int TimeScale = 65536;
 
 /* KJL 16:00:11 28/01/98 - unscaled frame time */
 int RealFrameTime;
@@ -184,16 +178,14 @@ int GlobalFrameCounter;
 int RouteFinder_CallsThisFrame;
 
 /* KJL 15:08:43 29/03/98 - added to give extra flexibility to debugging text */
-int PrintDebuggingText(const char* t, ...);
-int ReleasePrintDebuggingText(const char* t, ...);
-
+int PrintDebuggingText(const char *t, ...);
+int ReleasePrintDebuggingText(const char *t, ...);
 
 /*
 
  IO and Other Functions for the PC
 
 */
-
 
 /*
 
@@ -203,19 +195,16 @@ int ReleasePrintDebuggingText(const char* t, ...);
 
 */
 
-SHAPEHEADER* GetShapeData(int shapenum)
+SHAPEHEADER *GetShapeData(int shapenum)
 
 {
+    if (shapenum >= 0 && shapenum < maxshapes) {
+        SHAPEHEADER *sptr = mainshapelist[shapenum];
+        return sptr;
+    }
 
-	if(shapenum>=0 && shapenum< maxshapes)
-	{
-		SHAPEHEADER *sptr = mainshapelist[shapenum];
-		return sptr;
-	}
-	
-	return NULL;
+    return NULL;
 }
-
 
 /*
 
@@ -226,31 +215,28 @@ SHAPEHEADER* GetShapeData(int shapenum)
 void PlatformSpecificVDBInit(VIEWDESCRIPTORBLOCK *vdb)
 
 {
-	#if SuppressWarnings
-	vdb_tmp = vdb;
-	#endif
+#if SuppressWarnings
+    vdb_tmp = vdb;
+#endif
 }
-
 
 void PlatformSpecificShowViewEntry(VIEWDESCRIPTORBLOCK *vdb, SCREENDESCRIPTORBLOCK *sdb)
 
 {
-	#if SuppressWarnings
-	vdb_tmp = vdb;
-	sdb_tmp = sdb;
-	#endif
+#if SuppressWarnings
+    vdb_tmp = vdb;
+    sdb_tmp = sdb;
+#endif
 }
-
 
 void PlatformSpecificShowViewExit(VIEWDESCRIPTORBLOCK *vdb, SCREENDESCRIPTORBLOCK *sdb)
 
 {
-	#if SuppressWarnings
-	vdb_tmp = vdb;
-	sdb_tmp = sdb;
-	#endif
+#if SuppressWarnings
+    vdb_tmp = vdb;
+    sdb_tmp = sdb;
+#endif
 }
-
 
 /*
 
@@ -261,14 +247,11 @@ void PlatformSpecificShowViewExit(VIEWDESCRIPTORBLOCK *vdb, SCREENDESCRIPTORBLOC
 void GetDOSFilename(char *fnameptr)
 
 {
-
-	while(*fnameptr) {
-
-		if(*fnameptr == 0x2f) *fnameptr = 0x5c;
-		fnameptr++;
-
-	}
-
+    while (*fnameptr) {
+        if (*fnameptr == 0x2f)
+            *fnameptr = 0x5c;
+        fnameptr++;
+    }
 }
 
 /*
@@ -286,99 +269,90 @@ void GetDOSFilename(char *fnameptr)
 int CompareFilenameCH(char *string1, char *string2)
 
 {
+    char *srtmp1;
+    char *srtmp2;
+    int slen1 = 0;
+    int slen2 = 0;
+    int i;
+    char fname1[ImageNameSize];
+    char fname2[ImageNameSize];
 
-	char *srtmp1;
-	char *srtmp2;
-	int slen1 = 0;
-	int slen2 = 0;
-	int i;
-	char fname1[ImageNameSize];
-	char fname2[ImageNameSize];
-
-
-	#if 0
+#if 0
 	textprint(" Compare "); textprint(string1); textprint("\n");
 	textprint(" with    "); textprint(string2); textprint("\n");
 	/*WaitForReturn();*/
-	#endif
+#endif
 
+    /* Make a copy of string 1, adding the project subdirectory */
 
-	/* Make a copy of string 1, adding the project subdirectory */
+    srtmp1 = projectsubdirectory;
+    srtmp2 = fname1;
+    while (*srtmp1)
+        *srtmp2++ = *srtmp1++;
+    srtmp1 = string1;
+    while (*srtmp1)
+        *srtmp2++ = *srtmp1++;
+    *srtmp2 = 0;
 
-	srtmp1 = projectsubdirectory;
-	srtmp2 = fname1;
-	while(*srtmp1) *srtmp2++ = *srtmp1++;
-	srtmp1 = string1;
-	while(*srtmp1) *srtmp2++ = *srtmp1++;
-	*srtmp2 = 0;
+    /* Make a copy of string 2 */
 
-	/* Make a copy of string 2 */
+    srtmp1 = string2;
+    srtmp2 = fname2;
+    while (*srtmp1)
+        *srtmp2++ = *srtmp1++;
+    *srtmp2 = 0;
 
-	srtmp1 = string2;
-	srtmp2 = fname2;
-	while(*srtmp1) *srtmp2++ = *srtmp1++;
-	*srtmp2 = 0;
+    /* How long are they? */
 
-	/* How long are they? */
+    srtmp1 = fname1;
+    while (*srtmp1++ != 0)
+        slen1++;
 
-	srtmp1 = fname1;
-	while(*srtmp1++ != 0)
-		slen1++;
+    srtmp2 = fname2;
+    while (*srtmp2++ != 0)
+        slen2++;
 
-	srtmp2 = fname2;
-	while(*srtmp2++ != 0)
-		slen2++;
+    fname1[slen1] = 0; /* Term */
+    fname2[slen2] = 0;
 
-	fname1[slen1] = 0;	/* Term */
-	fname2[slen2] = 0;
-
-	#if 0
+#if 0
 	textprint("slen1 = %d, ", slen1);
 	textprint("slen2 = %d\n", slen2);
-	#endif
+#endif
 
-	#if 0
+#if 0
 	textprint(" Compare "); textprint(fname1); textprint("\n");
 	textprint(" with    "); textprint(fname2); textprint("\n");
 	/*WaitForReturn();*/
-	#endif
+#endif
 
+    GetDOSFilename(fname1);
+    GetDOSFilename(fname2);
 
-	GetDOSFilename(fname1);
-	GetDOSFilename(fname2);
+    if (slen1 != slen2) {
+        /*textprint("not same\n");*/
+        return No;
+    }
 
+    srtmp1 = fname1;
+    srtmp2 = fname2;
 
-	if(slen1 != slen2) {
-		/*textprint("not same\n");*/
-		return No;
-	}
-
-	srtmp1 = fname1;
-	srtmp2 = fname2;
-
-	#if 0
+#if 0
 	textprint(" Compare "); textprint(srtmp1); textprint("\n");
 	textprint(" with    "); textprint(srtmp2); textprint("\n");
 	WaitForReturn();
-	#endif
+#endif
 
-	for(i = slen1; i!=0; i--) {
-		if(*srtmp1++ != *srtmp2++) {
-			/*textprint("not same\n");*/
-			return No;
-		}
-	}
+    for (i = slen1; i != 0; i--) {
+        if (*srtmp1++ != *srtmp2++) {
+            /*textprint("not same\n");*/
+            return No;
+        }
+    }
 
-	/*textprint("same\n");*/
-	return Yes;
-
+    /*textprint("same\n");*/
+    return Yes;
 }
-
-
-
-
-
-
 
 /*
 
@@ -391,49 +365,40 @@ int CompareFilenameCH(char *string1, char *string2)
 int NearestColour(int rs, int gs, int bs, unsigned char *palette)
 
 {
+    int i;
+    VECTORCH p0;
+    VECTORCH p1;
+    int nearest_index;
+    int nearest_delta;
+    int d;
 
-	int i;
-	VECTORCH p0;
-	VECTORCH p1;
-	int nearest_index;
-	int nearest_delta;
-	int d;
+    p0.vx = rs;
+    p0.vy = gs;
+    p0.vz = bs;
 
+    nearest_index = 0;
+    nearest_delta = bigint;
 
-	p0.vx = rs;
-	p0.vy = gs;
-	p0.vz = bs;
+    for (i = 0; i < 256; i++) {
+        p1.vx = palette[0];
+        p1.vy = palette[1];
+        p1.vz = palette[2];
 
-	nearest_index = 0;
-	nearest_delta = bigint;
+        d = FandVD_Distance_3d(&p0, &p1);
 
-	for(i = 0; i < 256; i++) {
+        if (d < nearest_delta) {
+            nearest_delta = d;
+            nearest_index = i;
+        }
 
-		p1.vx = palette[0];
-		p1.vy = palette[1];
-		p1.vz = palette[2];
+        palette += 3;
+    }
 
-		d = FandVD_Distance_3d(&p0, &p1);
-
-		if(d < nearest_delta) {
-
-			nearest_delta = d;
-			nearest_index = i;
-
-		}
-
-		palette += 3;
-
-	}
-
-	return nearest_index;
-
+    return nearest_index;
 }
 
-
 /*************************************************************************/
 /*************************************************************************/
-
 
 /*
 
@@ -443,22 +408,21 @@ int NearestColour(int rs, int gs, int bs, unsigned char *palette)
 
 void InitialiseSystem()
 {
-	BOOL 		rc;
-	HINSTANCE hInstance = 0;
-	int nCmdShow = 1;
-	
+    BOOL rc;
+    HINSTANCE hInstance = 0;
+    int nCmdShow = 1;
+
     /*
 		Pick up processor type
 	*/
 
     ProcessorType = ReadProcessorType();
 
-    if ((ProcessorType == PType_PentiumMMX) ||
-	   (ProcessorType == PType_Klamath) ||
-	   (ProcessorType == PType_OffTopOfScale))
-	  MMXAvailable = TRUE;
-	else
-	  MMXAvailable = FALSE;
+    if ((ProcessorType == PType_PentiumMMX) || (ProcessorType == PType_Klamath)
+        || (ProcessorType == PType_OffTopOfScale))
+        MMXAvailable = TRUE;
+    else
+        MMXAvailable = FALSE;
 
     /*
 		Copy initial requests to current variables,
@@ -466,7 +430,7 @@ void InitialiseSystem()
 	*/
 
     VideoMode = VideoRequestMode;
-	WindowMode = WindowRequestMode;
+    WindowMode = WindowRequestMode;
 
     /*
 		Initialise dubious restart
@@ -529,11 +493,11 @@ void InitialiseSystem()
 #endif
 
     /* Initialise main window, windows procedure etc */
-	rc = InitialiseWindowsSystem(hInstance, nCmdShow, WinInitFull);
+    rc = InitialiseWindowsSystem(hInstance, nCmdShow, WinInitFull);
 
     /* Initialise input interface */
-    memset((void*)KeyboardInput, No, MAX_NUMBER_OF_INPUT_KEYS);
-	GotAnyKey = No;
+    memset((void *) KeyboardInput, No, MAX_NUMBER_OF_INPUT_KEYS);
+    GotAnyKey = No;
 
 #if 0 /* LINUX */
 	/* launch Direct Input */
@@ -545,24 +509,22 @@ void InitialiseSystem()
 
     /* Initialise textprint system */
     textprintPosX = 0;
-	textprintPosY = 0;
-	#if debug
-	InitPrintQueue();
-	#endif
+    textprintPosY = 0;
+#if debug
+    InitPrintQueue();
+#endif
 
-	#if SUPPORT_MMX
-	SelectMMXOptions();
-	#endif
+#if SUPPORT_MMX
+    SelectMMXOptions();
+#endif
 
-	{
-		/* CDF 4/2/97 */
-		extern void ConstructOneOverSinTable(void);
+    {
+        /* CDF 4/2/97 */
+        extern void ConstructOneOverSinTable(void);
 
-		ConstructOneOverSinTable();
-	}
-
+        ConstructOneOverSinTable();
+    }
 }
-
 
 /*
 
@@ -572,14 +534,13 @@ void InitialiseSystem()
 
 void ExitSystem(void)
 {
-	/* Game specific exit functions */
-	ExitGame();
+    /* Game specific exit functions */
+    ExitGame();
 
-
-	// Added by Mark so that Direct Sound exits cleanly
-	#if SOUND_ON
-	ExitSoundSystem();	// In ds_func.cpp
-	#endif
+// Added by Mark so that Direct Sound exits cleanly
+#if SOUND_ON
+    ExitSoundSystem(); // In ds_func.cpp
+#endif
 
     /* 
       Shaft DirectDraw and hit Direct3D 
@@ -590,10 +551,10 @@ void ExitSystem(void)
 	  rename it ReleaseDirectX sometime...
     */
 
-	ReleaseDirect3D();
+    ReleaseDirect3D();
 
-	/* Kill windows procedures */
-	ExitWindowsSystem();
+    /* Kill windows procedures */
+    ExitWindowsSystem();
 }
 
 /*
@@ -605,56 +566,52 @@ void ExitSystem(void)
 	significant a limitation...
 */
 
-
-
 void ResetFrameCounter(void)
 {
-	lastTickCount = timeGetTime();
-	
-	/* KJL 15:03:33 12/16/96 - I'm setting NormalFrameTime too, rather than checking that it's
-	non-zero everytime I have to divide by it, since it usually is zero on the first frame. */
-	NormalFrameTime = 65536 >> 4;
-	PrevNormalFrameTime = NormalFrameTime;
+    lastTickCount = timeGetTime();
 
-	RealFrameTime = NormalFrameTime;
-	FrameRate = 16;
-	GlobalFrameCounter=0;
-	CloakingPhase = 0;
-	
-	
-	RouteFinder_CallsThisFrame=0;
+    /* KJL 15:03:33 12/16/96 - I'm setting NormalFrameTime too, rather than checking that it's
+	non-zero everytime I have to divide by it, since it usually is zero on the first frame. */
+    NormalFrameTime = 65536 >> 4;
+    PrevNormalFrameTime = NormalFrameTime;
+
+    RealFrameTime = NormalFrameTime;
+    FrameRate = 16;
+    GlobalFrameCounter = 0;
+    CloakingPhase = 0;
+
+    RouteFinder_CallsThisFrame = 0;
 }
 void FrameCounterHandler(void)
 {
-	int newTickCount = timeGetTime();
-	int fcnt;
+    int newTickCount = timeGetTime();
+    int fcnt;
 
-	fcnt = newTickCount - lastTickCount;
-	lastTickCount = newTickCount;
+    fcnt = newTickCount - lastTickCount;
+    lastTickCount = newTickCount;
 
     if (fcnt == 0)
-	  fcnt = 1; /* for safety */
+        fcnt = 1; /* for safety */
 
-	FrameRate = TimerFrame / fcnt;
+    FrameRate = TimerFrame / fcnt;
 
-	PrevNormalFrameTime = NormalFrameTime;
-	NormalFrameTime = DIV_FIXED(fcnt,TimerFrame);
+    PrevNormalFrameTime = NormalFrameTime;
+    NormalFrameTime = DIV_FIXED(fcnt, TimerFrame);
 
-	RealFrameTime = NormalFrameTime;
+    RealFrameTime = NormalFrameTime;
 
-	{
-		if (TimeScale!=ONE_FIXED)
-		{
-			NormalFrameTime = MUL_FIXED(NormalFrameTime,TimeScale);
-		}
+    {
+        if (TimeScale != ONE_FIXED) {
+            NormalFrameTime = MUL_FIXED(NormalFrameTime, TimeScale);
+        }
+    }
+    /* cap NormalFrameTime if frame rate is really low */
+    if (NormalFrameTime > 16384)
+        NormalFrameTime = 16384;
+    GlobalFrameCounter++;
+    CloakingPhase += NormalFrameTime >> 5;
 
-	}
-	/* cap NormalFrameTime if frame rate is really low */
-	if (NormalFrameTime>16384) NormalFrameTime=16384;
-	GlobalFrameCounter++;
-	CloakingPhase += NormalFrameTime>>5;
-
-	RouteFinder_CallsThisFrame=0;
+    RouteFinder_CallsThisFrame = 0;
 }
 
 /*
@@ -675,22 +632,19 @@ void FrameCounterHandler(void)
 void WaitForReturn(void)
 
 {
-	/* Crude but probably serviceable for now */
-	long SavedTickCount;
-	SavedTickCount  = lastTickCount;
+    /* Crude but probably serviceable for now */
+    long SavedTickCount;
+    SavedTickCount = lastTickCount;
 
-/* Display any lingering text */
+    /* Display any lingering text */
     FlushTextprintBuffer();
-	FlipBuffers();
+    FlipBuffers();
 
-	while (!(KeyboardInput[KEY_CR]))
-	   DirectReadKeyboard();
+    while (!(KeyboardInput[KEY_CR]))
+        DirectReadKeyboard();
 
-	lastTickCount = SavedTickCount;
+    lastTickCount = SavedTickCount;
 }
-
-
-
 
 /*
 	By copying the globals here we guarantee
@@ -698,12 +652,11 @@ void WaitForReturn(void)
 	input values updated at a defined time
 */
 
-
 void ReadUserInput(void)
 {
-	DirectReadMouse();
+    DirectReadMouse();
     ReadJoysticks();
-	DirectReadKeyboard();
+    DirectReadKeyboard();
 }
 
 /*
@@ -714,22 +667,9 @@ void ReadUserInput(void)
 	may reactivate these.
 */
 
+void ReadKeyboard(void) {}
 
-
-void ReadKeyboard(void)
-
-{
-}
-
-
-void ReadMouse(void)
-
-{
-
-
-}
-
-
+void ReadMouse(void) {}
 
 /*
 	Not NECESSARILY the standard functionality,
@@ -739,34 +679,29 @@ void ReadMouse(void)
 void CursorHome(void)
 
 {
-/* Reset positions for textprint system */
-	textprintPosX = 0;
-	textprintPosY = 0;
+    /* Reset positions for textprint system */
+    textprintPosX = 0;
+    textprintPosY = 0;
 }
-
 
 void GetProjectFilename(char *fname, char *image)
 {
+    char *src;
+    char *dst;
 
-	char *src;
-	char *dst;
+    src = projectsubdirectory;
+    dst = fname;
 
+    while (*src)
+        *dst++ = *src++;
 
-	src = projectsubdirectory;
-	dst = fname;
+    src = image;
 
-	while(*src)
-		*dst++ = *src++;
+    while (*src)
+        *dst++ = *src++;
 
-	src = image;
-
-	while(*src)
-		*dst++ = *src++;
-
-	*dst = 0;
-
+    *dst = 0;
 }
-
 
 /*
 
@@ -783,30 +718,28 @@ void GetProjectFilename(char *fname, char *image)
 
 */
 
-TEXTURE* LoadImageCH(char *fname, IMAGEHEADER *iheader)
+TEXTURE *LoadImageCH(char *fname, IMAGEHEADER *iheader)
 {
-	return 0;
-}	
+    return 0;
+}
 
-
-void ConvertToDDPalette(unsigned char* src, unsigned char* dst, int length, int flags)
+void ConvertToDDPalette(unsigned char *src, unsigned char *dst, int length, int flags)
 {
-	int i;
+    int i;
 
-/*
+    /*
 	Copy palette, introducing flags and shifting up
 	to 8 bit triple
 */
 
-	for (i=0; i<length; i++)
-		{
-		 *dst++ = (*src++) << 2;
-		 *dst++ = (*src++) << 2;
-		 *dst++ = (*src++) << 2;
-		 *dst++ = flags; 
-		}
-}	
-		
+    for (i = 0; i < length; i++) {
+        *dst++ = (*src++) << 2;
+        *dst++ = (*src++) << 2;
+        *dst++ = (*src++) << 2;
+        *dst++ = flags;
+    }
+}
+
 /*
 
  Platform specific version of "printf()"
@@ -829,7 +762,6 @@ void ConvertToDDPalette(unsigned char* src, unsigned char* dst, int length, int 
 
 #if DHMtextprint
 
-
 /*
 	Dave Malcolm 21/11/96:
 
@@ -845,15 +777,15 @@ void ConvertToDDPalette(unsigned char* src, unsigned char* dst, int length, int 
 		- a y-offset that can be used to scroll up and down the text overlay output from textprint
 */
 
-	/* VERSION SETTINGS: */	
-		#define AutomaticNewLines	No
-			/* set this to Yes and you will get a \n inserted automatically at the end of each line */
-			#if AutomaticNewLines
-				#error Not yet written...
-			#endif
+/* VERSION SETTINGS: */
+#define AutomaticNewLines No
+/* set this to Yes and you will get a \n inserted automatically at the end of each line */
+#if AutomaticNewLines
+#error Not yet written...
+#endif
 
-	/* LOW LEVEL ASSERTION SUPPORT */
-		/*
+/* LOW LEVEL ASSERTION SUPPORT */
+/*
 			We cannot use standard assertions in this routine because this routine is called by the standard
 			assertion routine, and so would run the risk of infinite loops and excitingly obscure bugs.
 
@@ -861,36 +793,30 @@ void ConvertToDDPalette(unsigned char* src, unsigned char* dst, int length, int 
 		*/
 
 #if 1
-	#define LOWLEVELASSERT(ignore)
+#define LOWLEVELASSERT(ignore)
 #else
-		#if debug
+#if debug
 
-			#define LOWLEVELASSERT(x) \
-			     (void)									\
-			     (										\
-			     	(x) 								\
-			     	? 1 : (ReleaseDirect3D(),exit(GlobalAssertCode),0)	\
-			     )										
+#define LOWLEVELASSERT(x) (void) ((x) ? 1 : (ReleaseDirect3D(), exit(GlobalAssertCode), 0))
 
-		#else
-			/* Assertions are disabled at compile-time: */
-			#define LOWLEVELASSERT(ignore)
-		
-		#endif
+#else
+/* Assertions are disabled at compile-time: */
+#define LOWLEVELASSERT(ignore)
+
+#endif
 #endif
 
-
-	/* 
+/* 
 		We extract arguments into a buffer, with a dodgy hack to increase it in size to give more defence
 		against buffer overflows; there seems to be no easy & robust way to give vsprintf() a buffer size...
 
 		This buffer is reset once per string per frame
 	*/
-	#define PARANOIA_BYTES	(1024)
-	#define TEXTPRINT_BUFFER_SIZE	(MaxMsgChars+PARANOIA_BYTES+1)
-	static char TextprintBuffer[TEXTPRINT_BUFFER_SIZE]="";
+#define PARANOIA_BYTES (1024)
+#define TEXTPRINT_BUFFER_SIZE (MaxMsgChars + PARANOIA_BYTES + 1)
+static char TextprintBuffer[TEXTPRINT_BUFFER_SIZE] = "";
 
-	/*
+/*
 
 	The PRINTQUEUEITEM structure from PLATFORM.H is not used by my system; instead of queueing strings to be
 	displayed we do it on a character by character basis, with a limit on the total number of chars per frame.
@@ -904,29 +830,29 @@ void ConvertToDDPalette(unsigned char* src, unsigned char* dst, int length, int 
 
 	*/
 
-	typedef struct daveprintchar {
-		char CharToPrint;
-		int x,y;
-	} DAVEPRINTCHAR;
+typedef struct daveprintchar
+{
+    char CharToPrint;
+    int x, y;
+} DAVEPRINTCHAR;
 
-	#define DHM_PRINT_QUEUE_SIZE (MaxMsgChars*MaxMessages)
+#define DHM_PRINT_QUEUE_SIZE (MaxMsgChars * MaxMessages)
 
-	static DAVEPRINTCHAR DHM_PrintQueue[DHM_PRINT_QUEUE_SIZE];
-	static int DHM_NumCharsInQueue=0;
+static DAVEPRINTCHAR DHM_PrintQueue[DHM_PRINT_QUEUE_SIZE];
+static int DHM_NumCharsInQueue = 0;
 
-	static int fTextLost=No;
-	static char TextLostMessage[]="textprint warning:TEXT LOST";
-	#define TEXT_LOST_X	(50)
-	#define TEXT_LOST_Y	(20)
+static int fTextLost = No;
+static char TextLostMessage[] = "textprint warning:TEXT LOST";
+#define TEXT_LOST_X (50)
+#define TEXT_LOST_Y (20)
 
-	volatile int textprint_Y_offset=0;
-
+volatile int textprint_Y_offset = 0;
 
 /* Dave's version of initialising the print queue */
 void InitPrintQueue(void)
 {
-	DHM_NumCharsInQueue=0;
-	fTextLost=No;
+    DHM_NumCharsInQueue = 0;
+    fTextLost = No;
 }
 
 /*
@@ -944,326 +870,269 @@ void InitPrintQueue(void)
 void FlushTextprintBuffer(void)
 
 {
-	/* PRECONDITION: */
-	{
-		LOWLEVELASSERT(DHM_NumCharsInQueue<DHM_PRINT_QUEUE_SIZE);
-	}
+    /* PRECONDITION: */
+    {
+        LOWLEVELASSERT(DHM_NumCharsInQueue < DHM_PRINT_QUEUE_SIZE);
+    }
 
-	/* CODE: */
-	{
-		{
-			int i;
-			DAVEPRINTCHAR* pDPR=&DHM_PrintQueue[0];
+    /* CODE: */
+    {
+        {
+            int i;
+            DAVEPRINTCHAR *pDPR = &DHM_PrintQueue[0];
 
-			for (i=0; i<DHM_NumCharsInQueue; i++)
-			{
-			#if 0
+            for (i = 0; i < DHM_NumCharsInQueue; i++) {
+#if 0
 				BlitWin95Char
 				(
 					pDPR->x, 
 					pDPR->y,
 					pDPR->CharToPrint
 				);
-			#else 
-				D3D_BlitWhiteChar
-				(
-					pDPR->x, 
-					pDPR->y,
-					pDPR->CharToPrint
-				);
-			#endif
-				pDPR++;
-			}
+#else
+                D3D_BlitWhiteChar(pDPR->x, pDPR->y, pDPR->CharToPrint);
+#endif
+                pDPR++;
+            }
 
-			if (fTextLost)
-			{
-				/* Display error message in case test has been lost due to clipping of Y edge, or buffer overflow */
-				int i;
-				int NumChars=strlen(TextLostMessage);
+            if (fTextLost) {
+                /* Display error message in case test has been lost due to clipping of Y edge, or buffer overflow */
+                int i;
+                int NumChars = strlen(TextLostMessage);
 
-				for (i=0;i<NumChars;i++)
-				{
-	   //			   	BlitWin95Char(TEXT_LOST_X+(i*CharWidth),TEXT_LOST_Y,TextLostMessage[i]);
-				}
+                for (i = 0; i < NumChars; i++) {
+                    //			   	BlitWin95Char(TEXT_LOST_X+(i*CharWidth),TEXT_LOST_Y,TextLostMessage[i]);
+                }
 
-				fTextLost=No;
-			}
-		}
-		DHM_NumCharsInQueue=0;
-
-	}
+                fTextLost = No;
+            }
+        }
+        DHM_NumCharsInQueue = 0;
+    }
 }
 
 static int LastDisplayableXForChars(void)
 {
-	return ScreenDescriptorBlock.SDB_Width-CharWidth;
+    return ScreenDescriptorBlock.SDB_Width - CharWidth;
 }
 
 static int LastDisplayableYForChars(void)
 {
-	return ScreenDescriptorBlock.SDB_Height-CharHeight;
+    return ScreenDescriptorBlock.SDB_Height - CharHeight;
 }
 
-
-static void DHM_AddToQueue(int x,int y, char Ch)
+static void DHM_AddToQueue(int x, int y, char Ch)
 {
+    if ((y >= 0) && (y <= LastDisplayableYForChars())) {
+        if (DHM_NumCharsInQueue < DHM_PRINT_QUEUE_SIZE) {
+            DAVEPRINTCHAR *pDPR = &DHM_PrintQueue[DHM_NumCharsInQueue++];
+            /* We insert into the queue at this position, updating the length of the queue */
 
-	if
-	(
-		(y>=0)
-		&&
-		(y<=LastDisplayableYForChars())
-	)
-	{
-		if (DHM_NumCharsInQueue<DHM_PRINT_QUEUE_SIZE)
-		{
-			DAVEPRINTCHAR* pDPR=&DHM_PrintQueue[DHM_NumCharsInQueue++];
-			/* We insert into the queue at this position, updating the length of the queue */
-
-			pDPR->x=x;
-			pDPR->y=y;
-			pDPR->CharToPrint=Ch;
-		}
-		else
-		{
-			/* Otherwise the queue if full, we will have to ignore this char; set an error flag so we get a message*/
-			fTextLost=Yes;
-		}
-	}
-	else
-	{
-		/* Otherwise the text is off the top or bottom of the screen; set an error flag to get a message up*/
-		fTextLost=Yes;
-	}
+            pDPR->x = x;
+            pDPR->y = y;
+            pDPR->CharToPrint = Ch;
+        } else {
+            /* Otherwise the queue if full, we will have to ignore this char; set an error flag so we get a message*/
+            fTextLost = Yes;
+        }
+    } else {
+        /* Otherwise the text is off the top or bottom of the screen; set an error flag to get a message up*/
+        fTextLost = Yes;
+    }
 }
 
-static int DHM_MoveBufferToQueue(int* pPosX,int* pPosY,int fZeroLeftMargin)
+static int DHM_MoveBufferToQueue(int *pPosX, int *pPosY, int fZeroLeftMargin)
 {
-	/* 
+    /* 
 	Function takes two integers by reference (using pointers), and outputs whatever is in
 	the string buffer into the character queue, so that code can be shared by textprint() and textprintXY()
 
 	Returns "number of lines": any carriage returns or word wraps
 	*/
 
-	/* PRECONDITION */
-	{
-		LOWLEVELASSERT(pPosX);
-		LOWLEVELASSERT(pPosY);
-	}
+    /* PRECONDITION */
+    {
+        LOWLEVELASSERT(pPosX);
+        LOWLEVELASSERT(pPosY);
+    }
 
-	/* CODE */
-	{
-		int NumLines=0;
+    /* CODE */
+    {
+        int NumLines = 0;
 
-		int LeftMarginX;
+        int LeftMarginX;
 
-		if (fZeroLeftMargin)
-		{
-			LeftMarginX=0;
-		}
-		else
-		{
-			LeftMarginX=*pPosX;
-		}
+        if (fZeroLeftMargin) {
+            LeftMarginX = 0;
+        } else {
+            LeftMarginX = *pPosX;
+        }
 
+        /* Iterate through the string in the buffer, adding the individual characters to the queue */
+        {
+            char *pCh = &TextprintBuffer[0];
+            int SafetyCount = 0;
 
+            while (((*pCh) != '\0') && ((SafetyCount++) < MaxMsgChars)) {
+                switch (*pCh) {
+                case '\n': {
+                    /* Wrap around to next line.,. */
+                    (*pPosY) += HUD_FONT_HEIGHT;
+                    (*pPosX) = LeftMarginX;
+                    NumLines++;
 
-		/* Iterate through the string in the buffer, adding the individual characters to the queue */
-		{
-			char* pCh=&TextprintBuffer[0];
-			int SafetyCount=0;
+                } break;
+                default: {
+                    /* It is a standard character or a space */
+                    DHM_AddToQueue(*pPosX, (*pPosY) + textprint_Y_offset, *pCh);
 
-			while
-			(
-				((*pCh)!='\0')
-				&&
-				((SafetyCount++)<MaxMsgChars)
-			)
-			{
-				switch (*pCh)
-				{
-					case '\n':
-						{
-							/* Wrap around to next line.,. */
-							(*pPosY)+=HUD_FONT_HEIGHT;
-							(*pPosX)=LeftMarginX;
-							NumLines++;
-						
-						}
-						break;
-					default:
-						{
-							/* It is a standard character or a space */
-							DHM_AddToQueue(*pPosX,(*pPosY)+textprint_Y_offset, *pCh);
+                    (*pPosX) += AAFontWidths[(unsigned char) *pCh]; //CharWidthInPixels(*pCh);
 
-							(*pPosX)+=AAFontWidths[(unsigned char)*pCh];//CharWidthInPixels(*pCh);
+                    if ((*pPosX) > LastDisplayableXForChars()) {
+                        /* Wrap around to next line.,. */
+                        (*pPosY) += HUD_FONT_HEIGHT;
+                        (*pPosX) = LeftMarginX;
+                        NumLines++;
+                    }
+                }
+                }
 
-							if ((*pPosX)>LastDisplayableXForChars())
-							{
-								/* Wrap around to next line.,. */
-								(*pPosY)+=HUD_FONT_HEIGHT;
-								(*pPosX)=LeftMarginX;
-								NumLines++;
-							}
-						}
-				}
+                /* ...and on to the next character*/
+                pCh++;
+            }
+        }
 
-				/* ...and on to the next character*/
-				pCh++;
-			}
-		}
-		
-		/* Clear the string buffer */
-		{
-			TextprintBuffer[0]='\0';
-		}
+        /* Clear the string buffer */
+        {
+            TextprintBuffer[0] = '\0';
+        }
 
-		return NumLines;
-	}
-
+        return NumLines;
+    }
 }
 
-
-int textprint(const char* t, ...)
+int textprint(const char *t, ...)
 {
-	#if (debug && textprintOn)
-	if
-	(
-		bEnableTextprint
-	)	
-	{
-		/*
+#if (debug && textprintOn)
+    if (bEnableTextprint) {
+        /*
 		Get message string from arguments into buffer...
 		*/
-		{
-			va_list ap;
-		
-			va_start(ap, t);
-			vsprintf(&TextprintBuffer[0], t, ap);
-			va_end(ap);
-		}
+        {
+            va_list ap;
 
-		/* 
+            va_start(ap, t);
+            vsprintf(&TextprintBuffer[0], t, ap);
+            va_end(ap);
+        }
+
+        /* 
 		Attempt to trap buffer overflows...
 		*/
-		{
-			LOWLEVELASSERT(strlen(TextprintBuffer)<TextprintBuffer);
-		}
+        {
+            LOWLEVELASSERT(strlen(TextprintBuffer) < TextprintBuffer);
+        }
 
-		return DHM_MoveBufferToQueue(&textprintPosX,&textprintPosY,Yes);
+        return DHM_MoveBufferToQueue(&textprintPosX, &textprintPosY, Yes);
 
-		
-	}
-	else
-	{
-		// Run-time disabling of textprint()
-		return 0;
-	}
-	#else
-		/* Do nothing; hope the function call gets optimised away */
-		return 0;
-	#endif
+    } else {
+        // Run-time disabling of textprint()
+        return 0;
+    }
+#else
+    /* Do nothing; hope the function call gets optimised away */
+    return 0;
+#endif
 }
-int PrintDebuggingText(const char* t, ...)
+int PrintDebuggingText(const char *t, ...)
 {
-	/*
+    /*
 	Get message string from arguments into buffer...
 	*/
-	{
-		va_list ap;
-	
-		va_start(ap, t);
-		vsprintf(&TextprintBuffer[0], t, ap);
-		va_end(ap);
-	}
+    {
+        va_list ap;
 
-	/* 
+        va_start(ap, t);
+        vsprintf(&TextprintBuffer[0], t, ap);
+        va_end(ap);
+    }
+
+    /* 
 	Attempt to trap buffer overflows...
 	*/
-	{
-		LOWLEVELASSERT(strlen(TextprintBuffer)<TextprintBuffer);
-	}
+    {
+        LOWLEVELASSERT(strlen(TextprintBuffer) < TextprintBuffer);
+    }
 
-	return DHM_MoveBufferToQueue(&textprintPosX,&textprintPosY,Yes);
+    return DHM_MoveBufferToQueue(&textprintPosX, &textprintPosY, Yes);
 }
-int ReleasePrintDebuggingText(const char* t, ...)
+int ReleasePrintDebuggingText(const char *t, ...)
 {
-	/*
+    /*
 	Get message string from arguments into buffer...
 	*/
-	{
-		va_list ap;
-	
-		va_start(ap, t);
-		vsprintf(&TextprintBuffer[0], t, ap);
-		va_end(ap);
-	}
+    {
+        va_list ap;
 
-	/* 
+        va_start(ap, t);
+        vsprintf(&TextprintBuffer[0], t, ap);
+        va_end(ap);
+    }
+
+    /* 
 	Attempt to trap buffer overflows...
 	*/
-	{
-		LOWLEVELASSERT(strlen(TextprintBuffer)<TextprintBuffer);
-	}
+    {
+        LOWLEVELASSERT(strlen(TextprintBuffer) < TextprintBuffer);
+    }
 
-	return DHM_MoveBufferToQueue(&textprintPosX,&textprintPosY,Yes);
+    return DHM_MoveBufferToQueue(&textprintPosX, &textprintPosY, Yes);
 }
 
-
-int textprintXY(int x, int y, const char* t, ...)
+int textprintXY(int x, int y, const char *t, ...)
 
 {
-	#if (debug && textprintOn)
-	if
-	(
-		bEnableTextprintXY
-	)	
-	{
-		/*
+#if (debug && textprintOn)
+    if (bEnableTextprintXY) {
+        /*
 		Get message string from arguments into buffer...
 		*/
-		{
-			va_list ap;
-		
-			va_start(ap, t);
-			vsprintf(&TextprintBuffer[0], t, ap);
-			va_end(ap);
-		}
+        {
+            va_list ap;
 
-		/* 
+            va_start(ap, t);
+            vsprintf(&TextprintBuffer[0], t, ap);
+            va_end(ap);
+        }
+
+        /* 
 		Attempt to trap buffer overflows...
 		*/
-		{
-			LOWLEVELASSERT(strlen(TextprintBuffer)<TextprintBuffer);
-		}
+        {
+            LOWLEVELASSERT(strlen(TextprintBuffer) < TextprintBuffer);
+        }
 
-		{
-			int localX=x;
-			int localY=y;
+        {
+            int localX = x;
+            int localY = y;
 
-			return DHM_MoveBufferToQueue(&localX,&localY,No);
-		}
+            return DHM_MoveBufferToQueue(&localX, &localY, No);
+        }
 
-		
-	}
-	else
-	{
-		// Run-time disabling of textprint()
-		return 0;
-	}
-	#else
-	{
-		/* Do nothing; hope the function call gets optimised away */
+    } else {
+        // Run-time disabling of textprint()
+        return 0;
+    }
+#else
+    {
+        /* Do nothing; hope the function call gets optimised away */
 
-		return 0;
-	}
-	#endif
+        return 0;
+    }
+#endif
 }
 
-
-
-	/* 
+/* 
 	 *
 	 * 
 	
@@ -1287,7 +1156,6 @@ int textprintXY(int x, int y, const char* t, ...)
 	So there.
 */
 
-
 /*
 	IMPORTANT!!!!
 	Messages longer than MaxMsgChars are liable
@@ -1310,69 +1178,65 @@ int textprintXY(int x, int y, const char* t, ...)
 
 #if (debug && textprintOn)
 
-int textprint(const char* t, ...)
+int textprint(const char *t, ...)
 
 {
-	int i,j;
-	va_list ap;
-	char message[MaxMsgChars];
-	char outmsg[MaxMsgChars];
-	int numlines;
-	int CharCount;
-	int XPos=0;
+    int i, j;
+    va_list ap;
+    char message[MaxMsgChars];
+    char outmsg[MaxMsgChars];
+    int numlines;
+    int CharCount;
+    int XPos = 0;
 
-	va_start(ap, t);
+    va_start(ap, t);
 
-	vsprintf(&message[0], t, ap);
+    vsprintf(&message[0], t, ap);
 
-	va_end(ap);
+    va_end(ap);
 
     i = 0;
-	j = 0;
-	numlines = 0;
-	CharCount = strlen(&message[0]);
+    j = 0;
+    numlines = 0;
+    CharCount = strlen(&message[0]);
 
     /* Read through message buffer until we reach the terminator */
-    while ((i < CharCount) && (message[i] != '\0'))
-  	{
-    	outmsg[j++] = message[i];
-		XPos+=CharWidth;
+    while ((i < CharCount) && (message[i] != '\0')) {
+        outmsg[j++] = message[i];
+        XPos += CharWidth;
         /* newline within string */
-        if ((message[i] == '\n')||(XPos>ScreenDescriptorBlock.SDB_Width))
-	      {
-	       /* Display string and reset to start of next line */
-	       WriteStringToTextBuffer(textprintPosX, textprintPosY, 
-	              &outmsg[0]);
-		   textprintPosX = 0;
-		   textprintPosY += HUD_FONT_HEIGHT;
-		   XPos=0;
-		   /* Messages can pile up at bottom of screen */
-		   if (textprintPosY > ScreenDescriptorBlock.SDB_Height)
-		     textprintPosY = ScreenDescriptorBlock.SDB_Height;
-		   /* Clear output string and reset variables */
-		   {
-			int k;
-		    for (k=0; k<(j+1); k++)
-			  outmsg[k] = 0;
-		   }
-		   j = 0;
-		   /* Record number of lines output */
-		   numlines++;
-		  }
-		 i++;
-       }
+        if ((message[i] == '\n') || (XPos > ScreenDescriptorBlock.SDB_Width)) {
+            /* Display string and reset to start of next line */
+            WriteStringToTextBuffer(textprintPosX, textprintPosY, &outmsg[0]);
+            textprintPosX = 0;
+            textprintPosY += HUD_FONT_HEIGHT;
+            XPos = 0;
+            /* Messages can pile up at bottom of screen */
+            if (textprintPosY > ScreenDescriptorBlock.SDB_Height)
+                textprintPosY = ScreenDescriptorBlock.SDB_Height;
+            /* Clear output string and reset variables */
+            {
+                int k;
+                for (k = 0; k < (j + 1); k++)
+                    outmsg[k] = 0;
+            }
+            j = 0;
+            /* Record number of lines output */
+            numlines++;
+        }
+        i++;
+    }
 
-	/* Flush any remaining characters */
-	WriteStringToTextBuffer(textprintPosX, textprintPosY, 
-	     &outmsg[0]);
+    /* Flush any remaining characters */
+    WriteStringToTextBuffer(textprintPosX, textprintPosY, &outmsg[0]);
     textprintPosX = 0;
-	textprintPosY += HUD_FONT_HEIGHT;
-	/* Messages can pile up at bottom of screen */
-	if (textprintPosY > ScreenDescriptorBlock.SDB_Height)
-	  textprintPosY = ScreenDescriptorBlock.SDB_Height;
-	numlines++;
+    textprintPosY += HUD_FONT_HEIGHT;
+    /* Messages can pile up at bottom of screen */
+    if (textprintPosY > ScreenDescriptorBlock.SDB_Height)
+        textprintPosY = ScreenDescriptorBlock.SDB_Height;
+    numlines++;
 
-	return numlines;
+    return numlines;
 }
 
 /*
@@ -1383,39 +1247,38 @@ int textprint(const char* t, ...)
 	function will be IGNORED.
 */
 
-int textprintXY(int x, int y, const char* t, ...)
+int textprintXY(int x, int y, const char *t, ...)
 
 {
-	va_list ap;
-	char message[MaxMsgChars];
+    va_list ap;
+    char message[MaxMsgChars];
 
-	va_start(ap, t);
+    va_start(ap, t);
 
-	vsprintf(&message[0], t, ap);
+    vsprintf(&message[0], t, ap);
 
-	va_end(ap);
+    va_end(ap);
 
-	WriteStringToTextBuffer(x, y, &message[0]);
+    WriteStringToTextBuffer(x, y, &message[0]);
 
-	return 1; /* for one line */
+    return 1; /* for one line */
 }
 
 #else
 
-int textprint(const char* t, ...)
+int textprint(const char *t, ...)
 
 {
-	return 0;
+    return 0;
 }
 
-int textprintXY(int x, int y, const char* t, ...)
+int textprintXY(int x, int y, const char *t, ...)
 
 {
-	return 0;
+    return 0;
 }
 
 #endif
-
 
 /*
 	Add string to text buffer 
@@ -1424,18 +1287,16 @@ int textprintXY(int x, int y, const char* t, ...)
 void WriteStringToTextBuffer(int x, int y, unsigned char *buffer)
 
 {
-	if (MessagesStoredThisFrame < MaxMessages)
-	  {
-	   strcpy(PrintQueue[MessagesStoredThisFrame].text, buffer);
+    if (MessagesStoredThisFrame < MaxMessages) {
+        strcpy(PrintQueue[MessagesStoredThisFrame].text, buffer);
 
-       PrintQueue[MessagesStoredThisFrame].text_length = strlen(buffer);
-	   PrintQueue[MessagesStoredThisFrame].x = x;
-	   PrintQueue[MessagesStoredThisFrame].y = y;
+        PrintQueue[MessagesStoredThisFrame].text_length = strlen(buffer);
+        PrintQueue[MessagesStoredThisFrame].x = x;
+        PrintQueue[MessagesStoredThisFrame].y = y;
 
-	   MessagesStoredThisFrame++;
-	  }
+        MessagesStoredThisFrame++;
+    }
 }
-
 
 /*
 	Display string of chracters, starting at passed pointer,
@@ -1445,39 +1306,33 @@ void WriteStringToTextBuffer(int x, int y, unsigned char *buffer)
 	this routine, at least...
 */
 
-
 void DisplayWin95String(int x, int y, unsigned char *buffer)
 
 {
-	int InitialX=x;
-	int stlen;
-	unsigned char ch;
+    int InitialX = x;
+    int stlen;
+    unsigned char ch;
 
-	stlen = strlen(buffer);
+    stlen = strlen(buffer);
 
-    do
-	  {
-       ch = (unsigned char) *buffer;
-	   BlitWin95Char(x, y, ch);
-	   x += CharWidth;
-	   if (x > (ScreenDescriptorBlock.SDB_Width 
-	       - CharWidth))
-		{
-			#if 1
-				/* Wrap to new line, based on coordinates for display...*/
-				x=InitialX;
-				y+=HUD_FONT_HEIGHT;
-			#else
-			   	/* Characters will pile up at screen edge */
-				x = (ScreenDescriptorBlock.SDB_Width - CharWidth);
-			#endif
-		}
-	   
-	   buffer++;
-	   stlen--;
-	  }
-	while ((ch != '\n') && (ch != '\0') &&
-	      (stlen > 0));
+    do {
+        ch = (unsigned char) *buffer;
+        BlitWin95Char(x, y, ch);
+        x += CharWidth;
+        if (x > (ScreenDescriptorBlock.SDB_Width - CharWidth)) {
+#if 1
+            /* Wrap to new line, based on coordinates for display...*/
+            x = InitialX;
+            y += HUD_FONT_HEIGHT;
+#else
+            /* Characters will pile up at screen edge */
+            x = (ScreenDescriptorBlock.SDB_Width - CharWidth);
+#endif
+        }
+
+        buffer++;
+        stlen--;
+    } while ((ch != '\n') && (ch != '\0') && (stlen > 0));
 }
 
 /*
@@ -1491,21 +1346,19 @@ void DisplayWin95String(int x, int y, unsigned char *buffer)
 void FlushTextprintBuffer(void)
 
 {
-	int i;
+    int i;
 
-    for (i=0; i<MessagesStoredThisFrame; i++)
-	  {
-	   if (PrintQueue[i].text_length)
-	     DisplayWin95String(PrintQueue[i].x, 
-	        PrintQueue[i].y, PrintQueue[i].text);
+    for (i = 0; i < MessagesStoredThisFrame; i++) {
+        if (PrintQueue[i].text_length)
+            DisplayWin95String(PrintQueue[i].x, PrintQueue[i].y, PrintQueue[i].text);
 
-       /* 
+        /* 
          More mystery code from Roxby --- an extra safety
 		 check for printing?? Or a hangover from a linked
 		 list version of the data structure???
 	   */
-       PrintQueue[i].text_length = 0;
-	  }
+        PrintQueue[i].text_length = 0;
+    }
 
     MessagesStoredThisFrame = 0;
 }
@@ -1515,17 +1368,17 @@ void FlushTextprintBuffer(void)
 void InitPrintQueue(void)
 
 {
-	int i;
+    int i;
 
     /* Mystery code from Roxby here... */
-    for (i=0; i < MaxMessages; i++)
-	   PrintQueue[i].text_length = 0;
+    for (i = 0; i < MaxMessages; i++)
+        PrintQueue[i].text_length = 0;
 
     MessagesStoredThisFrame = 0;
 }
 
 #endif
-	/*end of old version of text routines */
+/*end of old version of text routines */
 
 /*
 	Load main, 8 bit paletted, font 
@@ -1542,8 +1395,6 @@ void InitPrintQueue(void)
 	i.e. AFTER SetVideoMode.
 	AND ONLY ONCE!!!!
 */
-
-
 
 /*
 	This function is intended to allow YOU,
@@ -1588,21 +1439,26 @@ void InitPrintQueue(void)
 	WITHOUT A SHAPE RELOAD!!!
 */
 
-int ChangeDisplayModes(HINSTANCE hInst, int nCmd, 
-     int NewVideoMode, int NewWindowMode,
-     int NewZBufferMode, int NewRasterisationMode, 
-     int NewSoftwareScanDrawMode, int NewDXMemoryMode)
+int ChangeDisplayModes(
+    HINSTANCE hInst,
+    int nCmd,
+    int NewVideoMode,
+    int NewWindowMode,
+    int NewZBufferMode,
+    int NewRasterisationMode,
+    int NewSoftwareScanDrawMode,
+    int NewDXMemoryMode)
 {
     BOOL rc;
-	BOOL ChangeWindow = No;
+    BOOL ChangeWindow = No;
 
-/*
+    /*
 	Shut down DirectX objects and destroy
 	the current window, if necessary.
 */
 
     if (NewWindowMode != WindowMode)
-	  ChangeWindow = Yes;
+        ChangeWindow = Yes;
 
     DeallocateAllImages();
 
@@ -1610,32 +1466,31 @@ int ChangeDisplayModes(HINSTANCE hInst, int nCmd,
 
     finiObjectsExceptDD();
 
-
     if (ChangeWindow)
-      ExitWindowsSystem(); 
+        ExitWindowsSystem();
 
-/* Test!! */
+    /* Test!! */
 
-/*
+    /*
 	Set the request modes and actual modes
 	according to the passed values.
 */
 
     VideoRequestMode = NewVideoMode;
     WindowRequestMode = NewWindowMode;
-	ZBufferRequestMode = NewZBufferMode;
-	RasterisationRequestMode = NewRasterisationMode;
-	SoftwareScanDrawRequestMode = NewSoftwareScanDrawMode;
-	DXMemoryRequestMode = NewDXMemoryMode;
+    ZBufferRequestMode = NewZBufferMode;
+    RasterisationRequestMode = NewRasterisationMode;
+    SoftwareScanDrawRequestMode = NewSoftwareScanDrawMode;
+    DXMemoryRequestMode = NewDXMemoryMode;
 
     VideoMode = VideoRequestMode;
-	WindowMode = WindowRequestMode;
+    WindowMode = WindowRequestMode;
 
-	/* this may reconstruct the dd object depending
+    /* this may reconstruct the dd object depending
 	   on the rasterisation request mode and whether
 	   a hardware dd driver is selected or could be
 	   available */
-	ChangeDirectDrawObject();
+    ChangeDirectDrawObject();
 
     /*
 	  Check that our new video mode exists,
@@ -1643,40 +1498,34 @@ int ChangeDisplayModes(HINSTANCE hInst, int nCmd,
 	  we can find one.
 	*/
 
-    #if CheckVideoModes
-	if (WindowMode == WindowModeFullScreen)
-	  {
-	   if (!(CheckForVideoModes(VideoMode)))
-	     {
-	      VideoMode = VideoMode_DX_640x480x8;
-	      if (!(CheckForVideoModes(VideoMode)))
-	        {
-		     VideoMode = VideoMode_DX_640x480x15;
-		     if (!(CheckForVideoModes(VideoMode)))
-		       {
-			    ReleaseDirect3D(); // for safety
-			    return FALSE;
-			   }
-		    } 
-	     }
-	  }
-	#endif
+#if CheckVideoModes
+    if (WindowMode == WindowModeFullScreen) {
+        if (!(CheckForVideoModes(VideoMode))) {
+            VideoMode = VideoMode_DX_640x480x8;
+            if (!(CheckForVideoModes(VideoMode))) {
+                VideoMode = VideoMode_DX_640x480x15;
+                if (!(CheckForVideoModes(VideoMode))) {
+                    ReleaseDirect3D(); // for safety
+                    return FALSE;
+                }
+            }
+        }
+    }
+#endif
 
-/*
+    /*
 	Recreate the window, allowing
 	for possible change in WindowMode.
 */
 
-    if (ChangeWindow)
-	  {
-	   rc = InitialiseWindowsSystem(hInst, nCmd, 
-	      WinInitChange);
+    if (ChangeWindow) {
+        rc = InitialiseWindowsSystem(hInst, nCmd, WinInitChange);
 
-       if (rc == FALSE)
-	     return rc;
-	  }
+        if (rc == FALSE)
+            return rc;
+    }
 
-/*
+    /*
 	Set the video mode again.  This
 	will handle all changes to DirectDraw
 	objects, all Direct3D initialisation,
@@ -1693,44 +1542,41 @@ int ChangeDisplayModes(HINSTANCE hInst, int nCmd,
 		FIXME!!!
 	*/
 
-/*
+    /*
     SetVideoMode[VideoMode]();
 */
 
-/*
+    /*
 	Lose all the textures and reload the 
 	debugging font
 */
 
     InitialiseTextures();
 
-
-/*
+    /*
 	Well, we HOPE it's okay...
 */
 
     return TRUE;
 }
 
-
 /*
 	Reverse of ConvertToDDPalette, introduced
 	to maintain internal interfaces only...
 */
 
-void ConvertDDToInternalPalette(unsigned char* src, unsigned char* dst, int length)
+void ConvertDDToInternalPalette(unsigned char *src, unsigned char *dst, int length)
 {
-	int i;
+    int i;
 
-/*
+    /*
 	Copy palette, shifting down
 	to 5 bit triple
 */
 
-	for (i=0; i<length; i++)
-		{
-		 *dst++ = (*src++) >> 2;
-		 *dst++ = (*src++) >> 2;
-		 *dst++ = (*src++) >> 2;
-		}
-}	
+    for (i = 0; i < length; i++) {
+        *dst++ = (*src++) >> 2;
+        *dst++ = (*src++) >> 2;
+        *dst++ = (*src++) >> 2;
+    }
+}

@@ -7,30 +7,28 @@
 
 #ifdef __cplusplus
 
-	extern "C" {
+extern "C" {
 
 #endif
 
 typedef struct loaded_sound
 {
-	int sound_num;
-	
-	char * wavname;
-	int num_attached;
-	
-	unsigned long permanent :1;
-	
+    int sound_num;
+
+    char *wavname;
+    int num_attached;
+
+    unsigned long permanent : 1;
+
 } LOADED_SOUND;
 
-
-void LoseSound (LOADED_SOUND const * ls);
-LOADED_SOUND const * GetSound (char const * fname);
+void LoseSound(LOADED_SOUND const *ls);
+LOADED_SOUND const *GetSound(char const *fname);
 
 #ifdef __cplusplus
 
-	}; // end of extern "c"
+}; // end of extern "c"
 
 #endif
-
 
 #endif

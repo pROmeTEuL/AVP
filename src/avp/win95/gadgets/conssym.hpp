@@ -11,16 +11,16 @@
 #ifndef _conssym_hpp
 #define _conssym_hpp 1
 
-	#if defined( _MSC_VER )
-		#pragma once
-	#endif
+#if defined(_MSC_VER)
+#pragma once
+#endif
 
-	#ifndef _scstring
-	#include "scstring.hpp"
-	#endif	
+#ifndef _scstring
+#include "scstring.hpp"
+#endif
 
 #ifdef __cplusplus
-	extern "C" {
+extern "C" {
 #endif
 
 /* Version settings *****************************************************/
@@ -31,10 +31,10 @@
 
 /* Type definitions *****************************************************/
 
-	class ConsoleSymbol
-	{
-		friend class TextInputState;
-			/*	WARNING!
+class ConsoleSymbol
+{
+    friend class TextInputState;
+    /*	WARNING!
 
 				TextInputState objects can refer to the list of ConsoleSymbols
 				in order to iterate through possible completion strings.  For
@@ -43,44 +43,32 @@
 				(I believe I've asserted against all such possible failures)
 			*/
 
-	public:
-	
-	OurBool ThisIsACheat;
-	protected:
-		ConsoleSymbol
-		(
-			ProjChar* pProjCh_ToUse
-		);
-		
+public:
+    OurBool ThisIsACheat;
 
-		SCString* pSCString_Symbol;
+protected:
+    ConsoleSymbol(ProjChar *pProjCh_ToUse);
 
-	public:
-		SCString* GetpSCString(void) const
-		{
-			return pSCString_Symbol; 
-		}
+    SCString *pSCString_Symbol;
 
+public:
+    SCString *GetpSCString(void) const { return pSCString_Symbol; }
 
-	private:
-		
-		static List <ConsoleSymbol *> List_pConsoleSym;
+private:
+    static List<ConsoleSymbol *> List_pConsoleSym;
 
-	public:
-		virtual ~ConsoleSymbol();
-	};	// suggested naming: "ConsoleSym"
+public:
+    virtual ~ConsoleSymbol();
+}; // suggested naming: "ConsoleSym"
 
 /* Exported globals *****************************************************/
 
 /* Function prototypes **************************************************/
 
-
-
 /* End of the header ****************************************************/
 
-
 #ifdef __cplusplus
-	};
+};
 #endif
 
 #endif

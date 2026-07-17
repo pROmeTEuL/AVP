@@ -5,40 +5,37 @@
  *
  */
 
-enum COLLISION_EXTENTS_ID
-{
-	CE_MARINE,
+enum COLLISION_EXTENTS_ID {
+    CE_MARINE,
 
-	CE_PREDATOR,
-	
-	CE_ALIEN,
+    CE_PREDATOR,
 
-	CE_XENOBORG,
-	
-	CE_PREDATORALIEN,
-	
-	CE_FACEHUGGER,
+    CE_ALIEN,
 
-	CE_QUEEN,
+    CE_XENOBORG,
 
-	CE_CORPSE,
+    CE_PREDATORALIEN,
 
-	MAX_NO_OF_COLLISION_EXTENTS
+    CE_FACEHUGGER,
+
+    CE_QUEEN,
+
+    CE_CORPSE,
+
+    MAX_NO_OF_COLLISION_EXTENTS
 };
-
 
 typedef struct
 {
-	/* radius of shape in XZ plane */
-	int CollisionRadius;
+    /* radius of shape in XZ plane */
+    int CollisionRadius;
 
-	/* height extents */
-	int Bottom; /* ie. max Y of the shape */
+    /* height extents */
+    int Bottom; /* ie. max Y of the shape */
 
-	int StandingTop;
-	int CrouchingTop;
+    int StandingTop;
+    int CrouchingTop;
 
 } COLLISION_EXTENTS;
-
 
 extern COLLISION_EXTENTS CollisionExtents[];

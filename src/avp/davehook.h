@@ -11,7 +11,7 @@
 #define _davehook 1
 
 #ifdef __cplusplus
-	extern "C" {
+extern "C" {
 #endif
 
 /* Version settings *****************************************************/
@@ -25,21 +25,17 @@
 /* Exported globals *****************************************************/
 
 /* Function prototypes **************************************************/
-	extern void DAVEHOOK_Init(void);
-	extern void DAVEHOOK_UnInit(void);
-	extern void DAVEHOOK_Maintain(void);
+extern void DAVEHOOK_Init(void);
+extern void DAVEHOOK_UnInit(void);
+extern void DAVEHOOK_Maintain(void);
 
-	extern void DAVEHOOK_ScreenModeChange_Setup(void);
-	extern void DAVEHOOK_ScreenModeChange_Cleanup(void);
-
-
-
+extern void DAVEHOOK_ScreenModeChange_Setup(void);
+extern void DAVEHOOK_ScreenModeChange_Cleanup(void);
 
 /* End of the header ****************************************************/
 
-
 #ifdef __cplusplus
-	};
+};
 #endif
 
 #endif

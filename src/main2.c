@@ -83,95 +83,91 @@ static int ViewportWidth;
 static int ViewportHeight;
 
 /* originally was "/usr/lib/libGL.so.1:/usr/lib/tls/libGL.so.1:/usr/X11R6/lib/libGL.so" */
-static const char * opengl_library = NULL;
+static const char *opengl_library = NULL;
 
 /* ** */
 
 static void IngameKeyboardInput_ClearBuffer(void)
 {
-	// clear the keyboard state
-	memset((void*) KeyboardInput, 0, MAX_NUMBER_OF_INPUT_KEYS);
-	GotAnyKey = 0;
+    // clear the keyboard state
+    memset((void *) KeyboardInput, 0, MAX_NUMBER_OF_INPUT_KEYS);
+    GotAnyKey = 0;
 }
 
-void DirectReadKeyboard()
-{
-}
+void DirectReadKeyboard() {}
 
-void DirectReadMouse()
-{
-}
+void DirectReadMouse() {}
 
 void ReadJoysticks()
 {
-	int axes, balls, hats;
-	Uint8 hat;
-	
-	JoystickData.dwXpos = 0;
-	JoystickData.dwYpos = 0;
-	JoystickData.dwRpos = 0;
-	JoystickData.dwUpos = 0;
-	JoystickData.dwVpos = 0;
-	JoystickData.dwPOV = (DWORD) -1;	
-	
-	if (joy == NULL || !GotJoystick) {
-		return;
-	}
+    int axes, balls, hats;
+    Uint8 hat;
 
-	SDL_JoystickUpdate();
-	
-	axes = SDL_JoystickNumAxes(joy);
-	balls = SDL_JoystickNumBalls(joy);
-	hats = SDL_JoystickNumHats(joy);
-	
-	if (axes > 0) {
-		JoystickData.dwXpos = SDL_JoystickGetAxis(joy, 0) + 32768;
-	}
-	if (axes > 1) {
-		JoystickData.dwYpos = SDL_JoystickGetAxis(joy, 1) + 32768;
-	}
-	
-	if (hats > 0) {
-		hat = SDL_JoystickGetHat(joy, 0);
-		
-		switch (hat) {
-			default:
-			case SDL_HAT_CENTERED:
-				JoystickData.dwPOV = (DWORD) -1;
-				break;
-			case SDL_HAT_UP:
-				JoystickData.dwPOV = 0;
-				break;
-			case SDL_HAT_RIGHT:
-				JoystickData.dwPOV = 9000;
-				break;
-			case SDL_HAT_DOWN:
-				JoystickData.dwPOV = 18000;
-				break;
-			case SDL_HAT_LEFT:
-				JoystickData.dwPOV = 27000;
-				break;
-			case SDL_HAT_RIGHTUP:
-				JoystickData.dwPOV = 4500;
-				break;
-			case SDL_HAT_RIGHTDOWN:
-				JoystickData.dwPOV = 13500;
-				break;
-			case SDL_HAT_LEFTUP:
-				JoystickData.dwPOV = 31500;
-				break;
-			case SDL_HAT_LEFTDOWN:
-				JoystickData.dwPOV = 22500;
-				break;
-		}
-	}
+    JoystickData.dwXpos = 0;
+    JoystickData.dwYpos = 0;
+    JoystickData.dwRpos = 0;
+    JoystickData.dwUpos = 0;
+    JoystickData.dwVpos = 0;
+    JoystickData.dwPOV = (DWORD) -1;
+
+    if (joy == NULL || !GotJoystick) {
+        return;
+    }
+
+    SDL_JoystickUpdate();
+
+    axes = SDL_JoystickNumAxes(joy);
+    balls = SDL_JoystickNumBalls(joy);
+    hats = SDL_JoystickNumHats(joy);
+
+    if (axes > 0) {
+        JoystickData.dwXpos = SDL_JoystickGetAxis(joy, 0) + 32768;
+    }
+    if (axes > 1) {
+        JoystickData.dwYpos = SDL_JoystickGetAxis(joy, 1) + 32768;
+    }
+
+    if (hats > 0) {
+        hat = SDL_JoystickGetHat(joy, 0);
+
+        switch (hat) {
+        default:
+        case SDL_HAT_CENTERED:
+            JoystickData.dwPOV = (DWORD) -1;
+            break;
+        case SDL_HAT_UP:
+            JoystickData.dwPOV = 0;
+            break;
+        case SDL_HAT_RIGHT:
+            JoystickData.dwPOV = 9000;
+            break;
+        case SDL_HAT_DOWN:
+            JoystickData.dwPOV = 18000;
+            break;
+        case SDL_HAT_LEFT:
+            JoystickData.dwPOV = 27000;
+            break;
+        case SDL_HAT_RIGHTUP:
+            JoystickData.dwPOV = 4500;
+            break;
+        case SDL_HAT_RIGHTDOWN:
+            JoystickData.dwPOV = 13500;
+            break;
+        case SDL_HAT_LEFTUP:
+            JoystickData.dwPOV = 31500;
+            break;
+        case SDL_HAT_LEFTDOWN:
+            JoystickData.dwPOV = 22500;
+            break;
+        }
+    }
 }
 
 /* ** */
 
 unsigned char *GetScreenShot24(int *width, int *height)
 {
-#if 0//REVIEW
+#if 0 //REVIEW
 	unsigned char *buf;
 //	Uint16 redtable[256], greentable[256], bluetable[256];
 	
@@ -237,141 +233,140 @@ unsigned char *GetScreenShot24(int *width, int *height)
 #endif	
 	return buf;
 #endif
-	return NULL;
+    return NULL;
 }
 
 /* ** */
 
 PROCESSORTYPES ReadProcessorType()
 {
-	return PType_PentiumMMX;
+    return PType_PentiumMMX;
 }
 
 /* ** */
 
 typedef struct VideoModeStruct
 {
-	int w;
-	int h;
-	int available;
+    int w;
+    int h;
+    int available;
 } VideoModeStruct;
-VideoModeStruct VideoModeList[] = {
-	{ 	512, 	384,	0	},
-	{	640,	480,	0	},
-	{	800,	600,	0	},
-	{	1024,	768,	0	},
-	{	1152,	864,	0	},
-	{	1280,   720,	0	},
-	{	1280,	960,	0	},
-	{	1280,	1024,	0	},
-	{	1600,	1200,	0	},
-	{	1920,	1080,	0	}
-};
+VideoModeStruct VideoModeList[]
+    = {{512, 384, 0},
+       {640, 480, 0},
+       {800, 600, 0},
+       {1024, 768, 0},
+       {1152, 864, 0},
+       {1280, 720, 0},
+       {1280, 960, 0},
+       {1280, 1024, 0},
+       {1600, 1200, 0},
+       {1920, 1080, 0}};
 
 int CurrentVideoMode;
 const int TotalVideoModes = sizeof(VideoModeList) / sizeof(VideoModeList[0]);
 
 void LoadDeviceAndVideoModePreferences()
 {
-	FILE *fp;
-	int mode;
-	
-	fp = OpenGameFile("AvP_TempVideo.cfg", FILEMODE_READONLY, FILETYPE_CONFIG);
-	
-	if (fp != NULL) {
-	 	if (fscanf(fp, "%d", &mode) == 1) {
-			fclose(fp);
-		
-			if (mode >= 0 && mode < TotalVideoModes && VideoModeList[mode].available) {
-				CurrentVideoMode = mode;
-				return;
-			}
-		} else {
-			fclose(fp);
-		}
-	}
-	
-	/* No, or invalid, mode found */
-	
-	/* Try 640x480 first */
-	if (VideoModeList[1].available) {
-		CurrentVideoMode = 1;
-	} else {
-		int i;
-		
-		for (i = 0; i < TotalVideoModes; i++) {
-			if (VideoModeList[i].available) {
-				CurrentVideoMode = i;
-				break;
-			}
-		}
-	}
+    FILE *fp;
+    int mode;
+
+    fp = OpenGameFile("AvP_TempVideo.cfg", FILEMODE_READONLY, FILETYPE_CONFIG);
+
+    if (fp != NULL) {
+        if (fscanf(fp, "%d", &mode) == 1) {
+            fclose(fp);
+
+            if (mode >= 0 && mode < TotalVideoModes && VideoModeList[mode].available) {
+                CurrentVideoMode = mode;
+                return;
+            }
+        } else {
+            fclose(fp);
+        }
+    }
+
+    /* No, or invalid, mode found */
+
+    /* Try 640x480 first */
+    if (VideoModeList[1].available) {
+        CurrentVideoMode = 1;
+    } else {
+        int i;
+
+        for (i = 0; i < TotalVideoModes; i++) {
+            if (VideoModeList[i].available) {
+                CurrentVideoMode = i;
+                break;
+            }
+        }
+    }
 }
 
 void SaveDeviceAndVideoModePreferences()
 {
-	FILE *fp;
-	
-	fp = OpenGameFile("AvP_TempVideo.cfg", FILEMODE_WRITEONLY, FILETYPE_CONFIG);
-	if (fp != NULL) {
-		fprintf(fp, "%d\n", CurrentVideoMode);
-		fclose(fp);
-	}
+    FILE *fp;
+
+    fp = OpenGameFile("AvP_TempVideo.cfg", FILEMODE_WRITEONLY, FILETYPE_CONFIG);
+    if (fp != NULL) {
+        fprintf(fp, "%d\n", CurrentVideoMode);
+        fclose(fp);
+    }
 }
 
 void PreviousVideoMode2()
 {
-	int cur = CurrentVideoMode;
+    int cur = CurrentVideoMode;
 
-	do {
-		if (cur == 0)
-			cur = TotalVideoModes;	
-		cur--;
-		if (cur == CurrentVideoMode)
-			return;
-	} while(!VideoModeList[cur].available);
-	
-	CurrentVideoMode = cur;
+    do {
+        if (cur == 0)
+            cur = TotalVideoModes;
+        cur--;
+        if (cur == CurrentVideoMode)
+            return;
+    } while (!VideoModeList[cur].available);
+
+    CurrentVideoMode = cur;
 }
 
 void NextVideoMode2()
 {
-	int cur = CurrentVideoMode;
+    int cur = CurrentVideoMode;
 
-	do {
-		cur++;
-		if (cur == TotalVideoModes)
-			cur = 0;
+    do {
+        cur++;
+        if (cur == TotalVideoModes)
+            cur = 0;
 
-		if (cur == CurrentVideoMode)
-			return;
-	} while(!VideoModeList[cur].available);
-	
-	CurrentVideoMode = cur;
+        if (cur == CurrentVideoMode)
+            return;
+    } while (!VideoModeList[cur].available);
+
+    CurrentVideoMode = cur;
 }
 
 char *GetVideoModeDescription2()
 {
-	return "SDL2";
+    return "SDL2";
 }
 
 char *GetVideoModeDescription3()
 {
-	static char buf[64];
-	
-	_snprintf(buf, 64, "%dx%d", VideoModeList[CurrentVideoMode].w, VideoModeList[CurrentVideoMode].h);
+    static char buf[64];
 
-	return buf;
+    _snprintf(buf, 64, "%dx%d", VideoModeList[CurrentVideoMode].w, VideoModeList[CurrentVideoMode].h);
+
+    return buf;
 }
 
 int InitSDL()
 {
-	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
-		fprintf(stderr, "SDL Init failed: %s\n", SDL_GetError());
-		exit(EXIT_FAILURE);
-	}
+    if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+        fprintf(stderr, "SDL Init failed: %s\n", SDL_GetError());
+        exit(EXIT_FAILURE);
+    }
 
-	atexit(SDL_Quit);
+    atexit(SDL_Quit);
 
 #if 0
 	SDL_Rect **SDL_AvailableVideoModes;
@@ -419,47 +414,47 @@ int InitSDL()
 	}
 #endif
 
-{
-	int i;
-	
-	for (i = 0; i < TotalVideoModes; i++) {
-		//if (SDL_VideoModeOK(VideoModeList[i].w, VideoModeList[i].h, 16, SDL_FULLSCREEN | SDL_OPENGL)) {
-			/* assume SDL isn't lying to us */
-			VideoModeList[i].available = 1;
-			
-			//foundit = 1;
-		//}
-	}
-}
+    {
+        int i;
 
-	LoadDeviceAndVideoModePreferences();
+        for (i = 0; i < TotalVideoModes; i++) {
+            //if (SDL_VideoModeOK(VideoModeList[i].w, VideoModeList[i].h, 16, SDL_FULLSCREEN | SDL_OPENGL)) {
+            /* assume SDL isn't lying to us */
+            VideoModeList[i].available = 1;
 
-	if (WantJoystick) {
-		SDL_InitSubSystem(SDL_INIT_JOYSTICK);
-		
-		if (SDL_NumJoysticks() > 0) {
-			/* TODO: make joystick number a configuration parameter */
-			
-			joy = SDL_JoystickOpen(0);
-			if (joy) {
-				GotJoystick = 1;
-			}
-			
-			JoystickCaps.wCaps = 0; /* no rudder... ? */
-			
-			JoystickData.dwXpos = 0;
-			JoystickData.dwYpos = 0;
-			JoystickData.dwRpos = 0;
-			JoystickData.dwUpos = 0;
-			JoystickData.dwVpos = 0;
-			JoystickData.dwPOV = (DWORD) -1;
-		}
-	}
-	
-	Uint32 rmask, gmask, bmask, amask;
-	
-	// pre-create the software surface in OpenGL RGBA order
-	// menus.c assumes RGB565; possible to support both?
+            //foundit = 1;
+            //}
+        }
+    }
+
+    LoadDeviceAndVideoModePreferences();
+
+    if (WantJoystick) {
+        SDL_InitSubSystem(SDL_INIT_JOYSTICK);
+
+        if (SDL_NumJoysticks() > 0) {
+            /* TODO: make joystick number a configuration parameter */
+
+            joy = SDL_JoystickOpen(0);
+            if (joy) {
+                GotJoystick = 1;
+            }
+
+            JoystickCaps.wCaps = 0; /* no rudder... ? */
+
+            JoystickData.dwXpos = 0;
+            JoystickData.dwYpos = 0;
+            JoystickData.dwRpos = 0;
+            JoystickData.dwUpos = 0;
+            JoystickData.dwVpos = 0;
+            JoystickData.dwPOV = (DWORD) -1;
+        }
+    }
+
+    Uint32 rmask, gmask, bmask, amask;
+
+    // pre-create the software surface in OpenGL RGBA order
+    // menus.c assumes RGB565; possible to support both?
 #if SDL_BYTEORDER == SDL_BIG_ENDIAN
     rmask = 0xff000000;
     gmask = 0x00ff0000;
@@ -472,18 +467,18 @@ int InitSDL()
     amask = 0x00000000;
 #endif
 
-	surface = SDL_CreateRGBSurface(0, 640, 480, 16, rmask, gmask, bmask, amask);
-	if (surface == NULL) {
-		return -1;
-	}
+    surface = SDL_CreateRGBSurface(0, 640, 480, 16, rmask, gmask, bmask, amask);
+    if (surface == NULL) {
+        return -1;
+    }
 
-	return 0;
+    return 0;
 }
 
 /* ** */
 static void load_opengl_library(const char *lib)
 {
-#if 0//REVIEW
+#if 0 //REVIEW
 	char tmppath[PATH_MAX];
 	size_t len, copylen;
 	
@@ -521,54 +516,55 @@ static void load_opengl_library(const char *lib)
 
 int SetSoftVideoMode(int Width, int Height, int Depth)
 {
-	//TODO: clear surface
+    //TODO: clear surface
 
-	ScanDrawMode = ScanDrawD3DHardwareRGB;
-	GotMouse = 1;
+    ScanDrawMode = ScanDrawD3DHardwareRGB;
+    GotMouse = 1;
 
-	// reset input
-	IngameKeyboardInput_ClearBuffer();
+    // reset input
+    IngameKeyboardInput_ClearBuffer();
 
-	ScreenDescriptorBlock.SDB_Width     = Width;
-	ScreenDescriptorBlock.SDB_Height    = Height;
-	ScreenDescriptorBlock.SDB_CentreX   = Width/2;
-	ScreenDescriptorBlock.SDB_CentreY   = Height/2;
-	ScreenDescriptorBlock.SDB_ProjX     = Width/2;
-	ScreenDescriptorBlock.SDB_ProjY     = Height/2;
-	ScreenDescriptorBlock.SDB_ClipLeft  = 0;
-	ScreenDescriptorBlock.SDB_ClipRight = Width;
-	ScreenDescriptorBlock.SDB_ClipUp    = 0;
-	ScreenDescriptorBlock.SDB_ClipDown  = Height;
+    ScreenDescriptorBlock.SDB_Width = Width;
+    ScreenDescriptorBlock.SDB_Height = Height;
+    ScreenDescriptorBlock.SDB_CentreX = Width / 2;
+    ScreenDescriptorBlock.SDB_CentreY = Height / 2;
+    ScreenDescriptorBlock.SDB_ProjX = Width / 2;
+    ScreenDescriptorBlock.SDB_ProjY = Height / 2;
+    ScreenDescriptorBlock.SDB_ClipLeft = 0;
+    ScreenDescriptorBlock.SDB_ClipRight = Width;
+    ScreenDescriptorBlock.SDB_ClipUp = 0;
+    ScreenDescriptorBlock.SDB_ClipDown = Height;
 
-	return 0;
+    return 0;
 }
 
-static int SDLCALL SDLEventFilter(void* userData, SDL_Event* event) {
-	(void) userData;
+static int SDLCALL SDLEventFilter(void *userData, SDL_Event *event)
+{
+    (void) userData;
 
-	//printf("SDLEventFilter: %d\n", event->type);
-	
-	switch (event->type) {
-		case SDL_APP_TERMINATING:
-			AvP.MainLoopRunning = 0; /* TODO */
-			break;
-	}
-	
-	return 1;
+    //printf("SDLEventFilter: %d\n", event->type);
+
+    switch (event->type) {
+    case SDL_APP_TERMINATING:
+        AvP.MainLoopRunning = 0; /* TODO */
+        break;
+    }
+
+    return 1;
 }
 
 int SetOGLVideoMode(int Width, int Height)
 {
-	int oldflags;
-	int flags;
-	
-	ScanDrawMode = ScanDrawD3DHardwareRGB;
-	GotMouse = 1;
+    int oldflags;
+    int flags;
 
-	if (window == NULL) {
-		load_ogl_functions(0);
+    ScanDrawMode = ScanDrawD3DHardwareRGB;
+    GotMouse = 1;
 
-		/*
+    if (window == NULL) {
+        load_ogl_functions(0);
+
+        /*
 		if (window != NULL) {
 			oldflags = SDL_GetWindowFlags(window);
 
@@ -576,649 +572,652 @@ int SetOGLVideoMode(int Width, int Height)
 		}
 		
 		 */
-		flags = SDL_WINDOW_OPENGL;
-		if (WantFullscreen) {
-			flags |= SDL_WINDOW_FULLSCREEN;
-		}
+        flags = SDL_WINDOW_OPENGL;
+        if (WantFullscreen) {
+            flags |= SDL_WINDOW_FULLSCREEN;
+        }
 
-		// reset input
-		IngameKeyboardInput_ClearBuffer();
-		
-		// force restart the video system
-		SDL_QuitSubSystem(SDL_INIT_VIDEO);
-		SDL_InitSubSystem(SDL_INIT_VIDEO);
+        // reset input
+        IngameKeyboardInput_ClearBuffer();
 
-		load_opengl_library(opengl_library);
-		
-		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
-		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
+        // force restart the video system
+        SDL_QuitSubSystem(SDL_INIT_VIDEO);
+        SDL_InitSubSystem(SDL_INIT_VIDEO);
 
-		SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 5);
-		SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 5);
-		SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 5);
-		SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 16);
-		SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+        load_opengl_library(opengl_library);
 
-		// These should be configurable video options.
-		//SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
-		//SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
-		SDL_GL_SetSwapInterval(1);
-		
-		window = SDL_CreateWindow("Aliens vs Predator",
-								  SDL_WINDOWPOS_UNDEFINED,
-								  SDL_WINDOWPOS_UNDEFINED,
-								  Width,
-								  Height,
-								  flags);
-		if (window == NULL) {
-			fprintf(stderr, "(OpenGL) SDL SDL_CreateWindow failed: %s\n", SDL_GetError());
-			exit(EXIT_FAILURE);
-		}
-		
-		context = SDL_GL_CreateContext(window);
-		if (context == NULL) {
-			fprintf(stderr, "(OpenGL) SDL SDL_GL_CreateContext failed: %s\n", SDL_GetError());
-			exit(EXIT_FAILURE);
-		}
-		SDL_GL_MakeCurrent(window, context);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
 
-		SDL_AddEventWatch(SDLEventFilter, NULL); //TODO move this to startup?
+        SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 5);
+        SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 5);
+        SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 5);
+        SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 16);
+        SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 
-		load_ogl_functions(1);
+        // These should be configurable video options.
+        //SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
+        //SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
+        SDL_GL_SetSwapInterval(1);
 
-		///* this is for supporting keyboard input processing with little hassle */
-		//SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
-		
-		//SDL_SetRelativeMouseMode(isgrab);
-	}
-	
-	ViewportWidth = Width;
-	ViewportHeight = Height;
+        window = SDL_CreateWindow(
+            "Aliens vs Predator",
+            SDL_WINDOWPOS_UNDEFINED,
+            SDL_WINDOWPOS_UNDEFINED,
+            Width,
+            Height,
+            flags);
+        if (window == NULL) {
+            fprintf(stderr, "(OpenGL) SDL SDL_CreateWindow failed: %s\n", SDL_GetError());
+            exit(EXIT_FAILURE);
+        }
 
-	SDL_SetWindowSize(window, Width, Height);
+        context = SDL_GL_CreateContext(window);
+        if (context == NULL) {
+            fprintf(stderr, "(OpenGL) SDL SDL_GL_CreateContext failed: %s\n", SDL_GetError());
+            exit(EXIT_FAILURE);
+        }
+        SDL_GL_MakeCurrent(window, context);
 
-	pglViewport(0, 0, Width, Height);
-		
-	pglMatrixMode(GL_PROJECTION);
-	pglLoadIdentity();
-	pglMatrixMode(GL_MODELVIEW);
-	pglLoadIdentity();
+        SDL_AddEventWatch(SDLEventFilter, NULL); //TODO move this to startup?
 
-	pglEnable(GL_BLEND);
-	pglBlendFunc(GL_SRC_ALPHA, GL_ONE);
-		
-	pglEnable(GL_DEPTH_TEST);
-	pglDepthFunc(GL_LEQUAL);
-	pglDepthMask(GL_TRUE);
-	pglDepthRange(0.0, 1.0);
-		
-	pglEnable(GL_TEXTURE_2D);
+        load_ogl_functions(1);
 
-	pglPolygonMode(GL_FRONT, GL_FILL);
-	pglPolygonMode(GL_BACK, GL_FILL);
-	pglDisable(GL_CULL_FACE);
-	
-	pglClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        ///* this is for supporting keyboard input processing with little hassle */
+        //SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
 
-	ScreenDescriptorBlock.SDB_Width     = Width;
-	ScreenDescriptorBlock.SDB_Height    = Height;
-	ScreenDescriptorBlock.SDB_CentreX   = Width/2;
-	ScreenDescriptorBlock.SDB_CentreY   = Height/2;
-	ScreenDescriptorBlock.SDB_ProjX     = Width/2;
-	ScreenDescriptorBlock.SDB_ProjY     = Height/2;
-	ScreenDescriptorBlock.SDB_ClipLeft  = 0;
-	ScreenDescriptorBlock.SDB_ClipRight = Width;
-	ScreenDescriptorBlock.SDB_ClipUp    = 0;
-	ScreenDescriptorBlock.SDB_ClipDown  = Height;
-	
-	InitOpenGL();
-	
-	return 0;
+        //SDL_SetRelativeMouseMode(isgrab);
+    }
+
+    ViewportWidth = Width;
+    ViewportHeight = Height;
+
+    SDL_SetWindowSize(window, Width, Height);
+
+    pglViewport(0, 0, Width, Height);
+
+    pglMatrixMode(GL_PROJECTION);
+    pglLoadIdentity();
+    pglMatrixMode(GL_MODELVIEW);
+    pglLoadIdentity();
+
+    pglEnable(GL_BLEND);
+    pglBlendFunc(GL_SRC_ALPHA, GL_ONE);
+
+    pglEnable(GL_DEPTH_TEST);
+    pglDepthFunc(GL_LEQUAL);
+    pglDepthMask(GL_TRUE);
+    pglDepthRange(0.0, 1.0);
+
+    pglEnable(GL_TEXTURE_2D);
+
+    pglPolygonMode(GL_FRONT, GL_FILL);
+    pglPolygonMode(GL_BACK, GL_FILL);
+    pglDisable(GL_CULL_FACE);
+
+    pglClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    ScreenDescriptorBlock.SDB_Width = Width;
+    ScreenDescriptorBlock.SDB_Height = Height;
+    ScreenDescriptorBlock.SDB_CentreX = Width / 2;
+    ScreenDescriptorBlock.SDB_CentreY = Height / 2;
+    ScreenDescriptorBlock.SDB_ProjX = Width / 2;
+    ScreenDescriptorBlock.SDB_ProjY = Height / 2;
+    ScreenDescriptorBlock.SDB_ClipLeft = 0;
+    ScreenDescriptorBlock.SDB_ClipRight = Width;
+    ScreenDescriptorBlock.SDB_ClipUp = 0;
+    ScreenDescriptorBlock.SDB_ClipDown = Height;
+
+    InitOpenGL();
+
+    return 0;
 }
 
 int InitialiseWindowsSystem(HANDLE hInstance, int nCmdShow, int WinInitMode)
 {
-	return 0;
+    return 0;
 }
 
 int ExitWindowsSystem()
 {
-	if (joy != NULL) {
-		SDL_JoystickClose(joy);
-	}
+    if (joy != NULL) {
+        SDL_JoystickClose(joy);
+    }
 
-	load_ogl_functions(0);
-	
-	if (surface != NULL) {
-		SDL_FreeSurface(surface);
-	}
-	surface = NULL;
+    load_ogl_functions(0);
 
-	if (context != NULL) {
-		SDL_GL_DeleteContext(context);
-	}
-	context = NULL;
+    if (surface != NULL) {
+        SDL_FreeSurface(surface);
+    }
+    surface = NULL;
 
-	if (window != NULL) {
-		SDL_DestroyWindow(window);
-	}
-	window = NULL;
+    if (context != NULL) {
+        SDL_GL_DeleteContext(context);
+    }
+    context = NULL;
 
-	return 0;
+    if (window != NULL) {
+        SDL_DestroyWindow(window);
+    }
+    window = NULL;
+
+    return 0;
 }
 
 static int GotPrintScn, HavePrintScn;
 
 static int KeySymToKey(int keysym)
 {
-	switch(keysym) {
-		case SDLK_ESCAPE:
-			return KEY_ESCAPE;
-			
-		case SDLK_0:
-			return KEY_0;
-		case SDLK_1:
-			return KEY_1;
-		case SDLK_2:
-			return KEY_2;
-		case SDLK_3:
-			return KEY_3;
-		case SDLK_4:
-			return KEY_4;
-		case SDLK_5:
-			return KEY_5;
-		case SDLK_6:
-			return KEY_6;
-		case SDLK_7:
-			return KEY_7;
-		case SDLK_8:
-			return KEY_8;
-		case SDLK_9:
-			return KEY_9;
-		
-		case SDLK_a:
-			return KEY_A;
-		case SDLK_b:
-			return KEY_B;
-		case SDLK_c:
-			return KEY_C;
-		case SDLK_d:
-			return KEY_D;
-		case SDLK_e:
-			return KEY_E;
-		case SDLK_f:
-			return KEY_F;
-		case SDLK_g:
-			return KEY_G;
-		case SDLK_h:
-			return KEY_H;
-		case SDLK_i:
-			return KEY_I;
-		case SDLK_j:
-			return KEY_J;
-		case SDLK_k:
-			return KEY_K;
-		case SDLK_l:
-			return KEY_L;
-		case SDLK_m:
-			return KEY_M;
-		case SDLK_n:
-			return KEY_N;
-		case SDLK_o:
-			return KEY_O;
-		case SDLK_p:
-			return KEY_P;
-		case SDLK_q:
-			return KEY_Q;
-		case SDLK_r:
-			return KEY_R;
-		case SDLK_s:
-			return KEY_S;
-		case SDLK_t:
-			return KEY_T;
-		case SDLK_u:
-			return KEY_U;
-		case SDLK_v:
-			return KEY_V;
-		case SDLK_w:
-			return KEY_W;
-		case SDLK_x:
-			return KEY_X;
-		case SDLK_y:
-			return KEY_Y;
-		case SDLK_z:
-			return KEY_Z;
-				
-		case SDLK_LEFT:
-			return KEY_LEFT;
-		case SDLK_RIGHT:
-			return KEY_RIGHT;
-		case SDLK_UP:
-			return KEY_UP;
-		case SDLK_DOWN:
-			return KEY_DOWN;		
-		case SDLK_RETURN:
-			return KEY_CR;
-		case SDLK_TAB:
-			return KEY_TAB;
-		case SDLK_INSERT:
-			return KEY_INS;
-		case SDLK_DELETE:
-			return KEY_DEL;
-		case SDLK_END:
-			return KEY_END;
-		case SDLK_HOME:
-			return KEY_HOME;
-		case SDLK_PAGEUP:
-			return KEY_PAGEUP;
-		case SDLK_PAGEDOWN:
-			return KEY_PAGEDOWN;
-		case SDLK_BACKSPACE:
-			return KEY_BACKSPACE;
-		case SDLK_COMMA:
-			return KEY_COMMA;
-		case SDLK_PERIOD:
-			return KEY_FSTOP;
-		case SDLK_SPACE:
-			return KEY_SPACE;
-			
-		case SDLK_LSHIFT:
-			return KEY_LEFTSHIFT;
-		case SDLK_RSHIFT:
-			return KEY_RIGHTSHIFT;
-		case SDLK_LALT:
-			return KEY_LEFTALT;
-		case SDLK_RALT:
-			return KEY_RIGHTALT;
-		case SDLK_LCTRL:
-			return KEY_LEFTCTRL;
-		case SDLK_RCTRL:
-			return KEY_RIGHTCTRL;
+    switch (keysym) {
+    case SDLK_ESCAPE:
+        return KEY_ESCAPE;
 
-		case SDLK_CAPSLOCK:
-			return KEY_CAPS;
-		case SDLK_NUMLOCKCLEAR:
-			return KEY_NUMLOCK;
-		case SDLK_SCROLLLOCK:
-			return KEY_SCROLLOK;
-			
-		case SDLK_KP_0:
-			return KEY_NUMPAD0;
-		case SDLK_KP_1:
-			return KEY_NUMPAD1;
-		case SDLK_KP_2:
-			return KEY_NUMPAD2;
-		case SDLK_KP_3:
-			return KEY_NUMPAD3;
-		case SDLK_KP_4:
-			return KEY_NUMPAD4;
-		case SDLK_KP_5:
-			return KEY_NUMPAD5;
-		case SDLK_KP_6:
-			return KEY_NUMPAD6;
-		case SDLK_KP_7:
-			return KEY_NUMPAD7;
-		case SDLK_KP_8:
-			return KEY_NUMPAD8;
-		case SDLK_KP_9:
-			return KEY_NUMPAD9;
-		case SDLK_KP_MINUS:
-			return KEY_NUMPADSUB;
-		case SDLK_KP_PLUS:
-			return KEY_NUMPADADD;
-		case SDLK_KP_PERIOD:
-			return KEY_NUMPADDEL;
-		case SDLK_KP_ENTER:
-			return KEY_NUMPADENTER;
-		case SDLK_KP_DIVIDE:
-			return KEY_NUMPADDIVIDE;
-		case SDLK_KP_MULTIPLY:
-			return KEY_NUMPADMULTIPLY;
-	
-		case SDLK_LEFTBRACKET:
-			return KEY_LBRACKET;
-		case SDLK_RIGHTBRACKET:
-			return KEY_RBRACKET;
-		case SDLK_SEMICOLON:
-			return KEY_SEMICOLON;
-		case SDLK_QUOTE:
-			return KEY_APOSTROPHE;
-		case SDLK_BACKQUOTE:
-			return KEY_GRAVE;
-		case SDLK_BACKSLASH:
-			return KEY_BACKSLASH;
-		case SDLK_SLASH:
-			return KEY_SLASH;
-/*		case SDLK_
+    case SDLK_0:
+        return KEY_0;
+    case SDLK_1:
+        return KEY_1;
+    case SDLK_2:
+        return KEY_2;
+    case SDLK_3:
+        return KEY_3;
+    case SDLK_4:
+        return KEY_4;
+    case SDLK_5:
+        return KEY_5;
+    case SDLK_6:
+        return KEY_6;
+    case SDLK_7:
+        return KEY_7;
+    case SDLK_8:
+        return KEY_8;
+    case SDLK_9:
+        return KEY_9;
+
+    case SDLK_a:
+        return KEY_A;
+    case SDLK_b:
+        return KEY_B;
+    case SDLK_c:
+        return KEY_C;
+    case SDLK_d:
+        return KEY_D;
+    case SDLK_e:
+        return KEY_E;
+    case SDLK_f:
+        return KEY_F;
+    case SDLK_g:
+        return KEY_G;
+    case SDLK_h:
+        return KEY_H;
+    case SDLK_i:
+        return KEY_I;
+    case SDLK_j:
+        return KEY_J;
+    case SDLK_k:
+        return KEY_K;
+    case SDLK_l:
+        return KEY_L;
+    case SDLK_m:
+        return KEY_M;
+    case SDLK_n:
+        return KEY_N;
+    case SDLK_o:
+        return KEY_O;
+    case SDLK_p:
+        return KEY_P;
+    case SDLK_q:
+        return KEY_Q;
+    case SDLK_r:
+        return KEY_R;
+    case SDLK_s:
+        return KEY_S;
+    case SDLK_t:
+        return KEY_T;
+    case SDLK_u:
+        return KEY_U;
+    case SDLK_v:
+        return KEY_V;
+    case SDLK_w:
+        return KEY_W;
+    case SDLK_x:
+        return KEY_X;
+    case SDLK_y:
+        return KEY_Y;
+    case SDLK_z:
+        return KEY_Z;
+
+    case SDLK_LEFT:
+        return KEY_LEFT;
+    case SDLK_RIGHT:
+        return KEY_RIGHT;
+    case SDLK_UP:
+        return KEY_UP;
+    case SDLK_DOWN:
+        return KEY_DOWN;
+    case SDLK_RETURN:
+        return KEY_CR;
+    case SDLK_TAB:
+        return KEY_TAB;
+    case SDLK_INSERT:
+        return KEY_INS;
+    case SDLK_DELETE:
+        return KEY_DEL;
+    case SDLK_END:
+        return KEY_END;
+    case SDLK_HOME:
+        return KEY_HOME;
+    case SDLK_PAGEUP:
+        return KEY_PAGEUP;
+    case SDLK_PAGEDOWN:
+        return KEY_PAGEDOWN;
+    case SDLK_BACKSPACE:
+        return KEY_BACKSPACE;
+    case SDLK_COMMA:
+        return KEY_COMMA;
+    case SDLK_PERIOD:
+        return KEY_FSTOP;
+    case SDLK_SPACE:
+        return KEY_SPACE;
+
+    case SDLK_LSHIFT:
+        return KEY_LEFTSHIFT;
+    case SDLK_RSHIFT:
+        return KEY_RIGHTSHIFT;
+    case SDLK_LALT:
+        return KEY_LEFTALT;
+    case SDLK_RALT:
+        return KEY_RIGHTALT;
+    case SDLK_LCTRL:
+        return KEY_LEFTCTRL;
+    case SDLK_RCTRL:
+        return KEY_RIGHTCTRL;
+
+    case SDLK_CAPSLOCK:
+        return KEY_CAPS;
+    case SDLK_NUMLOCKCLEAR:
+        return KEY_NUMLOCK;
+    case SDLK_SCROLLLOCK:
+        return KEY_SCROLLOK;
+
+    case SDLK_KP_0:
+        return KEY_NUMPAD0;
+    case SDLK_KP_1:
+        return KEY_NUMPAD1;
+    case SDLK_KP_2:
+        return KEY_NUMPAD2;
+    case SDLK_KP_3:
+        return KEY_NUMPAD3;
+    case SDLK_KP_4:
+        return KEY_NUMPAD4;
+    case SDLK_KP_5:
+        return KEY_NUMPAD5;
+    case SDLK_KP_6:
+        return KEY_NUMPAD6;
+    case SDLK_KP_7:
+        return KEY_NUMPAD7;
+    case SDLK_KP_8:
+        return KEY_NUMPAD8;
+    case SDLK_KP_9:
+        return KEY_NUMPAD9;
+    case SDLK_KP_MINUS:
+        return KEY_NUMPADSUB;
+    case SDLK_KP_PLUS:
+        return KEY_NUMPADADD;
+    case SDLK_KP_PERIOD:
+        return KEY_NUMPADDEL;
+    case SDLK_KP_ENTER:
+        return KEY_NUMPADENTER;
+    case SDLK_KP_DIVIDE:
+        return KEY_NUMPADDIVIDE;
+    case SDLK_KP_MULTIPLY:
+        return KEY_NUMPADMULTIPLY;
+
+    case SDLK_LEFTBRACKET:
+        return KEY_LBRACKET;
+    case SDLK_RIGHTBRACKET:
+        return KEY_RBRACKET;
+    case SDLK_SEMICOLON:
+        return KEY_SEMICOLON;
+    case SDLK_QUOTE:
+        return KEY_APOSTROPHE;
+    case SDLK_BACKQUOTE:
+        return KEY_GRAVE;
+    case SDLK_BACKSLASH:
+        return KEY_BACKSLASH;
+    case SDLK_SLASH:
+        return KEY_SLASH;
+        /*		case SDLK_
 			return KEY_CAPITAL; */
-		case SDLK_MINUS:
-			return KEY_MINUS;
-		case SDLK_EQUALS:
-			return KEY_EQUALS;
-		case SDLK_LGUI:
-			return KEY_LWIN;
-		case SDLK_RGUI:
-			return KEY_RWIN;
-/*		case SDLK_
+    case SDLK_MINUS:
+        return KEY_MINUS;
+    case SDLK_EQUALS:
+        return KEY_EQUALS;
+    case SDLK_LGUI:
+        return KEY_LWIN;
+    case SDLK_RGUI:
+        return KEY_RWIN;
+        /*		case SDLK_
 			return KEY_APPS; */
-		
-		case SDLK_F1:
-			return KEY_F1;
-		case SDLK_F2:
-			return KEY_F2;
-		case SDLK_F3:
-			return KEY_F3;
-		case SDLK_F4:
-			return KEY_F4;
-		case SDLK_F5:
-			return KEY_F5;
-		case SDLK_F6:
-			return KEY_F6;
-		case SDLK_F7:
-			return KEY_F7;
-		case SDLK_F8:
-			return KEY_F8;
-		case SDLK_F9:
-			return KEY_F9;
-		case SDLK_F10:
-			return KEY_F10;
-		case SDLK_F11:
-			return KEY_F11;
-		case SDLK_F12:
-			return KEY_F12;
 
-/* finish foreign keys */
+    case SDLK_F1:
+        return KEY_F1;
+    case SDLK_F2:
+        return KEY_F2;
+    case SDLK_F3:
+        return KEY_F3;
+    case SDLK_F4:
+        return KEY_F4;
+    case SDLK_F5:
+        return KEY_F5;
+    case SDLK_F6:
+        return KEY_F6;
+    case SDLK_F7:
+        return KEY_F7;
+    case SDLK_F8:
+        return KEY_F8;
+    case SDLK_F9:
+        return KEY_F9;
+    case SDLK_F10:
+        return KEY_F10;
+    case SDLK_F11:
+        return KEY_F11;
+    case SDLK_F12:
+        return KEY_F12;
 
-		default:
-			return -1;
-	}
+        /* finish foreign keys */
+
+    default:
+        return -1;
+    }
 }
 
 static void handle_keypress(int key, int unicode, int press)
-{	
-	if (key == -1)
-		return;
+{
+    if (key == -1)
+        return;
 
-	if (press) {
-		switch(key) {
-			case KEY_BACKSPACE:
-				RE_ENTRANT_QUEUE_WinProc_AddMessage_WM_KEYDOWN(VK_BACK);
-				break;
-			case KEY_END:
-				RE_ENTRANT_QUEUE_WinProc_AddMessage_WM_KEYDOWN(VK_END);
-				break;
-			case KEY_HOME:
-				RE_ENTRANT_QUEUE_WinProc_AddMessage_WM_KEYDOWN(VK_HOME);
-				break;
-			case KEY_LEFT:
-				RE_ENTRANT_QUEUE_WinProc_AddMessage_WM_KEYDOWN(VK_LEFT);
-				break;
-			case KEY_UP:
-				RE_ENTRANT_QUEUE_WinProc_AddMessage_WM_KEYDOWN(VK_UP);
-				break;
-			case KEY_RIGHT:
-				RE_ENTRANT_QUEUE_WinProc_AddMessage_WM_KEYDOWN(VK_RIGHT);
-				break;
-			case KEY_DOWN:
-				RE_ENTRANT_QUEUE_WinProc_AddMessage_WM_KEYDOWN(VK_DOWN);
-				break;
-			case KEY_INS:
-				RE_ENTRANT_QUEUE_WinProc_AddMessage_WM_KEYDOWN(VK_INSERT);
-				break;
-			case KEY_DEL:
-				RE_ENTRANT_QUEUE_WinProc_AddMessage_WM_KEYDOWN(VK_DELETE);
-				break;
-			case KEY_TAB:
-				RE_ENTRANT_QUEUE_WinProc_AddMessage_WM_KEYDOWN(VK_TAB);
-				break;
-			default:
-				break;
-		}
-	}
-	
-	if (press && !KeyboardInput[key]) {
-		DebouncedKeyboardInput[key] = 1;
-		DebouncedGotAnyKey = 1;
-	}
-	
-	if (press)
-		GotAnyKey = 1;
-	KeyboardInput[key] = press;
+    if (press) {
+        switch (key) {
+        case KEY_BACKSPACE:
+            RE_ENTRANT_QUEUE_WinProc_AddMessage_WM_KEYDOWN(VK_BACK);
+            break;
+        case KEY_END:
+            RE_ENTRANT_QUEUE_WinProc_AddMessage_WM_KEYDOWN(VK_END);
+            break;
+        case KEY_HOME:
+            RE_ENTRANT_QUEUE_WinProc_AddMessage_WM_KEYDOWN(VK_HOME);
+            break;
+        case KEY_LEFT:
+            RE_ENTRANT_QUEUE_WinProc_AddMessage_WM_KEYDOWN(VK_LEFT);
+            break;
+        case KEY_UP:
+            RE_ENTRANT_QUEUE_WinProc_AddMessage_WM_KEYDOWN(VK_UP);
+            break;
+        case KEY_RIGHT:
+            RE_ENTRANT_QUEUE_WinProc_AddMessage_WM_KEYDOWN(VK_RIGHT);
+            break;
+        case KEY_DOWN:
+            RE_ENTRANT_QUEUE_WinProc_AddMessage_WM_KEYDOWN(VK_DOWN);
+            break;
+        case KEY_INS:
+            RE_ENTRANT_QUEUE_WinProc_AddMessage_WM_KEYDOWN(VK_INSERT);
+            break;
+        case KEY_DEL:
+            RE_ENTRANT_QUEUE_WinProc_AddMessage_WM_KEYDOWN(VK_DELETE);
+            break;
+        case KEY_TAB:
+            RE_ENTRANT_QUEUE_WinProc_AddMessage_WM_KEYDOWN(VK_TAB);
+            break;
+        default:
+            break;
+        }
+    }
+
+    if (press && !KeyboardInput[key]) {
+        DebouncedKeyboardInput[key] = 1;
+        DebouncedGotAnyKey = 1;
+    }
+
+    if (press)
+        GotAnyKey = 1;
+    KeyboardInput[key] = press;
 }
 
 static void handle_buttonpress(int button, int press)
 {
-	int key;
+    int key;
 
-	switch(button) {
-		case 4: /* mouse wheel up */
-			key = KEY_MOUSEWHEELUP;
-			break;
-		case 5: /* mouse wheel down */
-			key = KEY_MOUSEWHEELDOWN;
-			break;
-		default: /* other buttons are handled elsewhere */
-			return;
-	}
-	
-	/* since this currently only handles wheel up/down */
-	if (press == 0)
-		return;
-		
-	if (press && !KeyboardInput[key]) {
-		DebouncedKeyboardInput[key] = 1;
-	}
-	
-	GotAnyKey = 1;
-	KeyboardInput[key] = press;
+    switch (button) {
+    case 4: /* mouse wheel up */
+        key = KEY_MOUSEWHEELUP;
+        break;
+    case 5: /* mouse wheel down */
+        key = KEY_MOUSEWHEELDOWN;
+        break;
+    default: /* other buttons are handled elsewhere */
+        return;
+    }
+
+    /* since this currently only handles wheel up/down */
+    if (press == 0)
+        return;
+
+    if (press && !KeyboardInput[key]) {
+        DebouncedKeyboardInput[key] = 1;
+    }
+
+    GotAnyKey = 1;
+    KeyboardInput[key] = press;
 }
 
 void CheckForWindowsMessages()
 {
-	SDL_Event event;
-	int x, y, buttons, wantmouse;
-	
-	GotAnyKey = 0;
-	DebouncedGotAnyKey = 0;
-	memset(DebouncedKeyboardInput, 0, sizeof(DebouncedKeyboardInput));
-	
-	wantmouse =	0; //(surface->flags & SDL_FULLSCREEN) ||
-			//(SDL_WM_GrabInput(SDL_GRAB_QUERY) == SDL_GRAB_ON);
+    SDL_Event event;
+    int x, y, buttons, wantmouse;
 
-	KeyboardInput[KEY_MOUSEWHEELUP] = 0;
-	KeyboardInput[KEY_MOUSEWHEELDOWN] = 0;
-	
-	if (SDL_PollEvent(&event)) {
-		do {
-			switch(event.type) {
-				case SDL_MOUSEBUTTONDOWN:
-					if (wantmouse)
-						handle_buttonpress(event.button.button, 1);
-					break;
-				case SDL_MOUSEBUTTONUP:
-					break;
-				case SDL_TEXTINPUT: {
-						int unicode = event.text.text[0]; //TODO convert to utf-32
-						if (unicode && !(unicode & 0xFF80)) {
-							RE_ENTRANT_QUEUE_WinProc_AddMessage_WM_CHAR(unicode);
-							KeyboardEntryQueue_Add(unicode);
-						}
-					}
-					break;
-				case SDL_KEYDOWN:
-					if (event.key.keysym.sym == SDLK_PRINTSCREEN) {
-						if (HavePrintScn == 0)
-							GotPrintScn = 1;
-						HavePrintScn = 1;
-					} else {
-						handle_keypress(KeySymToKey(event.key.keysym.sym), 0, 1);
-					}
-					break;
-				case SDL_KEYUP:
-					if (event.key.keysym.sym == SDLK_PRINTSCREEN) {
-						GotPrintScn = 0;
-						HavePrintScn = 0;
-					} else {
-						handle_keypress(KeySymToKey(event.key.keysym.sym), 0, 0);
-					}
-					break;
-				case SDL_QUIT:
-					AvP.MainLoopRunning = 0; /* TODO */
-					exit(0); //TODO
-					break;
-			}
-		} while (SDL_PollEvent(&event));
-	}
-	
-	buttons = SDL_GetRelativeMouseState(&x, &y);
-	
-	if (wantmouse) {
-		if (buttons & SDL_BUTTON(1))
-			handle_keypress(KEY_LMOUSE, 0, 1);
-		else
-			handle_keypress(KEY_LMOUSE, 0, 0);
-		if (buttons & SDL_BUTTON(2))
-			handle_keypress(KEY_MMOUSE, 0, 1);
-		else
-			handle_keypress(KEY_MMOUSE, 0, 0);
-		if (buttons & SDL_BUTTON(3))
-			handle_keypress(KEY_RMOUSE, 0, 1);
-		else
-			handle_keypress(KEY_RMOUSE, 0, 0);
-	
-		MouseVelX = DIV_FIXED(x, NormalFrameTime);
-		MouseVelY = DIV_FIXED(y, NormalFrameTime);
-	} else {
-		KeyboardInput[KEY_LMOUSE] = 0;
-		KeyboardInput[KEY_MMOUSE] = 0;
-		KeyboardInput[KEY_RMOUSE] = 0;
-		MouseVelX = 0;
-		MouseVelY = 0;
-	}
+    GotAnyKey = 0;
+    DebouncedGotAnyKey = 0;
+    memset(DebouncedKeyboardInput, 0, sizeof(DebouncedKeyboardInput));
 
-	if (GotJoystick) {
-		int numbuttons;
-		
-		SDL_JoystickUpdate();
-		
-		numbuttons = SDL_JoystickNumButtons(joy);
-		if (numbuttons > 16) numbuttons = 16;
-		
-		for (x = 0; x < numbuttons; x++) {
-			if (SDL_JoystickGetButton(joy, x)) {
-				GotAnyKey = 1;
-				if (!KeyboardInput[KEY_JOYSTICK_BUTTON_1+x]) {
-					KeyboardInput[KEY_JOYSTICK_BUTTON_1+x] = 1;
-					DebouncedKeyboardInput[KEY_JOYSTICK_BUTTON_1+x] = 1;
-				}
-			} else {
-				KeyboardInput[KEY_JOYSTICK_BUTTON_1+x] = 0;
-			}	
-		}
-	}
+    wantmouse = 0; //(surface->flags & SDL_FULLSCREEN) ||
+                   //(SDL_WM_GrabInput(SDL_GRAB_QUERY) == SDL_GRAB_ON);
 
-	if ((KeyboardInput[KEY_LEFTALT]||KeyboardInput[KEY_RIGHTALT]) && DebouncedKeyboardInput[KEY_CR]) {
-		//SDL_GrabMode gm;
-		//
-		//SDL_WM_ToggleFullScreen(surface);
-		//
-		//gm = SDL_WM_GrabInput(SDL_GRAB_QUERY);
-		//if (gm == SDL_GRAB_OFF && !(surface->flags & SDL_FULLSCREEN))
-		//	SDL_ShowCursor(1);
-		//else
-		//	SDL_ShowCursor(0);
-	}
+    KeyboardInput[KEY_MOUSEWHEELUP] = 0;
+    KeyboardInput[KEY_MOUSEWHEELDOWN] = 0;
 
-	if (KeyboardInput[KEY_LEFTCTRL] && DebouncedKeyboardInput[KEY_G]) {
-		//SDL_GrabMode gm;
-		//
-		//gm = SDL_WM_GrabInput(SDL_GRAB_QUERY);
-		//SDL_WM_GrabInput((gm == SDL_GRAB_ON) ? SDL_GRAB_OFF : SDL_GRAB_ON);
-		//
-		//gm = SDL_WM_GrabInput(SDL_GRAB_QUERY);
-		//if (gm == SDL_GRAB_OFF && !(surface->flags & SDL_FULLSCREEN))
-		//	SDL_ShowCursor(1);
-		//else
-		//	SDL_ShowCursor(0);
-	}
-	
-	if (GotPrintScn) {
-		GotPrintScn = 0;
-		
-		ScreenShot();
-	}
+    if (SDL_PollEvent(&event)) {
+        do {
+            switch (event.type) {
+            case SDL_MOUSEBUTTONDOWN:
+                if (wantmouse)
+                    handle_buttonpress(event.button.button, 1);
+                break;
+            case SDL_MOUSEBUTTONUP:
+                break;
+            case SDL_TEXTINPUT: {
+                int unicode = event.text.text[0]; //TODO convert to utf-32
+                if (unicode && !(unicode & 0xFF80)) {
+                    RE_ENTRANT_QUEUE_WinProc_AddMessage_WM_CHAR(unicode);
+                    KeyboardEntryQueue_Add(unicode);
+                }
+            } break;
+            case SDL_KEYDOWN:
+                if (event.key.keysym.sym == SDLK_PRINTSCREEN) {
+                    if (HavePrintScn == 0)
+                        GotPrintScn = 1;
+                    HavePrintScn = 1;
+                } else {
+                    handle_keypress(KeySymToKey(event.key.keysym.sym), 0, 1);
+                }
+                break;
+            case SDL_KEYUP:
+                if (event.key.keysym.sym == SDLK_PRINTSCREEN) {
+                    GotPrintScn = 0;
+                    HavePrintScn = 0;
+                } else {
+                    handle_keypress(KeySymToKey(event.key.keysym.sym), 0, 0);
+                }
+                break;
+            case SDL_QUIT:
+                AvP.MainLoopRunning = 0; /* TODO */
+                exit(0);                 //TODO
+                break;
+            }
+        } while (SDL_PollEvent(&event));
+    }
+
+    buttons = SDL_GetRelativeMouseState(&x, &y);
+
+    if (wantmouse) {
+        if (buttons & SDL_BUTTON(1))
+            handle_keypress(KEY_LMOUSE, 0, 1);
+        else
+            handle_keypress(KEY_LMOUSE, 0, 0);
+        if (buttons & SDL_BUTTON(2))
+            handle_keypress(KEY_MMOUSE, 0, 1);
+        else
+            handle_keypress(KEY_MMOUSE, 0, 0);
+        if (buttons & SDL_BUTTON(3))
+            handle_keypress(KEY_RMOUSE, 0, 1);
+        else
+            handle_keypress(KEY_RMOUSE, 0, 0);
+
+        MouseVelX = DIV_FIXED(x, NormalFrameTime);
+        MouseVelY = DIV_FIXED(y, NormalFrameTime);
+    } else {
+        KeyboardInput[KEY_LMOUSE] = 0;
+        KeyboardInput[KEY_MMOUSE] = 0;
+        KeyboardInput[KEY_RMOUSE] = 0;
+        MouseVelX = 0;
+        MouseVelY = 0;
+    }
+
+    if (GotJoystick) {
+        int numbuttons;
+
+        SDL_JoystickUpdate();
+
+        numbuttons = SDL_JoystickNumButtons(joy);
+        if (numbuttons > 16)
+            numbuttons = 16;
+
+        for (x = 0; x < numbuttons; x++) {
+            if (SDL_JoystickGetButton(joy, x)) {
+                GotAnyKey = 1;
+                if (!KeyboardInput[KEY_JOYSTICK_BUTTON_1 + x]) {
+                    KeyboardInput[KEY_JOYSTICK_BUTTON_1 + x] = 1;
+                    DebouncedKeyboardInput[KEY_JOYSTICK_BUTTON_1 + x] = 1;
+                }
+            } else {
+                KeyboardInput[KEY_JOYSTICK_BUTTON_1 + x] = 0;
+            }
+        }
+    }
+
+    if ((KeyboardInput[KEY_LEFTALT] || KeyboardInput[KEY_RIGHTALT])
+        && DebouncedKeyboardInput[KEY_CR]) {
+        //SDL_GrabMode gm;
+        //
+        //SDL_WM_ToggleFullScreen(surface);
+        //
+        //gm = SDL_WM_GrabInput(SDL_GRAB_QUERY);
+        //if (gm == SDL_GRAB_OFF && !(surface->flags & SDL_FULLSCREEN))
+        //	SDL_ShowCursor(1);
+        //else
+        //	SDL_ShowCursor(0);
+    }
+
+    if (KeyboardInput[KEY_LEFTCTRL] && DebouncedKeyboardInput[KEY_G]) {
+        //SDL_GrabMode gm;
+        //
+        //gm = SDL_WM_GrabInput(SDL_GRAB_QUERY);
+        //SDL_WM_GrabInput((gm == SDL_GRAB_ON) ? SDL_GRAB_OFF : SDL_GRAB_ON);
+        //
+        //gm = SDL_WM_GrabInput(SDL_GRAB_QUERY);
+        //if (gm == SDL_GRAB_OFF && !(surface->flags & SDL_FULLSCREEN))
+        //	SDL_ShowCursor(1);
+        //else
+        //	SDL_ShowCursor(0);
+    }
+
+    if (GotPrintScn) {
+        GotPrintScn = 0;
+
+        ScreenShot();
+    }
 }
-        
+
 void InGameFlipBuffers()
 {
-	if (window != NULL) {
-		SDL_GL_SwapWindow(window);
-	}
+    if (window != NULL) {
+        SDL_GL_SwapWindow(window);
+    }
 }
 
 void FlipBuffers()
 {
-	// TODO: move this to init
-	static GLuint t;
+    // TODO: move this to init
+    static GLuint t;
 
-	if (t == 0) {
-		pglGenTextures(1, &t);
+    if (t == 0) {
+        pglGenTextures(1, &t);
 
-		pglBindTexture(GL_TEXTURE_2D, t);
+        pglBindTexture(GL_TEXTURE_2D, t);
 
-		pglTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		pglTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		pglTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-		pglTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+        pglTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        pglTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        pglTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+        pglTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 
-		pglTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 640, 480, 0, GL_RGB, GL_UNSIGNED_SHORT_5_6_5, NULL);
-	}
+        pglTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 640, 480, 0, GL_RGB, GL_UNSIGNED_SHORT_5_6_5, NULL);
+    }
 
-	pglDisableClientState(GL_VERTEX_ARRAY);
-	pglDisableClientState(GL_TEXTURE_COORD_ARRAY);
-	pglDisableClientState(GL_COLOR_ARRAY);
+    pglDisableClientState(GL_VERTEX_ARRAY);
+    pglDisableClientState(GL_TEXTURE_COORD_ARRAY);
+    pglDisableClientState(GL_COLOR_ARRAY);
 
-	pglClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    pglClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	pglMatrixMode(GL_PROJECTION);
-	pglLoadIdentity();
-	pglMatrixMode(GL_MODELVIEW);
-	pglLoadIdentity();
+    pglMatrixMode(GL_PROJECTION);
+    pglLoadIdentity();
+    pglMatrixMode(GL_MODELVIEW);
+    pglLoadIdentity();
 
-	pglDisable(GL_ALPHA_TEST);
-	pglDisable(GL_BLEND);
-	pglDisable(GL_DEPTH_TEST);
+    pglDisable(GL_ALPHA_TEST);
+    pglDisable(GL_BLEND);
+    pglDisable(GL_DEPTH_TEST);
 
-	pglBindTexture(GL_TEXTURE_2D, t);
-	pglTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-	pglTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 640, 480, GL_RGB, GL_UNSIGNED_SHORT_5_6_5, surface->pixels);
+    pglBindTexture(GL_TEXTURE_2D, t);
+    pglTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+    pglTexSubImage2D(
+        GL_TEXTURE_2D, 0, 0, 0, 640, 480, GL_RGB, GL_UNSIGNED_SHORT_5_6_5, surface->pixels);
 
-	GLfloat x0;
-	GLfloat x1;
-	GLfloat y0;
-	GLfloat y1;
+    GLfloat x0;
+    GLfloat x1;
+    GLfloat y0;
+    GLfloat y1;
 
-	// figure out the best way to fit the 640x480 virtual window
-	GLfloat a = ViewportHeight * 640.0f / 480.0f;
-	GLfloat b = ViewportWidth * 480.0f / 640.0f;
+    // figure out the best way to fit the 640x480 virtual window
+    GLfloat a = ViewportHeight * 640.0f / 480.0f;
+    GLfloat b = ViewportWidth * 480.0f / 640.0f;
 
-	if (a <= ViewportWidth) {
-		// a x ViewportHeight window
-		y0 = -1.0f;
-		y1 =  1.0f;
+    if (a <= ViewportWidth) {
+        // a x ViewportHeight window
+        y0 = -1.0f;
+        y1 = 1.0f;
 
-		x1 = 1.0 - (ViewportWidth - a) / ViewportWidth;
-		x0 = -x1;
-	} else {
-		// ViewportWidth x b window
-		x0 = -1.0f;
-		x1 =  1.0f;
+        x1 = 1.0 - (ViewportWidth - a) / ViewportWidth;
+        x0 = -x1;
+    } else {
+        // ViewportWidth x b window
+        x0 = -1.0f;
+        x1 = 1.0f;
 
-		y1 = 1.0 - (ViewportHeight - b) / ViewportHeight;
-		y0 = -y1;
-	}
+        y1 = 1.0 - (ViewportHeight - b) / ViewportHeight;
+        y0 = -y1;
+    }
 
-	pglBegin(GL_QUADS);
+    pglBegin(GL_QUADS);
 
     pglTexCoord2f(0.0, 1.0);
     pglVertex3f(x0, y0, -1.0);
@@ -1234,328 +1233,331 @@ void FlipBuffers()
 
     pglEnd();
 
-	pglBindTexture(GL_TEXTURE_2D, 0);
+    pglBindTexture(GL_TEXTURE_2D, 0);
 
-	SDL_GL_SwapWindow(window);
+    SDL_GL_SwapWindow(window);
 }
 
 char *AvpCDPath = 0;
 
 #if !defined(_MSC_VER)
 static const struct option getopt_long_options[] = {
-{ "help",	0,	NULL,	'h' },
-{ "version",	0,	NULL,	'v' },
-{ "fullscreen",	0,	NULL,	'f' },
-{ "windowed",	0,	NULL,	'w' },
-{ "nosound",	0,	NULL,	's' },
-{ "nocdrom",	0,	NULL,	'c' },
-{ "nojoy",	0,	NULL,	'j' },
-{ "debug",	0,	NULL,	'd' },
-{ "withgl",	1,	NULL,	'g' },
-/*
+    {"help", 0, NULL, 'h'},
+    {"version", 0, NULL, 'v'},
+    {"fullscreen", 0, NULL, 'f'},
+    {"windowed", 0, NULL, 'w'},
+    {"nosound", 0, NULL, 's'},
+    {"nocdrom", 0, NULL, 'c'},
+    {"nojoy", 0, NULL, 'j'},
+    {"debug", 0, NULL, 'd'},
+    {"withgl", 1, NULL, 'g'},
+    /*
 { "loadrifs",	1,	NULL,	'l' },
 { "server",	0,	someval,	1 },
 { "client",	1,	someval,	2 },
 */
-{ NULL,		0,	NULL,	0 },
+    {NULL, 0, NULL, 0},
 };
 #endif
 
-static const char *usage_string =
-"Aliens vs Predator Linux - http://www.icculus.org/avp/\n"
-"Based on Rebellion Developments AvP Gold source\n"
-"      [-h | --help]           Display this help message\n"
-"      [-v | --version]        Display the game version\n"
-"      [-f | --fullscreen]     Run the game fullscreen\n"
-"      [-w | --windowed]       Run the game in a window\n"
-"      [-s | --nosound]        Do not access the soundcard\n"
-"      [-c | --nocdrom]        Do not access the CD-ROM\n"
-"      [-j | --nojoy]          Do not access the joystick\n"
-"      [-g | --withgl] [x]     Use [x] instead of /usr/lib/libGL.so.1 for OpenGL\n"
-;
-         
+static const char *usage_string
+    = "Aliens vs Predator Linux - http://www.icculus.org/avp/\n"
+      "Based on Rebellion Developments AvP Gold source\n"
+      "      [-h | --help]           Display this help message\n"
+      "      [-v | --version]        Display the game version\n"
+      "      [-f | --fullscreen]     Run the game fullscreen\n"
+      "      [-w | --windowed]       Run the game in a window\n"
+      "      [-s | --nosound]        Do not access the soundcard\n"
+      "      [-c | --nocdrom]        Do not access the CD-ROM\n"
+      "      [-j | --nojoy]          Do not access the joystick\n"
+      "      [-g | --withgl] [x]     Use [x] instead of /usr/lib/libGL.so.1 for OpenGL\n";
+
 int main(int argc, char *argv[])
-{			
+{
 #if !defined(_MSC_VER)
-	int c;
-	
-	opterr = 0;
-	while ((c = getopt_long(argc, argv, "hvfwscdg:", getopt_long_options, NULL)) != -1) {
-		switch(c) {
-			case 'h':
-				printf("%s", usage_string);
-				exit(EXIT_SUCCESS);
-			case 'v':
-				printf("%s", AvPVersionString);
-				exit(EXIT_SUCCESS);
-			case 'f':
-				WantFullscreen = 1;
-				break;
-			case 'w':
-				WantFullscreen = 0;
-				break;
-			case 's':
-				WantSound = 0;
-				break;
-			case 'c':
-				WantCDRom = 0;
-				break;
-			case 'j':
-				WantJoystick = 0;
-				break;			
-			case 'd': {
-				extern int DebuggingCommandsActive;
-				DebuggingCommandsActive = 1;
-				}
-				break;
-			case 'g':
-				opengl_library = optarg;
-				break;
-			default:
-				printf("%s", usage_string);
-				exit(EXIT_FAILURE);	
-		}
-	}
+    int c;
+
+    opterr = 0;
+    while ((c = getopt_long(argc, argv, "hvfwscdg:", getopt_long_options, NULL)) != -1) {
+        switch (c) {
+        case 'h':
+            printf("%s", usage_string);
+            exit(EXIT_SUCCESS);
+        case 'v':
+            printf("%s", AvPVersionString);
+            exit(EXIT_SUCCESS);
+        case 'f':
+            WantFullscreen = 1;
+            break;
+        case 'w':
+            WantFullscreen = 0;
+            break;
+        case 's':
+            WantSound = 0;
+            break;
+        case 'c':
+            WantCDRom = 0;
+            break;
+        case 'j':
+            WantJoystick = 0;
+            break;
+        case 'd': {
+            extern int DebuggingCommandsActive;
+            DebuggingCommandsActive = 1;
+        } break;
+        case 'g':
+            opengl_library = optarg;
+            break;
+        default:
+            printf("%s", usage_string);
+            exit(EXIT_FAILURE);
+        }
+    }
 #endif
 
-	InitGameDirectories(argv[0]);
-	
-	if (InitSDL() == -1) {
-		fprintf(stderr, "Could not find a sutable resolution!\n");
-		fprintf(stderr, "At least 512x384 is needed.  Does OpenGL work?\n");
-		exit(EXIT_FAILURE);
-	}
-		
-	LoadCDTrackList();
-	
-	SetFastRandom();
-	
+    InitGameDirectories(argv[0]);
+
+    if (InitSDL() == -1) {
+        fprintf(stderr, "Could not find a sutable resolution!\n");
+        fprintf(stderr, "At least 512x384 is needed.  Does OpenGL work?\n");
+        exit(EXIT_FAILURE);
+    }
+
+    LoadCDTrackList();
+
+    SetFastRandom();
+
 #if MARINE_DEMO
-	ffInit("fastfile/mffinfo.txt","fastfile/");
+    ffInit("fastfile/mffinfo.txt", "fastfile/");
 #elif ALIEN_DEMO
-	ffInit("alienfastfile/ffinfo.txt","alienfastfile/");
+    ffInit("alienfastfile/ffinfo.txt", "alienfastfile/");
 #else
-	ffInit("fastfile/ffinfo.txt","fastfile/");
+    ffInit("fastfile/ffinfo.txt", "fastfile/");
 #endif
-	InitGame();
+    InitGame();
 
-	//NEW
-	SetOGLVideoMode(VideoModeList[1].w, VideoModeList[1].h);
-	//NEW
+    //NEW
+    SetOGLVideoMode(VideoModeList[1].w, VideoModeList[1].h);
+    //NEW
 
-	SetSoftVideoMode(640, 480, 16);
-	
-	InitialVideoMode();
+    SetSoftVideoMode(640, 480, 16);
 
-	/* Env_List can probably be removed */
-	Env_List[0]->main = LevelName;
-	
-	InitialiseSystem();
-	InitialiseRenderer();
-	
-	LoadKeyConfiguration();
-	
-	SoundSys_Start();
-	if (WantCDRom) CDDA_Start();
-	
-	InitTextStrings();
-	
-	BuildMultiplayerLevelNameArray();
-	
-	ChangeDirectDrawObject();
-	AvP.LevelCompleted = 0;
-	LoadSounds("PLAYER");
+    InitialVideoMode();
 
-	/* is this still neccessary? */
-	AvP.CurrentEnv = AvP.StartingEnv = 0;
+    /* Env_List can probably be removed */
+    Env_List[0]->main = LevelName;
+
+    InitialiseSystem();
+    InitialiseRenderer();
+
+    LoadKeyConfiguration();
+
+    SoundSys_Start();
+    if (WantCDRom)
+        CDDA_Start();
+
+    InitTextStrings();
+
+    BuildMultiplayerLevelNameArray();
+
+    ChangeDirectDrawObject();
+    AvP.LevelCompleted = 0;
+    LoadSounds("PLAYER");
+
+    /* is this still neccessary? */
+    AvP.CurrentEnv = AvP.StartingEnv = 0;
 
 #if ALIEN_DEMO
-	AvP.PlayerType = I_Alien;
-	SetLevelToLoad(AVP_ENVIRONMENT_INVASION_A);
+    AvP.PlayerType = I_Alien;
+    SetLevelToLoad(AVP_ENVIRONMENT_INVASION_A);
 #elif PREDATOR_DEMO
-	AvP.PlayerType = I_Predator;
-	SetLevelToLoad(AVP_ENVIRONMENT_INVASION_P);
+    AvP.PlayerType = I_Predator;
+    SetLevelToLoad(AVP_ENVIRONMENT_INVASION_P);
 #elif MARINE_DEMO
-	AvP.PlayerType = I_Marine;
-	SetLevelToLoad(AVP_ENVIRONMENT_INVASION);
+    AvP.PlayerType = I_Marine;
+    SetLevelToLoad(AVP_ENVIRONMENT_INVASION);
 #endif
 
-#if !(ALIEN_DEMO|PREDATOR_DEMO|MARINE_DEMO)	
-while (AvP_MainMenus())
+#if !(ALIEN_DEMO | PREDATOR_DEMO | MARINE_DEMO)
+    while (AvP_MainMenus())
 #else
-if (AvP_MainMenus())
+    if (AvP_MainMenus())
 #endif
-{
-	int menusActive = 0;
-	int thisLevelHasBeenCompleted = 0;
-	
-	/* turn off any special effects */
-	d3d_light_ctrl.ctrl = LCCM_NORMAL;
-	
-	//NEW
-	//TODO
-	// need to watch for CurrentVideoMode to change in all cases
-	// the menu will always render in a 640x480 virtual window
-	// game will render in a user-specified virtual window
-	// real window will be which ever size is available
-	//TODO
-	//NEW
-	SetOGLVideoMode(VideoModeList[CurrentVideoMode].w, VideoModeList[CurrentVideoMode].h);
+    {
+        int menusActive = 0;
+        int thisLevelHasBeenCompleted = 0;
 
-	InitialiseGammaSettings(RequestedGammaSetting);
-	
-	start_of_loaded_shapes = load_precompiled_shapes();
-	
-	InitCharacter();
-	
-	LoadRifFile(); /* sets up a map */
-	
-	AssignAllSBNames();
-	
-	StartGame();
-	
-	ffcloseall();
-	
-	AvP.MainLoopRunning = 1;
-	
-	ScanImagesForFMVs();
-	
-	ResetFrameCounter();
+        /* turn off any special effects */
+        d3d_light_ctrl.ctrl = LCCM_NORMAL;
 
-	Game_Has_Loaded();
-	
-	ResetFrameCounter();
-	
-	if(AvP.Network!=I_No_Network)
-	{
-		/*Need to choose a starting position for the player , but first we must look
+        //NEW
+        //TODO
+        // need to watch for CurrentVideoMode to change in all cases
+        // the menu will always render in a 640x480 virtual window
+        // game will render in a user-specified virtual window
+        // real window will be which ever size is available
+        //TODO
+        //NEW
+        SetOGLVideoMode(VideoModeList[CurrentVideoMode].w, VideoModeList[CurrentVideoMode].h);
+
+        InitialiseGammaSettings(RequestedGammaSetting);
+
+        start_of_loaded_shapes = load_precompiled_shapes();
+
+        InitCharacter();
+
+        LoadRifFile(); /* sets up a map */
+
+        AssignAllSBNames();
+
+        StartGame();
+
+        ffcloseall();
+
+        AvP.MainLoopRunning = 1;
+
+        ScanImagesForFMVs();
+
+        ResetFrameCounter();
+
+        Game_Has_Loaded();
+
+        ResetFrameCounter();
+
+        if (AvP.Network != I_No_Network) {
+            /*Need to choose a starting position for the player , but first we must look
 		through the network messages to find out which generator spots are currently clear*/
-		netGameData.myGameState = NGS_Playing;
-		MinimalNetCollectMessages();
-		TeleportNetPlayerToAStartingPosition(Player->ObStrategyBlock,1);
-	}
+            netGameData.myGameState = NGS_Playing;
+            MinimalNetCollectMessages();
+            TeleportNetPlayerToAStartingPosition(Player->ObStrategyBlock, 1);
+        }
 
-	IngameKeyboardInput_ClearBuffer();
-	
-	while(AvP.MainLoopRunning) {
-		CheckForWindowsMessages();
-		
-		switch(AvP.GameMode) {
-		case I_GM_Playing:
-			if ((!menusActive || (AvP.Network!=I_No_Network && !netGameData.skirmishMode)) && !AvP.LevelCompleted) {
-				/* TODO: print some debugging stuff */
-				
-				DoAllShapeAnimations();
-				
-				UpdateGame();
-				
-				AvpShowViews();
-				
-				MaintainHUD();
-				
-				CheckCDAndChooseTrackIfNeeded();
-				
-				if(InGameMenusAreRunning() && ( (AvP.Network!=I_No_Network && netGameData.skirmishMode) || (AvP.Network==I_No_Network)) ) {
-					SoundSys_StopAll();
-				}
-			} else {
-				ReadUserInput();
-				
-				SoundSys_Management();
-				
-				FlushD3DZBuffer();
-				
-				ThisFramesRenderingHasBegun();
-			}
+        IngameKeyboardInput_ClearBuffer();
 
-			menusActive = AvP_InGameMenus();
-			if (AvP.RestartLevel) menusActive=0;
-			
-			if (AvP.LevelCompleted) {
-				SoundSys_FadeOutFast();
-				DoCompletedLevelStatisticsScreen();
-				thisLevelHasBeenCompleted = 1;
-			}
+        while (AvP.MainLoopRunning) {
+            CheckForWindowsMessages();
 
-			ThisFramesRenderingHasFinished();
+            switch (AvP.GameMode) {
+            case I_GM_Playing:
+                if ((!menusActive || (AvP.Network != I_No_Network && !netGameData.skirmishMode))
+                    && !AvP.LevelCompleted) {
+                    /* TODO: print some debugging stuff */
 
-			InGameFlipBuffers();
-			
-			FrameCounterHandler();
-			{
-				PLAYER_STATUS *playerStatusPtr = (PLAYER_STATUS *) (Player->ObStrategyBlock->SBdataptr);
-				
-				if (!menusActive && playerStatusPtr->IsAlive && !AvP.LevelCompleted) {
-					DealWithElapsedTime();
-				}
-			}
-			break;
-			
-		case I_GM_Menus:
-			AvP.GameMode = I_GM_Playing;
-			break;
-		default:
-			fprintf(stderr, "AvP.MainLoopRunning: gamemode = %d\n", AvP.GameMode);
-			exit(EXIT_FAILURE);
-		}
-		
-		if (AvP.RestartLevel) {
-			AvP.RestartLevel = 0;
-			AvP.LevelCompleted = 0;
+                    DoAllShapeAnimations();
 
-			FixCheatModesInUserProfile(UserProfilePtr);
+                    UpdateGame();
 
-			RestartLevel();
-		}
-	}
-	
-	AvP.LevelCompleted = thisLevelHasBeenCompleted;
+                    AvpShowViews();
 
-	FixCheatModesInUserProfile(UserProfilePtr);
+                    MaintainHUD();
 
-	ReleaseAllFMVTextures();
+                    CheckCDAndChooseTrackIfNeeded();
 
-	CONSBIND_WriteKeyBindingsToConfigFile();
-	
-	DeInitialisePlayer();
-	
-	DeallocatePlayersMirrorImage();
-	
-	KillHUD();
-	
-	Destroy_CurrentEnvironment();
-	
-	DeallocateAllImages();
-	
-	EndNPCs();
-	
-	ExitGame();
-	
-	SoundSys_StopAll();
-	
-	SoundSys_ResetFadeLevel();
-	
-	CDDA_Stop();
-	
-	if (AvP.Network != I_No_Network) {
-		EndAVPNetGame();
-	}
-	
-	ClearMemoryPool();
+                    if (InGameMenusAreRunning()
+                        && ((AvP.Network != I_No_Network && netGameData.skirmishMode)
+                            || (AvP.Network == I_No_Network))) {
+                        SoundSys_StopAll();
+                    }
+                } else {
+                    ReadUserInput();
+
+                    SoundSys_Management();
+
+                    FlushD3DZBuffer();
+
+                    ThisFramesRenderingHasBegun();
+                }
+
+                menusActive = AvP_InGameMenus();
+                if (AvP.RestartLevel)
+                    menusActive = 0;
+
+                if (AvP.LevelCompleted) {
+                    SoundSys_FadeOutFast();
+                    DoCompletedLevelStatisticsScreen();
+                    thisLevelHasBeenCompleted = 1;
+                }
+
+                ThisFramesRenderingHasFinished();
+
+                InGameFlipBuffers();
+
+                FrameCounterHandler();
+                {
+                    PLAYER_STATUS *playerStatusPtr
+                        = (PLAYER_STATUS *) (Player->ObStrategyBlock->SBdataptr);
+
+                    if (!menusActive && playerStatusPtr->IsAlive && !AvP.LevelCompleted) {
+                        DealWithElapsedTime();
+                    }
+                }
+                break;
+
+            case I_GM_Menus:
+                AvP.GameMode = I_GM_Playing;
+                break;
+            default:
+                fprintf(stderr, "AvP.MainLoopRunning: gamemode = %d\n", AvP.GameMode);
+                exit(EXIT_FAILURE);
+            }
+
+            if (AvP.RestartLevel) {
+                AvP.RestartLevel = 0;
+                AvP.LevelCompleted = 0;
+
+                FixCheatModesInUserProfile(UserProfilePtr);
+
+                RestartLevel();
+            }
+        }
+
+        AvP.LevelCompleted = thisLevelHasBeenCompleted;
+
+        FixCheatModesInUserProfile(UserProfilePtr);
+
+        ReleaseAllFMVTextures();
+
+        CONSBIND_WriteKeyBindingsToConfigFile();
+
+        DeInitialisePlayer();
+
+        DeallocatePlayersMirrorImage();
+
+        KillHUD();
+
+        Destroy_CurrentEnvironment();
+
+        DeallocateAllImages();
+
+        EndNPCs();
+
+        ExitGame();
+
+        SoundSys_StopAll();
+
+        SoundSys_ResetFadeLevel();
+
+        CDDA_Stop();
+
+        if (AvP.Network != I_No_Network) {
+            EndAVPNetGame();
+        }
+
+        ClearMemoryPool();
 
 /* go back to menu mode */
-#if !(ALIEN_DEMO|PREDATOR_DEMO|MARINE_DEMO)
-	SetSoftVideoMode(640, 480, 16);
-#endif	
-}
+#if !(ALIEN_DEMO | PREDATOR_DEMO | MARINE_DEMO)
+        SetSoftVideoMode(640, 480, 16);
+#endif
+    }
 
-	SoundSys_StopAll();
-	SoundSys_RemoveAll();
-	
-	ExitSystem();
-	
-	CDDA_End();
-	ClearMemoryPool();
-	
-	return 0;
+    SoundSys_StopAll();
+    SoundSys_RemoveAll();
+
+    ExitSystem();
+
+    CDDA_End();
+    ClearMemoryPool();
+
+    return 0;
 }

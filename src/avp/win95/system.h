@@ -7,14 +7,11 @@
 
 */
 
-
 #ifdef __cplusplus
 
 extern "C" {
 
 #endif
-
-
 
 /********************* SYSTEM, PLATFORM AND GAME************/
 
@@ -22,59 +19,52 @@ extern "C" {
 #define No 0
 
 #ifdef _DEBUG /* standard compiler command line debugging-ON switch */
-	#define debug Yes
+#define debug Yes
 #elif defined(NDEBUG) /* standard compiler command line debugging-OFF switch */
-	#define debug No
+#define debug No
 #else /* default switch */
-	#define debug Yes
+#define debug Yes
 #endif
 
-#define SuppressWarnings 	Yes
-							
-#define Term -1
+#define SuppressWarnings Yes
 
+#define Term -1
 
 /********************  General *****************************/
 
 #define GlobalScale 1
-
-
 
 #define one14 16383
 
 #define ONE_FIXED 65536
 #define ONE_FIXED_SHIFT 16
 
-#define Digital	No
-
+#define Digital No
 
 /* Offsets from *** int pointer *** for vectors and vertices */
 
 typedef enum {
 
-	ix,
-	iy,
-	iz
+    ix,
+    iy,
+    iz
 
 } PTARRAYINDICES;
 
 #define StopCompilationOnMultipleInclusions No
-#define UseProjPlatAssert                   Yes /* assert fired functions are in dxlog.c */
-
+#define UseProjPlatAssert Yes /* assert fired functions are in dxlog.c */
 
 /***************  CAMERA AND VIEW VOL********************/
-#define NearZ 	1024
-#define FarZ 	ONE_FIXED
+#define NearZ 1024
+#define FarZ ONE_FIXED
 
-#define SupportMultiCamModules	Yes
-
+#define SupportMultiCamModules Yes
 
 /************* Timer and Frame Rate Independence *************/
 
-#define TimerFrame		1000	
+#define TimerFrame 1000
 #define NormalFrame ONE_FIXED
 #define NormalFrameShift ONE_FIXED_SHIFT
-
 
 /***************** Angles  and VALUES ******************/
 
@@ -90,11 +80,10 @@ typedef enum {
 #define deg360 4096
 #define wrap360 4095
 
-#define Cosine45 		46341		/* 46340.95001 cosine(45deg)*/
+#define Cosine45 46341 /* 46340.95001 cosine(45deg)*/
 
-#define bigint 1<<30		/*  max int size*/
-#define smallint -(bigint)	/* smallest int size*/
-
+#define bigint 1 << 30     /*  max int size*/
+#define smallint -(bigint) /* smallest int size*/
 
 /****************** BUFFER SIZES **********************/
 
@@ -110,62 +99,55 @@ extern int maxshapes;
 
 #define maxpolys 4000
 #define maxpolyptrs maxpolys
-#define maxpolypts 9			/* Translates as number of vectors */
+#define maxpolypts 9 /* Translates as number of vectors */
 
-#define vsize 3					/* Scale for polygon vertex indices */
+#define vsize 3 /* Scale for polygon vertex indices */
 
 #define MaxImages 400
 #define MaxImageGroups 1
-
 
 /************** Some Shell and Loading Platform Compiler Options ******************/
 
 #undef RIFF_SYSTEM
 #define RIFF_SYSTEM
 #define TestRiffLoaders Yes
-#define LoadingMapsShapesAndTexturesEtc		No
+#define LoadingMapsShapesAndTexturesEtc No
 
-#define pc_backdrops						No
-
+#define pc_backdrops No
 
 /***************** DRAW SORT *******************/
 
-#define SupportTrackOptimisation			No
+#define SupportTrackOptimisation No
 
+#define SupportBSP No
 
-#define SupportBSP						 	No
-
-#define SupportZBuffering				Yes
-#define ZBufferTest							No
-
+#define SupportZBuffering Yes
+#define ZBufferTest No
 
 /***************** SHAPE DATA DEFINES************/
 
-#define StandardShapeLanguage						Yes
+#define StandardShapeLanguage Yes
 
-#define SupportModules 									Yes
-#define IncludeModuleFunctionPrototypes	Yes
+#define SupportModules Yes
+#define IncludeModuleFunctionPrototypes Yes
 
-#define SupportMorphing									Yes
-#define LazyEvaluationForMorphing				No
-
+#define SupportMorphing Yes
+#define LazyEvaluationForMorphing No
 
 /***************** COLLISION DEFINES*************/
-#define StandardStrategyAndCollisions		No
-#define IntermediateSSACM	No		/* User preference */
-
-
+#define StandardStrategyAndCollisions No
+#define IntermediateSSACM No /* User preference */
 
 /************** TEXTURE DEFINES*******************/
 
-#define maxTxAnimblocks	100
+#define maxTxAnimblocks 100
 
 /* Texture usage of the colour int */
 
-#define TxDefn 16				/* Shift up for texture definition index */
-#define TxLocal 0x8000			/* Set bit 15 to signify a local index */
-#define ClrTxIndex 0xffff0000	/* AND with this to clear the low 16-bits */
-#define ClrTxDefn 0x0000ffff	/* AND with this to clear the high 16-bits */
+#define TxDefn 16             /* Shift up for texture definition index */
+#define TxLocal 0x8000        /* Set bit 15 to signify a local index */
+#define ClrTxIndex 0xffff0000 /* AND with this to clear the low 16-bits */
+#define ClrTxDefn 0x0000ffff  /* AND with this to clear the high 16-bits */
 
 /*
  3d textures
@@ -178,27 +160,23 @@ extern int maxshapes;
  1/Z now reaches 0 at 2^29 = 537km
 */
 
-#define support3dtextures					Yes
-#define int3dtextures						No /* there is no D3D Zbuffer support for int 3d textures */
-#define SupportGouraud3dTextures  			Yes
-
+#define support3dtextures Yes
+#define int3dtextures No /* there is no D3D Zbuffer support for int 3d textures */
+#define SupportGouraud3dTextures Yes
 
 /*************************** WINDOWS 95 *********************/
 
 #define SUPPORT_MMX 0
 
 #define MaxD3DInstructions 1000 // includes state change instructions!!!
-#define MaxD3DVertices     256
+#define MaxD3DVertices 256
 
-#define optimiseflip No /* unstable at present */
+#define optimiseflip No  /* unstable at present */
 #define optimiseblit Yes /* unstable at present */
 
-
 #ifdef __cplusplus
-	
-	};
+};
 
 #endif
-
 
 #endif

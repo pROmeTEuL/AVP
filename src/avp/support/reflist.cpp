@@ -14,4 +14,4 @@
 
 /* Exported globals ************************************************/
 
-	char const* reflist_fail_destructor = "Failure in RefList destructor\n";
+char const *reflist_fail_destructor = "Failure in RefList destructor\n";

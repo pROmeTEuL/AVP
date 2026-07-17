@@ -9,15 +9,15 @@ extern "C" {
 
 typedef struct LogFile LOGFILE;
 
-int vlfprintf(LOGFILE * lfp, char const * format, va_list args );
+int vlfprintf(LOGFILE *lfp, char const *format, va_list args);
 
-int lfprintf(LOGFILE * lfp, char const * format, ... );
+int lfprintf(LOGFILE *lfp, char const *format, ...);
 
-int lfputs(LOGFILE * lfp, char const * str);
+int lfputs(LOGFILE *lfp, char const *str);
 
-LOGFILE * lfopen(char const * fname);
+LOGFILE *lfopen(char const *fname);
 
-void lfclose(LOGFILE * lfp);
+void lfclose(LOGFILE *lfp);
 
 #ifdef __cplusplus
 }

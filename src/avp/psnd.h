@@ -21,23 +21,21 @@ extern "C" {
   priority may stop and displace sounds with the minimum priority, if the 
   maximum number of sounds is being played.
   -----------------------------------------------------------------------------*/
-typedef enum activesoundpriority
-{
-	ASP_Minimum,
-	ASP_Maximum,
-}ACTIVESOUNDPRIORITY;
+typedef enum activesoundpriority {
+    ASP_Minimum,
+    ASP_Maximum,
+} ACTIVESOUNDPRIORITY;
 
 /* this is a structure for new 3d sound support */
 
 typedef struct sound3ddata
 {
-	VECTORCH position;
-	VECTORCH velocity;
-	int inner_range;
-	int outer_range;
-	
-} SOUND3DDATA;
+    VECTORCH position;
+    VECTORCH velocity;
+    int inner_range;
+    int outer_range;
 
+} SOUND3DDATA;
 
 /* Patrick 5/6/97 --------------------------------------------------------------
   Some platform independant defines:
@@ -46,17 +44,17 @@ typedef struct sound3ddata
   MAX\MIN PITCH: range of values accepted by functions for sound pitch settings,
   covers +- 4 octaves in 128ths of a semi-tone
   -----------------------------------------------------------------------------*/
-#define SOUND_NOACTIVEINDEX			(-1)
-#define SOUND_PLATFORMERROR			(-1)
+#define SOUND_NOACTIVEINDEX (-1)
+#define SOUND_PLATFORMERROR (-1)
 
-#define VOLUME_MAX		(127)		
-#define VOLUME_MIN		(0)
-#define VOLUME_DEFAULT	(127)
-#define VOLUME_FADERATE	(16) /* per second */
+#define VOLUME_MAX (127)
+#define VOLUME_MIN (0)
+#define VOLUME_DEFAULT (127)
+#define VOLUME_FADERATE (16) /* per second */
 
-#define PITCH_MAX		(6144)	
-#define PITCH_MIN		(-6144)
-#define PITCH_DEFAULT	(0)
+#define PITCH_MAX (6144)
+#define PITCH_MIN (-6144)
+#define PITCH_DEFAULT (0)
 
 /* Patrick 5/6/97 --------------------------------------------------------------
   SoundSys_Start() & SoundSys_End(): initialise and de-initialise the sound 
@@ -98,13 +96,11 @@ extern int SoundSys_IsOn(void);
   -----------------------------------------------------------------------------*/
 extern void SoundSys_ChangeVolume(int volume);
 
-
 /* New fading functionality KJL 99/4/5 */
 extern void SoundSys_ResetFadeLevel(void);
 extern void SoundSys_FadeIn(void);
 extern void SoundSys_FadeOut(void);
 extern void SoundSys_FadeOutFast(void);
-
 
 /* Patrick 5/6/97 --------------------------------------------------------------
   Sound play function: creates and plays and instance of a loaded game sound.
@@ -135,7 +131,7 @@ extern void SoundSys_FadeOutFast(void);
   'h': play sound with maximum priority (minimum is the default)
   'm': flag for marines to ignore.    
   -----------------------------------------------------------------------------*/
-extern void Sound_Play(SOUNDINDEX soundNumber, char* format, ...);
+extern void Sound_Play(SOUNDINDEX soundNumber, char *format, ...);
 /* Patrick 5/6/97 --------------------------------------------------------------
   The remaining functions are used to modify existing playing sounds. All take
   a handle to a sound. If an invalid handle is passed, the functions have no
@@ -147,26 +143,15 @@ extern void Sound_Play(SOUNDINDEX soundNumber, char* format, ...);
 extern void Sound_Stop(int activeSoundNumber);
 extern void Sound_ChangeVolume(int activeSoundNumber, int volume);
 extern void Sound_ChangePitch(int activeSoundNumber, int pitch);
-extern void Sound_Update3d(int activeSoundNumber, VECTORCH* posn);
-extern void Sound_UpdateNew3d(int activeSoundNumber, SOUND3DDATA * s3d);
+extern void Sound_Update3d(int activeSoundNumber, VECTORCH *posn);
+extern void Sound_UpdateNew3d(int activeSoundNumber, SOUND3DDATA *s3d);
 extern unsigned int SoundNumActiveVoices();
 
-
-extern void Load_SoundState(int* soundHandle);
-extern void Save_SoundState(int* soundHandle);
+extern void Load_SoundState(int *soundHandle);
+extern void Save_SoundState(int *soundHandle);
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif
-
-
-
-
-
-
-
-
-
-

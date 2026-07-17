@@ -7,7 +7,6 @@ void InitCameraValues(void);
 void LightSourcesInRangeOfObject(DISPLAYBLOCK *dptr);
 void ReflectObject(DISPLAYBLOCK *dPtr);
 
-
 extern VIEWDESCRIPTORBLOCK *Global_VDB_Ptr;
 
 #endif

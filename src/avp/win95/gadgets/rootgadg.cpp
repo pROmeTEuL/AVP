@@ -13,10 +13,10 @@
 #include "rootgadg.hpp"
 
 #if UseGadgets
-	#include "hudgadg.hpp"
-		
-	#define UseLocalAssert Yes
-	#include "ourasert.h"
+#include "hudgadg.hpp"
+
+#define UseLocalAssert Yes
+#include "ourasert.h"
 
 /* Version settings ************************************************/
 
@@ -28,14 +28,12 @@
 
 /* Imported data ***************************************************/
 #ifdef __cplusplus
-	extern "C"
-	{
+extern "C" {
 #endif
-		extern signed int HUDTranslucencyLevel;
-			// ranges from 0 to 255 inclusive ; convert to fixed point...
+extern signed int HUDTranslucencyLevel;
+// ranges from 0 to 255 inclusive ; convert to fixed point...
 
-
-		#if 0
+#if 0
 		extern OurBool			DaveDebugOn;
 		extern FDIEXTENSIONTAG	FDIET_Dummy;
 		extern IFEXTENSIONTAG	IFET_Dummy;
@@ -46,17 +44,15 @@
 		extern UncompressedGlobalPlotAtomID UGPAID_StandardNull;
 		extern IFCOLOUR			IFColour_Dummy;
  		extern IFVECTOR			IFVec_Zero;
-		#endif
-#ifdef __cplusplus
-	};
 #endif
-
-
+#ifdef __cplusplus
+};
+#endif
 
 /* Exported globals ************************************************/
 
-	// private:
-	/*static*/ RootGadget* RootGadget :: pSingleton = NULL;
+// private:
+/*static*/ RootGadget *RootGadget ::pSingleton = NULL;
 
 /* Internal type definitions ***************************************/
 
@@ -68,24 +64,19 @@
 // class RootGadget : public Gadget
 // friend extern void GADGET_Init(void);
 // friend extern void GADGET_UnInit(void);
-	// friend functions: these get permission in order to allow
-	// construction/destruction
+// friend functions: these get permission in order to allow
+// construction/destruction
 
 // public:
-void RootGadget :: Render
-(
-	const struct r2pos& R2Pos,
-	const struct r2rect& R2Rect_Clip,
-	int FixP_Alpha
-)
+void RootGadget ::Render(const struct r2pos &R2Pos, const struct r2rect &R2Rect_Clip, int FixP_Alpha)
 {
-	/* PRECONDITION */
-	{
-	}
+    /* PRECONDITION */
+    {
+    }
 
-	/* CODE */
-	{
-		#if 0
+    /* CODE */
+    {
+#if 0
 		textprint
 		(
 			"RootGadget :: Render at (%i,%i) clipped (%i,%i,%i,%i) alpha=%i\n",
@@ -97,107 +88,89 @@ void RootGadget :: Render
 			R2Rect_Clip . y1,
 			FixP_Alpha
 		);
-		#endif
+#endif
 
-		if ( pHUDGadg )
-		{
-			// HUDTranslucencyLevel ranges from 0 to 255 inclusive ; convert to fixed point...
+        if (pHUDGadg) {
+            // HUDTranslucencyLevel ranges from 0 to 255 inclusive ; convert to fixed point...
 
-			GLOBALASSERT( HUDTranslucencyLevel >= 0);
-			GLOBALASSERT( HUDTranslucencyLevel <= 255 );
+            GLOBALASSERT(HUDTranslucencyLevel >= 0);
+            GLOBALASSERT(HUDTranslucencyLevel <= 255);
 
-			pHUDGadg -> Render
-			(
-				R2Pos,
-				R2Rect_Clip,
-				(HUDTranslucencyLevel << 8) // int FixP_Alpha
-			);
-		}
-	}
+            pHUDGadg->Render(
+                R2Pos,
+                R2Rect_Clip,
+                (HUDTranslucencyLevel << 8) // int FixP_Alpha
+            );
+        }
+    }
 }
 
-void RootGadget :: RefreshHUD(void)
+void RootGadget ::RefreshHUD(void)
 {
-	/* PRECONDITION */
-	{
-	}
+    /* PRECONDITION */
+    {
+    }
 
-	/* CODE */
-	{
-		// For the moment, destroy any HUD:
-		if ( pHUDGadg )
-		{
-			delete pHUDGadg;
-			pHUDGadg = NULL;
-		}
+    /* CODE */
+    {
+        // For the moment, destroy any HUD:
+        if (pHUDGadg) {
+            delete pHUDGadg;
+            pHUDGadg = NULL;
+        }
 
-		GLOBALASSERT( NULL == pHUDGadg );
+        GLOBALASSERT(NULL == pHUDGadg);
 
-		// And then recreate if necessary:
-		{
-			extern AVP_GAME_DESC AvP;		 /* game description */
+        // And then recreate if necessary:
+        {
+            extern AVP_GAME_DESC AvP; /* game description */
 
-			if
-			(
-				AvP.GameMode == I_GM_Playing
-			)
-			{
-				pHUDGadg = HUDGadget :: MakeHUD
-				(
-					AvP.PlayerType // I_PLAYER_TYPE IPlayerType_ToMake
-				);
-			}
-		}
-	}
+            if (AvP.GameMode == I_GM_Playing) {
+                pHUDGadg = HUDGadget ::MakeHUD(AvP.PlayerType // I_PLAYER_TYPE IPlayerType_ToMake
+                );
+            }
+        }
+    }
 }
-
-
 
 // private:
-RootGadget :: RootGadget
-(
-) : Gadget
-	(
-		#if debug
-		"RootGadget"
-		#endif
-	)		
+RootGadget ::RootGadget()
+    : Gadget(
+#if debug
+          "RootGadget"
+#endif
+      )
 {
-	/* PRECONDITION */
-	{
-		GLOBALASSERT( pSingleton == NULL );
-	}
+    /* PRECONDITION */
+    {
+        GLOBALASSERT(pSingleton == NULL);
+    }
 
-	/* CODE */
-	{
-		pHUDGadg = NULL;
+    /* CODE */
+    {
+        pHUDGadg = NULL;
 
-		pSingleton = this;
-	}
+        pSingleton = this;
+    }
 }
 
-RootGadget :: ~RootGadget()
+RootGadget ::~RootGadget()
 {
-	/* PRECONDITION */
-	{
-		GLOBALASSERT( pSingleton == this );
-	}
+    /* PRECONDITION */
+    {
+        GLOBALASSERT(pSingleton == this);
+    }
 
-	/* CODE */
-	{
-		pSingleton = NULL;
+    /* CODE */
+    {
+        pSingleton = NULL;
 
-		if ( pHUDGadg )
-		{
-			delete pHUDGadg;
-		}
-	}
+        if (pHUDGadg) {
+            delete pHUDGadg;
+        }
+    }
 }
-
-
 
 /* Internal function definitions ***********************************/
-
-
 
 #endif // UseGadgets

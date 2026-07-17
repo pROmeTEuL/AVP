@@ -8,11 +8,10 @@
 #define ConsoleLog_h_included
 
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif
-	extern void OutputToConsoleLogfile(char *messagePtr);
-	extern void OutputBugReportToConsoleLogfile(char *messagePtr);
+extern void OutputToConsoleLogfile(char *messagePtr);
+extern void OutputBugReportToConsoleLogfile(char *messagePtr);
 #ifdef __cplusplus
 };
 #endif

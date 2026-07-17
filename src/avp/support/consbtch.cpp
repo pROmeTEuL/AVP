@@ -13,22 +13,17 @@
 
 #include "3dc.h"
 
-	#include "consbtch.hpp"
-	#include "reflist.hpp"
+#include "consbtch.hpp"
+#include "reflist.hpp"
 
-
-	#define UseLocalAssert Yes
-	#include "ourasert.h"
+#define UseLocalAssert Yes
+#include "ourasert.h"
 
 /* Version settings ************************************************/
 
 /* Constants *******************************************************/
 
-	enum
-	{
-		MaxBatchFileLineLength=300,
-		MaxBatchFileLineSize=(MaxBatchFileLineLength+1)
-	};
+enum { MaxBatchFileLineLength = 300, MaxBatchFileLineSize = (MaxBatchFileLineLength + 1) };
 
 /* Macros **********************************************************/
 
@@ -36,10 +31,9 @@
 
 /* Imported data ***************************************************/
 #ifdef __cplusplus
-	extern "C"
-	{
+extern "C" {
 #endif
-		#if 0
+#if 0
 		extern OurBool			DaveDebugOn;
 		extern FDIEXTENSIONTAG	FDIET_Dummy;
 		extern IFEXTENSIONTAG	IFET_Dummy;
@@ -50,12 +44,10 @@
 		extern UncompressedGlobalPlotAtomID UGPAID_StandardNull;
 		extern IFCOLOUR			IFColour_Dummy;
  		extern IFVECTOR			IFVec_Zero;
-		#endif
-#ifdef __cplusplus
-	};
 #endif
-
-
+#ifdef __cplusplus
+};
+#endif
 
 /* Exported globals ************************************************/
 
@@ -69,151 +61,116 @@
 // class BatchFileProcessing
 // public:
 // static
-OurBool
-BatchFileProcessing :: Run(char* Filename)
+OurBool BatchFileProcessing ::Run(char *Filename)
 {
-	// Tries to find the file, if it finds it it reads it,
-	// adds the non-comment lines to the pending list, and returns Yes
-	// If it can't find the file, it returns No
+    // Tries to find the file, if it finds it it reads it,
+    // adds the non-comment lines to the pending list, and returns Yes
+    // If it can't find the file, it returns No
 
-	// LOCALISEME
-	// This code makes several uses of the assumption that char is type-equal
-	// to ProjChar
+    // LOCALISEME
+    // This code makes several uses of the assumption that char is type-equal
+    // to ProjChar
 
-	RefList<SCString> PendingList;
+    RefList<SCString> PendingList;
 
-	{
-		FILE* pFile = OpenGameFile(Filename, FILEMODE_READONLY, FILETYPE_CONFIG);
+    {
+        FILE *pFile = OpenGameFile(Filename, FILEMODE_READONLY, FILETYPE_CONFIG);
 
-		if (NULL==pFile)
-		{
-			return No;
-		}
-		
-		
+        if (NULL == pFile) {
+            return No;
+        }
 
-		// Read the file, line by line.  
-		{
-			// We impose a maximum length on lines that will be valid:
-			char LineBuffer[MaxBatchFileLineSize];
+        // Read the file, line by line.
+        {
+            // We impose a maximum length on lines that will be valid:
+            char LineBuffer[MaxBatchFileLineSize];
 
-			int CharsReadInLine = 0;
+            int CharsReadInLine = 0;
 
-			while (1)
-			{
-				int Char = fgetc(pFile);
+            while (1) {
+                int Char = fgetc(pFile);
 
-				if (Char==EOF)
-				{
-					break;
-				}
-				else
-				{
-					if
-					(
-						Char=='\n'
-					)
-					{
-						// Flush the buffer into the pending queue:
-						GLOBALASSERT(CharsReadInLine<=MaxBatchFileLineLength);
-						LineBuffer[CharsReadInLine] = '\0';
+                if (Char == EOF) {
+                    break;
+                } else {
+                    if (Char == '\n') {
+                        // Flush the buffer into the pending queue:
+                        GLOBALASSERT(CharsReadInLine <= MaxBatchFileLineLength);
+                        LineBuffer[CharsReadInLine] = '\0';
 
-						SCString* pSCString_Line = new SCString(&LineBuffer[0]);
-						
-						PendingList . AddToEnd
-						(
-							*pSCString_Line
-						);
+                        SCString *pSCString_Line = new SCString(&LineBuffer[0]);
 
-						pSCString_Line -> R_Release();
+                        PendingList.AddToEnd(*pSCString_Line);
 
-						CharsReadInLine = 0;
-					}
-					else
-					{
-						// Add to buffer; silently reject characters beyond the length limit
-						if ( CharsReadInLine < MaxBatchFileLineLength )
-						{
-							LineBuffer[CharsReadInLine++]=toupper((char)Char);
-						}
-					}
-				}
-			}
+                        pSCString_Line->R_Release();
 
-			// Flush anything still in the buffer into the pending queue:
-			{
-				GLOBALASSERT(CharsReadInLine<=MaxBatchFileLineLength);
-				LineBuffer[CharsReadInLine] = '\0';
-				
-				SCString* pSCString_Line = new SCString(&LineBuffer[0]);
-				
-				PendingList . AddToEnd
-				(
-					*pSCString_Line
-				);
+                        CharsReadInLine = 0;
+                    } else {
+                        // Add to buffer; silently reject characters beyond the length limit
+                        if (CharsReadInLine < MaxBatchFileLineLength) {
+                            LineBuffer[CharsReadInLine++] = toupper((char) Char);
+                        }
+                    }
+                }
+            }
 
-				pSCString_Line -> R_Release();
-			}
-		}
+            // Flush anything still in the buffer into the pending queue:
+            {
+                GLOBALASSERT(CharsReadInLine <= MaxBatchFileLineLength);
+                LineBuffer[CharsReadInLine] = '\0';
 
-		fclose(pFile);
-	}
+                SCString *pSCString_Line = new SCString(&LineBuffer[0]);
 
-	// Feedback:
-	{
-		SCString* pSCString_1 = new SCString("EXECUTING BATCH FILE ");
-			// LOCALISEME
-		SCString* pSCString_2 = new SCString(Filename);
-		SCString* pSCString_Feedback = new SCString
-		(
-			pSCString_1,
-			pSCString_2
-		);
+                PendingList.AddToEnd(*pSCString_Line);
 
-		pSCString_Feedback -> SendToScreen();
+                pSCString_Line->R_Release();
+            }
+        }
 
-		pSCString_Feedback -> R_Release();
-		pSCString_2 -> R_Release();
-		pSCString_1 -> R_Release();
+        fclose(pFile);
+    }
 
-	}
+    // Feedback:
+    {
+        SCString *pSCString_1 = new SCString("EXECUTING BATCH FILE ");
+        // LOCALISEME
+        SCString *pSCString_2 = new SCString(Filename);
+        SCString *pSCString_Feedback = new SCString(pSCString_1, pSCString_2);
 
-	// Now process the pending queue:
-	{
-		// Iterate through the pending list, destructively reading the
-		// "references" from the front:
-		{
-			SCString* pSCString;
+        pSCString_Feedback->SendToScreen();
 
-			// The assignment in this boolean expression is deliberate:
-			while
-			(
-				NULL != (pSCString = PendingList . GetYourFirst())
-			)
-			{
-				if (pSCString->pProjCh()[0] != '#')
-				{
-					// lines beginning with hash are comments
-					if (bEcho)
-					{
-						pSCString -> SendToScreen();
-					}
+        pSCString_Feedback->R_Release();
+        pSCString_2->R_Release();
+        pSCString_1->R_Release();
+    }
 
-					pSCString -> ProcessAnyCheatCodes();
-				}
-				pSCString -> R_Release();
-			}
-		}
+    // Now process the pending queue:
+    {
+        // Iterate through the pending list, destructively reading the
+        // "references" from the front:
+        {
+            SCString *pSCString;
 
-	}
+            // The assignment in this boolean expression is deliberate:
+            while (NULL != (pSCString = PendingList.GetYourFirst())) {
+                if (pSCString->pProjCh()[0] != '#') {
+                    // lines beginning with hash are comments
+                    if (bEcho) {
+                        pSCString->SendToScreen();
+                    }
 
-	return Yes;
-	
+                    pSCString->ProcessAnyCheatCodes();
+                }
+                pSCString->R_Release();
+            }
+        }
+    }
+
+    return Yes;
 }
 
 // public:
 // static
-int BatchFileProcessing :: bEcho = No;
-
+int BatchFileProcessing ::bEcho = No;
 
 /* Internal function definitions ***********************************/

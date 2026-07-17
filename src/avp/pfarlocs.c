@@ -28,7 +28,7 @@
 static void BuildFM_AuxilaryLocs(MODULE *thisModule);
 static void GetFarLocHeight(FARVALIDATEDLOCATION *location, MODULE *thisModule);
 static void FarLocVolumeTest(FARVALIDATEDLOCATION *location, MODULE *thisModule);
-static int IsXZinPoly(VECTORCH* location, struct ColPolyTag *polygonData);
+static int IsXZinPoly(VECTORCH *location, struct ColPolyTag *polygonData);
 static void InitFarLocDataAreas(MODULE **moduleList, int numModules);
 
 /* external global variables used in this file */
@@ -37,31 +37,31 @@ extern int ModuleArraySize;
 /* prototypes for external functions */
 int SetupPolygonAccessFromShapeIndex(int shapeIndex);
 int SetupPointAccessFromShapeIndex(int shapeIndex);
-VECTORCH* AccessNextPoint(void);
-VECTORCH* AccessPointFromIndex(int index);
+VECTORCH *AccessNextPoint(void);
+VECTORCH *AccessPointFromIndex(int index);
 int *GetPolygonVertexIndices(void);
 
 /* globals for this file */
-FARENTRYPOINTSHEADER *FALLP_EntryPoints=(FARENTRYPOINTSHEADER*)0;
-FARLOCATIONSHEADER *FALLP_AuxLocs = (FARLOCATIONSHEADER *)0;
+FARENTRYPOINTSHEADER *FALLP_EntryPoints = (FARENTRYPOINTSHEADER *) 0;
+FARLOCATIONSHEADER *FALLP_AuxLocs = (FARLOCATIONSHEADER *) 0;
 
-int AIModuleArraySize=0;
-AIMODULE *AIModuleArray=0;
+int AIModuleArraySize = 0;
+AIMODULE *AIModuleArray = 0;
 
 /* static globals for this file */
 static FARVALIDATEDLOCATION *auxLocsGrid;
 static int numInfiniteModules = 0;
 
 static int FL_TotalNumAuxLocs = 0;
-static VECTORCH	*FL_AuxData = (VECTORCH *)0;
+static VECTORCH *FL_AuxData = (VECTORCH *) 0;
 
 /* a define for logging location data */
-#define logFarLocData	0
+#define logFarLocData 0
 #if logFarLocData
 static FILE *logfile;
 #endif
 
-#define logFarLocPositions	0
+#define logFarLocPositions 0
 #if logFarLocPositions
 static FILE *logfile2;
 #endif
@@ -77,12 +77,12 @@ static FILE *logfile2;
 
 void BuildFarModuleLocs(void)
 {
-	MODULE **moduleListPointer;	
-	int moduleCounter;
+    MODULE **moduleListPointer;
+    int moduleCounter;
 
-	/* don't do this for a net game */
-	//in fact do do it in net game
-	#if 0
+/* don't do this for a net game */
+//in fact do do it in net game
+#if 0
 	if(AvP.Network != I_No_Network)	
 	{
 		/* Make sure global data is zeroed, then return */
@@ -91,59 +91,59 @@ void BuildFarModuleLocs(void)
 		FL_AuxData = (VECTORCH *)0;
 		return;
 	}
-	#endif
+#endif
 
-	LOCALASSERT(ModuleArraySize);
+    LOCALASSERT(ModuleArraySize);
 
-	/* now get a pointer to the list of modules in this environment. */ 
-	{
-		extern SCENE Global_Scene;
-		extern SCENEMODULE **Global_ModulePtr;
-		SCENEMODULE *ScenePtr;
+    /* now get a pointer to the list of modules in this environment. */
+    {
+        extern SCENE Global_Scene;
+        extern SCENEMODULE **Global_ModulePtr;
+        SCENEMODULE *ScenePtr;
 
-		LOCALASSERT(Global_ModulePtr);
-		
-		ScenePtr = Global_ModulePtr[Global_Scene];
-		moduleListPointer = ScenePtr->sm_marray;
-	}
-		
-	#if logFarLocData
-	logfile = fopen("E:/3DC/FARLOCS.TXT","w");
-	fprintf(logfile, "MODULE FAR LOCATIONS DATA \n");
-	fprintf(logfile, "ENV: %s \n", Env_List[AvP.CurrentEnv]->main);
-	fprintf(logfile, "************************* \n");
-	fprintf(logfile, "number of modules: %d \n", ModuleArraySize);
-	fprintf(logfile, "grid size: %d \n", FAR_GRID_SIZE);
-	fprintf(logfile, "max locs stored per module: %d \n \n", FAR_MAX_LOCS);
-	fprintf(logfile, "alien box height: %d \n", FAR_BB_HEIGHT);
-	fprintf(logfile, "alien box width: %d \n", FAR_BB_WIDTH);
-	fprintf(logfile, "************************* \n \n");	
-	#endif
+        LOCALASSERT(Global_ModulePtr);
 
-	/* initialise infinite module counter */
-	numInfiniteModules = 0;
+        ScenePtr = Global_ModulePtr[Global_Scene];
+        moduleListPointer = ScenePtr->sm_marray;
+    }
 
-	/* allocate some temporary work spaces..*/
-	auxLocsGrid = (FARVALIDATEDLOCATION *)AllocateMem(FAR_GRID_SIZE*FAR_GRID_SIZE*sizeof(FARVALIDATEDLOCATION));
-	if(!auxLocsGrid) 
-	{
-		memoryInitialisationFailure = 1;
-		return;
-	}
+#if logFarLocData
+    logfile = fopen("E:/3DC/FARLOCS.TXT", "w");
+    fprintf(logfile, "MODULE FAR LOCATIONS DATA \n");
+    fprintf(logfile, "ENV: %s \n", Env_List[AvP.CurrentEnv]->main);
+    fprintf(logfile, "************************* \n");
+    fprintf(logfile, "number of modules: %d \n", ModuleArraySize);
+    fprintf(logfile, "grid size: %d \n", FAR_GRID_SIZE);
+    fprintf(logfile, "max locs stored per module: %d \n \n", FAR_MAX_LOCS);
+    fprintf(logfile, "alien box height: %d \n", FAR_BB_HEIGHT);
+    fprintf(logfile, "alien box width: %d \n", FAR_BB_WIDTH);
+    fprintf(logfile, "************************* \n \n");
+#endif
 
-	/* Initialise the entry point list and auxilary location list.
+    /* initialise infinite module counter */
+    numInfiniteModules = 0;
+
+    /* allocate some temporary work spaces..*/
+    auxLocsGrid = (FARVALIDATEDLOCATION *) AllocateMem(
+        FAR_GRID_SIZE * FAR_GRID_SIZE * sizeof(FARVALIDATEDLOCATION));
+    if (!auxLocsGrid) {
+        memoryInitialisationFailure = 1;
+        return;
+    }
+
+    /* Initialise the entry point list and auxilary location list.
 	NB entry points are are pre-allocated, since they are evaluated in pairs.*/
-	InitFarLocDataAreas(moduleListPointer, ModuleArraySize);
-	
-	#if logFarLocData
-	fprintf(logfile, "********************************* \n");
-	fprintf(logfile, "STARTING ENTRY POINTS.... \n");
-	fprintf(logfile, "********************************* \n \n");
-	#endif
+    InitFarLocDataAreas(moduleListPointer, ModuleArraySize);
 
-	/* Now go through the module list, and calculate entry points. This step should
+#if logFarLocData
+    fprintf(logfile, "********************************* \n");
+    fprintf(logfile, "STARTING ENTRY POINTS.... \n");
+    fprintf(logfile, "********************************* \n \n");
+#endif
+
+/* Now go through the module list, and calculate entry points. This step should
 	be done before auxilary locations, to be absolutely sure everything works out */
-	#if 0
+#if 0
 	//set up in projload now
 	for(moduleCounter = 0; moduleCounter < ModuleArraySize; moduleCounter++)
 	{
@@ -156,11 +156,11 @@ void BuildFarModuleLocs(void)
 		ThisModuleIndex = thisModule->m_index;
 		LOCALASSERT(ThisModuleIndex >= 0);
 		LOCALASSERT(ThisModuleIndex < ModuleArraySize);
-		
-		#if logFarLocData
+
+#if logFarLocData
 		fprintf(logfile, "********************************* \n");
 		fprintf(logfile, "Module Index: %d %s\n", ThisModuleIndex,thisModule->name);
- 		#endif
+#endif
 
 		/* reject modules that are not physical */
 		if(ModuleIsPhysical(thisModule)) 
@@ -168,220 +168,205 @@ void BuildFarModuleLocs(void)
 		else
 		{
 			numInfiniteModules++;
-			#if logFarLocData
+#if logFarLocData
 			fprintf(logfile, "NO EPS COMPUTED: NOT PHYSICAL\n \n");
-			#endif
+#endif
 		}
 	}
-	#endif
+#endif
 
-	#if logFarLocData
-	fprintf(logfile, "********************************* \n");
-	fprintf(logfile, "STARTING AUXILARY LOCATIONS.... \n");
-	fprintf(logfile, "********************************* \n \n");
-	#endif
+#if logFarLocData
+    fprintf(logfile, "********************************* \n");
+    fprintf(logfile, "STARTING AUXILARY LOCATIONS.... \n");
+    fprintf(logfile, "********************************* \n \n");
+#endif
 
-	/* now go thro' each module calculating auxilary locations */
-	for(moduleCounter = 0; moduleCounter < ModuleArraySize; moduleCounter++)
-	{
-		MODULE *thisModule;
-		int ThisModuleIndex;	
-	 		
-	 	/* get a pointer to the next module, and it's index */
-		thisModule = moduleListPointer[moduleCounter]; 
-		LOCALASSERT(thisModule);
-		ThisModuleIndex = thisModule->m_index;
-		LOCALASSERT(ThisModuleIndex >= 0);
-		LOCALASSERT(ThisModuleIndex < ModuleArraySize);
-		
-		#if logFarLocData
-		fprintf(logfile, "********************************* \n");
-		fprintf(logfile, "Module Index: %d \n", ThisModuleIndex);
-		fprintf(logfile, "Module X range: %d %d \n", thisModule->m_minx, thisModule->m_maxx);
-		fprintf(logfile, "Module Z range: %d %d \n \n", thisModule->m_minz, thisModule->m_maxz);
-		#endif
-		
-		/* check for entry points into this module if there	aren't any,
+    /* now go thro' each module calculating auxilary locations */
+    for (moduleCounter = 0; moduleCounter < ModuleArraySize; moduleCounter++) {
+        MODULE *thisModule;
+        int ThisModuleIndex;
+
+        /* get a pointer to the next module, and it's index */
+        thisModule = moduleListPointer[moduleCounter];
+        LOCALASSERT(thisModule);
+        ThisModuleIndex = thisModule->m_index;
+        LOCALASSERT(ThisModuleIndex >= 0);
+        LOCALASSERT(ThisModuleIndex < ModuleArraySize);
+
+#if logFarLocData
+        fprintf(logfile, "********************************* \n");
+        fprintf(logfile, "Module Index: %d \n", ThisModuleIndex);
+        fprintf(logfile, "Module X range: %d %d \n", thisModule->m_minx, thisModule->m_maxx);
+        fprintf(logfile, "Module Z range: %d %d \n \n", thisModule->m_minz, thisModule->m_maxz);
+#endif
+
+        /* check for entry points into this module if there	aren't any,
 		don't bother with auxilary locations */
 
-		if(thisModule->m_aimodule)
-			BuildFM_AuxilaryLocs(thisModule);
-		/*
+        if (thisModule->m_aimodule)
+            BuildFM_AuxilaryLocs(thisModule);
+        /*
 		else
 		{	
 			#if logFarLocData
 			fprintf(logfile, "NO AUXILARY LOCS COMPUTED: NO EPS \n \n");
 			#endif
 		} 
-		*/ 
-	}
+		*/
+    }
 
-	/* deallocate the temporary work spaces */
-	if (auxLocsGrid) DeallocateMem(auxLocsGrid);
+    /* deallocate the temporary work spaces */
+    if (auxLocsGrid)
+        DeallocateMem(auxLocsGrid);
 
-	#if logFarLocData
-	fprintf(logfile, "************************************* \n");
-	fprintf(logfile, "FINISHED ! \n");
-	fprintf(logfile, "NUM INFINITE MODULES/TERMINATORS: %d \n", numInfiniteModules);
-	fprintf(logfile, "************************************* \n");
-	fclose(logfile);
-	#endif
+#if logFarLocData
+    fprintf(logfile, "************************************* \n");
+    fprintf(logfile, "FINISHED ! \n");
+    fprintf(logfile, "NUM INFINITE MODULES/TERMINATORS: %d \n", numInfiniteModules);
+    fprintf(logfile, "************************************* \n");
+    fclose(logfile);
+#endif
 
-	#if logFarLocPositions && 0 //this log will need to updated for the ai modules.
-	logfile2 = fopen("D:/PATRICK/FARLOCS2.TXT","w");
-	fprintf(logfile2, "MODULE EPs AND AUXILARY LOCATIONS \n");
-	fprintf(logfile2, "ENV: %s \n", Env_List[AvP.CurrentEnv]->main);
-	fprintf(logfile2, "************************* \n \n");
+#if logFarLocPositions && 0 //this log will need to updated for the ai modules.
+    logfile2 = fopen("D:/PATRICK/FARLOCS2.TXT", "w");
+    fprintf(logfile2, "MODULE EPs AND AUXILARY LOCATIONS \n");
+    fprintf(logfile2, "ENV: %s \n", Env_List[AvP.CurrentEnv]->main);
+    fprintf(logfile2, "************************* \n \n");
 
-	for(moduleCounter = 0; moduleCounter < ModuleArraySize; moduleCounter++)
-	{
-		int i;
-		fprintf(logfile2, "MODULE INDEX: %d \n",moduleCounter);
-		fprintf(logfile2, "  EPs: \n");
-		for(i=0;i<FALLP_EntryPoints[moduleCounter].numEntryPoints;i++)
-		{
-			VECTORCH posn;
-			int index;
-			posn = (FALLP_EntryPoints[moduleCounter].entryPointsList)[i].position;
-			index = (FALLP_EntryPoints[moduleCounter].entryPointsList)[i].donorIndex; 
-			fprintf(logfile2, "  %d %d %d FROM %d \n", posn.vx, posn.vy, posn.vz, index);
-		}
-		fprintf(logfile2, "  AUX: \n");
-		for(i=0;i<FALLP_AuxLocs[moduleCounter].numLocations;i++)
-		{
-			VECTORCH posn;
-			posn = (FALLP_AuxLocs[moduleCounter].locationsList)[i];
-			fprintf(logfile2, "  %d %d %d \n", posn.vx, posn.vy, posn.vz);
-		}
-		fprintf(logfile2, "\n");
-	}
-	fprintf(logfile2, "************************* \n");
-	fprintf(logfile2, "END \n ");
-	fclose(logfile2);
-	#endif
+    for (moduleCounter = 0; moduleCounter < ModuleArraySize; moduleCounter++) {
+        int i;
+        fprintf(logfile2, "MODULE INDEX: %d \n", moduleCounter);
+        fprintf(logfile2, "  EPs: \n");
+        for (i = 0; i < FALLP_EntryPoints[moduleCounter].numEntryPoints; i++) {
+            VECTORCH posn;
+            int index;
+            posn = (FALLP_EntryPoints[moduleCounter].entryPointsList)[i].position;
+            index = (FALLP_EntryPoints[moduleCounter].entryPointsList)[i].donorIndex;
+            fprintf(logfile2, "  %d %d %d FROM %d \n", posn.vx, posn.vy, posn.vz, index);
+        }
+        fprintf(logfile2, "  AUX: \n");
+        for (i = 0; i < FALLP_AuxLocs[moduleCounter].numLocations; i++) {
+            VECTORCH posn;
+            posn = (FALLP_AuxLocs[moduleCounter].locationsList)[i];
+            fprintf(logfile2, "  %d %d %d \n", posn.vx, posn.vy, posn.vz);
+        }
+        fprintf(logfile2, "\n");
+    }
+    fprintf(logfile2, "************************* \n");
+    fprintf(logfile2, "END \n ");
+    fclose(logfile2);
+#endif
 }
 
 /* allocates and initialises primitive data areas */
 static void InitFarLocDataAreas(MODULE **moduleList, int numModules)
 {
-	int moduleCounter;
+    int moduleCounter;
 
-	/* first, the lists of data headers */	
-	LOCALASSERT(numModules>0);
-	FALLP_AuxLocs = (FARLOCATIONSHEADER *)AllocateMem(numModules*sizeof(FARLOCATIONSHEADER));
-	if(!FALLP_AuxLocs) 
-	{
-		memoryInitialisationFailure = 1;
-		return;
-	}
+    /* first, the lists of data headers */
+    LOCALASSERT(numModules > 0);
+    FALLP_AuxLocs = (FARLOCATIONSHEADER *) AllocateMem(numModules * sizeof(FARLOCATIONSHEADER));
+    if (!FALLP_AuxLocs) {
+        memoryInitialisationFailure = 1;
+        return;
+    }
 
+    FL_TotalNumAuxLocs = 0;
+    FL_AuxData = (VECTORCH *) 0;
 
-	FL_TotalNumAuxLocs = 0;
-	FL_AuxData = (VECTORCH *)0;
-		
-	/* work out the number of adjacent modules/auxilary locations for each module, 
+    /* work out the number of adjacent modules/auxilary locations for each module, 
 	and add them up */
-	for(moduleCounter=0;moduleCounter<numModules;moduleCounter++)
-	{
-		MODULE *thisModule; 
-		int thisModuleIndex;
+    for (moduleCounter = 0; moduleCounter < numModules; moduleCounter++) {
+        MODULE *thisModule;
+        int thisModuleIndex;
 
-		thisModule = moduleList[moduleCounter]; 
-		LOCALASSERT(thisModule);
-		thisModuleIndex = thisModule->m_index;
-		LOCALASSERT(thisModuleIndex >= 0);
-		LOCALASSERT(thisModuleIndex < ModuleArraySize);
-		
-		if(ModuleIsPhysical(thisModule))
-		{
-			FL_TotalNumAuxLocs += FAR_MAX_LOCS;
-		}	
-	}
+        thisModule = moduleList[moduleCounter];
+        LOCALASSERT(thisModule);
+        thisModuleIndex = thisModule->m_index;
+        LOCALASSERT(thisModuleIndex >= 0);
+        LOCALASSERT(thisModuleIndex < ModuleArraySize);
 
-	/* allocate base data areas */
-	LOCALASSERT(FL_TotalNumAuxLocs>0);
-	FL_AuxData = AllocateMem(FL_TotalNumAuxLocs*sizeof(VECTORCH));;
-	if(!FL_AuxData) 
-	{
-		memoryInitialisationFailure = 1;
-		return;
-	}
+        if (ModuleIsPhysical(thisModule)) {
+            FL_TotalNumAuxLocs += FAR_MAX_LOCS;
+        }
+    }
 
-	/* init header lists */
-	{
-		VECTORCH *auxDataPtr = FL_AuxData;
-		
-		for(moduleCounter=0;moduleCounter<AIModuleArraySize;moduleCounter++)
-		{
-			AIMODULE* thisAIModule = &AIModuleArray[moduleCounter]; 
-			int thisModuleIndex = thisAIModule->m_index;
-			/* NB these pointers and indexes have been validated above */
+    /* allocate base data areas */
+    LOCALASSERT(FL_TotalNumAuxLocs > 0);
+    FL_AuxData = AllocateMem(FL_TotalNumAuxLocs * sizeof(VECTORCH));
+    ;
+    if (!FL_AuxData) {
+        memoryInitialisationFailure = 1;
+        return;
+    }
 
-			FALLP_AuxLocs[thisModuleIndex].numLocations = 0;
-			FALLP_AuxLocs[thisModuleIndex].locationsList = (VECTORCH *)0;
+    /* init header lists */
+    {
+        VECTORCH *auxDataPtr = FL_AuxData;
 
-			{
-				MODULE** modulearray=thisAIModule->m_module_ptrs;
-				if(modulearray)
-				{
-					FALLP_AuxLocs[thisModuleIndex].locationsList = auxDataPtr;
-					while(*modulearray)
-					{
-						modulearray++;
-						auxDataPtr += FAR_MAX_LOCS;
+        for (moduleCounter = 0; moduleCounter < AIModuleArraySize; moduleCounter++) {
+            AIMODULE *thisAIModule = &AIModuleArray[moduleCounter];
+            int thisModuleIndex = thisAIModule->m_index;
+            /* NB these pointers and indexes have been validated above */
 
-					}
-				}
-			}
-		}
+            FALLP_AuxLocs[thisModuleIndex].numLocations = 0;
+            FALLP_AuxLocs[thisModuleIndex].locationsList = (VECTORCH *) 0;
 
-		/* we can now validate this process... */
-		LOCALASSERT(auxDataPtr==(FL_AuxData+FL_TotalNumAuxLocs));	
-	}
+            {
+                MODULE **modulearray = thisAIModule->m_module_ptrs;
+                if (modulearray) {
+                    FALLP_AuxLocs[thisModuleIndex].locationsList = auxDataPtr;
+                    while (*modulearray) {
+                        modulearray++;
+                        auxDataPtr += FAR_MAX_LOCS;
+                    }
+                }
+            }
+        }
+
+        /* we can now validate this process... */
+        LOCALASSERT(auxDataPtr == (FL_AuxData + FL_TotalNumAuxLocs));
+    }
 }
-
 
 /*-----------------------Patrick 28/11/96---------------------------
 This function deallocates the location lists for each module,
 and must be called at some point before the environment re-load
 -------------------------------------------------------------------*/
 void KillFarModuleLocs(void)
-{	
-	/* don't do this for a net game */
-	//in fact do do it in net game
-	//if(AvP.Network != I_No_Network)	return;
-	
-	LOCALASSERT(ModuleArraySize);
-	LOCALASSERT(AIModuleArraySize);
-	LOCALASSERT(FALLP_EntryPoints);
-	LOCALASSERT(FALLP_AuxLocs);
-	LOCALASSERT(FL_TotalNumAuxLocs>0);
-	LOCALASSERT(FL_AuxData);
+{
+    /* don't do this for a net game */
+    //in fact do do it in net game
+    //if(AvP.Network != I_No_Network)	return;
 
-	/* deallocate the base data area in one go, and re-init globals */
-	if (FL_AuxData) DeallocateMem(FL_AuxData);
-	FL_TotalNumAuxLocs = 0;
-	FL_AuxData = (VECTORCH *)0;
+    LOCALASSERT(ModuleArraySize);
+    LOCALASSERT(AIModuleArraySize);
+    LOCALASSERT(FALLP_EntryPoints);
+    LOCALASSERT(FALLP_AuxLocs);
+    LOCALASSERT(FL_TotalNumAuxLocs > 0);
+    LOCALASSERT(FL_AuxData);
 
-	/* deallocate the list headers, and re-init globals */
-	if (FALLP_AuxLocs) DeallocateMem(FALLP_AuxLocs);
-	FALLP_AuxLocs = (FARLOCATIONSHEADER *)0;
-	if (FALLP_EntryPoints) 
-	{
-		int i;
-		for(i=0;i<AIModuleArraySize;i++)
-		{
-			if(FALLP_EntryPoints[i].entryPointsList)
-			{
-				DeallocateMem(FALLP_EntryPoints[i].entryPointsList);
-			}
-		}
-		DeallocateMem(FALLP_EntryPoints);
-	}
-	FALLP_EntryPoints = (FARENTRYPOINTSHEADER *)0;
+    /* deallocate the base data area in one go, and re-init globals */
+    if (FL_AuxData)
+        DeallocateMem(FL_AuxData);
+    FL_TotalNumAuxLocs = 0;
+    FL_AuxData = (VECTORCH *) 0;
+
+    /* deallocate the list headers, and re-init globals */
+    if (FALLP_AuxLocs)
+        DeallocateMem(FALLP_AuxLocs);
+    FALLP_AuxLocs = (FARLOCATIONSHEADER *) 0;
+    if (FALLP_EntryPoints) {
+        int i;
+        for (i = 0; i < AIModuleArraySize; i++) {
+            if (FALLP_EntryPoints[i].entryPointsList) {
+                DeallocateMem(FALLP_EntryPoints[i].entryPointsList);
+            }
+        }
+        DeallocateMem(FALLP_EntryPoints);
+    }
+    FALLP_EntryPoints = (FARENTRYPOINTSHEADER *) 0;
 }
-
-
 
 /*-----------------------Patrick 20/12/96---------------------------
 THE FOLLOWING ARE SOME GENERIC FUNCTIONS FOR ANALYSING MODULE
@@ -392,152 +377,160 @@ STATES. THEY MAY BE USED IN ANY SOURCE FILE.
 This function takes a module and returns whether it is a door,
 and if so, what kind of door it is from an alien perspective.
 -------------------------------------------------------------------*/
-MODULEDOORTYPE ModuleIsADoor(MODULE* target)
+MODULEDOORTYPE ModuleIsADoor(MODULE *target)
 {
-	if((target->m_sbptr) && (target->m_sbptr->I_SBtype == I_BehaviourProximityDoor))
-		return MDT_ProxDoor;
-	if((target->m_sbptr) && (target->m_sbptr->I_SBtype == I_BehaviourLiftDoor))	
-		return MDT_LiftDoor;
-	if((target->m_sbptr) && (target->m_sbptr->I_SBtype == I_BehaviourSwitchDoor))	
-		return MDT_SecurityDoor;
+    if ((target->m_sbptr) && (target->m_sbptr->I_SBtype == I_BehaviourProximityDoor))
+        return MDT_ProxDoor;
+    if ((target->m_sbptr) && (target->m_sbptr->I_SBtype == I_BehaviourLiftDoor))
+        return MDT_LiftDoor;
+    if ((target->m_sbptr) && (target->m_sbptr->I_SBtype == I_BehaviourSwitchDoor))
+        return MDT_SecurityDoor;
 
-	return MDT_NotADoor;
+    return MDT_NotADoor;
 }
 
-MODULEDOORTYPE AIModuleIsADoor(AIMODULE* target)
+MODULEDOORTYPE AIModuleIsADoor(AIMODULE *target)
 {
-	/* A bit rough and ready at this point. */
-	int a;
-	MODULE **renderModule;
+    /* A bit rough and ready at this point. */
+    int a;
+    MODULE **renderModule;
 
-	GLOBALASSERT(target->m_module_ptrs);
+    GLOBALASSERT(target->m_module_ptrs);
 
-	renderModule=target->m_module_ptrs;
-	a=0;
+    renderModule = target->m_module_ptrs;
+    a = 0;
 
-	while ((*renderModule)!=NULL) {
+    while ((*renderModule) != NULL) {
+        if (((*renderModule)->m_sbptr)
+            && ((*renderModule)->m_sbptr->I_SBtype == I_BehaviourProximityDoor))
+            return MDT_ProxDoor;
+        if (((*renderModule)->m_sbptr)
+            && ((*renderModule)->m_sbptr->I_SBtype == I_BehaviourLiftDoor))
+            return MDT_LiftDoor;
+        if (((*renderModule)->m_sbptr)
+            && ((*renderModule)->m_sbptr->I_SBtype == I_BehaviourSwitchDoor))
+            return MDT_SecurityDoor;
 
-		if(((*renderModule)->m_sbptr) && ((*renderModule)->m_sbptr->I_SBtype == I_BehaviourProximityDoor))
-			return MDT_ProxDoor;
-		if(((*renderModule)->m_sbptr) && ((*renderModule)->m_sbptr->I_SBtype == I_BehaviourLiftDoor))	
-			return MDT_LiftDoor;
-		if(((*renderModule)->m_sbptr) && ((*renderModule)->m_sbptr->I_SBtype == I_BehaviourSwitchDoor))	
-			return MDT_SecurityDoor;
+        GLOBALASSERT(a < 300);
 
-		GLOBALASSERT(a<300);
+        renderModule++;
+        a++;
+    }
 
-		renderModule++;
-		a++;
-	}
-
-	return MDT_NotADoor;
+    return MDT_NotADoor;
 }
 
 /*-----------------------Patrick 20/12/96---------------------------
 Returns TRUE if a module is a physical part of the environment,
 ie is not infinite or a terminator, etc...
 -------------------------------------------------------------------*/
-int ModuleIsPhysical(MODULE* target)
+int ModuleIsPhysical(MODULE *target)
 {
-	if(target->m_flags & m_flag_infinite) return 0;
-	if(target->m_type == mtype_term) return 0;
-	return 1;
+    if (target->m_flags & m_flag_infinite)
+        return 0;
+    if (target->m_type == mtype_term)
+        return 0;
+    return 1;
 }
 
-int AIModuleIsPhysical(AIMODULE* target)
+int AIModuleIsPhysical(AIMODULE *target)
 {
-	if (target==NULL) {
-		return(0);
-	}
-	GLOBALASSERT(target);
-	if(target->m_module_ptrs==NULL) return 0;
-	return 1;
+    if (target == NULL) {
+        return (0);
+    }
+    GLOBALASSERT(target);
+    if (target->m_module_ptrs == NULL)
+        return 0;
+    return 1;
 }
 
 /*-----------------------Patrick 20/12/96---------------------------
 Takes 2 modules, and returns TRUE if the centre of the target module
 is within the bounding box of the source;
 -------------------------------------------------------------------*/
-int ModuleInModule(MODULE* source, MODULE* target)
+int ModuleInModule(MODULE *source, MODULE *target)
 {
-	
-	if(target->m_world.vx < (source->m_world.vx + source->m_minx)) return 0;
-	if(target->m_world.vx > (source->m_world.vx + source->m_maxx)) return 0;
+    if (target->m_world.vx < (source->m_world.vx + source->m_minx))
+        return 0;
+    if (target->m_world.vx > (source->m_world.vx + source->m_maxx))
+        return 0;
 
-	if(target->m_world.vy < (source->m_world.vy + source->m_miny)) return 0;
-	if(target->m_world.vy > (source->m_world.vy + source->m_maxy)) return 0;
+    if (target->m_world.vy < (source->m_world.vy + source->m_miny))
+        return 0;
+    if (target->m_world.vy > (source->m_world.vy + source->m_maxy))
+        return 0;
 
-	if(target->m_world.vz < (source->m_world.vz + source->m_minz)) return 0;
-	if(target->m_world.vz > (source->m_world.vz + source->m_maxz)) return 0;
+    if (target->m_world.vz < (source->m_world.vz + source->m_minz))
+        return 0;
+    if (target->m_world.vz > (source->m_world.vz + source->m_maxz))
+        return 0;
 
-	return 1;
+    return 1;
 }
 
 /*-----------------------Patrick 20/12/96---------------------------
 Returns the number of entries in a given module's adjacency list
 If there is no adjacency list, return 0.
 -------------------------------------------------------------------*/
-int NumAdjacentModules(AIMODULE* target)
+int NumAdjacentModules(AIMODULE *target)
 {
-	AIMODULE **AdjAIModulePtr;
-	int counter = 0;
-	
-	AdjAIModulePtr = (target->m_link_ptrs);
-	if(AdjAIModulePtr)	
-	{
-		while(*AdjAIModulePtr)
-		{
-			counter++;
-			AdjAIModulePtr++;
-		}
-	}
-	else return 0;
+    AIMODULE **AdjAIModulePtr;
+    int counter = 0;
 
-	return counter;
+    AdjAIModulePtr = (target->m_link_ptrs);
+    if (AdjAIModulePtr) {
+        while (*AdjAIModulePtr) {
+            counter++;
+            AdjAIModulePtr++;
+        }
+    } else
+        return 0;
+
+    return counter;
 }
 
 /*-----------------------Patrick 20/12/96---------------------------
 Returns a pointer to an entry point in thisModule from fromModule,
 or 0 if there isn't one.
 -------------------------------------------------------------------*/
-FARENTRYPOINT *GetModuleEP(MODULE* thisModule, MODULE*fromModule)
+FARENTRYPOINT *GetModuleEP(MODULE *thisModule, MODULE *fromModule)
 {
-	int numEps;
-	FARENTRYPOINT *epList;
-	FARENTRYPOINT *thisEp = (FARENTRYPOINT *)0;
-	int tmIndex = fromModule->m_index;
+    int numEps;
+    FARENTRYPOINT *epList;
+    FARENTRYPOINT *thisEp = (FARENTRYPOINT *) 0;
+    int tmIndex = fromModule->m_index;
 
-	numEps = FALLP_EntryPoints[thisModule->m_index].numEntryPoints;
-	epList = FALLP_EntryPoints[thisModule->m_index].entryPointsList;
+    numEps = FALLP_EntryPoints[thisModule->m_index].numEntryPoints;
+    epList = FALLP_EntryPoints[thisModule->m_index].entryPointsList;
 
-	while((numEps>0) && (thisEp == (FARENTRYPOINT *)0))
-	{
-		if(epList->donorIndex == tmIndex) thisEp = epList;
-		epList++;
-		numEps--;
-	}
-	
-	return thisEp;
+    while ((numEps > 0) && (thisEp == (FARENTRYPOINT *) 0)) {
+        if (epList->donorIndex == tmIndex)
+            thisEp = epList;
+        epList++;
+        numEps--;
+    }
+
+    return thisEp;
 }
 
-FARENTRYPOINT *GetAIModuleEP(AIMODULE* thisModule, AIMODULE*fromModule)
+FARENTRYPOINT *GetAIModuleEP(AIMODULE *thisModule, AIMODULE *fromModule)
 {
-	int numEps;
-	FARENTRYPOINT *epList;
-	FARENTRYPOINT *thisEp = (FARENTRYPOINT *)0;
-	int tmIndex = fromModule->m_index;
+    int numEps;
+    FARENTRYPOINT *epList;
+    FARENTRYPOINT *thisEp = (FARENTRYPOINT *) 0;
+    int tmIndex = fromModule->m_index;
 
-	numEps = FALLP_EntryPoints[thisModule->m_index].numEntryPoints;
-	epList = FALLP_EntryPoints[thisModule->m_index].entryPointsList;
+    numEps = FALLP_EntryPoints[thisModule->m_index].numEntryPoints;
+    epList = FALLP_EntryPoints[thisModule->m_index].entryPointsList;
 
-	while((numEps>0) && (thisEp == (FARENTRYPOINT *)0))
-	{
-		if(epList->donorIndex == tmIndex) thisEp = epList;
-		epList++;
-		numEps--;
-	}
-	
-	return thisEp;
+    while ((numEps > 0) && (thisEp == (FARENTRYPOINT *) 0)) {
+        if (epList->donorIndex == tmIndex)
+            thisEp = epList;
+        epList++;
+        numEps--;
+    }
+
+    return thisEp;
 }
 
 /*-----------------------Patrick 20/12/96---------------------------
@@ -547,27 +540,23 @@ The point is in module LOCAL space.
 NB the bizzare structure of this function produces optimum pentium
 instructions... apparently.
 -------------------------------------------------------------------*/
-int PointIsInModule(MODULE* thisModule, VECTORCH* thisPoint)
-{		
-	/*
+int PointIsInModule(MODULE *thisModule, VECTORCH *thisPoint)
+{
+    /*
 	Allow tolerance level on module boundaries equivavlent to that used by
 	ModuleFromPosition_WithToleranace.
 	THis may be a bad plan , but I think this function only really gets used 
 	for the purposes of asserts.
 	*/
-	if(thisPoint->vx <= thisModule->m_maxx + 50)
-		if(thisPoint->vx >= thisModule->m_minx - 50)
-			if(thisPoint->vy <= thisModule->m_maxy + 50)
-				if(thisPoint->vy >= thisModule->m_miny - 50)
-					if(thisPoint->vz <= thisModule->m_maxz + 50)
-						if(thisPoint->vz >= thisModule->m_minz - 50)
-							return 1;	
-	return 0;
+    if (thisPoint->vx <= thisModule->m_maxx + 50)
+        if (thisPoint->vx >= thisModule->m_minx - 50)
+            if (thisPoint->vy <= thisModule->m_maxy + 50)
+                if (thisPoint->vy >= thisModule->m_miny - 50)
+                    if (thisPoint->vz <= thisModule->m_maxz + 50)
+                        if (thisPoint->vz >= thisModule->m_minz - 50)
+                            return 1;
+    return 0;
 }
-
-
-
-
 
 /*-----------------------Patrick 20/12/96---------------------------
 LOCAL FUNCTIONS FOR MODULE ENTRY POINT SUPPORT
@@ -576,12 +565,12 @@ LOCAL FUNCTIONS FOR MODULE ENTRY POINT SUPPORT
 /* a structure and globals for the entry point calculations */
 typedef struct epbbextents
 {
-	int	maxX;
-	int	minX;
-	int	maxY;
-	int	minY;
-	int	maxZ;
-	int	minZ;
+    int maxX;
+    int minX;
+    int maxY;
+    int minY;
+    int maxZ;
+    int minZ;
 } EPBBEXTENTS;
 
 #if 0
@@ -612,9 +601,9 @@ static void BuildFM_EntryPoints(MODULE *thisModule)
 	/* check that there is a list of adjacent modules */
 	if(!(NumAdjacentModules(thisModule))) 
 	{
-		#if logFarLocData
+#if logFarLocData
 		fprintf(logfile, "No adjacent modules found for this module \n");
-		#endif
+#endif
 		return;
 	}
 	
@@ -642,17 +631,17 @@ static void BuildFM_ASingleEP(MODULE *thisModule, MODULE *targetModule)
 	/* containment check */
 	if(ModuleInModule(thisModule, targetModule))
 	{
-		#if logFarLocData
+#if logFarLocData
 		fprintf(logfile, "Against module %d: containment failure \n",targetModule->m_index);
-		#endif
+#endif
 		targetModule->m_flags |= m_flag_slipped_inside;
 		return;
 	}
 	if(ModuleInModule(targetModule, thisModule))
 	{
-		#if logFarLocData
+#if logFarLocData
 		fprintf(logfile, "Against module %d: containment failure \n",targetModule->m_index);
-		#endif
+#endif
 		thisModule->m_flags |= m_flag_slipped_inside;
 		return;
 	}
@@ -660,9 +649,9 @@ static void BuildFM_ASingleEP(MODULE *thisModule, MODULE *targetModule)
 	/* check if entry point already exists... */
 	if(GetModuleEP(thisModule, targetModule) != (FARENTRYPOINT *)0)
 	{
-		#if logFarLocData
+#if logFarLocData
 		fprintf(logfile, "Against module %d: ep already exists \n",targetModule->m_index);
-		#endif
+#endif
 		return;	
 	}
 
@@ -670,23 +659,23 @@ static void BuildFM_ASingleEP(MODULE *thisModule, MODULE *targetModule)
 	but it's a good idea to check the target module */
 	if (!(ModuleIsPhysical(targetModule)))
 	{
-		#if logFarLocData
+#if logFarLocData
 		fprintf(logfile, "Against module %d: target is not physical \n",targetModule->m_index);
-		#endif
+#endif
 		return;	
 	}
 			
 	/* so go ahead and find the entry point pair... */
-	#if logFarLocData
+#if logFarLocData
 	fprintf(logfile, "Calculating ep against module %d %s\n", targetModule->m_index,targetModule->name);
-	#endif
+#endif
 				
 	/* compute the bounding box intersection between the modules */
 	if(GetModulesIntersection(thisModule, targetModule) == 0)
-	{	
-		#if logFarLocData
+	{
+#if logFarLocData
 		fprintf(logfile, "Against module %d: BBOX failure \n",targetModule->m_index);
-		#endif
+#endif
 		return;		
 	}
 
@@ -699,9 +688,9 @@ static void BuildFM_ASingleEP(MODULE *thisModule, MODULE *targetModule)
 	{
 		int extentCentre;
 
-		#if logFarLocData
+#if logFarLocData
 		fprintf(logfile, "Against module %d: not enough points in intersection \n",targetModule->m_index);
-		#endif
+#endif
 
 		/* Create one anyways. */
 
@@ -764,9 +753,9 @@ static void BuildFM_ASingleEP(MODULE *thisModule, MODULE *targetModule)
 				targetModuleEP.vy = MI_Volume3.maxY + EP_POSNDISP;
 			}
 		}
-		#if logFarLocData
+#if logFarLocData
 		fprintf(logfile, "Made one anyway.\n");
-		#endif
+#endif
 	
 	} else {
 
@@ -893,27 +882,27 @@ static void BuildFM_ASingleEP(MODULE *thisModule, MODULE *targetModule)
 		inModule = PointIsInModule(thisModule, &thisModuleEP);
 		if(!inModule)
 		{
-			#if logFarLocData
+#if logFarLocData
 			fprintf(logfile, "....can't add eps: MODULE %d, EP NOT IN MODULE SPACE \n", thisModule->m_index);
-			#endif
+#endif
 			return;
 		}
 		inModule = PointIsInModule(targetModule, &targetModuleEP);
 		if(!inModule)
 		{
-			#if logFarLocData
+#if logFarLocData
 			fprintf(logfile, "....can't add eps: MODULE %d, EP NOT IN MODULE SPACE \n", targetModule->m_index);
-			#endif
+#endif
 			return;
 		}
 	}
 	
 	/* Finally, set up the entry points for this and target module */
 	AddModuleEP(thisModule, targetModule, &thisModuleEP);
-	AddModuleEP(targetModule, thisModule, &targetModuleEP);	
-	#if logFarLocData
+	AddModuleEP(targetModule, thisModule, &targetModuleEP);
+#if logFarLocData
 	fprintf(logfile, "... entry points added \n");
-	#endif
+#endif
 	
 }
 #endif
@@ -923,7 +912,7 @@ static void BuildFM_ASingleEP(MODULE *thisModule, MODULE *targetModule)
   between 2 adjacent modules (in world space coords).
   
   Returns 1 if the bounding box is valis, 0 if not.
-  ------------------------------------------------------------------*/ 
+  ------------------------------------------------------------------*/
 #if 0
 static int GetModulesIntersection(MODULE *thisModule, MODULE *targetModule)
 {
@@ -1037,9 +1026,9 @@ static void AddModuleEP(MODULE* thisModule, MODULE*fromModule, VECTORCH *posn)
 		The effective result is that the linked module will get an ep from the 
 		unlinked module, but not the other way round....
 		*/
-		#if logFarLocData
+#if logFarLocData
 		fprintf(logfile, "....CAN'T ADD EP TO MODULE %d : NO EP SLOTS \n", thisModule->m_index);
-		#endif
+#endif
 		return;
 	}
 
@@ -1063,186 +1052,173 @@ LOCAL FUNCTIONS FOR AUXILARY MODULE LOCATION SUPPORT
   -----------------------------------------------------------------*/
 static void BuildFM_AuxilaryLocs(MODULE *thisModule)
 {
-	int gridStartX, gridStartZ, gridExtentX, gridExtentZ, XIndex, ZIndex;
-	int NumLocsValid = 0;
-	int NumLocsHeightFailed = 0;
-	int NumLocsVolFailed = 0;
-	int ThisModuleIndex;
-	AIMODULE* aimodule=thisModule->m_aimodule;
-	 	
-	/* get the module index */
-	LOCALASSERT(aimodule);
-	ThisModuleIndex = aimodule->m_index;
-	LOCALASSERT(ThisModuleIndex >= 0);
-	LOCALASSERT(ThisModuleIndex < ModuleArraySize);	
-	
-	gridStartX = thisModule->m_minx + (FAR_BB_WIDTH>>1);
-	gridStartZ = thisModule->m_minz + (FAR_BB_WIDTH>>1);
-	gridExtentX = thisModule->m_maxx - thisModule->m_minx - FAR_BB_WIDTH;
-	gridExtentZ = thisModule->m_maxz - thisModule->m_minz - FAR_BB_WIDTH;
+    int gridStartX, gridStartZ, gridExtentX, gridExtentZ, XIndex, ZIndex;
+    int NumLocsValid = 0;
+    int NumLocsHeightFailed = 0;
+    int NumLocsVolFailed = 0;
+    int ThisModuleIndex;
+    AIMODULE *aimodule = thisModule->m_aimodule;
 
-	if(gridExtentX<=0 || gridExtentZ<=0)
-	{
-		//module is too narrow for auxilary locations
-		return;
-	}
+    /* get the module index */
+    LOCALASSERT(aimodule);
+    ThisModuleIndex = aimodule->m_index;
+    LOCALASSERT(ThisModuleIndex >= 0);
+    LOCALASSERT(ThisModuleIndex < ModuleArraySize);
 
-	LOCALASSERT(gridStartX > thisModule->m_minx);
+    gridStartX = thisModule->m_minx + (FAR_BB_WIDTH >> 1);
+    gridStartZ = thisModule->m_minz + (FAR_BB_WIDTH >> 1);
+    gridExtentX = thisModule->m_maxx - thisModule->m_minx - FAR_BB_WIDTH;
+    gridExtentZ = thisModule->m_maxz - thisModule->m_minz - FAR_BB_WIDTH;
 
-	/* step through each grid (index) location */
-	for(XIndex = FAR_GRID_SIZE; XIndex > 0; XIndex--)
-	{
-		for(ZIndex = FAR_GRID_SIZE; ZIndex > 0; ZIndex--)
-		{
-			int locationsIndex = (XIndex-1)*FAR_GRID_SIZE + (ZIndex-1);
+    if (gridExtentX <= 0 || gridExtentZ <= 0) {
+        //module is too narrow for auxilary locations
+        return;
+    }
 
-			auxLocsGrid[locationsIndex].position.vx = gridStartX + (gridExtentX*(XIndex-1))/(FAR_GRID_SIZE-1);
-			auxLocsGrid[locationsIndex].position.vz = gridStartZ + (gridExtentZ*(ZIndex-1))/(FAR_GRID_SIZE-1);
-			auxLocsGrid[locationsIndex].position.vy = 0;
-			auxLocsGrid[locationsIndex].valid = 1; /* validated by default */
+    LOCALASSERT(gridStartX > thisModule->m_minx);
 
-			/* get the floor height for this location.
+    /* step through each grid (index) location */
+    for (XIndex = FAR_GRID_SIZE; XIndex > 0; XIndex--) {
+        for (ZIndex = FAR_GRID_SIZE; ZIndex > 0; ZIndex--) {
+            int locationsIndex = (XIndex - 1) * FAR_GRID_SIZE + (ZIndex - 1);
+
+            auxLocsGrid[locationsIndex].position.vx = gridStartX
+                                                      + (gridExtentX * (XIndex - 1))
+                                                            / (FAR_GRID_SIZE - 1);
+            auxLocsGrid[locationsIndex].position.vz = gridStartZ
+                                                      + (gridExtentZ * (ZIndex - 1))
+                                                            / (FAR_GRID_SIZE - 1);
+            auxLocsGrid[locationsIndex].position.vy = 0;
+            auxLocsGrid[locationsIndex].valid = 1; /* validated by default */
+
+            /* get the floor height for this location.
 			If no valid height is found, the location is set to
 			minx,minz,miny, ie. outside of the grid, and abandoned */
-			
-			GetFarLocHeight(&auxLocsGrid[locationsIndex], thisModule);
-	
-			/* if there's a valid floor height, check the volume around the location
+
+            GetFarLocHeight(&auxLocsGrid[locationsIndex], thisModule);
+
+            /* if there's a valid floor height, check the volume around the location
 			for impinging polygons.  If volume is impinged, the location is set to 
 			minx,minz,miny, ie. outside of the grid, and abandoned */
-			if(auxLocsGrid[locationsIndex].valid)
-			{
-				FarLocVolumeTest(&auxLocsGrid[locationsIndex], thisModule); 
-				if(auxLocsGrid[locationsIndex].valid)
-				{
-					
-					AddVector(&thisModule->m_world,&auxLocsGrid[locationsIndex].position);
-					SubVector(&aimodule->m_world,&auxLocsGrid[locationsIndex].position);
-					NumLocsValid++;
-				}
-				else NumLocsVolFailed++;	
-			}
-			else NumLocsHeightFailed++;
-		}
-	}
-					
-	
-	#if logFarLocData
-	fprintf(logfile, "Num valid locs: %d \n", NumLocsValid);
-	fprintf(logfile, "Num Height failed: %d \n", NumLocsHeightFailed);
-	fprintf(logfile, "Num Vol failed: %d \n \n", NumLocsVolFailed);
-	#endif
-	
-	/* now have a full list of locations.... 
-	Those that are zero are invalid: hopefully some have survived */
-	LOCALASSERT((NumLocsHeightFailed+NumLocsVolFailed+NumLocsValid) == (FAR_GRID_SIZE*FAR_GRID_SIZE));
+            if (auxLocsGrid[locationsIndex].valid) {
+                FarLocVolumeTest(&auxLocsGrid[locationsIndex], thisModule);
+                if (auxLocsGrid[locationsIndex].valid) {
+                    AddVector(&thisModule->m_world, &auxLocsGrid[locationsIndex].position);
+                    SubVector(&aimodule->m_world, &auxLocsGrid[locationsIndex].position);
+                    NumLocsValid++;
+                } else
+                    NumLocsVolFailed++;
+            } else
+                NumLocsHeightFailed++;
+        }
+    }
 
-	/* If there are any valid locations remaining, store them in the locations list */
-	if(NumLocsValid > 0) 
-	{
-		/* Build a final and definitive list of valid locations for the module:
+#if logFarLocData
+    fprintf(logfile, "Num valid locs: %d \n", NumLocsValid);
+    fprintf(logfile, "Num Height failed: %d \n", NumLocsHeightFailed);
+    fprintf(logfile, "Num Vol failed: %d \n \n", NumLocsVolFailed);
+#endif
+
+    /* now have a full list of locations.... 
+	Those that are zero are invalid: hopefully some have survived */
+    LOCALASSERT(
+        (NumLocsHeightFailed + NumLocsVolFailed + NumLocsValid) == (FAR_GRID_SIZE * FAR_GRID_SIZE));
+
+    /* If there are any valid locations remaining, store them in the locations list */
+    if (NumLocsValid > 0) {
+        /* Build a final and definitive list of valid locations for the module:
 		look at the number of valid locations. If there are more than the maximum 
 		number, take a reasonably distributed sample. Otherwise just put them all in.
 	
 		NB this wil be a list of Local Space coordinates.
-		*/   			
-   	
-		if(NumLocsValid > FAR_MAX_LOCS) 
-		{
-			VECTORCH *destinationPtr;
-			int locationsIndex = 0;
-			
-			int numTaken = 0;
-			int numFound = 0;
-			int nextToTake = 0; 
+		*/
 
-			/* fill out the header (space is preallocated) */
-			destinationPtr = &FALLP_AuxLocs[ThisModuleIndex].locationsList[FALLP_AuxLocs[ThisModuleIndex].numLocations];
-			FALLP_AuxLocs[ThisModuleIndex].numLocations += FAR_MAX_LOCS;
+        if (NumLocsValid > FAR_MAX_LOCS) {
+            VECTORCH *destinationPtr;
+            int locationsIndex = 0;
 
-  			numTaken=0;
-			nextToTake = NumLocsValid / FAR_MAX_LOCS;					
-			
-			while(numTaken<FAR_MAX_LOCS)
-			{
-				LOCALASSERT(nextToTake <= NumLocsValid);
-				LOCALASSERT(locationsIndex < (FAR_GRID_SIZE*FAR_GRID_SIZE));			
-				
-				while(auxLocsGrid[locationsIndex].valid == 0) locationsIndex++;
-				LOCALASSERT(locationsIndex < (FAR_GRID_SIZE*FAR_GRID_SIZE));			
-				numFound++;
-				LOCALASSERT(numFound <= NumLocsValid);
+            int numTaken = 0;
+            int numFound = 0;
+            int nextToTake = 0;
 
-				if(numFound == nextToTake)
-				{
-					*destinationPtr++ = auxLocsGrid[locationsIndex].position;
-					numTaken++;
-					/* calc index of the next one to take */
-					nextToTake = ((numTaken + 1) * NumLocsValid) / FAR_MAX_LOCS;
-				}
-				/* move to next location */
-				locationsIndex++;
-			}
+            /* fill out the header (space is preallocated) */
+            destinationPtr = &FALLP_AuxLocs[ThisModuleIndex]
+                                  .locationsList[FALLP_AuxLocs[ThisModuleIndex].numLocations];
+            FALLP_AuxLocs[ThisModuleIndex].numLocations += FAR_MAX_LOCS;
 
-		}
-		else
-		{	
-			VECTORCH *destinationPtr;
-			int locationsIndex;
-			int checkCount = 0; 
+            numTaken = 0;
+            nextToTake = NumLocsValid / FAR_MAX_LOCS;
 
-			/* fill out the header (space is preallocated) */
-			destinationPtr = &FALLP_AuxLocs[ThisModuleIndex].locationsList[FALLP_AuxLocs[ThisModuleIndex].numLocations];
-			FALLP_AuxLocs[ThisModuleIndex].numLocations += NumLocsValid;
+            while (numTaken < FAR_MAX_LOCS) {
+                LOCALASSERT(nextToTake <= NumLocsValid);
+                LOCALASSERT(locationsIndex < (FAR_GRID_SIZE * FAR_GRID_SIZE));
 
-			/* fill up the list with what we've got */
-			locationsIndex = (FAR_GRID_SIZE*FAR_GRID_SIZE) - 1;
-			do
-			{
-				if(auxLocsGrid[locationsIndex].valid)
-				{
-					/* found a valid location: copy it into the list */
-					*(destinationPtr++) = auxLocsGrid[locationsIndex].position;
-					checkCount++;
-				}			
-			}
-			while(locationsIndex--);
-			
-			LOCALASSERT(checkCount == NumLocsValid);
-		
-		}
-		#if logFarLocData
-		{
-			/* log the final list */
-			VECTORCH *tmpPtr;
-			int tmpCounter;
-			fprintf(logfile, "Locations list: \n");
+                while (auxLocsGrid[locationsIndex].valid == 0)
+                    locationsIndex++;
+                LOCALASSERT(locationsIndex < (FAR_GRID_SIZE * FAR_GRID_SIZE));
+                numFound++;
+                LOCALASSERT(numFound <= NumLocsValid);
 
-			tmpCounter = FALLP_AuxLocs[ThisModuleIndex].numLocations;
-			tmpPtr = FALLP_AuxLocs[ThisModuleIndex].locationsList;
+                if (numFound == nextToTake) {
+                    *destinationPtr++ = auxLocsGrid[locationsIndex].position;
+                    numTaken++;
+                    /* calc index of the next one to take */
+                    nextToTake = ((numTaken + 1) * NumLocsValid) / FAR_MAX_LOCS;
+                }
+                /* move to next location */
+                locationsIndex++;
+            }
 
-			while(tmpCounter > 0)
-			{
-				fprintf(logfile, "%d %d %d \n", tmpPtr->vx, tmpPtr->vz, tmpPtr->vy);
-				tmpPtr++;
-				tmpCounter--;	
-			}
+        } else {
+            VECTORCH *destinationPtr;
+            int locationsIndex;
+            int checkCount = 0;
 
-			fprintf(logfile,"\n");
-				
-		}
-		#endif
-	}
-	else
-	{
-		/* No valid locations */
-		#if logFarLocData
-		{
-			/* log an error */
-			fprintf(logfile,"All auxilary locations FAILED \n");
-		}
-		#endif	
-	}									
+            /* fill out the header (space is preallocated) */
+            destinationPtr = &FALLP_AuxLocs[ThisModuleIndex]
+                                  .locationsList[FALLP_AuxLocs[ThisModuleIndex].numLocations];
+            FALLP_AuxLocs[ThisModuleIndex].numLocations += NumLocsValid;
+
+            /* fill up the list with what we've got */
+            locationsIndex = (FAR_GRID_SIZE * FAR_GRID_SIZE) - 1;
+            do {
+                if (auxLocsGrid[locationsIndex].valid) {
+                    /* found a valid location: copy it into the list */
+                    *(destinationPtr++) = auxLocsGrid[locationsIndex].position;
+                    checkCount++;
+                }
+            } while (locationsIndex--);
+
+            LOCALASSERT(checkCount == NumLocsValid);
+        }
+#if logFarLocData
+        {
+            /* log the final list */
+            VECTORCH *tmpPtr;
+            int tmpCounter;
+            fprintf(logfile, "Locations list: \n");
+
+            tmpCounter = FALLP_AuxLocs[ThisModuleIndex].numLocations;
+            tmpPtr = FALLP_AuxLocs[ThisModuleIndex].locationsList;
+
+            while (tmpCounter > 0) {
+                fprintf(logfile, "%d %d %d \n", tmpPtr->vx, tmpPtr->vz, tmpPtr->vy);
+                tmpPtr++;
+                tmpCounter--;
+            }
+
+            fprintf(logfile, "\n");
+        }
+#endif
+    } else {
+/* No valid locations */
+#if logFarLocData
+        {
+            /* log an error */
+            fprintf(logfile, "All auxilary locations FAILED \n");
+        }
+#endif
+    }
 }
 
 /*----------------------Patrick 1/12/96--------------------------
@@ -1256,87 +1232,88 @@ static void BuildFM_AuxilaryLocs(MODULE *thisModule)
   ----------------------------------------------------------------*/
 static void GetFarLocHeight(FARVALIDATEDLOCATION *location, MODULE *thisModule)
 {
-	int polyCounter;	
-	int heightOfUpPoly = thisModule->m_maxy; /* init to lowest module extent */
-	int heightOfDownPoly = thisModule->m_miny; /* init to heighest module extent */
-	int upPolyFound = 0;
-	int downPolyFound = 0;
-	int XZcontainment;
-			
-	struct ColPolyTag polygonData;
-	
-	polyCounter = SetupPolygonAccessFromShapeIndex(thisModule->m_mapptr->MapShape);
-	
-	/* loop through the item list, then ... */
-	while(polyCounter>0)
-	{
-		AccessNextPolygon();
-		GetPolygonVertices(&polygonData);
-		GetPolygonNormal(&polygonData);
-				
-		/* first test if poly is vertical */
-		if((polygonData.PolyNormal.vy > FAR_MIN_INCLINE)||(polygonData.PolyNormal.vy < -FAR_MIN_INCLINE))
-		{
-			XZcontainment = IsXZinPoly(&(location->position), &polygonData);
-			if(XZcontainment)
-			{				
-				if(polygonData.PolyNormal.vy > 0) /* downwards facing */
-				{
-					downPolyFound++;
-					{
-						/* find height of this poly: height of lowest vertex */
-						int tmpHeight = polygonData.PolyPoint[0].vy;
-						
-						if(polygonData.PolyPoint[1].vy > tmpHeight) tmpHeight = polygonData.PolyPoint[1].vy;
-						if(polygonData.PolyPoint[2].vy > tmpHeight) tmpHeight = polygonData.PolyPoint[2].vy;
-						if(polygonData.NumberOfVertices == 4)
-						{
-							if(polygonData.PolyPoint[3].vy > tmpHeight) tmpHeight = polygonData.PolyPoint[2].vy;
-						}
-						
-						/* record height of lowest downward facing poly */
-						if(tmpHeight > heightOfDownPoly) heightOfDownPoly =	tmpHeight;						
-					}
-				}
-				else /* upwards facing */
-				{
-					upPolyFound++;
-					{
-						/* find height of this poly: height of highest vertex */
-						int tmpHeight = polygonData.PolyPoint[0].vy;
-						
-						if(polygonData.PolyPoint[1].vy < tmpHeight) tmpHeight = polygonData.PolyPoint[1].vy;
-						if(polygonData.PolyPoint[2].vy < tmpHeight) tmpHeight = polygonData.PolyPoint[2].vy;
-						if(polygonData.NumberOfVertices == 4)
-						{
-							if(polygonData.PolyPoint[3].vy < tmpHeight) tmpHeight = polygonData.PolyPoint[2].vy;
-						}
-						
-						/* record height of heighest upward facing poly */
-						if(tmpHeight < heightOfUpPoly) heightOfUpPoly =	tmpHeight;						
-					}
-				}
-			}
-		}
-		polyCounter--;		
-	}			
-	/* if up & down polys exist check their heights:
+    int polyCounter;
+    int heightOfUpPoly = thisModule->m_maxy;   /* init to lowest module extent */
+    int heightOfDownPoly = thisModule->m_miny; /* init to heighest module extent */
+    int upPolyFound = 0;
+    int downPolyFound = 0;
+    int XZcontainment;
+
+    struct ColPolyTag polygonData;
+
+    polyCounter = SetupPolygonAccessFromShapeIndex(thisModule->m_mapptr->MapShape);
+
+    /* loop through the item list, then ... */
+    while (polyCounter > 0) {
+        AccessNextPolygon();
+        GetPolygonVertices(&polygonData);
+        GetPolygonNormal(&polygonData);
+
+        /* first test if poly is vertical */
+        if ((polygonData.PolyNormal.vy > FAR_MIN_INCLINE)
+            || (polygonData.PolyNormal.vy < -FAR_MIN_INCLINE)) {
+            XZcontainment = IsXZinPoly(&(location->position), &polygonData);
+            if (XZcontainment) {
+                if (polygonData.PolyNormal.vy > 0) /* downwards facing */
+                {
+                    downPolyFound++;
+                    {
+                        /* find height of this poly: height of lowest vertex */
+                        int tmpHeight = polygonData.PolyPoint[0].vy;
+
+                        if (polygonData.PolyPoint[1].vy > tmpHeight)
+                            tmpHeight = polygonData.PolyPoint[1].vy;
+                        if (polygonData.PolyPoint[2].vy > tmpHeight)
+                            tmpHeight = polygonData.PolyPoint[2].vy;
+                        if (polygonData.NumberOfVertices == 4) {
+                            if (polygonData.PolyPoint[3].vy > tmpHeight)
+                                tmpHeight = polygonData.PolyPoint[2].vy;
+                        }
+
+                        /* record height of lowest downward facing poly */
+                        if (tmpHeight > heightOfDownPoly)
+                            heightOfDownPoly = tmpHeight;
+                    }
+                } else /* upwards facing */
+                {
+                    upPolyFound++;
+                    {
+                        /* find height of this poly: height of highest vertex */
+                        int tmpHeight = polygonData.PolyPoint[0].vy;
+
+                        if (polygonData.PolyPoint[1].vy < tmpHeight)
+                            tmpHeight = polygonData.PolyPoint[1].vy;
+                        if (polygonData.PolyPoint[2].vy < tmpHeight)
+                            tmpHeight = polygonData.PolyPoint[2].vy;
+                        if (polygonData.NumberOfVertices == 4) {
+                            if (polygonData.PolyPoint[3].vy < tmpHeight)
+                                tmpHeight = polygonData.PolyPoint[2].vy;
+                        }
+
+                        /* record height of heighest upward facing poly */
+                        if (tmpHeight < heightOfUpPoly)
+                            heightOfUpPoly = tmpHeight;
+                    }
+                }
+            }
+        }
+        polyCounter--;
+    }
+    /* if up & down polys exist check their heights:
 	if there is not enough clearance bewteen the lowest down poly and the heighest up poly, 
 	invalidate the location.*/
-	if((upPolyFound!=0) && (downPolyFound!=0))
-	{
-			int minclearance = FAR_BB_HEIGHT;
-			if(thisModule->m_flags & MODULEFLAG_AIRDUCT) minclearance>>=1;
-			if((heightOfUpPoly-heightOfDownPoly)>=minclearance)
-			{
-				//position the aux location slightly above the polygon
-				location->position.vy = heightOfUpPoly-10;
-			}
-			else location->valid = 0;		
-	}
-	else location->valid = 0;
- }
-
+    if ((upPolyFound != 0) && (downPolyFound != 0)) {
+        int minclearance = FAR_BB_HEIGHT;
+        if (thisModule->m_flags & MODULEFLAG_AIRDUCT)
+            minclearance >>= 1;
+        if ((heightOfUpPoly - heightOfDownPoly) >= minclearance) {
+            //position the aux location slightly above the polygon
+            location->position.vy = heightOfUpPoly - 10;
+        } else
+            location->valid = 0;
+    } else
+        location->valid = 0;
+}
 
 /*------------------ Patrick 3/12/96 ----------------------
   This function determines whether an x/z position lies
@@ -1344,76 +1321,72 @@ static void GetFarLocHeight(FARVALIDATEDLOCATION *location, MODULE *thisModule)
 
   NB is not entirely accurate for concave polygons.
   ---------------------------------------------------------*/
-static int IsXZinPoly(VECTORCH* location, struct ColPolyTag *polygonData)
+static int IsXZinPoly(VECTORCH *location, struct ColPolyTag *polygonData)
 {
-	int x = location->vx;
-	int z = location->vz;
-	int xa,za,xb,zb;
-	int intersections = 0;
-	int intersectMinz, intersectMaxz;
-	int linesToTest;
-	int nextLine;
-	
-	linesToTest = polygonData->NumberOfVertices;
+    int x = location->vx;
+    int z = location->vz;
+    int xa, za, xb, zb;
+    int intersections = 0;
+    int intersectMinz, intersectMaxz;
+    int linesToTest;
+    int nextLine;
 
-	if(linesToTest == 3)
-	{
-		xa = polygonData->PolyPoint[2].vx;
-		za = polygonData->PolyPoint[2].vz;
-	}
-	else
-	{
-		LOCALASSERT(linesToTest == 4);
-		xa = polygonData->PolyPoint[3].vx;
-		za = polygonData->PolyPoint[3].vz;
-	}
+    linesToTest = polygonData->NumberOfVertices;
 
-	nextLine = 0;
-	
-	while(nextLine < linesToTest)
-	{
-		/* copy last first point to next last point (?) */
-		xb = xa;
-		zb = za;
-		
-		/* get next first point */
-		xa = polygonData->PolyPoint[nextLine].vx;
-		za = polygonData->PolyPoint[nextLine].vz;
-				
-		if(((x>=xb) && (x<=xa)) || ((x<xb) && (x>=xa)))
-		{
-		  	/* intesection ! */
-			intersections++;
-			if(!(intersections<4)) return 0;
+    if (linesToTest == 3) {
+        xa = polygonData->PolyPoint[2].vx;
+        za = polygonData->PolyPoint[2].vz;
+    } else {
+        LOCALASSERT(linesToTest == 4);
+        xa = polygonData->PolyPoint[3].vx;
+        za = polygonData->PolyPoint[3].vz;
+    }
 
-			{
-				int zPosn;
+    nextLine = 0;
 
-				if(xb==xa)
-					zPosn = za;
-				else
-					zPosn = zb + WideMulNarrowDiv((za-zb),(x-xb),(xa-xb));
-				
-				if(intersections == 1)
-					intersectMinz = intersectMaxz = zPosn;
-				else
-				{
-					if(zPosn < intersectMinz) intersectMinz = zPosn;
-					else if(zPosn > intersectMaxz) intersectMaxz = zPosn;
-				}
-			}
-		}	  	
-	  	nextLine++;
-	}
+    while (nextLine < linesToTest) {
+        /* copy last first point to next last point (?) */
+        xb = xa;
+        zb = za;
 
-	if(intersections == 0) return 0;
-	if(intersections == 1)
-		return (z == intersectMinz);	
-	else 
-		return ((z >= intersectMinz)&&(z <= intersectMaxz));
-	
+        /* get next first point */
+        xa = polygonData->PolyPoint[nextLine].vx;
+        za = polygonData->PolyPoint[nextLine].vz;
+
+        if (((x >= xb) && (x <= xa)) || ((x < xb) && (x >= xa))) {
+            /* intesection ! */
+            intersections++;
+            if (!(intersections < 4))
+                return 0;
+
+            {
+                int zPosn;
+
+                if (xb == xa)
+                    zPosn = za;
+                else
+                    zPosn = zb + WideMulNarrowDiv((za - zb), (x - xb), (xa - xb));
+
+                if (intersections == 1)
+                    intersectMinz = intersectMaxz = zPosn;
+                else {
+                    if (zPosn < intersectMinz)
+                        intersectMinz = zPosn;
+                    else if (zPosn > intersectMaxz)
+                        intersectMaxz = zPosn;
+                }
+            }
+        }
+        nextLine++;
+    }
+
+    if (intersections == 0)
+        return 0;
+    if (intersections == 1)
+        return (z == intersectMinz);
+    else
+        return ((z >= intersectMinz) && (z <= intersectMaxz));
 }
-
 
 /*--------------------Patrick 4/12/96--------------------
   This function checks a potential location for impinging
@@ -1434,42 +1407,42 @@ static int FarBoxContainsPolygon();
 
 static void FarLocVolumeTest(FARVALIDATEDLOCATION *location, MODULE *thisModule)
 {
-	int polyCounter;
-	int containmentFailure = 0;
+    int polyCounter;
+    int containmentFailure = 0;
 
-	LOCALASSERT(location->valid);
-	
-	/* the location is provided as an x,y,z:
+    LOCALASSERT(location->valid);
+
+    /* the location is provided as an x,y,z:
 	the x and z indicate the centre, and the y indicates the bottom.
 	translate these into bounding box extents.... */
-	
-	/* 10/7/97: this test has been modified: the bbox is moved up slightly, and any
+
+    /* 10/7/97: this test has been modified: the bbox is moved up slightly, and any
 	impinging ploygon invalidates the location */
 
-	farbbox_maxx = location->position.vx + (FAR_BB_WIDTH>>1);
-	farbbox_minx = location->position.vx - (FAR_BB_WIDTH>>1);
-	farbbox_maxz = location->position.vz + (FAR_BB_WIDTH>>1);
-	farbbox_minz = location->position.vz - (FAR_BB_WIDTH>>1);
-	farbbox_maxy = location->position.vy - 10;
+    farbbox_maxx = location->position.vx + (FAR_BB_WIDTH >> 1);
+    farbbox_minx = location->position.vx - (FAR_BB_WIDTH >> 1);
+    farbbox_maxz = location->position.vz + (FAR_BB_WIDTH >> 1);
+    farbbox_minz = location->position.vz - (FAR_BB_WIDTH >> 1);
+    farbbox_maxy = location->position.vy - 10;
 
-	/* patrick 4/7/97: a little adittion for airducts: npc should be crouched in them */
-	if(thisModule->m_flags & MODULEFLAG_AIRDUCT)
-		farbbox_miny = location->position.vy - (FAR_BB_HEIGHT>>1) - 10;	
-	else
-		farbbox_miny = location->position.vy - FAR_BB_HEIGHT - 10;
+    /* patrick 4/7/97: a little adittion for airducts: npc should be crouched in them */
+    if (thisModule->m_flags & MODULEFLAG_AIRDUCT)
+        farbbox_miny = location->position.vy - (FAR_BB_HEIGHT >> 1) - 10;
+    else
+        farbbox_miny = location->position.vy - FAR_BB_HEIGHT - 10;
 
-	/* now just run through the polygons in the shape. If a polygon is 
-	inside (actually, not definitely outside) the bbox, invalidate the location */		
- 	polyCounter = SetupPolygonAccessFromShapeIndex(thisModule->m_mapptr->MapShape);
-	while((polyCounter>0)&&(!containmentFailure))
-	{
-		AccessNextPolygon();
-		GetPolygonVertices(&farbbox_polygonData);
-		containmentFailure = FarBoxContainsPolygon();					
-		polyCounter--;
-	}
-	/* so, if there	has been a containmentFailure, invalidate the location */
-	if(containmentFailure) location->valid = 0;
+    /* now just run through the polygons in the shape. If a polygon is 
+	inside (actually, not definitely outside) the bbox, invalidate the location */
+    polyCounter = SetupPolygonAccessFromShapeIndex(thisModule->m_mapptr->MapShape);
+    while ((polyCounter > 0) && (!containmentFailure)) {
+        AccessNextPolygon();
+        GetPolygonVertices(&farbbox_polygonData);
+        containmentFailure = FarBoxContainsPolygon();
+        polyCounter--;
+    }
+    /* so, if there	has been a containmentFailure, invalidate the location */
+    if (containmentFailure)
+        location->valid = 0;
 }
 
 /*--------------------Patrick 5/12/96----------------------------------
@@ -1479,64 +1452,72 @@ static void FarLocVolumeTest(FARVALIDATEDLOCATION *location, MODULE *thisModule)
  ----------------------------------------------------------------------*/
 static int FarBoxContainsPolygon()
 {
-	if(farbbox_polygonData.NumberOfVertices == 3)
-	{
-		if(	(farbbox_polygonData.PolyPoint[0].vy<=farbbox_miny)&&
-			(farbbox_polygonData.PolyPoint[1].vy<=farbbox_miny)&&
-			(farbbox_polygonData.PolyPoint[2].vy<=farbbox_miny))	return 0;
+    if (farbbox_polygonData.NumberOfVertices == 3) {
+        if ((farbbox_polygonData.PolyPoint[0].vy <= farbbox_miny)
+            && (farbbox_polygonData.PolyPoint[1].vy <= farbbox_miny)
+            && (farbbox_polygonData.PolyPoint[2].vy <= farbbox_miny))
+            return 0;
 
-		if(	(farbbox_polygonData.PolyPoint[0].vx<=farbbox_minx)&&
-			(farbbox_polygonData.PolyPoint[1].vx<=farbbox_minx)&&
-			(farbbox_polygonData.PolyPoint[2].vx<=farbbox_minx))	return 0;	
+        if ((farbbox_polygonData.PolyPoint[0].vx <= farbbox_minx)
+            && (farbbox_polygonData.PolyPoint[1].vx <= farbbox_minx)
+            && (farbbox_polygonData.PolyPoint[2].vx <= farbbox_minx))
+            return 0;
 
-		if( (farbbox_polygonData.PolyPoint[0].vz<=farbbox_minz)&&
-			(farbbox_polygonData.PolyPoint[1].vz<=farbbox_minz)&&
-			(farbbox_polygonData.PolyPoint[2].vz<=farbbox_minz))	return 0;
+        if ((farbbox_polygonData.PolyPoint[0].vz <= farbbox_minz)
+            && (farbbox_polygonData.PolyPoint[1].vz <= farbbox_minz)
+            && (farbbox_polygonData.PolyPoint[2].vz <= farbbox_minz))
+            return 0;
 
-		if( (farbbox_polygonData.PolyPoint[0].vz>=farbbox_maxz)&&
-			(farbbox_polygonData.PolyPoint[1].vz>=farbbox_maxz)&&
-			(farbbox_polygonData.PolyPoint[2].vz>=farbbox_maxz))	return 0;
-						
-		if( (farbbox_polygonData.PolyPoint[0].vx>=farbbox_maxx)&&
-			(farbbox_polygonData.PolyPoint[1].vx>=farbbox_maxx)&&
-			(farbbox_polygonData.PolyPoint[2].vx>=farbbox_maxx))	return 0;
+        if ((farbbox_polygonData.PolyPoint[0].vz >= farbbox_maxz)
+            && (farbbox_polygonData.PolyPoint[1].vz >= farbbox_maxz)
+            && (farbbox_polygonData.PolyPoint[2].vz >= farbbox_maxz))
+            return 0;
 
-		if( (farbbox_polygonData.PolyPoint[0].vy>=farbbox_maxy)&&
-			(farbbox_polygonData.PolyPoint[1].vy>=farbbox_maxy)&&
-			(farbbox_polygonData.PolyPoint[2].vy>=farbbox_maxy))	return 0;
-	}
-	else
-	{
-		if(	(farbbox_polygonData.PolyPoint[0].vy<=farbbox_miny)&&
-			(farbbox_polygonData.PolyPoint[1].vy<=farbbox_miny)&&
-			(farbbox_polygonData.PolyPoint[2].vy<=farbbox_miny)&&
-			(farbbox_polygonData.PolyPoint[3].vy<=farbbox_miny))	return 0;
+        if ((farbbox_polygonData.PolyPoint[0].vx >= farbbox_maxx)
+            && (farbbox_polygonData.PolyPoint[1].vx >= farbbox_maxx)
+            && (farbbox_polygonData.PolyPoint[2].vx >= farbbox_maxx))
+            return 0;
 
-		if(	(farbbox_polygonData.PolyPoint[0].vx<=farbbox_minx)&&
-			(farbbox_polygonData.PolyPoint[1].vx<=farbbox_minx)&&
-			(farbbox_polygonData.PolyPoint[2].vx<=farbbox_minx)&&
-			(farbbox_polygonData.PolyPoint[3].vx<=farbbox_minx))	return 0;	
+        if ((farbbox_polygonData.PolyPoint[0].vy >= farbbox_maxy)
+            && (farbbox_polygonData.PolyPoint[1].vy >= farbbox_maxy)
+            && (farbbox_polygonData.PolyPoint[2].vy >= farbbox_maxy))
+            return 0;
+    } else {
+        if ((farbbox_polygonData.PolyPoint[0].vy <= farbbox_miny)
+            && (farbbox_polygonData.PolyPoint[1].vy <= farbbox_miny)
+            && (farbbox_polygonData.PolyPoint[2].vy <= farbbox_miny)
+            && (farbbox_polygonData.PolyPoint[3].vy <= farbbox_miny))
+            return 0;
 
-		if( (farbbox_polygonData.PolyPoint[0].vz<=farbbox_minz)&&
-			(farbbox_polygonData.PolyPoint[1].vz<=farbbox_minz)&&
-			(farbbox_polygonData.PolyPoint[2].vz<=farbbox_minz)&&
-			(farbbox_polygonData.PolyPoint[3].vz<=farbbox_minz))	return 0;
+        if ((farbbox_polygonData.PolyPoint[0].vx <= farbbox_minx)
+            && (farbbox_polygonData.PolyPoint[1].vx <= farbbox_minx)
+            && (farbbox_polygonData.PolyPoint[2].vx <= farbbox_minx)
+            && (farbbox_polygonData.PolyPoint[3].vx <= farbbox_minx))
+            return 0;
 
-		if( (farbbox_polygonData.PolyPoint[0].vz>=farbbox_maxz)&&
-			(farbbox_polygonData.PolyPoint[1].vz>=farbbox_maxz)&&
-			(farbbox_polygonData.PolyPoint[2].vz>=farbbox_maxz)&&
-			(farbbox_polygonData.PolyPoint[3].vz>=farbbox_maxz))	return 0;
+        if ((farbbox_polygonData.PolyPoint[0].vz <= farbbox_minz)
+            && (farbbox_polygonData.PolyPoint[1].vz <= farbbox_minz)
+            && (farbbox_polygonData.PolyPoint[2].vz <= farbbox_minz)
+            && (farbbox_polygonData.PolyPoint[3].vz <= farbbox_minz))
+            return 0;
 
-		if( (farbbox_polygonData.PolyPoint[0].vx>=farbbox_maxx)&&
-			(farbbox_polygonData.PolyPoint[1].vx>=farbbox_maxx)&&
-			(farbbox_polygonData.PolyPoint[2].vx>=farbbox_maxx)&&
-			(farbbox_polygonData.PolyPoint[3].vx>=farbbox_maxx))	return 0;
-						
-		if( (farbbox_polygonData.PolyPoint[0].vy>=farbbox_maxy)&&
-			(farbbox_polygonData.PolyPoint[1].vy>=farbbox_maxy)&&
-			(farbbox_polygonData.PolyPoint[2].vy>=farbbox_maxy)&&
-			(farbbox_polygonData.PolyPoint[3].vy>=farbbox_maxy))	return 0;
-	}	
-	return 1;
+        if ((farbbox_polygonData.PolyPoint[0].vz >= farbbox_maxz)
+            && (farbbox_polygonData.PolyPoint[1].vz >= farbbox_maxz)
+            && (farbbox_polygonData.PolyPoint[2].vz >= farbbox_maxz)
+            && (farbbox_polygonData.PolyPoint[3].vz >= farbbox_maxz))
+            return 0;
+
+        if ((farbbox_polygonData.PolyPoint[0].vx >= farbbox_maxx)
+            && (farbbox_polygonData.PolyPoint[1].vx >= farbbox_maxx)
+            && (farbbox_polygonData.PolyPoint[2].vx >= farbbox_maxx)
+            && (farbbox_polygonData.PolyPoint[3].vx >= farbbox_maxx))
+            return 0;
+
+        if ((farbbox_polygonData.PolyPoint[0].vy >= farbbox_maxy)
+            && (farbbox_polygonData.PolyPoint[1].vy >= farbbox_maxy)
+            && (farbbox_polygonData.PolyPoint[2].vy >= farbbox_maxy)
+            && (farbbox_polygonData.PolyPoint[3].vy >= farbbox_maxy))
+            return 0;
+    }
+    return 1;
 }
-

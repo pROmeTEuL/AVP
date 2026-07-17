@@ -20,37 +20,32 @@
 #ifndef _projfont
 #define _projfont 1
 
-	#ifndef _font_h_included
-	#include "font.h"
-	#endif
+#ifndef _font_h_included
+#include "font.h"
+#endif
 
 #ifdef __cplusplus
-	extern "C" {
+extern "C" {
 #endif
 
 /* Version settings *****************************************************/
 
 /* Constants  ***********************************************************/
-	#define IndexedFonts_MAX_NUMBER_OF_FONTS ( NUM_FONTS )
+#define IndexedFonts_MAX_NUMBER_OF_FONTS (NUM_FONTS)
 
 /* Macros ***************************************************************/
 
 /* Type definitions *****************************************************/
-	typedef enum fonts FontIndex;
-
-	
+typedef enum fonts FontIndex;
 
 /* Exported globals *****************************************************/
 
 /* Function prototypes **************************************************/
 
-
-
 /* End of the header ****************************************************/
 
-
 #ifdef __cplusplus
-	};
+};
 #endif
 
 #endif

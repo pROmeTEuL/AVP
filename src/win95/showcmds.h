@@ -8,26 +8,26 @@
 */
 struct DEBUGGINGTEXTOPTIONS
 {
-	unsigned int FPS :1;
-	unsigned int Environment :1;
-	unsigned int Coords :1;
-	unsigned int Module :1;
-	unsigned int Target :1;
+    unsigned int FPS : 1;
+    unsigned int Environment : 1;
+    unsigned int Coords : 1;
+    unsigned int Module : 1;
+    unsigned int Target : 1;
 
-	unsigned int Networking: 1;
-	unsigned int Dynamics :1;
-	unsigned int GunPos :1;
-	unsigned int Tears :1;
-	unsigned int PolyCount :1;
-	unsigned int Sounds :1;
+    unsigned int Networking : 1;
+    unsigned int Dynamics : 1;
+    unsigned int GunPos : 1;
+    unsigned int Tears : 1;
+    unsigned int PolyCount : 1;
+    unsigned int Sounds : 1;
 };
 
 extern struct DEBUGGINGTEXTOPTIONS ShowDebuggingText;
 
 #ifdef AVP_DEBUG_VERSION
-	#define DEBUGGING_TEXT_ON 1
+#define DEBUGGING_TEXT_ON 1
 #else
-	#define DEBUGGING_TEXT_ON 0
+#define DEBUGGING_TEXT_ON 0
 #endif
 
 #if 0 /* stupid defines */
@@ -44,5 +44,5 @@ extern int ReleasePrintDebuggingText(const char* t, ...);
 #endif
 #endif /* ... */
 
-extern int PrintDebuggingText(const char* t, ...);
-extern int ReleasePrintDebuggingText(const char* t, ...);
+extern int PrintDebuggingText(const char *t, ...);
+extern int ReleasePrintDebuggingText(const char *t, ...);

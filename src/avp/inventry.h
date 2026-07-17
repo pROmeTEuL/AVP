@@ -18,25 +18,22 @@ extern void SetPlayerSecurityClearance(STRATEGYBLOCK *sbPtr, unsigned int securi
 extern int ReturnPlayerSecurityClearance(STRATEGYBLOCK *sbPtr, unsigned int securityLevel);
 int SlotForThisWeapon(enum WEAPON_ID weaponID);
 
-
-
 //structure for starting equipment information loaded from rif files
 typedef struct player_starting_equipment
 {
-	unsigned int marine_jetpack :1;
-	
-	unsigned int predator_pistol :1;
-	unsigned int predator_plasmacaster :1;
-	unsigned int predator_disc :1;
-	unsigned int predator_medicomp :1;
-	unsigned int predator_grappling_hook :1;
-	int predator_num_spears;
+    unsigned int marine_jetpack : 1;
 
-	
-}PLAYER_STARTING_EQUIPMENT;
+    unsigned int predator_pistol : 1;
+    unsigned int predator_plasmacaster : 1;
+    unsigned int predator_disc : 1;
+    unsigned int predator_medicomp : 1;
+    unsigned int predator_grappling_hook : 1;
+    int predator_num_spears;
+
+} PLAYER_STARTING_EQUIPMENT;
 
 extern PLAYER_STARTING_EQUIPMENT StartingEquipment;
 
-#define PISTOL_INFINITE_AMMO	(netGameData.pistolInfiniteAmmo)
+#define PISTOL_INFINITE_AMMO (netGameData.pistolInfiniteAmmo)
 
 #endif

@@ -1,7 +1,7 @@
 #ifndef HUD_H
 #define HUD_H
 
-#include "stratdef.h"  /* for STRATEGYBLOCK */
+#include "stratdef.h" /* for STRATEGYBLOCK */
 
 void InitHUD(void);
 void KillHUD(void);

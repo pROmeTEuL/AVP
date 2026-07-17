@@ -22,4 +22,3 @@ VOID PutLittleDword(DWORD v, FILE *fp);
 #endif /* __cplusplus */
 
 #endif /* _included_endianio_h_ */
-

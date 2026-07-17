@@ -43,17 +43,14 @@ New sound system
 #include "game_statistics.h"
 #include "cdtrackselection.h"
 
-
 // EXTERNS
-
-
 
 extern int WindowMode;
 extern int VideoMode;
 
 extern SCREENDESCRIPTORBLOCK ScreenDescriptorBlock;
 
-extern SHAPEHEADER** mainshapelist;
+extern SHAPEHEADER **mainshapelist;
 
 extern int NumActiveBlocks;
 extern int NumOnScreenBlocks;
@@ -62,13 +59,13 @@ extern DISPLAYBLOCK *ActiveBlockList[];
 extern MODULEMAPBLOCK AvpCompiledMaps[];
 extern MAPHEADER TestMap[];
 extern MAPHEADER Map[];
-extern MAPHEADER * staticmaplist[];
+extern MAPHEADER *staticmaplist[];
 extern MAPBLOCK8 Player_and_Camera_Type8[];
 
 extern SCENEMODULE **Global_ModulePtr;
 extern SCENEMODULE *MainSceneArray[];
 
-extern void (*SetVideoMode[]) (void);
+extern void (*SetVideoMode[])(void);
 extern int HWAccel;
 extern int Resolution;
 extern void SetupVision(void);
@@ -76,7 +73,6 @@ extern void ReInitHUD(void);
 extern void CheckCDStatus(void);
 
 extern void DeallocateSoundsAndPoolAllocatedMemory();
-
 
 /*Globals */
 
@@ -89,8 +85,7 @@ int DXMemoryRequestMode;
 WINSCALEXY TopLeftSubWindow;
 WINSCALEXY ExtentXYSubWindow;
 
-
-// static 
+// static
 
 static int ReadModuleMapList(MODULEMAPBLOCK *mmbptr);
 RIFFHANDLE env_rif = INVALID_RIFFHANDLE;
@@ -116,15 +111,14 @@ void ProcessSystemObjects();
 void InitialVideoMode(void)
 
 {
-/*
+    /*
 	Note that video modes are now only
 	REQUESTED, not set.  
 	Sound will also be dealt with in the 
 	same way.
 */
 
-
-	ScreenDescriptorBlock.SDB_Flags = SDB_Flag_Raw256 | SDB_Flag_MIP;
+    ScreenDescriptorBlock.SDB_Flags = SDB_Flag_Raw256 | SDB_Flag_MIP;
 
     /*
 		Setup for Windows mode.  Note that
@@ -144,36 +138,36 @@ void InitialVideoMode(void)
 	  Note this is now only a request mode.
 	*/
 
-    #if 1
+#if 1
     WindowRequestMode = WindowModeFullScreen;
-	#else
+#else
     WindowRequestMode = WindowModeSubWindow;
-	#endif
+#endif
 
     TopLeftSubWindow.x = 0.3;
-	TopLeftSubWindow.y = 0.3;
-	ExtentXYSubWindow.x = 0.6;
-	ExtentXYSubWindow.y = 0.6;
+    TopLeftSubWindow.y = 0.3;
+    ExtentXYSubWindow.x = 0.6;
+    ExtentXYSubWindow.y = 0.6;
 
-/*
+    /*
 	Experimental settings for other 
 	request modes affecting rendering.
 */
 
-	/*VideoRequestMode = VideoMode_DX_640x480x8;  for menus - is this guaranteed? */
-	VideoRequestMode = AvP.MenuVideoRequestMode;
-	
-	/* JH 20/5/97
+    /*VideoRequestMode = VideoMode_DX_640x480x8;  for menus - is this guaranteed? */
+    VideoRequestMode = AvP.MenuVideoRequestMode;
+
+    /* JH 20/5/97
 		begin in minmal h/w configuration - for menus
 		- don't need any h/w 3d, but do need to know
 		about h/w direct draw and what video modes
 		will be available */
 
-	ZBufferRequestMode = RequestZBufferNever;
+    ZBufferRequestMode = RequestZBufferNever;
 
     RasterisationRequestMode = RequestDefaultRasterisation;
 
-    SoftwareScanDrawRequestMode = RequestScanDrawDirectDraw; 
+    SoftwareScanDrawRequestMode = RequestScanDrawDirectDraw;
 
     DXMemoryRequestMode = RequestSystemMemoryAlways;
 
@@ -186,11 +180,7 @@ void InitialVideoMode(void)
 		initialisation (done through SetVideoMode)
 		must be done after windows initialisation
 	*/
-
 }
-
-
-
 
 /****************** AVP Change Display Modes*/
 
@@ -237,34 +227,30 @@ void InitialVideoMode(void)
 	WITHOUT A SHAPE RELOAD!!!
 */
 
-
-int AVP_ChangeDisplayMode
-		(
-			HINSTANCE hInst, 
-			int nCmd, 
-			int NewVideoMode, 
-			int NewWindowMode,
-			int NewZBufferMode, 
-			int NewRasterisationMode, 
-			int NewSoftwareScanDrawMode, 
-			int NewDXMemoryMode
-		)
+int AVP_ChangeDisplayMode(
+    HINSTANCE hInst,
+    int nCmd,
+    int NewVideoMode,
+    int NewWindowMode,
+    int NewZBufferMode,
+    int NewRasterisationMode,
+    int NewSoftwareScanDrawMode,
+    int NewDXMemoryMode)
 {
-	BOOL ChangeWindow = No;
+    BOOL ChangeWindow = No;
 
-	/*
+    /*
 		Shut down DirectX objects and destroy
 		the current window, if necessary.
 	*/
 
-    if (NewWindowMode != WindowMode)
-		{
-		  ChangeWindow = Yes;
-		}
+    if (NewWindowMode != WindowMode) {
+        ChangeWindow = Yes;
+    }
 
     /* JH 30/5/97 - added this line back in so that d3d is cleaned up properly when the
 	   display is changed back to 8-but for the menus */
-	/* JH 3/6/97 - don't quit kill off the images - still keep buffers in system memory
+    /* JH 3/6/97 - don't quit kill off the images - still keep buffers in system memory
 	   that are not linked to direct draw */
     MinimizeAllImages();
     ReleaseDirect3DNotDDOrImages();
@@ -272,63 +258,54 @@ int AVP_ChangeDisplayMode
     finiObjectsExceptDD();
 
     if (ChangeWindow)
-      ExitWindowsSystem(); 
+        ExitWindowsSystem();
 
-
-	/*
+    /*
 		Set the request modes and actual modes
 		according to the passed values.
 	*/
 
     VideoRequestMode = NewVideoMode;
     WindowRequestMode = NewWindowMode;
-	ZBufferRequestMode = NewZBufferMode;
-	RasterisationRequestMode = NewRasterisationMode;
-	SoftwareScanDrawRequestMode = NewSoftwareScanDrawMode;
-	DXMemoryRequestMode = NewDXMemoryMode;
+    ZBufferRequestMode = NewZBufferMode;
+    RasterisationRequestMode = NewRasterisationMode;
+    SoftwareScanDrawRequestMode = NewSoftwareScanDrawMode;
+    DXMemoryRequestMode = NewDXMemoryMode;
 
     VideoMode = VideoRequestMode;
-	WindowMode = WindowRequestMode;
+    WindowMode = WindowRequestMode;
 
-	/* this may reconstruct the dd object depending
+    /* this may reconstruct the dd object depending
 	   on the rasterisation request mode and whether
 	   a hardware dd driver is selected or could be
 	   available - JH 20/5/97 */
-	ChangeDirectDrawObject();
+    ChangeDirectDrawObject();
 
-	/*
+    /*
 		Recreate the window, allowing
 		for possible change in WindowMode.
 	*/
 
-    if (ChangeWindow)
-	  {
-	   	BOOL rc = InitialiseWindowsSystem
-		(
-			hInst, 
-			nCmd, 
-			WinInitChange
-		);
+    if (ChangeWindow) {
+        BOOL rc = InitialiseWindowsSystem(hInst, nCmd, WinInitChange);
 
-       	if (rc == FALSE)
-	     	return rc;
-	  }
+        if (rc == FALSE)
+            return rc;
+    }
 
-	/*
+    /*
 		Set the video mode again.  This
 		will handle all changes to DirectDraw
 		objects, all Direct3D initialisation,
 		and other request modes such as
 		zbuffering.
 	*/
-/*
+    /*
 	SetVideoMode[VideoMode]();
 */
 
-
     return TRUE;
 }
-
 
 //void ReleaseDirect3DNotDDOrImages(void)
 //{
@@ -337,531 +314,505 @@ int AVP_ChangeDisplayMode
 //    RELEASE(d3d.lpD3D);
 //}
 
-
 //empty functions for hooks
 // hooks for doing stuff after drawing and
 // after a flip
 
-void ProjectSpecificItemListPostProcessing(void){;}
-void ProjectSpecificBufferFlipPostProcessing(void){;}
-
-
+void ProjectSpecificItemListPostProcessing(void)
+{
+    ;
+}
+void ProjectSpecificBufferFlipPostProcessing(void)
+{
+    ;
+}
 
 /*******************************************************************************************/
 /*******************************************************************************************/
 
 /***************						GAME AND ENIVROMENT CONTROL 					**************************/
 
-
-
 void InitCharacter()
 {
-	/*** RWH cleans up the character initialisation 
+    /*** RWH cleans up the character initialisation 
 			 it would be nice if this can be called when
 			 we load up a game of a different character
 	***/
-	
-	// load charcater specific rif and sounds
 
+    // load charcater specific rif and sounds
 
-	if(player_rif != INVALID_RIFFHANDLE)
-	{
-			// we already have a player loaded - delete the bastard
-			avp_undo_rif_load(player_rif);
-	}
-	if(alien_weapon_rif != INVALID_RIFFHANDLE)
-	{
-			// we already have a player loaded - delete the bastard
-		avp_undo_rif_load(alien_weapon_rif);
-	}
-	if(marine_weapon_rif != INVALID_RIFFHANDLE)
-	{
-			// we already have a player loaded - delete the bastard
-		avp_undo_rif_load(marine_weapon_rif);
-	}
-	if(predator_weapon_rif != INVALID_RIFFHANDLE)
-	{
-			// we already have a player loaded - delete the bastard
-		avp_undo_rif_load(predator_weapon_rif);
-	}
-	
-	#if MaxImageGroups==1
-	InitialiseTextures();
-	#else
-	SetCurrentImageGroup(0);
-	DeallocateCurrentImages();
-	#endif
-	
-	Start_Progress_Bar();
+    if (player_rif != INVALID_RIFFHANDLE) {
+        // we already have a player loaded - delete the bastard
+        avp_undo_rif_load(player_rif);
+    }
+    if (alien_weapon_rif != INVALID_RIFFHANDLE) {
+        // we already have a player loaded - delete the bastard
+        avp_undo_rif_load(alien_weapon_rif);
+    }
+    if (marine_weapon_rif != INVALID_RIFFHANDLE) {
+        // we already have a player loaded - delete the bastard
+        avp_undo_rif_load(marine_weapon_rif);
+    }
+    if (predator_weapon_rif != INVALID_RIFFHANDLE) {
+        // we already have a player loaded - delete the bastard
+        avp_undo_rif_load(predator_weapon_rif);
+    }
 
-	
-	Set_Progress_Bar_Position(PBAR_HUD_START);
+#if MaxImageGroups == 1
+    InitialiseTextures();
+#else
+    SetCurrentImageGroup(0);
+    DeallocateCurrentImages();
+#endif
 
-	switch(AvP.Network)
-	{
-		case I_No_Network:
-		{
-			
+    Start_Progress_Bar();
 
-			// set up the standard single player game
-			switch(AvP.PlayerType)
-				{
-					case I_Marine:
-						{
-							marine_weapon_rif = avp_load_rif("avp_huds/marwep.rif");
-							Set_Progress_Bar_Position(PBAR_HUD_START+PBAR_HUD_INTERVAL*.25);
-							player_rif = avp_load_rif("avp_huds/marine.rif");
-							break;
-						}
-					case I_Predator:
-						{
-							predator_weapon_rif = avp_load_rif("avp_huds/pred_hud.rif");
-							Set_Progress_Bar_Position(PBAR_HUD_START+PBAR_HUD_INTERVAL*.25);
-							player_rif = avp_load_rif("avp_huds/predator.rif");
-							break;
-						}
+    Set_Progress_Bar_Position(PBAR_HUD_START);
 
-					case I_Alien:
-						{
-							#if ALIEN_DEMO
-							alien_weapon_rif = avp_load_rif("alienavp_huds/alien_hud.rif");
-							Set_Progress_Bar_Position(PBAR_HUD_START+PBAR_HUD_INTERVAL*.25);
-							player_rif = avp_load_rif("alienavp_huds/alien.rif");
-							#else
-							alien_weapon_rif = avp_load_rif("avp_huds/alien_hud.rif");
-							Set_Progress_Bar_Position(PBAR_HUD_START+PBAR_HUD_INTERVAL*.25);
-							player_rif = avp_load_rif("avp_huds/alien.rif");
-							#endif
-							break;
-						}
-					default:
-						{
-							GLOBALASSERT(2<1);
-						}
-				}
-				break;
-			}
-			default:
-			{
-				
+    switch (AvP.Network) {
+    case I_No_Network: {
+        // set up the standard single player game
+        switch (AvP.PlayerType) {
+        case I_Marine: {
+            marine_weapon_rif = avp_load_rif("avp_huds/marwep.rif");
+            Set_Progress_Bar_Position(PBAR_HUD_START + PBAR_HUD_INTERVAL * .25);
+            player_rif = avp_load_rif("avp_huds/marine.rif");
+            break;
+        }
+        case I_Predator: {
+            predator_weapon_rif = avp_load_rif("avp_huds/pred_hud.rif");
+            Set_Progress_Bar_Position(PBAR_HUD_START + PBAR_HUD_INTERVAL * .25);
+            player_rif = avp_load_rif("avp_huds/predator.rif");
+            break;
+        }
 
-				
-				// set up a multiplayer game - here becuse we might end
-				// up with a cooperative game
-				//load all weapon rifs
-				marine_weapon_rif = avp_load_rif("avp_huds/marwep.rif");
-				predator_weapon_rif = avp_load_rif("avp_huds/pred_hud.rif");
-				alien_weapon_rif = avp_load_rif("avp_huds/alien_hud.rif");
-				
-				Set_Progress_Bar_Position(PBAR_HUD_START+PBAR_HUD_INTERVAL*.25);
-				player_rif = avp_load_rif("avp_huds/multip.rif");
-			}
-	}
-	Set_Progress_Bar_Position(PBAR_HUD_START+PBAR_HUD_INTERVAL*.5);
+        case I_Alien: {
+#if ALIEN_DEMO
+            alien_weapon_rif = avp_load_rif("alienavp_huds/alien_hud.rif");
+            Set_Progress_Bar_Position(PBAR_HUD_START + PBAR_HUD_INTERVAL * .25);
+            player_rif = avp_load_rif("alienavp_huds/alien.rif");
+#else
+            alien_weapon_rif = avp_load_rif("avp_huds/alien_hud.rif");
+            Set_Progress_Bar_Position(PBAR_HUD_START + PBAR_HUD_INTERVAL * .25);
+            player_rif = avp_load_rif("avp_huds/alien.rif");
+#endif
+            break;
+        }
+        default: {
+            GLOBALASSERT(2 < 1);
+        }
+        }
+        break;
+    }
+    default: {
+        // set up a multiplayer game - here becuse we might end
+        // up with a cooperative game
+        //load all weapon rifs
+        marine_weapon_rif = avp_load_rif("avp_huds/marwep.rif");
+        predator_weapon_rif = avp_load_rif("avp_huds/pred_hud.rif");
+        alien_weapon_rif = avp_load_rif("avp_huds/alien_hud.rif");
 
-	#if MaxImageGroups>1
-	SetCurrentImageGroup(0);
-	#endif
-	copy_rif_data(player_rif,CCF_IMAGEGROUPSET,PBAR_HUD_START+PBAR_HUD_INTERVAL*.5,PBAR_HUD_INTERVAL*.25);
-	
-	Set_Progress_Bar_Position(PBAR_HUD_START+PBAR_HUD_INTERVAL*.75);
-	
-	
-	if(alien_weapon_rif!=INVALID_RIFFHANDLE)
-		copy_rif_data(alien_weapon_rif,CCF_LOAD_AS_HIERARCHY_IF_EXISTS|CCF_IMAGEGROUPSET|CCF_DONT_INITIALISE_TEXTURES,PBAR_HUD_START+PBAR_HUD_INTERVAL*.5,PBAR_HUD_INTERVAL*.25);
+        Set_Progress_Bar_Position(PBAR_HUD_START + PBAR_HUD_INTERVAL * .25);
+        player_rif = avp_load_rif("avp_huds/multip.rif");
+    }
+    }
+    Set_Progress_Bar_Position(PBAR_HUD_START + PBAR_HUD_INTERVAL * .5);
 
-	if(marine_weapon_rif!=INVALID_RIFFHANDLE)
-		copy_rif_data(marine_weapon_rif,CCF_LOAD_AS_HIERARCHY_IF_EXISTS|CCF_IMAGEGROUPSET|CCF_DONT_INITIALISE_TEXTURES,PBAR_HUD_START+PBAR_HUD_INTERVAL*.5,PBAR_HUD_INTERVAL*.25);
+#if MaxImageGroups > 1
+    SetCurrentImageGroup(0);
+#endif
+    copy_rif_data(
+        player_rif,
+        CCF_IMAGEGROUPSET,
+        PBAR_HUD_START + PBAR_HUD_INTERVAL * .5,
+        PBAR_HUD_INTERVAL * .25);
 
-	if(predator_weapon_rif!=INVALID_RIFFHANDLE)
-		copy_rif_data(predator_weapon_rif,CCF_LOAD_AS_HIERARCHY_IF_EXISTS|CCF_IMAGEGROUPSET|CCF_DONT_INITIALISE_TEXTURES,PBAR_HUD_START+PBAR_HUD_INTERVAL*.5,PBAR_HUD_INTERVAL*.25);
+    Set_Progress_Bar_Position(PBAR_HUD_START + PBAR_HUD_INTERVAL * .75);
 
-	Set_Progress_Bar_Position(PBAR_HUD_START+PBAR_HUD_INTERVAL);
-	//copy_chunks_from_environment(0);
+    if (alien_weapon_rif != INVALID_RIFFHANDLE)
+        copy_rif_data(
+            alien_weapon_rif,
+            CCF_LOAD_AS_HIERARCHY_IF_EXISTS | CCF_IMAGEGROUPSET | CCF_DONT_INITIALISE_TEXTURES,
+            PBAR_HUD_START + PBAR_HUD_INTERVAL * .5,
+            PBAR_HUD_INTERVAL * .25);
 
-	/*KJL*************************************
+    if (marine_weapon_rif != INVALID_RIFFHANDLE)
+        copy_rif_data(
+            marine_weapon_rif,
+            CCF_LOAD_AS_HIERARCHY_IF_EXISTS | CCF_IMAGEGROUPSET | CCF_DONT_INITIALISE_TEXTURES,
+            PBAR_HUD_START + PBAR_HUD_INTERVAL * .5,
+            PBAR_HUD_INTERVAL * .25);
+
+    if (predator_weapon_rif != INVALID_RIFFHANDLE)
+        copy_rif_data(
+            predator_weapon_rif,
+            CCF_LOAD_AS_HIERARCHY_IF_EXISTS | CCF_IMAGEGROUPSET | CCF_DONT_INITIALISE_TEXTURES,
+            PBAR_HUD_START + PBAR_HUD_INTERVAL * .5,
+            PBAR_HUD_INTERVAL * .25);
+
+    Set_Progress_Bar_Position(PBAR_HUD_START + PBAR_HUD_INTERVAL);
+    //copy_chunks_from_environment(0);
+
+    /*KJL*************************************
 	*   Setup generic data for weapons etc   *
 	*************************************KJL*/
 
- 	InitialiseEquipment();
-	InitHUD();
-	
+    InitialiseEquipment();
+    InitHUD();
 }
 
-extern void create_strategies_from_list ();
+extern void create_strategies_from_list();
 extern void AssignAllSBNames();
 
 void RestartLevel()
 {
-	//get the cd to start again at the beginning of the play list.
-	ResetCDPlayForLevel();
-	
-	CleanUpPheromoneSystem();
-	// now deallocate the module vis array
-	DeallocateModuleVisArrays();
-	
-	/* destroy the VDB list */	
-	InitialiseVDBs();
-	InitialiseTxAnimBlocks(); 
-	
-	
-	// deallocate strategy and display blocks
-	{
-		int i ;
+    //get the cd to start again at the beginning of the play list.
+    ResetCDPlayForLevel();
 
-		i = maxstblocks;
-		DestroyAllStrategyBlocks();
-		while(i--)
-			ActiveStBlockList[i] = NULL;
+    CleanUpPheromoneSystem();
+    // now deallocate the module vis array
+    DeallocateModuleVisArrays();
 
-		i = maxobjects;
-	 	InitialiseObjectBlocks();
-		while(i --)
-			ActiveBlockList[i] = NULL;
-	}
+    /* destroy the VDB list */
+    InitialiseVDBs();
+    InitialiseTxAnimBlocks();
 
-	//stop all sound
-	SoundSys_StopAll();
-	
-	//reset the displayblock for modules to 0
-	{
-		int i=2;
-		while(MainScene.sm_module[i].m_type!=mtype_term)
-		{
-			MainScene.sm_module[i].m_dptr=0;
-			i++;
-		}
+    // deallocate strategy and display blocks
+    {
+        int i;
 
-	}
- 	
-	// set the Onscreenbloock lsit to zero
- 	NumOnScreenBlocks = 0;
- 	
- 	//start reinitialising stuff
- 	
-// 	InitialiseEquipment();
-//	InitHUD();
-	
-	ProcessSystemObjects();
-	
-	create_strategies_from_list ();
-	AssignAllSBNames();
-	
-	SetupVision();
-	InitObjectVisibilities();
-	InitPheromoneSystem();
-	InitHive();
-	InitSquad();
-	
-	/* KJL 14:22:41 17/11/98 - reset HUD data, such as where the crosshair is,
+        i = maxstblocks;
+        DestroyAllStrategyBlocks();
+        while (i--)
+            ActiveStBlockList[i] = NULL;
+
+        i = maxobjects;
+        InitialiseObjectBlocks();
+        while (i--)
+            ActiveBlockList[i] = NULL;
+    }
+
+    //stop all sound
+    SoundSys_StopAll();
+
+    //reset the displayblock for modules to 0
+    {
+        int i = 2;
+        while (MainScene.sm_module[i].m_type != mtype_term) {
+            MainScene.sm_module[i].m_dptr = 0;
+            i++;
+        }
+    }
+
+    // set the Onscreenbloock lsit to zero
+    NumOnScreenBlocks = 0;
+
+    //start reinitialising stuff
+
+    // 	InitialiseEquipment();
+    //	InitHUD();
+
+    ProcessSystemObjects();
+
+    create_strategies_from_list();
+    AssignAllSBNames();
+
+    SetupVision();
+    InitObjectVisibilities();
+    InitPheromoneSystem();
+    InitHive();
+    InitSquad();
+
+    /* KJL 14:22:41 17/11/98 - reset HUD data, such as where the crosshair is,
 	whether the Alien jaw is on-screen, and so on */
-	ReInitHUD();
-	
-	InitialiseParticleSystem();
-	InitialiseSfxBlocks();
-	InitialiseLightElementSystem();
-	CreateRubberDucks();
-	InitialiseTriggeredFMVs();
+    ReInitHUD();
 
-	CheckCDStatus();
+    InitialiseParticleSystem();
+    InitialiseSfxBlocks();
+    InitialiseLightElementSystem();
+    CreateRubberDucks();
+    InitialiseTriggeredFMVs();
 
-	/*Make sure we don't get a slow frame when we restart , since this can cause problems*/
-	ResetFrameCounter();
+    CheckCDStatus();
 
-	CurrentGameStats_Initialise();
-	MessageHistory_Initialise();
-	
-	if(AvP.Network!=I_No_Network)
-	{
-		TeleportNetPlayerToAStartingPosition(Player->ObStrategyBlock,1);
-	}
-	else
-	{
-		//make sure the visibilities are up to date
-		extern VIEWDESCRIPTORBLOCK* Global_VDB_Ptr;
-		Global_VDB_Ptr->VDB_World = Player->ObWorld;
-		AllNewModuleHandler();
-		DoObjectVisibilities();
-	}
+    /*Make sure we don't get a slow frame when we restart , since this can cause problems*/
+    ResetFrameCounter();
+
+    CurrentGameStats_Initialise();
+    MessageHistory_Initialise();
+
+    if (AvP.Network != I_No_Network) {
+        TeleportNetPlayerToAStartingPosition(Player->ObStrategyBlock, 1);
+    } else {
+        //make sure the visibilities are up to date
+        extern VIEWDESCRIPTORBLOCK *Global_VDB_Ptr;
+        Global_VDB_Ptr->VDB_World = Player->ObWorld;
+        AllNewModuleHandler();
+        DoObjectVisibilities();
+    }
 }
 
 static ELO JunkEnv; /* This is not needed */
-ELO* Env_List[I_Num_Environments] = { &JunkEnv };
+ELO *Env_List[I_Num_Environments] = {&JunkEnv};
 
 /**** Construct filename and go for it ***************/
 
-void catpathandextension(char*, char*);
+void catpathandextension(char *, char *);
 void DestroyActiveBlockList(void);
-void InitialiseObjectBlocks(void);	
-
+void InitialiseObjectBlocks(void);
 
 char EnvFileName[100];
 char LevelDir[100];
 
 void ProcessSystemObjects()
 {
-	int i;
+    int i;
 
-	MODULEMAPBLOCK* mmbptr= &AvpCompiledMaps[0];
-	STRATEGYBLOCK* sbptr;
+    MODULEMAPBLOCK *mmbptr = &AvpCompiledMaps[0];
+    STRATEGYBLOCK *sbptr;
 
-	/* PC Loading.
+    /* PC Loading.
 		 1 LoadRif File 
 		 			a sets up precompiled shapes
 					b	sets up other loaded shapes
 					c sets maps ans SBs for loaded maps
 					
 		 2 
-	*/	
+	*/
 
+#if TestRiffLoaders
+    ReadMap(Map); /* for chunck loader*/
+    ReadModuleMapList(mmbptr);
+#else
+#if SupportModules
+    ReadModuleMapList(mmbptr);
+#endif /*SupportModules*/
+    ReadMap(Map);
+#endif
 
-	#if TestRiffLoaders
-	ReadMap(Map);							 /* for chunck loader*/
-	ReadModuleMapList(mmbptr);
-	#else
-	#if SupportModules
-	ReadModuleMapList(mmbptr);
-	#endif /*SupportModules*/
-	ReadMap(Map);	
-	#endif
+    /*HACK HACK*/
 
-	/*HACK HACK*/
+    sbptr = AttachNewStratBlock(
+        (MODULE *) NULL, (MODULEMAPBLOCK *) &Player_and_Camera_Type8[0], Player);
+    AssignRunTimeBehaviours(sbptr);
 
-	sbptr = AttachNewStratBlock((MODULE*)NULL,
-															(MODULEMAPBLOCK*)&Player_and_Camera_Type8[0],
-															Player);
-	AssignRunTimeBehaviours(sbptr);
+#if SupportModules
 
-	#if SupportModules
+    Global_ModulePtr = MainSceneArray;
+    PreprocessAllModules();
+    i = GetModuleVisArrays();
+    if (i == No)
+        textprint("GetModuleVisArrays() failed\n");
 
-	Global_ModulePtr = MainSceneArray;
-	PreprocessAllModules();
-	i = GetModuleVisArrays();
-	if(i == No) textprint("GetModuleVisArrays() failed\n");
+    /*WaitForReturn();*/
 
-
-	/*WaitForReturn();*/
-
-	#endif
+#endif
 }
 
 static int ReadModuleMapList(MODULEMAPBLOCK *mmbptr)
 {
-	MODULE m_temp;
+    MODULE m_temp;
 
-	DISPLAYBLOCK *dptr;
-	STRATEGYBLOCK *sbptr;
-	/* this automatically attaches sbs to dbs */
+    DISPLAYBLOCK *dptr;
+    STRATEGYBLOCK *sbptr;
+    /* this automatically attaches sbs to dbs */
 
-	while(mmbptr->MapType != MapType_Term)
-		{
-			m_temp.m_mapptr = mmbptr;
-			m_temp.m_sbptr = (STRATEGYBLOCK*)NULL;
-			m_temp.m_dptr = NULL;
-			AllocateModuleObject(&m_temp); 
-			dptr = m_temp.m_dptr;
-			LOCALASSERT(dptr); /* if this fires, cannot allocate displayblock */
-			dptr->ObMyModule = NULL;
-			sbptr = AttachNewStratBlock((MODULE*)NULL, mmbptr, dptr);
-			/* enable compile in behaviours here */
-			AssignRunTimeBehaviours(sbptr);
+    while (mmbptr->MapType != MapType_Term) {
+        m_temp.m_mapptr = mmbptr;
+        m_temp.m_sbptr = (STRATEGYBLOCK *) NULL;
+        m_temp.m_dptr = NULL;
+        AllocateModuleObject(&m_temp);
+        dptr = m_temp.m_dptr;
+        LOCALASSERT(dptr); /* if this fires, cannot allocate displayblock */
+        dptr->ObMyModule = NULL;
+        sbptr = AttachNewStratBlock((MODULE *) NULL, mmbptr, dptr);
+        /* enable compile in behaviours here */
+        AssignRunTimeBehaviours(sbptr);
 
-			mmbptr++;
-		}
+        mmbptr++;
+    }
 
-	return(0);
+    return (0);
 }
-	
 
 void UnloadRifFile()
 {
-	unload_rif(env_rif);
-}  
-
+    unload_rif(env_rif);
+}
 
 void ChangeEnvironmentToEnv(I_AVP_ENVIRONMENTS env_to_load)
 {
+    GLOBALASSERT(env_to_load != AvP.CurrentEnv);
 
-	GLOBALASSERT(env_to_load != AvP.CurrentEnv);
- 
-	GLOBALASSERT(Env_List[env_to_load]);
+    GLOBALASSERT(Env_List[env_to_load]);
 
-	Destroy_CurrentEnvironment(); 
-	/* Patrick: 26/6/97
-	Stop and remove all sounds here */	
-	SoundSys_StopAll();
-	SoundSys_RemoveAll(); 
-	CDDA_Stop();
+    Destroy_CurrentEnvironment();
+    /* Patrick: 26/6/97
+	Stop and remove all sounds here */
+    SoundSys_StopAll();
+    SoundSys_RemoveAll();
+    CDDA_Stop();
 
-	// Loading functions
-	AvP.CurrentEnv = env_to_load;
-	LoadRifFile();
-
+    // Loading functions
+    AvP.CurrentEnv = env_to_load;
+    LoadRifFile();
 }
-
 
 void IntegrateNewEnvironment()
 {
-	int i;
-	MODULEMAPBLOCK* mmbptr= &AvpCompiledMaps[0];
+    int i;
+    MODULEMAPBLOCK *mmbptr = &AvpCompiledMaps[0];
 
-	// elements we need form processsystemobjects
+    // elements we need form processsystemobjects
 
-	ReadMap(Map);							 /* for chunck loader*/
-	ReadModuleMapList(mmbptr);
+    ReadMap(Map); /* for chunck loader*/
+    ReadModuleMapList(mmbptr);
 
-	Global_ModulePtr = MainSceneArray;
-	PreprocessAllModules();
-	i = GetModuleVisArrays();
-	if(i == No) textprint("GetModuleVisArrays() failed\n");
+    Global_ModulePtr = MainSceneArray;
+    PreprocessAllModules();
+    i = GetModuleVisArrays();
+    if (i == No)
+        textprint("GetModuleVisArrays() failed\n");
 
- 
-	// elements from start game for AI
+    // elements from start game for AI
 
-	InitObjectVisibilities();
-	InitPheromoneSystem();
-	BuildFarModuleLocs();
-	InitHive();
+    InitObjectVisibilities();
+    InitPheromoneSystem();
+    BuildFarModuleLocs();
+    InitHive();
 
-	AssignAllSBNames();
+    AssignAllSBNames();
 
-	/* KJL 20:54:55 05/15/97 - setup player vision (alien wideangle, etc) */
-	SetupVision();
+    /* KJL 20:54:55 05/15/97 - setup player vision (alien wideangle, etc) */
+    SetupVision();
 
-	UnloadRifFile();//deletes environment File_Chunk since it is no longer needed
+    UnloadRifFile(); //deletes environment File_Chunk since it is no longer needed
 
-	/* Patrick: 26/6/97
-	Load our sounds for the new env */	
-	LoadSounds("PLAYER");
+    /* Patrick: 26/6/97
+	Load our sounds for the new env */
+    LoadSounds("PLAYER");
 
-	/* remove resident loaded 'fast' files */
-	ffcloseall();
+    /* remove resident loaded 'fast' files */
+    ffcloseall();
 
-	ResetFrameCounter();
+    ResetFrameCounter();
 }
 
-
 const char GameDataDirName[20] = {"avp_rifs"};
-const char FileNameExtension[5] =  {".rif"};
- 
+const char FileNameExtension[5] = {".rif"};
+
 void LoadRifFile()
 {
-	
-	char file_and_path[100];
-	int i = 0;
-	
-	Set_Progress_Bar_Position(PBAR_LEVEL_START);
-	
-	// clear the dir names
+    char file_and_path[100];
+    int i = 0;
 
-	for(i = 0; i < 100; i++)
-	  {
-	  	file_and_path[i] = (char)0;
-			EnvFileName[i] = (char)0;
-			LevelDir[i] = (char)0;
-	  }
+    Set_Progress_Bar_Position(PBAR_LEVEL_START);
 
-	// Set up the dirname for the Rif load
-				
-	catpathandextension(&file_and_path[0], (char *)&GameDataDirName[0]);
-	catpathandextension(&file_and_path[0], Env_List[AvP.CurrentEnv]->main); /* root of the file name,smae as dir*/
-	catpathandextension(&file_and_path[0], (char *)&FileNameExtension[0]);	/* extension*/
-	
-	env_rif = avp_load_rif((const char*)&file_and_path[0]);
-	Set_Progress_Bar_Position(PBAR_LEVEL_START+PBAR_LEVEL_INTERVAL*.4);
-	
-	if(INVALID_RIFFHANDLE == env_rif)
-	  {
-			finiObjects();
-			exit(0x3421);
-				
-	  };
+    // clear the dir names
 
-	#if MaxImageGroups>1
-	SetCurrentImageGroup(2); // FOR ENV
-	#endif
-	copy_rif_data(env_rif,CCF_ENVIRONMENT,PBAR_LEVEL_START+PBAR_LEVEL_INTERVAL*.4,PBAR_LEVEL_INTERVAL*.6);
-	//setup_shading_tables();
+    for (i = 0; i < 100; i++) {
+        file_and_path[i] = (char) 0;
+        EnvFileName[i] = (char) 0;
+        LevelDir[i] = (char) 0;
+    }
+
+    // Set up the dirname for the Rif load
+
+    catpathandextension(&file_and_path[0], (char *) &GameDataDirName[0]);
+    catpathandextension(
+        &file_and_path[0], Env_List[AvP.CurrentEnv]->main); /* root of the file name,smae as dir*/
+    catpathandextension(&file_and_path[0], (char *) &FileNameExtension[0]); /* extension*/
+
+    env_rif = avp_load_rif((const char *) &file_and_path[0]);
+    Set_Progress_Bar_Position(PBAR_LEVEL_START + PBAR_LEVEL_INTERVAL * .4);
+
+    if (INVALID_RIFFHANDLE == env_rif) {
+        finiObjects();
+        exit(0x3421);
+    };
+
+#if MaxImageGroups > 1
+    SetCurrentImageGroup(2); // FOR ENV
+#endif
+    copy_rif_data(
+        env_rif,
+        CCF_ENVIRONMENT,
+        PBAR_LEVEL_START + PBAR_LEVEL_INTERVAL * .4,
+        PBAR_LEVEL_INTERVAL * .6);
+    //setup_shading_tables();
 }
 
 int Destroy_CurrentEnvironment(void)
 {
-	// RWH destroys all en specific data
+    // RWH destroys all en specific data
 
-	// function to change environment when we 
-	// are playing a game	- environmnet reset
-	
-	// this stores all info we need
+    // function to change environment when we
+    // are playing a game	- environmnet reset
 
-	TimeStampedMessage("Beginning Destroy_CurrentEnvironment");
-	//CreateLevelMetablocks(AvP.CurrentEnv);
-	TimeStampedMessage("After CreateLevelMetablocks");
+    // this stores all info we need
 
-	/*----------------------Patrick 14/3/97-----------------------
+    TimeStampedMessage("Beginning Destroy_CurrentEnvironment");
+    //CreateLevelMetablocks(AvP.CurrentEnv);
+    TimeStampedMessage("After CreateLevelMetablocks");
+
+    /*----------------------Patrick 14/3/97-----------------------
 	  Clean up AI systems at end of level
 	--------------------------------------------------------------*/
 
-	{
-		int i ;
+    {
+        int i;
 
-		i = maxstblocks;
-		DestroyAllStrategyBlocks();
-		while(i--)
-			ActiveStBlockList[i] = NULL;
+        i = maxstblocks;
+        DestroyAllStrategyBlocks();
+        while (i--)
+            ActiveStBlockList[i] = NULL;
 
-		i = maxobjects;
-	 	InitialiseObjectBlocks();
-		while(i --)
-			ActiveBlockList[i] = NULL;
-	}
-	TimeStampedMessage("After object blocks");
-	
-	//Get rid of all sounds
-	//Deallocate memory for all shapes and hierarchy animations
-	DeallocateSoundsAndPoolAllocatedMemory();
-	
-	KillFarModuleLocs();
-	TimeStampedMessage("After KillFarModuleLocs");
-	CleanUpPheromoneSystem();
-	TimeStampedMessage("After CleanUpPheromoneSystem");
-	
-	#if MaxImageGroups>1
-	SetCurrentImageGroup(2); // FOR ENV
-	TimeStampedMessage("After SetCurrentImageGroup");
+        i = maxobjects;
+        InitialiseObjectBlocks();
+        while (i--)
+            ActiveBlockList[i] = NULL;
+    }
+    TimeStampedMessage("After object blocks");
 
-	DeallocateCurrentImages();
-	TimeStampedMessage("After DeallocateCurrentImages");
-	#endif
-	// now deasllocate the module vis array
-	DeallocateModuleVisArrays();
-	TimeStampedMessage("After DeallocateModuleVisArrays");
+    //Get rid of all sounds
+    //Deallocate memory for all shapes and hierarchy animations
+    DeallocateSoundsAndPoolAllocatedMemory();
 
-		
+    KillFarModuleLocs();
+    TimeStampedMessage("After KillFarModuleLocs");
+    CleanUpPheromoneSystem();
+    TimeStampedMessage("After CleanUpPheromoneSystem");
 
-	/* destroy the VDB list */	
-	InitialiseVDBs();
-	TimeStampedMessage("After InitialiseVDBs");
+#if MaxImageGroups > 1
+    SetCurrentImageGroup(2); // FOR ENV
+    TimeStampedMessage("After SetCurrentImageGroup");
 
-	
-	InitialiseTxAnimBlocks(); // RUN THE npcS ON OUR OWN
-	TimeStampedMessage("After InitialiseTxAnimBlocks");
+    DeallocateCurrentImages();
+    TimeStampedMessage("After DeallocateCurrentImages");
+#endif
+    // now deasllocate the module vis array
+    DeallocateModuleVisArrays();
+    TimeStampedMessage("After DeallocateModuleVisArrays");
 
+    /* destroy the VDB list */
+    InitialiseVDBs();
+    TimeStampedMessage("After InitialiseVDBs");
 
-	/* frees the memory from the env load*/
-	DeallocateModules();
-	TimeStampedMessage("After DeallocateModules");
+    InitialiseTxAnimBlocks(); // RUN THE npcS ON OUR OWN
+    TimeStampedMessage("After InitialiseTxAnimBlocks");
 
-	avp_undo_rif_load(env_rif);
-	TimeStampedMessage("After avp_undo_rif_load");
+    /* frees the memory from the env load*/
+    DeallocateModules();
+    TimeStampedMessage("After DeallocateModules");
 
+    avp_undo_rif_load(env_rif);
+    TimeStampedMessage("After avp_undo_rif_load");
 
-	// set the Onscreenbloock lsit to zero
- 	NumOnScreenBlocks = 0;
- 
- 	return(0);
+    // set the Onscreenbloock lsit to zero
+    NumOnScreenBlocks = 0;
+
+    return (0);
 }
-
-
 
 #if 0
 void InitEnvironmentFromLoad(void) 
@@ -878,10 +829,10 @@ void InitEnvironmentFromLoad(void)
 	Destroy_CurrentEnvironment();
 	// then the REST
 	DestroyAllStrategyBlocks();
-	#if MaxImageGroups>1
+#if MaxImageGroups > 1
 	SetCurrentImageGroup(0); // FOR ENV
 	DeallocateCurrentImages();
-	#endif
+#endif
 	/* Patrick: 26/6/97
 	Stop and remove all sounds here */	
 	SoundSys_StopAll();
@@ -949,30 +900,25 @@ void SaveGameToFile(void)
 // project spec game exit
 void ExitGame(void)
 {
-	if(player_rif != INVALID_RIFFHANDLE)
-	{
-		avp_undo_rif_load(player_rif);
-	  	player_rif=INVALID_RIFFHANDLE;
+    if (player_rif != INVALID_RIFFHANDLE) {
+        avp_undo_rif_load(player_rif);
+        player_rif = INVALID_RIFFHANDLE;
+    }
 
-	}
-	
-	if(alien_weapon_rif != INVALID_RIFFHANDLE)
-	{
-		avp_undo_rif_load(alien_weapon_rif);
-		alien_weapon_rif=INVALID_RIFFHANDLE;
-	}
-	if(marine_weapon_rif != INVALID_RIFFHANDLE)
-	{
-		avp_undo_rif_load(marine_weapon_rif);
-		marine_weapon_rif=INVALID_RIFFHANDLE;
-	}
-	if(predator_weapon_rif != INVALID_RIFFHANDLE)
-	{
-		avp_undo_rif_load(predator_weapon_rif);
-		predator_weapon_rif=INVALID_RIFFHANDLE;
-	}
-	#if MaxImageGroups>1
-	SetCurrentImageGroup(0);
-	DeallocateCurrentImages();
-	#endif
+    if (alien_weapon_rif != INVALID_RIFFHANDLE) {
+        avp_undo_rif_load(alien_weapon_rif);
+        alien_weapon_rif = INVALID_RIFFHANDLE;
+    }
+    if (marine_weapon_rif != INVALID_RIFFHANDLE) {
+        avp_undo_rif_load(marine_weapon_rif);
+        marine_weapon_rif = INVALID_RIFFHANDLE;
+    }
+    if (predator_weapon_rif != INVALID_RIFFHANDLE) {
+        avp_undo_rif_load(predator_weapon_rif);
+        predator_weapon_rif = INVALID_RIFFHANDLE;
+    }
+#if MaxImageGroups > 1
+    SetCurrentImageGroup(0);
+    DeallocateCurrentImages();
+#endif
 }

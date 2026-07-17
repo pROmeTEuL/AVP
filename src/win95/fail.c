@@ -12,16 +12,15 @@
 #include "fail.h"
 #include "dxlog.h"
 
-void
-fail (const char * format, ...)
+void fail(const char *format, ...)
 {
-  va_list ap;
+    va_list ap;
 
-  LOGDXSTR(format);
-  va_start (ap, format);
-  if (format != 0)
-    vfprintf (stderr, format, ap);
-  va_end (ap);
+    LOGDXSTR(format);
+    va_start(ap, format);
+    if (format != 0)
+        vfprintf(stderr, format, ap);
+    va_end(ap);
 
-  exit (EXIT_FAILURE);
+    exit(EXIT_FAILURE);
 }

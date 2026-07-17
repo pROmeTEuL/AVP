@@ -8,18 +8,16 @@
 * 			which can be called	externally.                                 *
 ************************************************************************KJL*/
 
-
 /*KJL****************************************************************************************
 * 								       S T R U C T U R E S 	 								*
 ****************************************************************************************KJL*/
 struct ColPolyTag
 {
-	int NumberOfVertices;
-	VECTORCH PolyPoint[4];
+    int NumberOfVertices;
+    VECTORCH PolyPoint[4];
     VECTORCH PolyNormal;
-	DISPLAYBLOCK *ParentObject;
+    DISPLAYBLOCK *ParentObject;
 };
-
 
 /*KJL****************************************************************************************
 *                             P H Y S I C A L   C O N S T A N T S                           *
@@ -40,14 +38,11 @@ struct ColPolyTag
 extern void ObjectDynamics(void);
 extern void DynamicallyRotateObject(DYNAMICSBLOCK *dynPtr);
 
-
 /* externs to shape access fns (platform specific) */
 extern int SetupPolygonAccess(DISPLAYBLOCK *objectPtr);
 extern void AccessNextPolygon(void);
 extern void GetPolygonVertices(struct ColPolyTag *polyPtr);
 extern void GetPolygonNormal(struct ColPolyTag *polyPtr);
-
-
 
 /* extra camera movement */
 extern EULER HeadOrientation;

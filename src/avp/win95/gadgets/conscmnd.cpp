@@ -13,8 +13,8 @@
 #include "conscmnd.hpp"
 #include "strutil.h"
 
-	#define UseLocalAssert Yes
-	#include "ourasert.h"
+#define UseLocalAssert Yes
+#include "ourasert.h"
 
 /* Version settings ************************************************/
 
@@ -26,10 +26,9 @@
 
 /* Imported data ***************************************************/
 #ifdef __cplusplus
-	extern "C"
-	{
+extern "C" {
 #endif
-		#if 0
+#if 0
 		extern OurBool			DaveDebugOn;
 		extern FDIEXTENSIONTAG	FDIET_Dummy;
 		extern IFEXTENSIONTAG	IFET_Dummy;
@@ -40,90 +39,81 @@
 		extern UncompressedGlobalPlotAtomID UGPAID_StandardNull;
 		extern IFCOLOUR			IFColour_Dummy;
  		extern IFVECTOR			IFVec_Zero;
-		#endif
+#endif
 #ifdef __cplusplus
-	};
+};
 #endif
 
-
-
 /* Exported globals ************************************************/
-	/*static*/ List<ConsoleCommand*> ConsoleCommand :: List_pConsoleCommand;
+/*static*/ List<ConsoleCommand *> ConsoleCommand ::List_pConsoleCommand;
 
 /* Internal type definitions ***************************************/
 
-	class ConsoleCommand_VoidVoid : public ConsoleCommand
-	{
-	public:
-		ConsoleCommand_VoidVoid
-		(
-			ProjChar* pProjCh_ToUse,
-			ProjChar* pProjCh_Description_ToUse,
-			void (*f) (void),
-			OurBool Cheat = FALSE
-		);
-		void Execute(ProjChar* pProjCh_In);
+class ConsoleCommand_VoidVoid : public ConsoleCommand
+{
+public:
+    ConsoleCommand_VoidVoid(
+        ProjChar *pProjCh_ToUse,
+        ProjChar *pProjCh_Description_ToUse,
+        void (*f)(void),
+        OurBool Cheat = FALSE);
+    void Execute(ProjChar *pProjCh_In);
 
-	private:
-		void (*theFn) (void);
-	};
-	class ConsoleCommand_VoidInt : public ConsoleCommand
-	{
-	public:
-		ConsoleCommand_VoidInt
-		(
-			ProjChar* pProjCh_ToUse,
-			ProjChar* pProjCh_Description_ToUse,
-			void (*f) (int),
-			OurBool Cheat = FALSE
-		);
-		void Execute(ProjChar* pProjCh_In);
-	private:
-		void (*theFn) (int);
-	};
-	class ConsoleCommand_IntVoid : public ConsoleCommand
-	{
-	public:
-		ConsoleCommand_IntVoid
-		(
-			ProjChar* pProjCh_ToUse,
-			ProjChar* pProjCh_Description_ToUse,
-			int (*f) (void),
-			OurBool Cheat = FALSE
-		);
-		void Execute(ProjChar* pProjCh_In);
-	private:
-		int (*theFn) (void);
-	};
-	class ConsoleCommand_IntInt : public ConsoleCommand
-	{
-	public:
-		ConsoleCommand_IntInt
-		(
-			ProjChar* pProjCh_ToUse,
-			ProjChar* pProjCh_Description_ToUse,
-			int (*f) (int),
-			OurBool Cheat = FALSE
-		);
-		void Execute(ProjChar* pProjCh_In);
-	private:
-		int (*theFn) (int);
-	};
-	class ConsoleCommand_VoidCharP : public ConsoleCommand
-	{
-	public:
-		ConsoleCommand_VoidCharP
-		(
-			ProjChar* pProjCh_ToUse,
-			ProjChar* pProjCh_Description_ToUse,
-			void (*f) (char*),
-			OurBool Cheat = FALSE
-		);
-		void Execute(ProjChar* pProjCh_In);
-	private:
-		void (*theFn) (char*);
-	};
+private:
+    void (*theFn)(void);
+};
+class ConsoleCommand_VoidInt : public ConsoleCommand
+{
+public:
+    ConsoleCommand_VoidInt(
+        ProjChar *pProjCh_ToUse,
+        ProjChar *pProjCh_Description_ToUse,
+        void (*f)(int),
+        OurBool Cheat = FALSE);
+    void Execute(ProjChar *pProjCh_In);
 
+private:
+    void (*theFn)(int);
+};
+class ConsoleCommand_IntVoid : public ConsoleCommand
+{
+public:
+    ConsoleCommand_IntVoid(
+        ProjChar *pProjCh_ToUse,
+        ProjChar *pProjCh_Description_ToUse,
+        int (*f)(void),
+        OurBool Cheat = FALSE);
+    void Execute(ProjChar *pProjCh_In);
+
+private:
+    int (*theFn)(void);
+};
+class ConsoleCommand_IntInt : public ConsoleCommand
+{
+public:
+    ConsoleCommand_IntInt(
+        ProjChar *pProjCh_ToUse,
+        ProjChar *pProjCh_Description_ToUse,
+        int (*f)(int),
+        OurBool Cheat = FALSE);
+    void Execute(ProjChar *pProjCh_In);
+
+private:
+    int (*theFn)(int);
+};
+class ConsoleCommand_VoidCharP : public ConsoleCommand
+{
+public:
+    ConsoleCommand_VoidCharP(
+        ProjChar *pProjCh_ToUse,
+        ProjChar *pProjCh_Description_ToUse,
+        void (*f)(char *),
+        OurBool Cheat = FALSE);
+    void Execute(ProjChar *pProjCh_In);
+
+private:
+    void (*theFn)(char *);
+};
 
 /* Internal function ProjChar* pProjCh_In*/
 
@@ -134,380 +124,227 @@
 // public:
 
 // Various factory methods:
-/*static*/ void ConsoleCommand :: Make
-(
-	ProjChar* pProjCh_ToUse,
-	ProjChar* pProjCh_Description_ToUse,
-	void (&f) (void),
-	OurBool Cheat
-)
+/*static*/ void ConsoleCommand ::Make(
+    ProjChar *pProjCh_ToUse, ProjChar *pProjCh_Description_ToUse, void (&f)(void), OurBool Cheat)
 {
-	new ConsoleCommand_VoidVoid
-	(
-		pProjCh_ToUse,
-		pProjCh_Description_ToUse,
-		f,
-		Cheat
-	);
+    new ConsoleCommand_VoidVoid(pProjCh_ToUse, pProjCh_Description_ToUse, f, Cheat);
 }
-/*static*/ void ConsoleCommand :: Make
-(
-	ProjChar* pProjCh_ToUse,
-	ProjChar* pProjCh_Description_ToUse,
-	void (&f) (int),
-	OurBool Cheat
-)
+/*static*/ void ConsoleCommand ::Make(
+    ProjChar *pProjCh_ToUse, ProjChar *pProjCh_Description_ToUse, void (&f)(int), OurBool Cheat)
 {
-	new ConsoleCommand_VoidInt
-	(
-		pProjCh_ToUse,
-		pProjCh_Description_ToUse,
-		f,
-		Cheat
-	);
+    new ConsoleCommand_VoidInt(pProjCh_ToUse, pProjCh_Description_ToUse, f, Cheat);
 }
-/*static*/ void ConsoleCommand :: Make
-(
-	ProjChar* pProjCh_ToUse,
-	ProjChar* pProjCh_Description_ToUse,
-	int (&f) (void),
-	OurBool Cheat
+/*static*/ void ConsoleCommand ::Make(
+    ProjChar *pProjCh_ToUse, ProjChar *pProjCh_Description_ToUse, int (&f)(void), OurBool Cheat
 
 )
 {
-	new ConsoleCommand_IntVoid
-	(
-		pProjCh_ToUse,
-		pProjCh_Description_ToUse,
-		f,
-		Cheat
-	);
+    new ConsoleCommand_IntVoid(pProjCh_ToUse, pProjCh_Description_ToUse, f, Cheat);
 }
 
-/*static*/ void ConsoleCommand :: Make
-(
-	ProjChar* pProjCh_ToUse,
-	ProjChar* pProjCh_Description_ToUse,
-	int (&f) (int),
-	OurBool Cheat
-)
+/*static*/ void ConsoleCommand ::Make(
+    ProjChar *pProjCh_ToUse, ProjChar *pProjCh_Description_ToUse, int (&f)(int), OurBool Cheat)
 {
-	new ConsoleCommand_IntInt
-	(
-		pProjCh_ToUse,
-		pProjCh_Description_ToUse,
-		f,
-		Cheat
-	);
+    new ConsoleCommand_IntInt(pProjCh_ToUse, pProjCh_Description_ToUse, f, Cheat);
 }
-/*static*/ void ConsoleCommand :: Make
-(
-	ProjChar* pProjCh_ToUse,
-	ProjChar* pProjCh_Description_ToUse,
-	void (&f) (char*),
-	OurBool Cheat
-)
+/*static*/ void ConsoleCommand ::Make(
+    ProjChar *pProjCh_ToUse, ProjChar *pProjCh_Description_ToUse, void (&f)(char *), OurBool Cheat)
 {
-	new ConsoleCommand_VoidCharP
-	(
-		pProjCh_ToUse,
-		pProjCh_Description_ToUse,
-		f,
-		Cheat
-	);
+    new ConsoleCommand_VoidCharP(pProjCh_ToUse, pProjCh_Description_ToUse, f, Cheat);
 }
 
-/*static*/ OurBool ConsoleCommand :: Process( ProjChar* pProjCh_In )
+/*static*/ OurBool ConsoleCommand ::Process(ProjChar *pProjCh_In)
 {
-	// used for proccesing input text.
-	// return value = was any processing performed?
+    // used for proccesing input text.
+    // return value = was any processing performed?
 
-	GLOBALASSERT( pProjCh_In );
+    GLOBALASSERT(pProjCh_In);
 
-	OurBool bProcessed = No;
+    OurBool bProcessed = No;
 
-	// Parse into words; find the first word.  Iterate through the commands
-	// looking for a match:
+    // Parse into words; find the first word.  Iterate through the commands
+    // looking for a match:
 
-	{
-		ProjChar *commandPtr = pProjCh_In;
-		ProjChar *argumentPtr = pProjCh_In;
+    {
+        ProjChar *commandPtr = pProjCh_In;
+        ProjChar *argumentPtr = pProjCh_In;
 
-		while(*argumentPtr!=0 && *argumentPtr!=' ')
-		{
-			argumentPtr++;	
-		}
+        while (*argumentPtr != 0 && *argumentPtr != ' ') {
+            argumentPtr++;
+        }
 
-		// if we found a space at the end of the first word
-		// change it to a terminator, and point to the text after it
-		if (*argumentPtr) *argumentPtr++=0;	
-		
-		// otherwise we'll be pointing to a terminator anyway
-		
+        // if we found a space at the end of the first word
+        // change it to a terminator, and point to the text after it
+        if (*argumentPtr)
+            *argumentPtr++ = 0;
 
-		if ( *commandPtr )
-		{
-			// Iterate through the console commands; looking for a match
-			{
-				for
-				(
-					LIF<ConsoleCommand*> oi(&List_pConsoleCommand);
-					!oi . done();
-					oi . next()
-				)
-				{
-					GLOBALASSERT(oi());
-					GLOBALASSERT(oi()-> pSCString_Symbol );
+        // otherwise we'll be pointing to a terminator anyway
 
-					
-					if
-					(
-						oi()->ThisIsACheat ? 
+        if (*commandPtr) {
+            // Iterate through the console commands; looking for a match
+            {
+                for (LIF<ConsoleCommand *> oi(&List_pConsoleCommand); !oi.done(); oi.next()) {
+                    GLOBALASSERT(oi());
+                    GLOBALASSERT(oi()->pSCString_Symbol);
 
-						STRUTIL_SC_Strequal //case sensitive comparisons for cheats
-						(
-							oi() -> pSCString_Symbol -> pProjCh(),
-							commandPtr
-						)
-						:
-						STRUTIL_SC_Strequal_Insensitive //case insensitive otherwise
-						(
-							oi() -> pSCString_Symbol -> pProjCh(),
-							commandPtr
-						)
-					)
-					{
-						// Got match
-						bProcessed = Yes;
+                    if (oi()->ThisIsACheat
+                            ?
 
-						// Execute the function:
-						{
-							oi() -> Execute(argumentPtr);
-						}
-					}
-				}
-			}
-			if (*argumentPtr) *(--argumentPtr)=' ';
-		}
+                            STRUTIL_SC_Strequal //case sensitive comparisons for cheats
+                            (oi()->pSCString_Symbol->pProjCh(),
+                             commandPtr)
+                            : STRUTIL_SC_Strequal_Insensitive //case insensitive otherwise
+                            (oi()->pSCString_Symbol->pProjCh(), commandPtr)) {
+                        // Got match
+                        bProcessed = Yes;
 
+                        // Execute the function:
+                        {
+                            oi()->Execute(argumentPtr);
+                        }
+                    }
+                }
+            }
+            if (*argumentPtr)
+                *(--argumentPtr) = ' ';
+        }
+    }
 
-	}
-
-	return bProcessed;
+    return bProcessed;
 }
 
-
-/*static*/ void ConsoleCommand :: ListAll(void)
+/*static*/ void ConsoleCommand ::ListAll(void)
 {
-	SCString* pSCString_Temp = new SCString("LIST OF ALL CONSOLE COMMANDS:");
-		// LOCALISEME()
+    SCString *pSCString_Temp = new SCString("LIST OF ALL CONSOLE COMMANDS:");
+    // LOCALISEME()
 
-	pSCString_Temp -> SendToScreen();
+    pSCString_Temp->SendToScreen();
 
-	pSCString_Temp ->R_Release();
+    pSCString_Temp->R_Release();
 
-	for
-	(
-		LIF<ConsoleCommand*> oi(&List_pConsoleCommand);
-		!oi.done();
-		oi.next()
-	)
-	{
-		oi() -> Display();
-	}	
+    for (LIF<ConsoleCommand *> oi(&List_pConsoleCommand); !oi.done(); oi.next()) {
+        oi()->Display();
+    }
 }
 
-/*virtual*/ ConsoleCommand :: ~ConsoleCommand()
+/*virtual*/ ConsoleCommand ::~ConsoleCommand()
 {
-	pSCString_Description -> R_Release();
+    pSCString_Description->R_Release();
 
-	List_pConsoleCommand . delete_entry(this);
-
+    List_pConsoleCommand.delete_entry(this);
 }
 
-void ConsoleCommand :: Display(void) const
+void ConsoleCommand ::Display(void) const
 {
-	SCString* pSCString_Temp1 = new SCString("\"");
-	SCString* pSCString_Temp2 = new SCString("\" ");
+    SCString *pSCString_Temp1 = new SCString("\"");
+    SCString *pSCString_Temp2 = new SCString("\" ");
 
-	SCString* pSCString_Feedback = new SCString
-	(
-		pSCString_Temp1,
-		pSCString_Symbol,
-		pSCString_Temp2,
-		pSCString_Description
-	);
+    SCString *pSCString_Feedback
+        = new SCString(pSCString_Temp1, pSCString_Symbol, pSCString_Temp2, pSCString_Description);
 
-	pSCString_Temp2 -> R_Release();
-	pSCString_Temp1 -> R_Release();
+    pSCString_Temp2->R_Release();
+    pSCString_Temp1->R_Release();
 
-	pSCString_Feedback -> SendToScreen();
+    pSCString_Feedback->SendToScreen();
 
-	pSCString_Feedback -> R_Release();
+    pSCString_Feedback->R_Release();
 }
-
 
 // protected:
-ConsoleCommand :: ConsoleCommand
-(
-	ProjChar* pProjCh_ToUse,
-	ProjChar* pProjCh_Description_ToUse,
-	OurBool Cheat
-) : ConsoleSymbol(pProjCh_ToUse),
-	pSCString_Description( new SCString(pProjCh_Description_ToUse) )
+ConsoleCommand ::ConsoleCommand(
+    ProjChar *pProjCh_ToUse, ProjChar *pProjCh_Description_ToUse, OurBool Cheat)
+    : ConsoleSymbol(pProjCh_ToUse)
+    , pSCString_Description(new SCString(pProjCh_Description_ToUse))
 {
-	ThisIsACheat = Cheat;
-	List_pConsoleCommand . add_entry(this);
+    ThisIsACheat = Cheat;
+    List_pConsoleCommand.add_entry(this);
 }
 
-void ConsoleCommand :: EchoResult(int Result)
+void ConsoleCommand ::EchoResult(int Result)
 {
-	SCString* pSCString_Feedback = new SCString(Result);
-	pSCString_Feedback -> SendToScreen();
-	pSCString_Feedback -> R_Release();
+    SCString *pSCString_Feedback = new SCString(Result);
+    pSCString_Feedback->SendToScreen();
+    pSCString_Feedback->R_Release();
 }
 
-int ConsoleCommand :: GetArg(ProjChar* pProjCh_Arg)
+int ConsoleCommand ::GetArg(ProjChar *pProjCh_Arg)
 {
-	GLOBALASSERT( pProjCh_Arg );
+    GLOBALASSERT(pProjCh_Arg);
 
-	return atoi(pProjCh_Arg);
+    return atoi(pProjCh_Arg);
 }
-
 
 /* Internal function definitions ***********************************/
 // class ConsoleCommand_VoidVoid : public ConsoleCommand
 // public:
-ConsoleCommand_VoidVoid :: ConsoleCommand_VoidVoid
-(
-	ProjChar* pProjCh_ToUse,
-	ProjChar* pProjCh_Description_ToUse,
-	void (*f) (void),
-	OurBool Cheat
+ConsoleCommand_VoidVoid ::ConsoleCommand_VoidVoid(
+    ProjChar *pProjCh_ToUse, ProjChar *pProjCh_Description_ToUse, void (*f)(void), OurBool Cheat
 
-) : ConsoleCommand
-	(
-		pProjCh_ToUse,
-		pProjCh_Description_ToUse,
-		Cheat
-	),
-	theFn(f)
+    )
+    : ConsoleCommand(pProjCh_ToUse, pProjCh_Description_ToUse, Cheat)
+    , theFn(f)
+{}
+void ConsoleCommand_VoidVoid ::Execute(ProjChar *pProjCh_In)
 {
-}
-void ConsoleCommand_VoidVoid :: Execute(ProjChar* pProjCh_In)
-{
-	GLOBALASSERT(theFn);
-	GLOBALASSERT(pProjCh_In);
-	(*theFn)();
+    GLOBALASSERT(theFn);
+    GLOBALASSERT(pProjCh_In);
+    (*theFn)();
 }
 // class ConsoleCommand_VoidInt : public ConsoleCommand
 // public:
-ConsoleCommand_VoidInt :: ConsoleCommand_VoidInt
-(
-	ProjChar* pProjCh_ToUse,
-	ProjChar* pProjCh_Description_ToUse,
-	void (*f) (int),
-	OurBool Cheat
+ConsoleCommand_VoidInt ::ConsoleCommand_VoidInt(
+    ProjChar *pProjCh_ToUse, ProjChar *pProjCh_Description_ToUse, void (*f)(int), OurBool Cheat
 
-) : ConsoleCommand
-	(
-		pProjCh_ToUse,
-		pProjCh_Description_ToUse,
-		Cheat
-	),
-	theFn(f)
+    )
+    : ConsoleCommand(pProjCh_ToUse, pProjCh_Description_ToUse, Cheat)
+    , theFn(f)
+{}
+void ConsoleCommand_VoidInt ::Execute(ProjChar *pProjCh_In)
 {
-}
-void ConsoleCommand_VoidInt :: Execute(ProjChar* pProjCh_In)
-{
-	GLOBALASSERT(theFn);
-	GLOBALASSERT(pProjCh_In);
-	(*theFn)
-	(
-		GetArg(pProjCh_In)
-	);
+    GLOBALASSERT(theFn);
+    GLOBALASSERT(pProjCh_In);
+    (*theFn)(GetArg(pProjCh_In));
 }
 // class ConsoleCommand_IntVoid : public ConsoleCommand
 // public:
-ConsoleCommand_IntVoid :: ConsoleCommand_IntVoid
-(
-	ProjChar* pProjCh_ToUse,
-	ProjChar* pProjCh_Description_ToUse,
-	int (*f) (void),
-	OurBool Cheat
+ConsoleCommand_IntVoid ::ConsoleCommand_IntVoid(
+    ProjChar *pProjCh_ToUse, ProjChar *pProjCh_Description_ToUse, int (*f)(void), OurBool Cheat
 
-) : ConsoleCommand
-	(
-		pProjCh_ToUse,
-		pProjCh_Description_ToUse,
-		Cheat
-	),
-	theFn(f)
+    )
+    : ConsoleCommand(pProjCh_ToUse, pProjCh_Description_ToUse, Cheat)
+    , theFn(f)
+{}
+void ConsoleCommand_IntVoid ::Execute(ProjChar *pProjCh_In)
 {
-}
-void ConsoleCommand_IntVoid :: Execute(ProjChar* pProjCh_In)
-{
-	GLOBALASSERT(theFn);
-	GLOBALASSERT(pProjCh_In);
-	EchoResult
-	(
-		(*theFn)()
-	);
+    GLOBALASSERT(theFn);
+    GLOBALASSERT(pProjCh_In);
+    EchoResult((*theFn)());
 }
 // class ConsoleCommand_IntInt : public ConsoleCommand
 // public:
-ConsoleCommand_IntInt :: ConsoleCommand_IntInt
-(
-	ProjChar* pProjCh_ToUse,
-	ProjChar* pProjCh_Description_ToUse,
-	int (*f) (int),
-	OurBool Cheat
-) : ConsoleCommand
-	(
-		pProjCh_ToUse,
-		pProjCh_Description_ToUse,
-		Cheat
-	),
-	theFn(f)
+ConsoleCommand_IntInt ::ConsoleCommand_IntInt(
+    ProjChar *pProjCh_ToUse, ProjChar *pProjCh_Description_ToUse, int (*f)(int), OurBool Cheat)
+    : ConsoleCommand(pProjCh_ToUse, pProjCh_Description_ToUse, Cheat)
+    , theFn(f)
+{}
+void ConsoleCommand_IntInt ::Execute(ProjChar *pProjCh_In)
 {
-}
-void ConsoleCommand_IntInt :: Execute(ProjChar* pProjCh_In)
-{
-	GLOBALASSERT(theFn);
-	GLOBALASSERT(pProjCh_In);
+    GLOBALASSERT(theFn);
+    GLOBALASSERT(pProjCh_In);
 
-	EchoResult
-	(
-		(*theFn)
-		(
-			GetArg(pProjCh_In)
-		)
-	);
+    EchoResult((*theFn)(GetArg(pProjCh_In)));
 }
 
+ConsoleCommand_VoidCharP ::ConsoleCommand_VoidCharP(
+    ProjChar *pProjCh_ToUse, ProjChar *pProjCh_Description_ToUse, void (*f)(char *), OurBool Cheat
 
-ConsoleCommand_VoidCharP :: ConsoleCommand_VoidCharP
-(
-	ProjChar* pProjCh_ToUse,
-	ProjChar* pProjCh_Description_ToUse,
-	void (*f) (char*),
-	OurBool Cheat
-
-) : ConsoleCommand
-	(
-		pProjCh_ToUse,
-		pProjCh_Description_ToUse,
-		Cheat
-	),
-	theFn(f)
+    )
+    : ConsoleCommand(pProjCh_ToUse, pProjCh_Description_ToUse, Cheat)
+    , theFn(f)
+{}
+void ConsoleCommand_VoidCharP ::Execute(ProjChar *pProjCh_In)
 {
-}
-void ConsoleCommand_VoidCharP :: Execute(ProjChar* pProjCh_In)
-{
-	GLOBALASSERT(theFn);
-	GLOBALASSERT(pProjCh_In);
-	(*theFn)
-	(
-		pProjCh_In
-	);
+    GLOBALASSERT(theFn);
+    GLOBALASSERT(pProjCh_In);
+    (*theFn)(pProjCh_In);
 }

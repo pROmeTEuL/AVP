@@ -10,11 +10,7 @@
  *
  */
 
-enum FrustrumType 
-{
-	FRUSTRUM_TYPE_NORMAL,
-	FRUSTRUM_TYPE_WIDE
-};
+enum FrustrumType { FRUSTRUM_TYPE_NORMAL, FRUSTRUM_TYPE_WIDE };
 
 extern void SetFrustrumType(enum FrustrumType frustrumType);
 
@@ -51,15 +47,14 @@ extern int DecalWithinFrustrum(DECAL *decalPtr);
 extern int QuadWithinFrustrum(void);
 extern int TriangleWithinFrustrum(void);
 
-
 /* pass a pointer to a vertex to be tested; results are returned in an int,
 using the following defines */
-#define INSIDE_FRUSTRUM_Z_PLANE		1
-#define INSIDE_FRUSTRUM_PX_PLANE	2	
-#define INSIDE_FRUSTRUM_NX_PLANE	4	
-#define INSIDE_FRUSTRUM_PY_PLANE	8	
-#define INSIDE_FRUSTRUM_NY_PLANE	16	
-#define INSIDE_FRUSTRUM				31
+#define INSIDE_FRUSTRUM_Z_PLANE 1
+#define INSIDE_FRUSTRUM_PX_PLANE 2
+#define INSIDE_FRUSTRUM_NX_PLANE 4
+#define INSIDE_FRUSTRUM_PY_PLANE 8
+#define INSIDE_FRUSTRUM_NY_PLANE 16
+#define INSIDE_FRUSTRUM 31
 
 extern char FrustrumFlagForVertex[maxrotpts];
 

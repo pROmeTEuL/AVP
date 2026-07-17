@@ -35,9 +35,8 @@
 static LogFile ConsoleLogFile("ConsoleLog.txt");
 #endif
 
-extern "C"
-{
-	int LogConsoleTextToFile;
+extern "C" {
+int LogConsoleTextToFile;
 extern void OutputBugReportToConsoleLogfile(char *messagePtr)
 {
 #if 0
@@ -91,7 +90,6 @@ extern void OutputToConsoleLogfile(char *messagePtr)
 	{
 		ConsoleLogFile.lprintf("%s\n", (char const*)messagePtr);
 	}
-#endif	
+#endif
 }
-
 };

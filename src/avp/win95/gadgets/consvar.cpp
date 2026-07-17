@@ -13,8 +13,8 @@
 #include "consvar.hpp"
 #include "strutil.h"
 
-	#define UseLocalAssert Yes
-	#include "ourasert.h"
+#define UseLocalAssert Yes
+#include "ourasert.h"
 
 /* Version settings ************************************************/
 
@@ -26,10 +26,9 @@
 
 /* Imported data ***************************************************/
 #ifdef __cplusplus
-	extern "C"
-	{
+extern "C" {
 #endif
-		#if 0
+#if 0
 		extern OurBool			DaveDebugOn;
 		extern FDIEXTENSIONTAG	FDIET_Dummy;
 		extern IFEXTENSIONTAG	IFET_Dummy;
@@ -40,76 +39,66 @@
 		extern UncompressedGlobalPlotAtomID UGPAID_StandardNull;
 		extern IFCOLOUR			IFColour_Dummy;
  		extern IFVECTOR			IFVec_Zero;
-		#endif
+#endif
 #ifdef __cplusplus
-	};
+};
 #endif
 
-
-
 /* Exported globals ************************************************/
-	/*static*/ List <ConsoleVariable*> ConsoleVariable :: List_pConsoleVar;
+/*static*/ List<ConsoleVariable *> ConsoleVariable ::List_pConsoleVar;
 
 /* Internal type definitions ***************************************/
-	class ConsoleVariable_Simple_Int : public ConsoleVariable
-	{
-	public:
-		ConsoleVariable_Simple_Int
-		(
-			int& Value_ToUse,
-			ProjChar* pProjCh_ToUse,
-			ProjChar* pProjCh_Description_ToUse,
-			int MinVal_New,
-			int MaxVal_New,
-			OurBool Cheat = FALSE
+class ConsoleVariable_Simple_Int : public ConsoleVariable
+{
+public:
+    ConsoleVariable_Simple_Int(
+        int &Value_ToUse,
+        ProjChar *pProjCh_ToUse,
+        ProjChar *pProjCh_Description_ToUse,
+        int MinVal_New,
+        int MaxVal_New,
+        OurBool Cheat = FALSE
 
-		);
+    );
 
-		int GetValue(void) const;
-		void SetValue(int Val_New);
-		void SetValue(float Val_New);
+    int GetValue(void) const;
+    void SetValue(int Val_New);
+    void SetValue(float Val_New);
 
-	private:
-		SCString* MakeRangeString(void);
-		SCString* MakeValueString(int Val);
+private:
+    SCString *MakeRangeString(void);
+    SCString *MakeValueString(int Val);
 
-	private:
-		int& theValue;
-	};
+private:
+    int &theValue;
+};
 
-	class ConsoleVariable_Simple_FixP : public ConsoleVariable
-	{
-	public:
-		ConsoleVariable_Simple_FixP
-		(
-			int& Value_ToUse,
-			ProjChar* pProjCh_ToUse,
-			ProjChar* pProjCh_Description_ToUse,
-			int MinVal_New,
-			int MaxVal_New,
-			OurBool Cheat = FALSE
+class ConsoleVariable_Simple_FixP : public ConsoleVariable
+{
+public:
+    ConsoleVariable_Simple_FixP(
+        int &Value_ToUse,
+        ProjChar *pProjCh_ToUse,
+        ProjChar *pProjCh_Description_ToUse,
+        int MinVal_New,
+        int MaxVal_New,
+        OurBool Cheat = FALSE
 
-		);
+    );
 
-		int GetValue(void) const;
-		void SetValue(int Val_New);
-		void SetValue(float Val_New);
+    int GetValue(void) const;
+    void SetValue(int Val_New);
+    void SetValue(float Val_New);
 
-	private:
-		SCString* MakeRangeString(void);
-		SCString* MakeValueString(int Val);
+private:
+    SCString *MakeRangeString(void);
+    SCString *MakeValueString(int Val);
 
-		static float FixP2Float(int FixP)
-		{
-			return
-			(
-				((float) FixP) / (ONE_FIXED)
-			);
-		}
+    static float FixP2Float(int FixP) { return (((float) FixP) / (ONE_FIXED)); }
 
-	private:
-		int& theValue;
-	};
+private:
+    int &theValue;
+};
 
 /* Internal function prototypes ************************************/
 
@@ -118,610 +107,435 @@
 /* Exported function definitions ***********************************/
 // class ConsoleVariable
 // Factory method:
-/*static*/ ConsoleVariable* ConsoleVariable :: MakeSimpleConsoleVariable_Int
-(
-	int& Value_ToUse,
-	ProjChar* pProjCh_Symbol_ToUse,
-	ProjChar* pProjCh_Description_ToUse,
-	int MinVal_New,
-	int MaxVal_New,
-	OurBool Cheat
+/*static*/ ConsoleVariable *ConsoleVariable ::MakeSimpleConsoleVariable_Int(
+    int &Value_ToUse,
+    ProjChar *pProjCh_Symbol_ToUse,
+    ProjChar *pProjCh_Description_ToUse,
+    int MinVal_New,
+    int MaxVal_New,
+    OurBool Cheat
 
 )
 {
-	/* PRECONDITION */
-	{
-		GLOBALASSERT( pProjCh_Symbol_ToUse );
-		GLOBALASSERT( pProjCh_Description_ToUse );
-	}
+    /* PRECONDITION */
+    {
+        GLOBALASSERT(pProjCh_Symbol_ToUse);
+        GLOBALASSERT(pProjCh_Description_ToUse);
+    }
 
-	/* CODE */
-	{
-		return new ConsoleVariable_Simple_Int
-		(
-			Value_ToUse,
-			pProjCh_Symbol_ToUse,
-			pProjCh_Description_ToUse,
-			MinVal_New,
-			MaxVal_New,
-			Cheat
-		);
-	}
+    /* CODE */
+    {
+        return new ConsoleVariable_Simple_Int(
+            Value_ToUse,
+            pProjCh_Symbol_ToUse,
+            pProjCh_Description_ToUse,
+            MinVal_New,
+            MaxVal_New,
+            Cheat);
+    }
 }
 
-/*static*/ ConsoleVariable* ConsoleVariable :: MakeSimpleConsoleVariable_FixP
-(
-	int& Value_ToUse,
-	ProjChar* pProjCh_Symbol_ToUse,
-	ProjChar* pProjCh_Description_ToUse,
-	int MinVal_New,
-	int MaxVal_New,
-	OurBool Cheat
+/*static*/ ConsoleVariable *ConsoleVariable ::MakeSimpleConsoleVariable_FixP(
+    int &Value_ToUse,
+    ProjChar *pProjCh_Symbol_ToUse,
+    ProjChar *pProjCh_Description_ToUse,
+    int MinVal_New,
+    int MaxVal_New,
+    OurBool Cheat
 
 )
 {
-	/* PRECONDITION */
-	{
-		GLOBALASSERT( pProjCh_Symbol_ToUse );
-		GLOBALASSERT( pProjCh_Description_ToUse );
-	}
+    /* PRECONDITION */
+    {
+        GLOBALASSERT(pProjCh_Symbol_ToUse);
+        GLOBALASSERT(pProjCh_Description_ToUse);
+    }
 
-	/* CODE */
-	{
-		return new ConsoleVariable_Simple_FixP
-		(
-			Value_ToUse,
-			pProjCh_Symbol_ToUse,
-			pProjCh_Description_ToUse,
-			MinVal_New,
-			MaxVal_New,
-			Cheat
-		);
-	}
+    /* CODE */
+    {
+        return new ConsoleVariable_Simple_FixP(
+            Value_ToUse,
+            pProjCh_Symbol_ToUse,
+            pProjCh_Description_ToUse,
+            MinVal_New,
+            MaxVal_New,
+            Cheat);
+    }
 }
 
-ConsoleVariable :: ~ConsoleVariable()
+ConsoleVariable ::~ConsoleVariable()
 {
-	pSCString_Description ->R_Release();
+    pSCString_Description->R_Release();
 
-	// remove from the list
-    List_pConsoleVar . delete_entry
-    (
-    	this
-    );
+    // remove from the list
+    List_pConsoleVar.delete_entry(this);
 }
 
-/*static*/ OurBool ConsoleVariable :: Process( ProjChar* pProjCh_In )
+/*static*/ OurBool ConsoleVariable ::Process(ProjChar *pProjCh_In)
 {
-	// used for proccesing input text.  Could decide that the user
-	// was requesting the value of a variable, or was setting a new
-	// value etc; if so, acts accordingly.
-	// return value = was any processing performed?
+    // used for proccesing input text.  Could decide that the user
+    // was requesting the value of a variable, or was setting a new
+    // value etc; if so, acts accordingly.
+    // return value = was any processing performed?
 
-	// Check to see if there's a match between the entire
-	// input string and each console command
-	{
-		for
-		(
-			LIF<ConsoleVariable*> oi(&List_pConsoleVar);
-			!oi.done();
-			oi.next()
-		)
-		{
-			if
-			(
-				oi() -> ThisIsACheat
-				?
-				STRUTIL_SC_Strequal //case sensitive comparisons for cheats
-				(
-					pProjCh_In,
-					oi() -> pSCString_Symbol -> pProjCh()
-				)
-				:
-				STRUTIL_SC_Strequal_Insensitive
-				(
-					pProjCh_In,
-					oi() -> pSCString_Symbol -> pProjCh()
-				)
-			)
-			{
-				oi() -> Display();
-				return Yes;
-			}
-		}				
-	}
+    // Check to see if there's a match between the entire
+    // input string and each console command
+    {
+        for (LIF<ConsoleVariable *> oi(&List_pConsoleVar); !oi.done(); oi.next()) {
+            if (oi()->ThisIsACheat
+                    ? STRUTIL_SC_Strequal //case sensitive comparisons for cheats
+                    (pProjCh_In, oi()->pSCString_Symbol->pProjCh())
+                    : STRUTIL_SC_Strequal_Insensitive(pProjCh_In, oi()->pSCString_Symbol->pProjCh())) {
+                oi()->Display();
+                return Yes;
+            }
+        }
+    }
 
-	// Otherwise check to see if there's a match between the front
-	// of the console command up to the first space (if any)
-	// with the rest being treated as a number
-	{
-		// Find the point in the input text where the first word
-		// ends (if there is one...):
-		ProjChar* pProjCh_Search = pProjCh_In;
-		int NumChars = 0;
+    // Otherwise check to see if there's a match between the front
+    // of the console command up to the first space (if any)
+    // with the rest being treated as a number
+    {
+        // Find the point in the input text where the first word
+        // ends (if there is one...):
+        ProjChar *pProjCh_Search = pProjCh_In;
+        int NumChars = 0;
 
-		while
-		(
-			(*pProjCh_Search != '\0')
-			&&
-			(*pProjCh_Search != ' ')
-		)
-		{
-			pProjCh_Search++;
-			NumChars++;
-		}
+        while ((*pProjCh_Search != '\0') && (*pProjCh_Search != ' ')) {
+            pProjCh_Search++;
+            NumChars++;
+        }
 
-		if ( *pProjCh_Search == '\0' )
-		{
-			// then there were no word breaks; stop
+        if (*pProjCh_Search == '\0') {
+            // then there were no word breaks; stop
 
-			return No;
-		}
+            return No;
+        }
 
-		if ( NumChars < 1 )
-		{
-			return No;
-		}
+        if (NumChars < 1) {
+            return No;
+        }
 
-		for
-		(
-			LIF<ConsoleVariable*> oi(&List_pConsoleVar);
-			!oi.done();
-			oi.next()
-		)
-		{
-		
-			// LOCALISEME():
-			if
-			(
-				0 == strncmp
-				(
-					pProjCh_In,
-					oi() -> pSCString_Symbol -> pProjCh(),
-					NumChars
-				)
-			)
-			{
-				if (strchr(pProjCh_Search,'.'))
-				{
-					// interpret as fraction
-					float NewValue = atof(pProjCh_Search);
+        for (LIF<ConsoleVariable *> oi(&List_pConsoleVar); !oi.done(); oi.next()) {
+            // LOCALISEME():
+            if (0 == strncmp(pProjCh_In, oi()->pSCString_Symbol->pProjCh(), NumChars)) {
+                if (strchr(pProjCh_Search, '.')) {
+                    // interpret as fraction
+                    float NewValue = atof(pProjCh_Search);
 
-					oi() -> ProcessSetValue( NewValue );
+                    oi()->ProcessSetValue(NewValue);
 
-					return Yes;
-				}
-				else
-				{
-					// interpret as int
-					int NewValue = atoi(pProjCh_Search);
+                    return Yes;
+                } else {
+                    // interpret as int
+                    int NewValue = atoi(pProjCh_Search);
 
-					oi() -> ProcessSetValue( NewValue );
+                    oi()->ProcessSetValue(NewValue);
 
-					return Yes;
+                    return Yes;
+                }
+            }
+        }
+    }
 
-				}
-			}
-		}
-	}
-
-
-	// If you get here, no processing has been performed:
-	return No;
-
+    // If you get here, no processing has been performed:
+    return No;
 }
 
-/*static*/ void ConsoleVariable :: ListAllVariables(void)
+/*static*/ void ConsoleVariable ::ListAllVariables(void)
 {
-	SCString* pSCString_Temp = new SCString("LIST OF ALL CONSOLE VARIABLES:");
+    SCString *pSCString_Temp = new SCString("LIST OF ALL CONSOLE VARIABLES:");
 
-	pSCString_Temp -> SendToScreen();
+    pSCString_Temp->SendToScreen();
 
-	pSCString_Temp ->R_Release();
+    pSCString_Temp->R_Release();
 
-	for
-	(
-		LIF<ConsoleVariable*> oi(&List_pConsoleVar);
-		!oi.done();
-		oi.next()
-	)
-	{
-		oi() -> Display();
-	}	
+    for (LIF<ConsoleVariable *> oi(&List_pConsoleVar); !oi.done(); oi.next()) {
+        oi()->Display();
+    }
 }
 // protected:
-ConsoleVariable :: ConsoleVariable
-(
-	ProjChar* pProjCh_ToUse,
-	ProjChar* pProjCh_Description_ToUse,
-	int MinVal_New,
-	int MaxVal_New,
-	OurBool Cheat
+ConsoleVariable ::ConsoleVariable(
+    ProjChar *pProjCh_ToUse,
+    ProjChar *pProjCh_Description_ToUse,
+    int MinVal_New,
+    int MaxVal_New,
+    OurBool Cheat
 
-) :	ConsoleSymbol
-	(
-		pProjCh_ToUse
-	),
-	MinVal(MinVal_New),
-	MaxVal(MaxVal_New),
-	pSCString_Description
-	(
-		new SCString( pProjCh_Description_ToUse )
-			// constructor for the SCString adds the required reference
-	)
+    )
+    : ConsoleSymbol(pProjCh_ToUse)
+    , MinVal(MinVal_New)
+    , MaxVal(MaxVal_New)
+    , pSCString_Description(new SCString(pProjCh_Description_ToUse)
+                            // constructor for the SCString adds the required reference
+      )
 {
-	/* PRECONDITION */
-	{
-	}
+    /* PRECONDITION */
+    {
+    }
 
-	/* CODE */
-	{
-		ThisIsACheat = Cheat;
-	
-		// add to list of all console variables
-	    List_pConsoleVar . add_entry
-	    (
-	    	this
-	    );
-	}
+    /* CODE */
+    {
+        ThisIsACheat = Cheat;
+
+        // add to list of all console variables
+        List_pConsoleVar.add_entry(this);
+    }
 }
 
 // private:
-void ConsoleVariable :: Display(void)
+void ConsoleVariable ::Display(void)
 {
-	// used by the list display and to interrogate an individual variable
-	SCString* pSCString_Temp1 = new SCString
-	(
-		" = "
-	);
+    // used by the list display and to interrogate an individual variable
+    SCString *pSCString_Temp1 = new SCString(" = ");
 
-	SCString* pSCString_Temp2 = MakeValueString( GetValue() );
+    SCString *pSCString_Temp2 = MakeValueString(GetValue());
 
-	SCString* pSCString_Temp3 = MakeRangeString();
+    SCString *pSCString_Temp3 = MakeRangeString();
 
-	SCString* pSCString_Out = new SCString
-	(
-		pSCString_Symbol,
-		pSCString_Temp1,
-		pSCString_Temp2,
-		pSCString_Temp3,
-		pSCString_Description
-	);
+    SCString *pSCString_Out = new SCString(
+        pSCString_Symbol, pSCString_Temp1, pSCString_Temp2, pSCString_Temp3, pSCString_Description);
 
-	pSCString_Temp3 ->R_Release();
-	pSCString_Temp2 ->R_Release();
-	pSCString_Temp1 ->R_Release();
+    pSCString_Temp3->R_Release();
+    pSCString_Temp2->R_Release();
+    pSCString_Temp1->R_Release();
 
-	pSCString_Out -> SendToScreen();
+    pSCString_Out->SendToScreen();
 
-	pSCString_Out ->R_Release();
+    pSCString_Out->R_Release();
 }
 
-
-void ConsoleVariable :: ProcessSetValue
-(
-	int Val_New
-)
+void ConsoleVariable ::ProcessSetValue(int Val_New)
 {
-	// used by command processor; sets the value and outputs
-	// a message
+    // used by command processor; sets the value and outputs
+    // a message
 
-	int OldValue = GetValue();
+    int OldValue = GetValue();
 
-	SetValue( Val_New );
+    SetValue(Val_New);
 
-	OutputResultOfSetValue( OldValue );
-
+    OutputResultOfSetValue(OldValue);
 }
 
-void ConsoleVariable :: ProcessSetValue
-(
-	float Val_New
-)
+void ConsoleVariable ::ProcessSetValue(float Val_New)
 {
-	// used by command processor; sets the value and outputs
-	// a message
+    // used by command processor; sets the value and outputs
+    // a message
 
-	int OldValue = GetValue();
+    int OldValue = GetValue();
 
-	SetValue( Val_New );
+    SetValue(Val_New);
 
-	OutputResultOfSetValue( OldValue );
+    OutputResultOfSetValue(OldValue);
 }
 
-void ConsoleVariable :: OutputResultOfSetValue( int OldVal )
+void ConsoleVariable ::OutputResultOfSetValue(int OldVal)
 {
-	int NewValue = GetValue();
+    int NewValue = GetValue();
 
-	// Output result
-	{
-		SCString* pSCString_Temp1 = new SCString
-		(
-			" "
-		);
+    // Output result
+    {
+        SCString *pSCString_Temp1 = new SCString(" ");
 
-		SCString* pSCString_Temp2 = MakeValueString
-		(
-			OldVal
-		);
+        SCString *pSCString_Temp2 = MakeValueString(OldVal);
 
-		SCString* pSCString_Temp3 = new SCString
-		(
-			" -> "
-		);
+        SCString *pSCString_Temp3 = new SCString(" -> ");
 
-		SCString* pSCString_Temp4 = MakeValueString
-		(
-			NewValue
-		);
+        SCString *pSCString_Temp4 = MakeValueString(NewValue);
 
-		SCString* pSCString_Out = new SCString
-		(
-			pSCString_Symbol,
-			pSCString_Temp1,
-			pSCString_Temp2,
-			pSCString_Temp3,
-			pSCString_Temp4
-		);
+        SCString *pSCString_Out = new SCString(
+            pSCString_Symbol, pSCString_Temp1, pSCString_Temp2, pSCString_Temp3, pSCString_Temp4);
 
-		pSCString_Temp4 ->R_Release();
-		pSCString_Temp3 ->R_Release();
-		pSCString_Temp2 ->R_Release();
-		pSCString_Temp1 ->R_Release();
+        pSCString_Temp4->R_Release();
+        pSCString_Temp3->R_Release();
+        pSCString_Temp2->R_Release();
+        pSCString_Temp1->R_Release();
 
-		pSCString_Out -> SendToScreen();
-		
-		pSCString_Out ->R_Release();
+        pSCString_Out->SendToScreen();
 
-	}
-	
+        pSCString_Out->R_Release();
+    }
 }
-
 
 /* Internal function definitions ***********************************/
-ConsoleVariable_Simple_Int :: ConsoleVariable_Simple_Int
-(
-	int& Value_ToUse,
-	ProjChar* pProjCh_ToUse,
-	ProjChar* pProjCh_Description_ToUse,
-	int MinVal_New,
-	int MaxVal_New,
-	OurBool Cheat
-) :	ConsoleVariable
-	(
-		pProjCh_ToUse,
-		pProjCh_Description_ToUse,
-		MinVal_New,
-		MaxVal_New,
-		Cheat
-	),
-	theValue( Value_ToUse )
+ConsoleVariable_Simple_Int ::ConsoleVariable_Simple_Int(
+    int &Value_ToUse,
+    ProjChar *pProjCh_ToUse,
+    ProjChar *pProjCh_Description_ToUse,
+    int MinVal_New,
+    int MaxVal_New,
+    OurBool Cheat)
+    : ConsoleVariable(pProjCh_ToUse, pProjCh_Description_ToUse, MinVal_New, MaxVal_New, Cheat)
+    , theValue(Value_ToUse)
 {
-	/* PRECONDITION */
-	{
-		GLOBALASSERT( pProjCh_ToUse );
-		GLOBALASSERT( pProjCh_Description_ToUse );
-	}
+    /* PRECONDITION */
+    {
+        GLOBALASSERT(pProjCh_ToUse);
+        GLOBALASSERT(pProjCh_Description_ToUse);
+    }
 
-	/* CODE */
-	{
-	}
+    /* CODE */
+    {
+    }
 }
 
-int ConsoleVariable_Simple_Int :: GetValue(void) const
+int ConsoleVariable_Simple_Int ::GetValue(void) const
 {
-	return theValue;
+    return theValue;
 }
 
-void ConsoleVariable_Simple_Int :: SetValue(int Val_New)
+void ConsoleVariable_Simple_Int ::SetValue(int Val_New)
 {
-	// Ensure bounded:
-	if ( Val_New > MaxVal )
-	{
-		Val_New = MaxVal;
-	}
+    // Ensure bounded:
+    if (Val_New > MaxVal) {
+        Val_New = MaxVal;
+    }
 
-	if ( Val_New < MinVal )
-	{
-		Val_New = MinVal;
-	}
+    if (Val_New < MinVal) {
+        Val_New = MinVal;
+    }
 
-	theValue = Val_New;
+    theValue = Val_New;
 }
 
-void ConsoleVariable_Simple_Int :: SetValue(float Val_New_F )
+void ConsoleVariable_Simple_Int ::SetValue(float Val_New_F)
 {
-	int Val_New = int(Val_New_F);
+    int Val_New = int(Val_New_F);
 
-	// Ensure bounded:
-	if ( Val_New > MaxVal )
-	{
-		Val_New = MaxVal;
-	}
+    // Ensure bounded:
+    if (Val_New > MaxVal) {
+        Val_New = MaxVal;
+    }
 
-	if ( Val_New < MinVal )
-	{
-		Val_New = MinVal;
-	}
+    if (Val_New < MinVal) {
+        Val_New = MinVal;
+    }
 
-	theValue = Val_New;
+    theValue = Val_New;
 }
 
 // private:
-SCString* ConsoleVariable_Simple_Int :: MakeRangeString(void)
+SCString *ConsoleVariable_Simple_Int ::MakeRangeString(void)
 {
-	SCString* pSCString_Temp2_1 = new SCString
-	(
-		" INT:("
-	);
+    SCString *pSCString_Temp2_1 = new SCString(" INT:(");
 
-	SCString* pSCString_Temp2_2 = MakeValueString
-	(
-		MinVal
-	);
+    SCString *pSCString_Temp2_2 = MakeValueString(MinVal);
 
-	SCString* pSCString_Temp2_3 = new SCString
-	(
-		","
-	);
+    SCString *pSCString_Temp2_3 = new SCString(",");
 
-	SCString* pSCString_Temp2_4 = MakeValueString
-	(
-		MaxVal
-	);
+    SCString *pSCString_Temp2_4 = MakeValueString(MaxVal);
 
-	SCString* pSCString_Temp2_5 = new SCString
-	(
-		") "
-	);
+    SCString *pSCString_Temp2_5 = new SCString(") ");
 
-	SCString* pSCString_Return = new SCString
-	(
-		pSCString_Temp2_1,
-		pSCString_Temp2_2,
-		pSCString_Temp2_3,
-		pSCString_Temp2_4,
-		pSCString_Temp2_5
-	);
+    SCString *pSCString_Return = new SCString(
+        pSCString_Temp2_1,
+        pSCString_Temp2_2,
+        pSCString_Temp2_3,
+        pSCString_Temp2_4,
+        pSCString_Temp2_5);
 
-	pSCString_Temp2_5 ->R_Release();
-	pSCString_Temp2_4 ->R_Release();
-	pSCString_Temp2_3 ->R_Release();
-	pSCString_Temp2_2 ->R_Release();
-	pSCString_Temp2_1 ->R_Release();		
+    pSCString_Temp2_5->R_Release();
+    pSCString_Temp2_4->R_Release();
+    pSCString_Temp2_3->R_Release();
+    pSCString_Temp2_2->R_Release();
+    pSCString_Temp2_1->R_Release();
 
-	return pSCString_Return;
+    return pSCString_Return;
 }
 
-SCString* ConsoleVariable_Simple_Int :: MakeValueString(int Val)
+SCString *ConsoleVariable_Simple_Int ::MakeValueString(int Val)
 {
-	return new SCString
-	(
-		Val
-	);
+    return new SCString(Val);
 }
 
-
-ConsoleVariable_Simple_FixP :: ConsoleVariable_Simple_FixP
-(
-	int& Value_ToUse,
-	ProjChar* pProjCh_ToUse,
-	ProjChar* pProjCh_Description_ToUse,
-	int MinVal_New,
-	int MaxVal_New,
-	OurBool Cheat
-) :	ConsoleVariable
-	(
-		pProjCh_ToUse,
-		pProjCh_Description_ToUse,
-		MinVal_New,
-		MaxVal_New,
-		Cheat
-	),
-	theValue( Value_ToUse )
+ConsoleVariable_Simple_FixP ::ConsoleVariable_Simple_FixP(
+    int &Value_ToUse,
+    ProjChar *pProjCh_ToUse,
+    ProjChar *pProjCh_Description_ToUse,
+    int MinVal_New,
+    int MaxVal_New,
+    OurBool Cheat)
+    : ConsoleVariable(pProjCh_ToUse, pProjCh_Description_ToUse, MinVal_New, MaxVal_New, Cheat)
+    , theValue(Value_ToUse)
 {
-	/* PRECONDITION */
-	{
-		GLOBALASSERT( pProjCh_ToUse );
-		GLOBALASSERT( pProjCh_Description_ToUse );
-	}
+    /* PRECONDITION */
+    {
+        GLOBALASSERT(pProjCh_ToUse);
+        GLOBALASSERT(pProjCh_Description_ToUse);
+    }
 
-	/* CODE */
-	{
-	}
+    /* CODE */
+    {
+    }
 }
 
-int ConsoleVariable_Simple_FixP :: GetValue(void) const
+int ConsoleVariable_Simple_FixP ::GetValue(void) const
 {
-	return theValue;
+    return theValue;
 }
 
-void ConsoleVariable_Simple_FixP :: SetValue(int Val_New)
+void ConsoleVariable_Simple_FixP ::SetValue(int Val_New)
 {
-	Val_New *= ONE_FIXED;
+    Val_New *= ONE_FIXED;
 
-	// Ensure bounded:
-	if ( Val_New > MaxVal )
-	{
-		Val_New = MaxVal;
-	}
+    // Ensure bounded:
+    if (Val_New > MaxVal) {
+        Val_New = MaxVal;
+    }
 
-	if ( Val_New < MinVal )
-	{
-		Val_New = MinVal;
-	}
+    if (Val_New < MinVal) {
+        Val_New = MinVal;
+    }
 
-	theValue = Val_New;
+    theValue = Val_New;
 }
 
-void ConsoleVariable_Simple_FixP :: SetValue(float Val_New_F )
+void ConsoleVariable_Simple_FixP ::SetValue(float Val_New_F)
 {
-	int Val_New = int(Val_New_F * ONE_FIXED);
+    int Val_New = int(Val_New_F * ONE_FIXED);
 
-	// Ensure bounded:
-	if ( Val_New > MaxVal )
-	{
-		Val_New = MaxVal;
-	}
+    // Ensure bounded:
+    if (Val_New > MaxVal) {
+        Val_New = MaxVal;
+    }
 
-	if ( Val_New < MinVal )
-	{
-		Val_New = MinVal;
-	}
+    if (Val_New < MinVal) {
+        Val_New = MinVal;
+    }
 
-	theValue = Val_New;
+    theValue = Val_New;
 }
 
 // private:
-SCString* ConsoleVariable_Simple_FixP :: MakeRangeString(void)
+SCString *ConsoleVariable_Simple_FixP ::MakeRangeString(void)
 {
-	SCString* pSCString_Temp2_1 = new SCString
-	(
-		" FRAC:("
-	);
+    SCString *pSCString_Temp2_1 = new SCString(" FRAC:(");
 
-	SCString* pSCString_Temp2_2 = MakeValueString
-	(
-		MinVal
-	);
+    SCString *pSCString_Temp2_2 = MakeValueString(MinVal);
 
-	SCString* pSCString_Temp2_3 = new SCString
-	(
-		","
-	);
+    SCString *pSCString_Temp2_3 = new SCString(",");
 
-	SCString* pSCString_Temp2_4 = MakeValueString
-	(
-		MaxVal
-	);
+    SCString *pSCString_Temp2_4 = MakeValueString(MaxVal);
 
-	SCString* pSCString_Temp2_5 = new SCString
-	(
-		") "
-	);
+    SCString *pSCString_Temp2_5 = new SCString(") ");
 
-	SCString* pSCString_Return = new SCString
-	(
-		pSCString_Temp2_1,
-		pSCString_Temp2_2,
-		pSCString_Temp2_3,
-		pSCString_Temp2_4,
-		pSCString_Temp2_5
-	);
+    SCString *pSCString_Return = new SCString(
+        pSCString_Temp2_1,
+        pSCString_Temp2_2,
+        pSCString_Temp2_3,
+        pSCString_Temp2_4,
+        pSCString_Temp2_5);
 
-	pSCString_Temp2_5 ->R_Release();
-	pSCString_Temp2_4 ->R_Release();
-	pSCString_Temp2_3 ->R_Release();
-	pSCString_Temp2_2 ->R_Release();
-	pSCString_Temp2_1 ->R_Release();		
+    pSCString_Temp2_5->R_Release();
+    pSCString_Temp2_4->R_Release();
+    pSCString_Temp2_3->R_Release();
+    pSCString_Temp2_2->R_Release();
+    pSCString_Temp2_1->R_Release();
 
-	return pSCString_Return;
+    return pSCString_Return;
 }
 
-SCString* ConsoleVariable_Simple_FixP :: MakeValueString(int Val)
+SCString *ConsoleVariable_Simple_FixP ::MakeValueString(int Val)
 {
-	return new SCString
-	(
-		FixP2Float( Val )
-	);
+    return new SCString(FixP2Float(Val));
 }

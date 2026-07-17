@@ -16,22 +16,17 @@ extern const short ArcTanTable[256];
 
 extern LONGLONGCH ll_zero;
 
-
 /*
 
  Globals
 
 */
 
-	MATRIXCH IdentityMatrix = {
+MATRIXCH IdentityMatrix = {
 
-		ONE_FIXED, 0, 0,
-		0, ONE_FIXED, 0,
-		0, 0, ONE_FIXED
+    ONE_FIXED, 0, 0, 0, ONE_FIXED, 0, 0, 0, ONE_FIXED
 
-	};
-
-
+};
 
 /*
 
@@ -39,37 +34,33 @@ extern LONGLONGCH ll_zero;
 
 */
 
-
-
 /* One over sin functions - CDF 4/2/98 */
 
 extern int oneoversin[4096];
 
-void ConstructOneOverSinTable(void) {
+void ConstructOneOverSinTable(void)
+{
+    int a, sin;
 
-	int a,sin;
+    for (a = 0; a < 4096; a++) {
+        sin = GetSin(a);
 
-	for (a=0; a<4096; a++) {
-		sin=GetSin(a);
-
-		if (sin!=0) {
-			oneoversin[a]=DIV_FIXED(ONE_FIXED,sin);
-		} else {
-			sin=100;
-			oneoversin[a]=DIV_FIXED(ONE_FIXED,sin);
-		}
-	}
-
+        if (sin != 0) {
+            oneoversin[a] = DIV_FIXED(ONE_FIXED, sin);
+        } else {
+            sin = 100;
+            oneoversin[a] = DIV_FIXED(ONE_FIXED, sin);
+        }
+    }
 }
 
-int GetOneOverSin(int a) {
+int GetOneOverSin(int a)
+{
+    int b;
 
-	int b;
+    b = a & wrap360;
 
-	b=a&wrap360;
-	
-	return(oneoversin[b]);
-
+    return (oneoversin[b]);
 }
 
 /*
@@ -83,32 +74,25 @@ int GetOneOverSin(int a) {
 int _DotProduct(VECTORCH *vptr1, VECTORCH *vptr2)
 
 {
+    int dp;
 
-	int dp;
+    dp = MUL_FIXED(vptr1->vx, vptr2->vx);
+    dp += MUL_FIXED(vptr1->vy, vptr2->vy);
+    dp += MUL_FIXED(vptr1->vz, vptr2->vz);
 
-	dp =  MUL_FIXED(vptr1->vx, vptr2->vx);
-	dp += MUL_FIXED(vptr1->vy, vptr2->vy);
-	dp += MUL_FIXED(vptr1->vz, vptr2->vz);
-
-	return(dp);
-
+    return (dp);
 }
-
 
 int DotProduct2d(VECTOR2D *vptr1, VECTOR2D *vptr2)
 
 {
+    int dp;
 
-	int dp;
+    dp = MUL_FIXED(vptr1->vx, vptr2->vx);
+    dp += MUL_FIXED(vptr1->vy, vptr2->vy);
 
-
-	dp  = MUL_FIXED(vptr1->vx, vptr2->vx);
-	dp += MUL_FIXED(vptr1->vy, vptr2->vy);
-
-	return dp;
-
+    return dp;
 }
-
 
 /*
 
@@ -119,18 +103,14 @@ int DotProduct2d(VECTOR2D *vptr1, VECTOR2D *vptr2)
 int VectorDistance(VECTORCH *v1, VECTORCH *v2)
 
 {
+    VECTORCH v;
 
-	VECTORCH v;
+    v.vx = v1->vx - v2->vx;
+    v.vy = v1->vy - v2->vy;
+    v.vz = v1->vz - v2->vz;
 
-
-	v.vx = v1->vx - v2->vx;
-	v.vy = v1->vy - v2->vy;
-	v.vz = v1->vz - v2->vz;
-
-	return Magnitude(&v);
-
+    return Magnitude(&v);
 }
-
 
 /*
 
@@ -143,29 +123,31 @@ int VectorDistance(VECTORCH *v1, VECTORCH *v2)
 int OutcodeVectorDistance(VECTORCH *v1, VECTORCH *v2, int d)
 
 {
+    int i;
 
-	int i;
+    i = v1->vx - v2->vx;
+    if (i < 0)
+        i = -i;
 
+    if (i >= d)
+        return No;
 
-	i = v1->vx - v2->vx;
-	if(i < 0) i = -i;
+    i = v1->vy - v2->vy;
+    if (i < 0)
+        i = -i;
 
-	if(i >= d) return No;
+    if (i >= d)
+        return No;
 
-	i = v1->vy - v2->vy;
-	if(i < 0) i = -i;
+    i = v1->vz - v2->vz;
+    if (i < 0)
+        i = -i;
 
-	if(i >= d) return No;
+    if (i >= d)
+        return No;
 
-	i = v1->vz - v2->vz;
-	if(i < 0) i = -i;
-
-	if(i >= d) return No;
-
-	return Yes;
-
+    return Yes;
 }
-
 
 /*
 
@@ -178,15 +160,12 @@ int OutcodeVectorDistance(VECTORCH *v1, VECTORCH *v2, int d)
 void GetNormalVector(VECTORCH *v1, VECTORCH *v2, VECTORCH *v3)
 
 {
+    v3->vx = v1->vx - v2->vx;
+    v3->vy = v1->vy - v2->vy;
+    v3->vz = v1->vz - v2->vz;
 
-	v3->vx = v1->vx - v2->vx;
-	v3->vy = v1->vy - v2->vy;
-	v3->vz = v1->vz - v2->vz;
-
-	Normalise(v3);
-
+    Normalise(v3);
 }
-
 
 /*
 
@@ -197,41 +176,30 @@ void GetNormalVector(VECTORCH *v1, VECTORCH *v2, VECTORCH *v3)
 void Renormalise(VECTORCH *nvector)
 
 {
+    int m;
+    int xsq, ysq, zsq;
 
-	int m;
-	int xsq, ysq, zsq;
+    /* Scale x, y and z */
 
+    nvector->vx >>= 2;
+    nvector->vy >>= 2;
+    nvector->vz >>= 2;
 
-/* Scale x, y and z */
+    /* Normalise */
 
-	nvector->vx >>= 2;
-	nvector->vy >>= 2;
-	nvector->vz >>= 2;
+    xsq = nvector->vx * nvector->vx;
+    ysq = nvector->vy * nvector->vy;
+    zsq = nvector->vz * nvector->vz;
 
+    m = SqRoot32(xsq + ysq + zsq);
 
-/* Normalise */
+    if (m == 0)
+        m = 1; /* Just in case */
 
-	xsq = nvector->vx * nvector->vx;
-	ysq = nvector->vy * nvector->vy;
-	zsq = nvector->vz * nvector->vz;
-
-	m = SqRoot32(xsq + ysq + zsq);
-
-	if(m == 0) m = 1;			/* Just in case */
-
-	nvector->vx = (nvector->vx * ONE_FIXED) / m;
-	nvector->vy = (nvector->vy * ONE_FIXED) / m;
-	nvector->vz = (nvector->vz * ONE_FIXED) / m;
-
+    nvector->vx = (nvector->vx * ONE_FIXED) / m;
+    nvector->vy = (nvector->vy * ONE_FIXED) / m;
+    nvector->vz = (nvector->vz * ONE_FIXED) / m;
 }
-
-
-
-
-
-
-
-
 
 /*
 
@@ -242,27 +210,21 @@ void Renormalise(VECTORCH *nvector)
 int FindShift32(int value, int limit)
 
 {
+    int shift = 0;
 
-	int shift = 0;
+    /*if(limit == 0) exit(0xfa11fa11);*/
 
+    if (value < 0)
+        value = -value;
 
-	/*if(limit == 0) exit(0xfa11fa11);*/
+    while (value > limit) {
+        shift++;
 
+        value >>= 1;
+    }
 
-	if(value < 0) value = -value;
-
-	while(value > limit) {
-
-		shift++;
-
-		value >>= 1;
-
-	}
-
-	return shift;
-
+    return shift;
 }
-
 
 /*
 
@@ -273,22 +235,18 @@ int FindShift32(int value, int limit)
 int MaxInt(int *iarray, int iarraysize)
 
 {
+    int imax = smallint;
+    int i;
 
-	int imax = smallint;
-	int i;
+    for (i = iarraysize; i != 0; i--) {
+        if (imax < *iarray)
+            imax = *iarray;
 
-	for(i = iarraysize; i!=0; i--) {
+        iarray++;
+    }
 
-		if(imax < *iarray) imax = *iarray;
-
-		iarray++;
-
-	}
-
-	return imax;
-
+    return imax;
 }
-
 
 /*
 
@@ -299,23 +257,18 @@ int MaxInt(int *iarray, int iarraysize)
 int MinInt(int *iarray, int iarraysize)
 
 {
+    int imin = bigint;
+    int i;
 
-	int imin = bigint;
-	int i;
+    for (i = iarraysize; i != 0; i--) {
+        if (imin > *iarray)
+            imin = *iarray;
 
-	for(i = iarraysize; i!=0; i--) {
+        iarray++;
+    }
 
-		if(imin > *iarray) imin = *iarray;
-
-		iarray++;
-
-	}
-
-	return imin;
-
+    return imin;
 }
-
-
 
 /*
 
@@ -335,82 +288,70 @@ int MinInt(int *iarray, int iarraysize)
 
 void CreateEulerMatrix(EULER *e, MATRIXCH *m1)
 {
-	int t, sx, sy, sz, cx, cy, cz;
+    int t, sx, sy, sz, cx, cy, cz;
 
+    sx = GetSin(e->EulerX);
+    sy = GetSin(e->EulerY);
+    sz = GetSin(e->EulerZ);
 
-	sx = GetSin(e->EulerX);
-	sy = GetSin(e->EulerY);
-	sz = GetSin(e->EulerZ);
+    cx = GetCos(e->EulerX);
+    cy = GetCos(e->EulerY);
+    cz = GetCos(e->EulerZ);
 
-	cx = GetCos(e->EulerX);
-	cy = GetCos(e->EulerY);
-	cz = GetCos(e->EulerZ);
-
-
-	#if 0
+#if 0
 	textprint("Euler Matrix Sines & Cosines\n");
 	textprint("%d, %d, %d\n", sx, sy, sz);
 	textprint("%d, %d, %d\n", cx, cy, cz);
-	#endif
+#endif
 
+    /* m11 = cy*cz + sx*sy*sz */
 
-/* m11 = cy*cz + sx*sy*sz */
+    m1->mat11 = MUL_FIXED(cy, cz); /* cy*cz	*/
+    t = MUL_FIXED(sx, sy);         /* sx*sy */
+    t = MUL_FIXED(t, sz);          /* *sz	*/
+    m1->mat11 += t;
 
-	m1->mat11 = MUL_FIXED(cy, cz);		/* cy*cz	*/
-	t = MUL_FIXED(sx, sy);					/* sx*sy */
-	t = MUL_FIXED(t, sz);					/* *sz	*/
-	m1->mat11 += t;
+    /* m12 = -cy*sz + sx*sy*cz */
 
+    m1->mat12 = MUL_FIXED(-cy, sz);
+    t = MUL_FIXED(sx, sy);
+    t = MUL_FIXED(t, cz);
+    m1->mat12 += t;
 
-/* m12 = -cy*sz + sx*sy*cz */
+    /* m13 = cx*sy */
 
-	m1->mat12=MUL_FIXED(-cy,sz);
-	t=MUL_FIXED(sx,sy);
-	t=MUL_FIXED(t,cz);
-	m1->mat12+=t;
+    m1->mat13 = MUL_FIXED(cx, sy);
 
+    /* m21 = cx*sz */
 
-/* m13 = cx*sy */
+    m1->mat21 = MUL_FIXED(cx, sz);
 
-	m1->mat13=MUL_FIXED(cx,sy);
+    /* m22 = cx*cz */
 
+    m1->mat22 = MUL_FIXED(cx, cz);
 
-/* m21 = cx*sz */
+    /* m23 = -sx */
 
-	m1->mat21=MUL_FIXED(cx,sz);
+    m1->mat23 = -sx;
 
+    /* m31 = -sy*cz + sx*cy*sz */
 
-/* m22 = cx*cz */
+    m1->mat31 = MUL_FIXED(-sy, cz);
+    t = MUL_FIXED(sx, cy);
+    t = MUL_FIXED(t, sz);
+    m1->mat31 += t;
 
-	m1->mat22=MUL_FIXED(cx,cz);
+    /* m32 = sy*sz + sx*cy*cz */
 
+    m1->mat32 = MUL_FIXED(sy, sz);
+    t = MUL_FIXED(sx, cy);
+    t = MUL_FIXED(t, cz);
+    m1->mat32 += t;
 
-/* m23 = -sx */
+    /* m33 = cx*cy */
 
-	m1->mat23=-sx;
-
-
-/* m31 = -sy*cz + sx*cy*sz */
-
-	m1->mat31=MUL_FIXED(-sy,cz);
-	t=MUL_FIXED(sx,cy);
-	t=MUL_FIXED(t,sz);
-	m1->mat31+=t;
-
-
-/* m32 = sy*sz + sx*cy*cz */
-
-	m1->mat32=MUL_FIXED(sy,sz);
-	t=MUL_FIXED(sx,cy);
-	t=MUL_FIXED(t,cz);
-	m1->mat32+=t;
-
-
-/* m33 = cx*cy */
-
-	m1->mat33=MUL_FIXED(cx,cy);
+    m1->mat33 = MUL_FIXED(cx, cy);
 }
-
 
 /*
 
@@ -421,42 +362,34 @@ void CreateEulerMatrix(EULER *e, MATRIXCH *m1)
 void CreateEulerVector(EULER *e, VECTORCH *v)
 
 {
+    int t, sx, sy, sz, cx, cy, cz;
 
-	int t, sx, sy, sz, cx, cy, cz;
+    sx = GetSin(e->EulerX);
+    sy = GetSin(e->EulerY);
+    sz = GetSin(e->EulerZ);
 
+    cx = GetCos(e->EulerX);
+    cy = GetCos(e->EulerY);
+    cz = GetCos(e->EulerZ);
 
-	sx = GetSin(e->EulerX);
-	sy = GetSin(e->EulerY);
-	sz = GetSin(e->EulerZ);
+    /* x = -sy*cz + sx*cy*sz */
 
-	cx = GetCos(e->EulerX);
-	cy = GetCos(e->EulerY);
-	cz = GetCos(e->EulerZ);
+    v->vx = MUL_FIXED(-sy, cz);
+    t = MUL_FIXED(sx, cy);
+    t = MUL_FIXED(t, sz);
+    v->vx += t;
 
+    /* y = sy*sz + sx*cy*cz */
 
-	/* x = -sy*cz + sx*cy*sz */
+    v->vy = MUL_FIXED(sy, sz);
+    t = MUL_FIXED(sx, cy);
+    t = MUL_FIXED(t, cz);
+    v->vy += t;
 
-	v->vx  = MUL_FIXED(-sy, cz);
-	t      = MUL_FIXED(sx, cy);
-	t      = MUL_FIXED(t, sz);
-	v->vx += t;
+    /* z = cx*cy */
 
-
-	/* y = sy*sz + sx*cy*cz */
-
-	v->vy  = MUL_FIXED(sy, sz);
-	t      = MUL_FIXED(sx, cy);
-	t      = MUL_FIXED(t, cz);
-	v->vy += t;
-
-
-	/* z = cx*cy */
-
-	v->vz = MUL_FIXED(cx,cy);
-
+    v->vz = MUL_FIXED(cx, cy);
 }
-
-
 
 /*
 
@@ -494,67 +427,66 @@ void CreateEulerVector(EULER *e, VECTORCH *v)
 void MatrixMultiply(struct matrixch *m1, struct matrixch *m2, struct matrixch *m3)
 
 {
-	MATRIXCH TmpMat;
-	 
-/* m11'' = c1.r1' */
+    MATRIXCH TmpMat;
 
-	TmpMat.mat11=MUL_FIXED(m1->mat11,m2->mat11);
-	TmpMat.mat11+=MUL_FIXED(m1->mat21,m2->mat12);
-	TmpMat.mat11+=MUL_FIXED(m1->mat31,m2->mat13);
+    /* m11'' = c1.r1' */
 
-/* m12'' = c2.r1' */
+    TmpMat.mat11 = MUL_FIXED(m1->mat11, m2->mat11);
+    TmpMat.mat11 += MUL_FIXED(m1->mat21, m2->mat12);
+    TmpMat.mat11 += MUL_FIXED(m1->mat31, m2->mat13);
 
-	TmpMat.mat12=MUL_FIXED(m1->mat12,m2->mat11);
-	TmpMat.mat12+=MUL_FIXED(m1->mat22,m2->mat12);
-	TmpMat.mat12+=MUL_FIXED(m1->mat32,m2->mat13);
+    /* m12'' = c2.r1' */
 
-/* m13'' = c3.r1' */
+    TmpMat.mat12 = MUL_FIXED(m1->mat12, m2->mat11);
+    TmpMat.mat12 += MUL_FIXED(m1->mat22, m2->mat12);
+    TmpMat.mat12 += MUL_FIXED(m1->mat32, m2->mat13);
 
-	TmpMat.mat13=MUL_FIXED(m1->mat13,m2->mat11);
-	TmpMat.mat13+=MUL_FIXED(m1->mat23,m2->mat12);
-	TmpMat.mat13+=MUL_FIXED(m1->mat33,m2->mat13);
+    /* m13'' = c3.r1' */
 
-/* m21'' = c1.r2' */
+    TmpMat.mat13 = MUL_FIXED(m1->mat13, m2->mat11);
+    TmpMat.mat13 += MUL_FIXED(m1->mat23, m2->mat12);
+    TmpMat.mat13 += MUL_FIXED(m1->mat33, m2->mat13);
 
-	TmpMat.mat21=MUL_FIXED(m1->mat11,m2->mat21);
-	TmpMat.mat21+=MUL_FIXED(m1->mat21,m2->mat22);
-	TmpMat.mat21+=MUL_FIXED(m1->mat31,m2->mat23);
+    /* m21'' = c1.r2' */
 
-/* m22'' = c2.r2' */
+    TmpMat.mat21 = MUL_FIXED(m1->mat11, m2->mat21);
+    TmpMat.mat21 += MUL_FIXED(m1->mat21, m2->mat22);
+    TmpMat.mat21 += MUL_FIXED(m1->mat31, m2->mat23);
 
-	TmpMat.mat22=MUL_FIXED(m1->mat12,m2->mat21);
-	TmpMat.mat22+=MUL_FIXED(m1->mat22,m2->mat22);
-	TmpMat.mat22+=MUL_FIXED(m1->mat32,m2->mat23);
+    /* m22'' = c2.r2' */
 
-/* m23'' = c3.r2' */
+    TmpMat.mat22 = MUL_FIXED(m1->mat12, m2->mat21);
+    TmpMat.mat22 += MUL_FIXED(m1->mat22, m2->mat22);
+    TmpMat.mat22 += MUL_FIXED(m1->mat32, m2->mat23);
 
-	TmpMat.mat23=MUL_FIXED(m1->mat13,m2->mat21);
-	TmpMat.mat23+=MUL_FIXED(m1->mat23,m2->mat22);
-	TmpMat.mat23+=MUL_FIXED(m1->mat33,m2->mat23);
+    /* m23'' = c3.r2' */
 
-/* m31'' = c1.r3' */
+    TmpMat.mat23 = MUL_FIXED(m1->mat13, m2->mat21);
+    TmpMat.mat23 += MUL_FIXED(m1->mat23, m2->mat22);
+    TmpMat.mat23 += MUL_FIXED(m1->mat33, m2->mat23);
 
-	TmpMat.mat31=MUL_FIXED(m1->mat11,m2->mat31);
-	TmpMat.mat31+=MUL_FIXED(m1->mat21,m2->mat32);
-	TmpMat.mat31+=MUL_FIXED(m1->mat31,m2->mat33);
+    /* m31'' = c1.r3' */
 
-/* m32'' = c2.r3' */
+    TmpMat.mat31 = MUL_FIXED(m1->mat11, m2->mat31);
+    TmpMat.mat31 += MUL_FIXED(m1->mat21, m2->mat32);
+    TmpMat.mat31 += MUL_FIXED(m1->mat31, m2->mat33);
 
-	TmpMat.mat32=MUL_FIXED(m1->mat12,m2->mat31);
-	TmpMat.mat32+=MUL_FIXED(m1->mat22,m2->mat32);
-	TmpMat.mat32+=MUL_FIXED(m1->mat32,m2->mat33);
+    /* m32'' = c2.r3' */
 
-/* m33'' = c3.r3' */
+    TmpMat.mat32 = MUL_FIXED(m1->mat12, m2->mat31);
+    TmpMat.mat32 += MUL_FIXED(m1->mat22, m2->mat32);
+    TmpMat.mat32 += MUL_FIXED(m1->mat32, m2->mat33);
 
-	TmpMat.mat33=MUL_FIXED(m1->mat13,m2->mat31);
-	TmpMat.mat33+=MUL_FIXED(m1->mat23,m2->mat32);
-	TmpMat.mat33+=MUL_FIXED(m1->mat33,m2->mat33);
+    /* m33'' = c3.r3' */
 
-/* Finally, copy TmpMat to m3 */
+    TmpMat.mat33 = MUL_FIXED(m1->mat13, m2->mat31);
+    TmpMat.mat33 += MUL_FIXED(m1->mat23, m2->mat32);
+    TmpMat.mat33 += MUL_FIXED(m1->mat33, m2->mat33);
 
-	CopyMatrix(&TmpMat, m3);
+    /* Finally, copy TmpMat to m3 */
+
+    CopyMatrix(&TmpMat, m3);
 }
-
 
 /*
 
@@ -565,23 +497,20 @@ void MatrixMultiply(struct matrixch *m1, struct matrixch *m2, struct matrixch *m
 void TransposeMatrixCH(MATRIXCH *m1)
 
 {
+    int t;
 
-	int t;
+    t = m1->mat12;
+    m1->mat12 = m1->mat21;
+    m1->mat21 = t;
 
-	t=m1->mat12;
-	m1->mat12=m1->mat21;
-	m1->mat21=t;
+    t = m1->mat13;
+    m1->mat13 = m1->mat31;
+    m1->mat31 = t;
 
-	t=m1->mat13;
-	m1->mat13=m1->mat31;
-	m1->mat31=t;
-
-	t=m1->mat23;
-	m1->mat23=m1->mat32;
-	m1->mat32=t;
-
+    t = m1->mat23;
+    m1->mat23 = m1->mat32;
+    m1->mat32 = t;
 }
-
 
 /*
 
@@ -592,15 +521,12 @@ void TransposeMatrixCH(MATRIXCH *m1)
 void CopyVector(VECTORCH *v1, VECTORCH *v2)
 
 {
+    /* Copy VECTORCH v1 -> VECTORCH v2 */
 
-/* Copy VECTORCH v1 -> VECTORCH v2 */
-
-	v2->vx=v1->vx;
-	v2->vy=v1->vy;
-	v2->vz=v1->vz;
-
+    v2->vx = v1->vx;
+    v2->vy = v1->vy;
+    v2->vz = v1->vz;
 }
-
 
 /*
 
@@ -611,18 +537,12 @@ void CopyVector(VECTORCH *v1, VECTORCH *v2)
 void CopyLocation(VECTORCH *v1, VECTORCH *v2)
 
 {
+    /* Copy VECTORCH v1 -> VECTORCH v2 */
 
-/* Copy VECTORCH v1 -> VECTORCH v2 */
-
-	v2->vx=v1->vx;
-	v2->vy=v1->vy;
-	v2->vz=v1->vz;
-
+    v2->vx = v1->vx;
+    v2->vy = v1->vy;
+    v2->vz = v1->vz;
 }
-
-
-
-
 
 /*
 
@@ -633,15 +553,12 @@ void CopyLocation(VECTORCH *v1, VECTORCH *v2)
 void CopyEuler(EULER *e1, EULER *e2)
 
 {
+    /* Copy EULER e1 -> EULER e2 */
 
-/* Copy EULER e1 -> EULER e2 */
-
-	e2->EulerX=e1->EulerX;
-	e2->EulerY=e1->EulerY;
-	e2->EulerZ=e1->EulerZ;
-
+    e2->EulerX = e1->EulerX;
+    e2->EulerY = e1->EulerY;
+    e2->EulerZ = e1->EulerZ;
 }
-
 
 /*
 
@@ -652,23 +569,20 @@ void CopyEuler(EULER *e1, EULER *e2)
 void CopyMatrix(MATRIXCH *m1, MATRIXCH *m2)
 
 {
+    /* Copy MATRIXCH m1 -> MATRIXCH m2 */
 
-/* Copy MATRIXCH m1 -> MATRIXCH m2 */
+    m2->mat11 = m1->mat11;
+    m2->mat12 = m1->mat12;
+    m2->mat13 = m1->mat13;
 
-	m2->mat11=m1->mat11;
-	m2->mat12=m1->mat12;
-	m2->mat13=m1->mat13;
+    m2->mat21 = m1->mat21;
+    m2->mat22 = m1->mat22;
+    m2->mat23 = m1->mat23;
 
-	m2->mat21=m1->mat21;
-	m2->mat22=m1->mat22;
-	m2->mat23=m1->mat23;
-
-	m2->mat31=m1->mat31;
-	m2->mat32=m1->mat32;
-	m2->mat33=m1->mat33;
-
+    m2->mat31 = m1->mat31;
+    m2->mat32 = m1->mat32;
+    m2->mat33 = m1->mat33;
 }
-
 
 /*
 
@@ -681,13 +595,10 @@ void CopyMatrix(MATRIXCH *m1, MATRIXCH *m2)
 void MakeVector(VECTORCH *v1, VECTORCH *v2, VECTORCH *v3)
 
 {
-
-	v3->vx = v1->vx - v2->vx;
-	v3->vy = v1->vy - v2->vy;
-	v3->vz = v1->vz - v2->vz;
-
+    v3->vx = v1->vx - v2->vx;
+    v3->vy = v1->vy - v2->vy;
+    v3->vz = v1->vz - v2->vz;
 }
-
 
 /*
 
@@ -700,13 +611,10 @@ void MakeVector(VECTORCH *v1, VECTORCH *v2, VECTORCH *v3)
 void AddVector(VECTORCH *v1, VECTORCH *v2)
 
 {
-
-	v2->vx += v1->vx;
-	v2->vy += v1->vy;
-	v2->vz += v1->vz;
-
+    v2->vx += v1->vx;
+    v2->vy += v1->vy;
+    v2->vz += v1->vz;
 }
-
 
 /*
 
@@ -719,14 +627,10 @@ void AddVector(VECTORCH *v1, VECTORCH *v2)
 void SubVector(VECTORCH *v1, VECTORCH *v2)
 
 {
-
-	v2->vx -= v1->vx;
-	v2->vy -= v1->vy;
-	v2->vz -= v1->vz;
-
+    v2->vx -= v1->vx;
+    v2->vy -= v1->vy;
+    v2->vz -= v1->vz;
 }
-
-
 
 /*
 
@@ -740,29 +644,26 @@ void SubVector(VECTORCH *v1, VECTORCH *v2)
 
 */
 
-void _RotateVector(VECTORCH *v, MATRIXCH*  m)
+void _RotateVector(VECTORCH *v, MATRIXCH *m)
 {
+    int x, y, z;
 
-	int x, y, z;
-	
+    x = MUL_FIXED(m->mat11, v->vx);
+    x += MUL_FIXED(m->mat21, v->vy);
+    x += MUL_FIXED(m->mat31, v->vz);
 
-	x =  MUL_FIXED(m->mat11, v->vx);
-	x += MUL_FIXED(m->mat21, v->vy);
-	x += MUL_FIXED(m->mat31, v->vz);
+    y = MUL_FIXED(m->mat12, v->vx);
+    y += MUL_FIXED(m->mat22, v->vy);
+    y += MUL_FIXED(m->mat32, v->vz);
 
-	y  = MUL_FIXED(m->mat12, v->vx);
-	y += MUL_FIXED(m->mat22, v->vy);
-	y += MUL_FIXED(m->mat32, v->vz);
+    z = MUL_FIXED(m->mat13, v->vx);
+    z += MUL_FIXED(m->mat23, v->vy);
+    z += MUL_FIXED(m->mat33, v->vz);
 
-	z  = MUL_FIXED(m->mat13, v->vx);
-	z += MUL_FIXED(m->mat23, v->vy);
-	z += MUL_FIXED(m->mat33, v->vz);
-
-	v->vx = x;
-	v->vy = y;
-	v->vz = z;
+    v->vx = x;
+    v->vy = y;
+    v->vz = z;
 }
-
 
 /*
 
@@ -778,22 +679,18 @@ void _RotateVector(VECTORCH *v, MATRIXCH*  m)
 void _RotateAndCopyVector(VECTORCH *v1, VECTORCH *v2, MATRIXCH *m)
 
 {
+    v2->vx = MUL_FIXED(m->mat11, v1->vx);
+    v2->vx += MUL_FIXED(m->mat21, v1->vy);
+    v2->vx += MUL_FIXED(m->mat31, v1->vz);
 
-	v2->vx=MUL_FIXED(m->mat11,v1->vx);
-	v2->vx+=MUL_FIXED(m->mat21,v1->vy);
-	v2->vx+=MUL_FIXED(m->mat31,v1->vz);
+    v2->vy = MUL_FIXED(m->mat12, v1->vx);
+    v2->vy += MUL_FIXED(m->mat22, v1->vy);
+    v2->vy += MUL_FIXED(m->mat32, v1->vz);
 
-	v2->vy=MUL_FIXED(m->mat12,v1->vx);
-	v2->vy+=MUL_FIXED(m->mat22,v1->vy);
-	v2->vy+=MUL_FIXED(m->mat32,v1->vz);
-
-	v2->vz=MUL_FIXED(m->mat13,v1->vx);
-	v2->vz+=MUL_FIXED(m->mat23,v1->vy);
-	v2->vz+=MUL_FIXED(m->mat33,v1->vz);
-
+    v2->vz = MUL_FIXED(m->mat13, v1->vx);
+    v2->vz += MUL_FIXED(m->mat23, v1->vy);
+    v2->vz += MUL_FIXED(m->mat33, v1->vz);
 }
-
-
 
 /*
 
@@ -820,534 +717,488 @@ void _RotateAndCopyVector(VECTORCH *v1, VECTORCH *v2, MATRIXCH *m)
 
 */
 
-
 #define m2e_scale 2
 #define ONE_FIXED_S ((ONE_FIXED >> m2e_scale) - 1)
 #define m2e_shift 14
 
 #define j_and_r_change Yes
 
-
 void MatrixToEuler(MATRIXCH *m, EULER *e)
 
 {
+    int x, sinx, cosx, siny, cosy, sinz, cosz;
+    int abs_cosx, abs_cosy, abs_cosz;
+    int SineMatrixPitch, SineMatrixYaw, SineMatrixRoll;
+    int CosMatrixPitch, CosMatrixYaw, CosMatrixRoll;
 
-	int x, sinx, cosx, siny, cosy, sinz, cosz;
-	int abs_cosx, abs_cosy, abs_cosz;
-	int SineMatrixPitch, SineMatrixYaw, SineMatrixRoll;
-	int CosMatrixPitch, CosMatrixYaw, CosMatrixRoll;
-
-
-
-
-	#if 0
+#if 0
 	textprint("CosMatrixPitch = %d\n", CosMatrixPitch);
 	/* WaitForReturn(); */
-	#endif
+#endif
 
+    if (m->mat32 > -65500 && m->mat32 < 65500) {
+        /* Yaw */
 
-	if(m->mat32 >-65500 && m->mat32<65500)
-	{
-			/* Yaw */
+        /* Pitch */
 
-		/* Pitch */
+#if j_and_r_change
+        SineMatrixPitch = -m->mat32;
+#else
+        SineMatrixPitch = -m->mat23;
+#endif
 
-		#if j_and_r_change
-		SineMatrixPitch = -m->mat32;
-		#else
-		SineMatrixPitch = -m->mat23;
-		#endif
+        SineMatrixPitch >>= m2e_scale;
 
-		SineMatrixPitch >>= m2e_scale;
-
-		#if 0
+#if 0
 		textprint("SineMatrixPitch = %d\n", SineMatrixPitch);
 		/* WaitForReturn(); */
-		#endif
+#endif
 
-		CosMatrixPitch = SineMatrixPitch * SineMatrixPitch;
-		CosMatrixPitch >>= m2e_shift;
+        CosMatrixPitch = SineMatrixPitch * SineMatrixPitch;
+        CosMatrixPitch >>= m2e_shift;
 
-		CosMatrixPitch = -CosMatrixPitch;
-		CosMatrixPitch += ONE_FIXED_S;
-		CosMatrixPitch *= ONE_FIXED_S;
-		CosMatrixPitch = SqRoot32(CosMatrixPitch);
+        CosMatrixPitch = -CosMatrixPitch;
+        CosMatrixPitch += ONE_FIXED_S;
+        CosMatrixPitch *= ONE_FIXED_S;
+        CosMatrixPitch = SqRoot32(CosMatrixPitch);
 
-		if(CosMatrixPitch) {
+        if (CosMatrixPitch) {
+            if (CosMatrixPitch > ONE_FIXED_S)
+                CosMatrixPitch = ONE_FIXED_S;
+            else if (CosMatrixPitch < -ONE_FIXED_S)
+                CosMatrixPitch = -ONE_FIXED_S;
 
-			if(CosMatrixPitch > ONE_FIXED_S) CosMatrixPitch = ONE_FIXED_S;
-			else if(CosMatrixPitch < -ONE_FIXED_S) CosMatrixPitch = -ONE_FIXED_S;
+        }
 
-		}
+        else
+            CosMatrixPitch = 1;
 
-		else CosMatrixPitch = 1;
+        SineMatrixYaw = WideMulNarrowDiv(
+#if j_and_r_change
+            m->mat31 >> m2e_scale, ONE_FIXED_S, CosMatrixPitch);
+#else
+            m->mat13 >> m2e_scale, ONE_FIXED_S, CosMatrixPitch);
+#endif
 
-		SineMatrixYaw = WideMulNarrowDiv(
-			#if j_and_r_change
-			m->mat31 >> m2e_scale, ONE_FIXED_S, CosMatrixPitch);
-			#else
-			m->mat13 >> m2e_scale, ONE_FIXED_S, CosMatrixPitch);
-			#endif
-
-		#if 0
+#if 0
 		textprint("SineMatrixYaw = %d\n", SineMatrixYaw);
 		/* WaitForReturn(); */
-		#endif
+#endif
 
-		CosMatrixYaw = WideMulNarrowDiv(
-			m->mat33 >> m2e_scale, ONE_FIXED_S, CosMatrixPitch);
+        CosMatrixYaw = WideMulNarrowDiv(m->mat33 >> m2e_scale, ONE_FIXED_S, CosMatrixPitch);
 
-		#if 0
+#if 0
 		textprint("CosMatrixYaw = %d\n", CosMatrixYaw);
 		/* WaitForReturn(); */
-		#endif
+#endif
 
+        /* Roll */
 
-		/* Roll */
+        SineMatrixRoll = WideMulNarrowDiv(
+#if j_and_r_change
+            m->mat12 >> m2e_scale, ONE_FIXED_S, CosMatrixPitch);
+#else
+            m->mat21 >> m2e_scale, ONE_FIXED_S, CosMatrixPitch);
+#endif
 
-		SineMatrixRoll = WideMulNarrowDiv(
-			#if j_and_r_change
-			m->mat12 >> m2e_scale, ONE_FIXED_S, CosMatrixPitch);
-			#else
-			m->mat21 >> m2e_scale, ONE_FIXED_S, CosMatrixPitch);
-			#endif
-
-		#if 0
+#if 0
 		textprint("SineMatrixRoll = %d\n", SineMatrixRoll);
 		/* WaitForReturn(); */
-		#endif
+#endif
 
-		CosMatrixRoll = WideMulNarrowDiv(
-			m->mat22 >> m2e_scale, ONE_FIXED_S, CosMatrixPitch);
+        CosMatrixRoll = WideMulNarrowDiv(m->mat22 >> m2e_scale, ONE_FIXED_S, CosMatrixPitch);
 
-		#if 0
+#if 0
 		textprint("CosMatrixRoll = %d\n", CosMatrixRoll);
 		/* WaitForReturn(); */
-		#endif
-	
-		/* Tables are for values +- 2^16 */
+#endif
 
-		sinx = SineMatrixPitch << m2e_scale;
-		siny = SineMatrixYaw   << m2e_scale;
-		sinz = SineMatrixRoll  << m2e_scale;
+        /* Tables are for values +- 2^16 */
 
-		cosx = CosMatrixPitch << m2e_scale;
-		cosy = CosMatrixYaw   << m2e_scale;
-		cosz = CosMatrixRoll  << m2e_scale;
+        sinx = SineMatrixPitch << m2e_scale;
+        siny = SineMatrixYaw << m2e_scale;
+        sinz = SineMatrixRoll << m2e_scale;
 
-		#if 0
+        cosx = CosMatrixPitch << m2e_scale;
+        cosy = CosMatrixYaw << m2e_scale;
+        cosz = CosMatrixRoll << m2e_scale;
+
+#if 0
 		textprint("sines = %d, %d, %d\n", sinx, siny, sinz);
 		textprint("cos's = %d, %d, %d\n", cosx, cosy, cosz);
 		/* WaitForReturn(); */
-		#endif
+#endif
 
-		/* Absolute Cosines */
+        /* Absolute Cosines */
 
-		abs_cosx = cosx;
-		if(abs_cosx < 0) abs_cosx = -abs_cosx;
+        abs_cosx = cosx;
+        if (abs_cosx < 0)
+            abs_cosx = -abs_cosx;
 
-		abs_cosy = cosy;
-		if(abs_cosy < 0) abs_cosy = -abs_cosy;
+        abs_cosy = cosy;
+        if (abs_cosy < 0)
+            abs_cosy = -abs_cosy;
 
-		abs_cosz = cosz;
-		if(abs_cosz < 0) abs_cosz = -abs_cosz;
+        abs_cosz = cosz;
+        if (abs_cosz < 0)
+            abs_cosz = -abs_cosz;
 
+        /* Euler X */
 
-		/* Euler X */
+        if (abs_cosx > Cosine45) {
+            x = ArcSin(sinx);
 
-		if(abs_cosx > Cosine45) {
+            if (cosx < 0) {
+                x = -x;
+                x += deg180;
+                x &= wrap360;
+            }
+        }
 
-			x = ArcSin(sinx);
+        else {
+            x = ArcCos(cosx);
 
-			if(cosx < 0) {
-				x =  -x;
-				x += deg180;
-				x &= wrap360;
-			}
-		}
+            if (sinx < 0) {
+                x = -x;
+                x &= wrap360;
+            }
+        }
 
-		else {
+#if (j_and_r_change == No)
+        x = -x;
+        x &= wrap360;
+#endif
 
-			x = ArcCos(cosx);
+        e->EulerX = x;
 
-			if(sinx < 0) {
-				x =  -x;
-				x &= wrap360;			
-			}
-		}
+        /* Euler Y */
 
-		#if (j_and_r_change == No)
-		x = -x;
-		x &= wrap360;
-		#endif
+        if (abs_cosy > Cosine45) {
+            x = ArcSin(siny);
 
-		e->EulerX = x;
+            if (cosy < 0) {
+                x = -x;
+                x += deg180;
+                x &= wrap360;
+            }
 
+        }
 
-		/* Euler Y */
+        else {
+            x = ArcCos(cosy);
 
-		if(abs_cosy > Cosine45) {
+            if (siny < 0) {
+                x = -x;
+                x &= wrap360;
+            }
+        }
 
-			x = ArcSin(siny);
+#if (j_and_r_change == No)
+        x = -x;
+        x &= wrap360;
+#endif
 
-			if(cosy < 0) {
-				x =  -x;
-				x += deg180;
-				x &= wrap360;
-			}
+        e->EulerY = x;
 
-		}
+        /* Euler Z */
 
-		else {
+        if (abs_cosz > Cosine45) {
+            x = ArcSin(sinz);
 
-			x = ArcCos(cosy);
+            if (cosz < 0) {
+                x = -x;
+                x += deg180;
+                x &= wrap360;
+            }
+        }
 
-			if(siny < 0) {
-				x =  -x;
-				x &= wrap360;			
-			}
+        else {
+            x = ArcCos(cosz);
 
-		}
+            if (sinz < 0) {
+                x = -x;
+                x &= wrap360;
+            }
+        }
 
-		#if (j_and_r_change == No)
-		x = -x;
-		x &= wrap360;
-		#endif
+#if (j_and_r_change == No)
+        x = -x;
+        x &= wrap360;
+#endif
 
-		e->EulerY = x;
+        e->EulerZ = x;
+    } else //singularity case
+    {
+        if (m->mat32 > 0)
+            e->EulerX = 3072;
+        else
+            e->EulerX = 1024;
 
+        e->EulerZ = 0;
 
-		/* Euler Z */
+        /* Yaw */
 
-		if(abs_cosz > Cosine45) {
+        siny = -m->mat13;
 
-			x = ArcSin(sinz);
+        cosy = m->mat11;
 
-			if(cosz < 0) {
-				x =  -x;
-				x += deg180;
-				x &= wrap360;
-			}
-		}
+        abs_cosy = cosy;
+        if (abs_cosy < 0)
+            abs_cosy = -abs_cosy;
 
-		else {
+        if (abs_cosy > Cosine45) {
+            x = ArcSin(siny);
 
-			x = ArcCos(cosz);
+            if (cosy < 0) {
+                x = -x;
+                x += deg180;
+                x &= wrap360;
+            }
 
-			if(sinz < 0) {
-				x =  -x;
-				x &= wrap360;			
-			}
-		}
+        }
 
-		#if (j_and_r_change == No)
-		x =  -x;
-		x &= wrap360;
-		#endif
+        else {
+            x = ArcCos(cosy);
 
-		e->EulerZ = x;
-	}
-	else //singularity case
-	{
+            if (siny < 0) {
+                x = -x;
+                x &= wrap360;
+            }
+        }
 
-		if(m->mat32>0)
-			e->EulerX = 3072;
-		else
-			e->EulerX = 1024;
-		
-		e->EulerZ=0;
+#if (j_and_r_change == No)
+        x = -x;
+        x &= wrap360;
+#endif
 
+        e->EulerY = x;
+    }
 
-		
-		/* Yaw */
-		
-		siny = -m->mat13 ;
-
-		cosy = 	m->mat11 ;
-
-		abs_cosy = cosy;
-		if(abs_cosy < 0) abs_cosy = -abs_cosy;
-
-
-		if(abs_cosy > Cosine45) {
-
-			x = ArcSin(siny);
-
-			if(cosy < 0) {
-				x =  -x;
-				x += deg180;
-				x &= wrap360;
-			}
-
-		}
-
-		else {
-
-			x = ArcCos(cosy);
-
-			if(siny < 0) {
-				x =  -x;
-				x &= wrap360;			
-			}
-
-		}
-
-		#if (j_and_r_change == No)
-		x = -x;
-		x &= wrap360;
-		#endif
-
-		e->EulerY = x;
-
-	}
-
-
-
-
-	#if 0
+#if 0
 	textprint("\nEuler from VDB Matrix is:\n%d\n%d\n%d\n",
 	e->EulerX,
 	e->EulerY,
 	e->EulerZ
 	);
 	/* WaitForReturn(); */
-	#endif
-
+#endif
 }
-
 
 #define j_and_r_change_2 Yes
 
 void MatrixToEuler2(MATRIXCH *m, EULER *e)
 
 {
+    int x, sinx, cosx, siny, cosy, sinz, cosz;
+    int abs_cosx, abs_cosy, abs_cosz;
+    int SineMatrixPitch, SineMatrixYaw, SineMatrixRoll;
+    int CosMatrixPitch, CosMatrixYaw, CosMatrixRoll;
 
-	int x, sinx, cosx, siny, cosy, sinz, cosz;
-	int abs_cosx, abs_cosy, abs_cosz;
-	int SineMatrixPitch, SineMatrixYaw, SineMatrixRoll;
-	int CosMatrixPitch, CosMatrixYaw, CosMatrixRoll;
+    /* Pitch */
 
+#if j_and_r_change_2
+    SineMatrixPitch = -m->mat32;
+#else
+    SineMatrixPitch = -m->mat23;
+#endif
 
-	/* Pitch */
+    SineMatrixPitch >>= m2e_scale;
 
-	#if j_and_r_change_2
-	SineMatrixPitch = -m->mat32;
-	#else
-	SineMatrixPitch = -m->mat23;
-	#endif
-
-	SineMatrixPitch >>= m2e_scale;
-
-	#if 0
+#if 0
 	textprint("SineMatrixPitch = %d\n", SineMatrixPitch);
 	/* WaitForReturn(); */
-	#endif
+#endif
 
-	CosMatrixPitch = SineMatrixPitch * SineMatrixPitch;
-	CosMatrixPitch >>= m2e_shift;
+    CosMatrixPitch = SineMatrixPitch * SineMatrixPitch;
+    CosMatrixPitch >>= m2e_shift;
 
-	CosMatrixPitch = -CosMatrixPitch;
-	CosMatrixPitch += ONE_FIXED_S;
-	CosMatrixPitch *= ONE_FIXED_S;
-	CosMatrixPitch = SqRoot32(CosMatrixPitch);
+    CosMatrixPitch = -CosMatrixPitch;
+    CosMatrixPitch += ONE_FIXED_S;
+    CosMatrixPitch *= ONE_FIXED_S;
+    CosMatrixPitch = SqRoot32(CosMatrixPitch);
 
-	if(CosMatrixPitch) {
+    if (CosMatrixPitch) {
+        if (CosMatrixPitch > ONE_FIXED_S)
+            CosMatrixPitch = ONE_FIXED_S;
+        else if (CosMatrixPitch < -ONE_FIXED_S)
+            CosMatrixPitch = -ONE_FIXED_S;
 
-		if(CosMatrixPitch > ONE_FIXED_S) CosMatrixPitch = ONE_FIXED_S;
-		else if(CosMatrixPitch < -ONE_FIXED_S) CosMatrixPitch = -ONE_FIXED_S;
+    }
 
-	}
+    else
+        CosMatrixPitch = 1;
 
-	else CosMatrixPitch = 1;
-
-
-	#if 0
+#if 0
 	textprint("CosMatrixPitch = %d\n", CosMatrixPitch);
 	/* WaitForReturn(); */
-	#endif
+#endif
 
+    /* Yaw */
 
-	/* Yaw */
+    SineMatrixYaw = WideMulNarrowDiv(
+#if j_and_r_change_2
+        m->mat31 >> m2e_scale, ONE_FIXED_S, CosMatrixPitch);
+#else
+        m->mat13 >> m2e_scale, ONE_FIXED_S, CosMatrixPitch);
+#endif
 
-	SineMatrixYaw = WideMulNarrowDiv(
-		#if j_and_r_change_2
-		m->mat31 >> m2e_scale, ONE_FIXED_S, CosMatrixPitch);
-		#else
-		m->mat13 >> m2e_scale, ONE_FIXED_S, CosMatrixPitch);
-		#endif
-
-	#if 0
+#if 0
 	textprint("SineMatrixYaw = %d\n", SineMatrixYaw);
 	/* WaitForReturn(); */
-	#endif
+#endif
 
-	CosMatrixYaw = WideMulNarrowDiv(
-		m->mat33 >> m2e_scale, ONE_FIXED_S, CosMatrixPitch);
+    CosMatrixYaw = WideMulNarrowDiv(m->mat33 >> m2e_scale, ONE_FIXED_S, CosMatrixPitch);
 
-	#if 0
+#if 0
 	textprint("CosMatrixYaw = %d\n", CosMatrixYaw);
 	/* WaitForReturn(); */
-	#endif
+#endif
 
+    /* Roll */
 
-	/* Roll */
+    SineMatrixRoll = WideMulNarrowDiv(
+#if j_and_r_change_2
+        m->mat12 >> m2e_scale, ONE_FIXED_S, CosMatrixPitch);
+#else
+        m->mat21 >> m2e_scale, ONE_FIXED_S, CosMatrixPitch);
+#endif
 
-	SineMatrixRoll = WideMulNarrowDiv(
-		#if j_and_r_change_2
-		m->mat12 >> m2e_scale, ONE_FIXED_S, CosMatrixPitch);
-		#else
-		m->mat21 >> m2e_scale, ONE_FIXED_S, CosMatrixPitch);
-		#endif
-
-	#if 0
+#if 0
 	textprint("SineMatrixRoll = %d\n", SineMatrixRoll);
 	/* WaitForReturn(); */
-	#endif
+#endif
 
-	CosMatrixRoll = WideMulNarrowDiv(
-		m->mat22 >> m2e_scale, ONE_FIXED_S, CosMatrixPitch);
+    CosMatrixRoll = WideMulNarrowDiv(m->mat22 >> m2e_scale, ONE_FIXED_S, CosMatrixPitch);
 
-	#if 0
+#if 0
 	textprint("CosMatrixRoll = %d\n", CosMatrixRoll);
 	/* WaitForReturn(); */
-	#endif
+#endif
 
+    /* Tables are for values +- 2^16 */
 
-	/* Tables are for values +- 2^16 */
+    sinx = SineMatrixPitch << m2e_scale;
+    siny = SineMatrixYaw << m2e_scale;
+    sinz = SineMatrixRoll << m2e_scale;
 
-	sinx = SineMatrixPitch << m2e_scale;
-	siny = SineMatrixYaw   << m2e_scale;
-	sinz = SineMatrixRoll  << m2e_scale;
+    cosx = CosMatrixPitch << m2e_scale;
+    cosy = CosMatrixYaw << m2e_scale;
+    cosz = CosMatrixRoll << m2e_scale;
 
-	cosx = CosMatrixPitch << m2e_scale;
-	cosy = CosMatrixYaw   << m2e_scale;
-	cosz = CosMatrixRoll  << m2e_scale;
-
-	#if 0
+#if 0
 	textprint("sines = %d, %d, %d\n", sinx, siny, sinz);
 	textprint("cos's = %d, %d, %d\n", cosx, cosy, cosz);
 	/* WaitForReturn(); */
-	#endif
+#endif
 
-	/* Absolute Cosines */
+    /* Absolute Cosines */
 
-	abs_cosx = cosx;
-	if(abs_cosx < 0) abs_cosx = -abs_cosx;
+    abs_cosx = cosx;
+    if (abs_cosx < 0)
+        abs_cosx = -abs_cosx;
 
-	abs_cosy = cosy;
-	if(abs_cosy < 0) abs_cosy = -abs_cosy;
+    abs_cosy = cosy;
+    if (abs_cosy < 0)
+        abs_cosy = -abs_cosy;
 
-	abs_cosz = cosz;
-	if(abs_cosz < 0) abs_cosz = -abs_cosz;
+    abs_cosz = cosz;
+    if (abs_cosz < 0)
+        abs_cosz = -abs_cosz;
 
+    /* Euler X */
 
-	/* Euler X */
+    if (abs_cosx > Cosine45) {
+        x = ArcSin(sinx);
 
-	if(abs_cosx > Cosine45) {
+        if (cosx < 0) {
+            x = -x;
+            x += deg180;
+            x &= wrap360;
+        }
+    }
 
-		x = ArcSin(sinx);
+    else {
+        x = ArcCos(cosx);
 
-		if(cosx < 0) {
-			x =  -x;
-			x += deg180;
-			x &= wrap360;
-		}
-	}
+        if (sinx < 0) {
+            x = -x;
+            x &= wrap360;
+        }
+    }
 
-	else {
+#if (j_and_r_change_2 == No)
+    x = -x;
+    x &= wrap360;
+#endif
 
-		x = ArcCos(cosx);
+    e->EulerX = x;
 
-		if(sinx < 0) {
-			x =  -x;
-			x &= wrap360;			
-		}
-	}
+    /* Euler Y */
 
-	#if (j_and_r_change_2 == No)
-	x = -x;
-	x &= wrap360;
-	#endif
+    if (abs_cosy > Cosine45) {
+        x = ArcSin(siny);
 
-	e->EulerX = x;
+        if (cosy < 0) {
+            x = -x;
+            x += deg180;
+            x &= wrap360;
+        }
 
+    }
 
-	/* Euler Y */
+    else {
+        x = ArcCos(cosy);
 
-	if(abs_cosy > Cosine45) {
+        if (siny < 0) {
+            x = -x;
+            x &= wrap360;
+        }
+    }
 
-		x = ArcSin(siny);
+#if (j_and_r_change_2 == No)
+    x = -x;
+    x &= wrap360;
+#endif
 
-		if(cosy < 0) {
-			x =  -x;
-			x += deg180;
-			x &= wrap360;
-		}
+    e->EulerY = x;
 
-	}
+    /* Euler Z */
 
-	else {
+    if (abs_cosz > Cosine45) {
+        x = ArcSin(sinz);
 
-		x = ArcCos(cosy);
+        if (cosz < 0) {
+            x = -x;
+            x += deg180;
+            x &= wrap360;
+        }
+    }
 
-		if(siny < 0) {
-			x =  -x;
-			x &= wrap360;			
-		}
+    else {
+        x = ArcCos(cosz);
 
-	}
+        if (sinz < 0) {
+            x = -x;
+            x &= wrap360;
+        }
+    }
 
-	#if (j_and_r_change_2 == No)
-	x = -x;
-	x &= wrap360;
-	#endif
+#if (j_and_r_change_2 == No)
+    x = -x;
+    x &= wrap360;
+#endif
 
-	e->EulerY = x;
+    e->EulerZ = x;
 
-
-	/* Euler Z */
-
-	if(abs_cosz > Cosine45) {
-
-		x = ArcSin(sinz);
-
-		if(cosz < 0) {
-			x =  -x;
-			x += deg180;
-			x &= wrap360;
-		}
-	}
-
-	else {
-
-		x = ArcCos(cosz);
-
-		if(sinz < 0) {
-			x =  -x;
-			x &= wrap360;			
-		}
-	}
-
-	#if (j_and_r_change_2 == No)
-	x =  -x;
-	x &= wrap360;
-	#endif
-
-	e->EulerZ = x;
-
-
-	#if 0
+#if 0
 	textprint("\nEuler from VDB Matrix is:\n%d\n%d\n%d\n",
 	e->EulerX,
 	e->EulerY,
 	e->EulerZ
 	);
 	/* WaitForReturn(); */
-	#endif
-
+#endif
 }
-
-
 
 /*
 
@@ -1362,35 +1213,32 @@ void MatrixToEuler2(MATRIXCH *m, EULER *e)
 void MNormalise(MATRIXCH *m)
 
 {
+    VECTORCH *x = (VECTORCH *) &m->mat11;
+    VECTORCH *y = (VECTORCH *) &m->mat21;
+    VECTORCH *z = (VECTORCH *) &m->mat31;
+    int dotxy = Dot(x, y);
+    int dotxz = Dot(x, z);
+    int dotyz = Dot(y, z);
+    VECTORCH *s;
+    VECTORCH *t;
+    VECTORCH u;
+    VECTORCH v;
+    VECTORCH zero = {0, 0, 0};
 
-	VECTORCH *x = (VECTORCH *) &m->mat11;
-	VECTORCH *y = (VECTORCH *) &m->mat21;
-	VECTORCH *z = (VECTORCH *) &m->mat31;
-	int dotxy = Dot(x, y);
-	int dotxz = Dot(x, z);
-	int dotyz = Dot(y, z);
-	VECTORCH *s;
-	VECTORCH *t;
-	VECTORCH u;
-	VECTORCH v;
-	VECTORCH zero = {0, 0, 0};
-
-
-	#if 0
+#if 0
 	textprint("dotxy = %d\n", dotxy);
 	textprint("dotxz = %d\n", dotxz);
 	textprint("dotyz = %d\n", dotyz);
-	#endif
+#endif
 
-	#if 0
+#if 0
 	/* TEST */
 	dotxy = 0;
 	dotxz = 0;
 	dotyz = 1;
-	#endif
+#endif
 
-
-	#if 0
+#if 0
 	textprint("%d	%d	%d\n",
 		x->vx,
 		x->vy,
@@ -1408,76 +1256,70 @@ void MNormalise(MATRIXCH *m)
 		z->vy,
 		z->vz
 	);
-	#endif
+#endif
 
+    /* Find the two vectors nearest 90ø */
 
-	/* Find the two vectors nearest 90ø */
+    if (dotxy > dotxz && dotxy > dotyz) {
+        /* xy are the closest to 90ø */
 
-	if(dotxy > dotxz && dotxy > dotyz) {
+        /*textprint("xy\n");*/
 
-		/* xy are the closest to 90ø */
+        s = x;
+        t = y;
 
-		/*textprint("xy\n");*/
+        MakeNormal(&zero, s, t, &u); /* Cross them for a new 3rd vector */
 
-		s = x;
-		t = y;
+        MakeNormal(&zero, s, &u, &v); /* Cross 1st & 3rd for a new 2nd */
+        v.vx = -v.vx;
+        v.vy = -v.vy;
+        v.vz = -v.vz;
 
-		MakeNormal(&zero, s, t, &u);		/* Cross them for a new 3rd vector */
+        CopyVector(&u, z);
+        CopyVector(&v, y);
 
-		MakeNormal(&zero, s, &u, &v);		/* Cross 1st & 3rd for a new 2nd */
-		v.vx = -v.vx;
-		v.vy = -v.vy;
-		v.vz = -v.vz;
+    }
 
-		CopyVector(&u, z);
-		CopyVector(&v, y);
+    else if (dotxz > dotxy && dotxz > dotyz) {
+        /* xz are the closest to 90ø */
 
-	}
+        /*textprint("xz\n");*/
 
-	else if(dotxz > dotxy && dotxz > dotyz) {
+        s = x;
+        t = z;
 
-		/* xz are the closest to 90ø */
+        MakeNormal(&zero, s, t, &u); /* Cross them for a new 3rd vector */
+        u.vx = -u.vx;
+        u.vy = -u.vy;
+        u.vz = -u.vz;
 
-		/*textprint("xz\n");*/
+        MakeNormal(&zero, s, &u, &v); /* Cross 1st & 3rd for a new 2nd */
 
-		s = x;
-		t = z;
+        CopyVector(&u, y);
+        CopyVector(&v, z);
 
-		MakeNormal(&zero, s, t, &u);		/* Cross them for a new 3rd vector */
-		u.vx = -u.vx;
-		u.vy = -u.vy;
-		u.vz = -u.vz;
+    }
 
-		MakeNormal(&zero, s, &u, &v);		/* Cross 1st & 3rd for a new 2nd */
+    else {
+        /* yz are the closest to 90ø */
 
-		CopyVector(&u, y);
-		CopyVector(&v, z);
+        /*textprint("yz\n");*/
 
-	}
+        s = y;
+        t = z;
 
-	else {
+        MakeNormal(&zero, s, t, &u); /* Cross them for a new 3rd vector */
 
-		/* yz are the closest to 90ø */
+        MakeNormal(&zero, s, &u, &v); /* Cross 1st & 3rd for a new 2nd */
+        v.vx = -v.vx;
+        v.vy = -v.vy;
+        v.vz = -v.vz;
 
-		/*textprint("yz\n");*/
+        CopyVector(&u, x);
+        CopyVector(&v, z);
+    }
 
-		s = y;
-		t = z;
-
-		MakeNormal(&zero, s, t, &u);		/* Cross them for a new 3rd vector */
-
-		MakeNormal(&zero, s, &u, &v);		/* Cross 1st & 3rd for a new 2nd */
-		v.vx = -v.vx;
-		v.vy = -v.vy;
-		v.vz = -v.vz;
-
-		CopyVector(&u, x);
-		CopyVector(&v, z);
-
-	}
-
-
-	#if 0
+#if 0
 	textprint("%d	%d	%d\n",
 		x->vx,
 		x->vy,
@@ -1495,21 +1337,16 @@ void MNormalise(MATRIXCH *m)
 		z->vy,
 		z->vz
 	);
-	#endif
+#endif
 
-	#if 0
+#if 0
 	textprint("mag. x = %d\n", Magnitude(x));
 	textprint("mag. y = %d\n", Magnitude(y));
 	textprint("mag. z = %d\n", Magnitude(z));
-	#endif
+#endif
 
-	/*WaitForReturn();*/
-
-
+    /*WaitForReturn();*/
 }
-
-
-
 
 /*
 
@@ -1537,23 +1374,22 @@ void MNormalise(MATRIXCH *m)
 int ArcCos(int c)
 
 {
+    short acos;
 
-	short acos;
+    if (c < (-(ONE_FIXED - 1)))
+        c = -(ONE_FIXED - 1);
+    else if (c > (ONE_FIXED - 1))
+        c = ONE_FIXED - 1;
 
-	if(c < (-(ONE_FIXED - 1))) c = -(ONE_FIXED - 1);
-	else if(c > (ONE_FIXED - 1)) c = ONE_FIXED - 1;
-
-	#if 0
+#if 0
 	c =  c >> 5;		/* -64k -> +64k becomes -2k -> +2k */
 	c += 2048;			/* -2k -> +2k becomes 0 -> 4k */
-	#endif
+#endif
 
-	acos = ArcCosTable[(c >> 5) + 2048];
+    acos = ArcCosTable[(c >> 5) + 2048];
 
-	return (int) (acos & wrap360);
-
+    return (int) (acos & wrap360);
 }
-
 
 /*
 
@@ -1581,24 +1417,22 @@ int ArcCos(int c)
 int ArcSin(int s)
 
 {
+    short asin;
 
-	short asin;
+    if (s < (-(ONE_FIXED - 1)))
+        s = -(ONE_FIXED - 1);
+    else if (s > (ONE_FIXED - 1))
+        s = ONE_FIXED - 1;
 
-
-	if(s < (-(ONE_FIXED - 1))) s = -(ONE_FIXED - 1);
-	else if(s > (ONE_FIXED - 1)) s = ONE_FIXED - 1;
-
-	#if 0
+#if 0
 	s =  s >> 5;		/* -64k -> +64k becomes -2k -> +2k */
 	s += 2048;			/* -2k -> +2k becomes 0 -> 4k */
-	#endif
+#endif
 
-	asin = ArcSineTable[(s >> 5) + 2048];
+    asin = ArcSineTable[(s >> 5) + 2048];
 
-	return (int) (asin & wrap360);
-
+    return (int) (asin & wrap360);
 }
-
 
 /*
 
@@ -1618,76 +1452,70 @@ int ArcSin(int s)
 int ArcTan(int height_x, int width_z)
 
 {
+    int abs_height_x, abs_width_z, angle, sign, signsame, temp;
 
-	int abs_height_x, abs_width_z, angle, sign, signsame, temp;
+    sign = 0;
 
-	sign=0;
+    if ((height_x < 0 && width_z < 0) || (height_x >= 0 && width_z >= 0))
+        signsame = Yes;
+    else
+        signsame = No;
 
-	if((height_x<0 && width_z<0) || (height_x>=0 && width_z>=0))
-		signsame=Yes;
-	else
-		signsame=No;
+    abs_height_x = height_x;
+    if (abs_height_x < 0)
+        abs_height_x = -abs_height_x;
 
-	abs_height_x=height_x;
-	if(abs_height_x<0) abs_height_x=-abs_height_x;
+    abs_width_z = width_z;
+    if (abs_width_z < 0)
+        abs_width_z = -abs_width_z;
 
-	abs_width_z=width_z;
-	if(abs_width_z<0) abs_width_z=-abs_width_z;
-
-/*
+    /*
 
  Find ATN
 
 */
 
-	if(width_z==0) angle=-deg90;
+    if (width_z == 0)
+        angle = -deg90;
 
-	else if(abs_width_z==abs_height_x)
-		angle=deg45;
+    else if (abs_width_z == abs_height_x)
+        angle = deg45;
 
-	else {
+    else {
+        if (abs_width_z > abs_height_x) {
+            temp = abs_width_z;
+            abs_width_z = abs_height_x;
+            abs_height_x = temp;
+            sign = -1;
+        }
 
-		if(abs_width_z>abs_height_x) {
-			temp=abs_width_z;
-			abs_width_z=abs_height_x;
-			abs_height_x=temp;
-			sign=-1;
-		}
+        if (abs_height_x != 0)
 
-		if(abs_height_x!=0)
+            /* angle = (abs_width_z << 8) / abs_height_x; */
 
-			/* angle = (abs_width_z << 8) / abs_height_x; */
+            angle = DIV_INT((abs_width_z << 8), abs_height_x);
 
+        else
+            angle = deg22pt5;
 
+        angle = ArcTanTable[angle];
 
-			angle = DIV_INT((abs_width_z << 8), abs_height_x);
+        if (sign >= 0) {
+            angle = -angle;
+            angle += deg90;
+        }
+    }
 
+    if (signsame == No)
+        angle = -angle;
 
+    if (width_z <= 0)
+        angle += deg180;
 
+    angle &= wrap360;
 
-
-		else
-			angle=deg22pt5;
-
-		angle=ArcTanTable[angle];
-
-		if(sign>=0) {
-			angle=-angle;
-			angle+=deg90;
-		}
-
-	}
-
-	if(signsame==No) angle=-angle;
-
-	if(width_z<=0) angle+=deg180;
-
-	angle&=wrap360;
-
-	return(angle);
-
+    return (angle);
 }
-
 
 /*
 
@@ -1698,50 +1526,37 @@ int ArcTan(int height_x, int width_z)
 void MatrixFromZVector(VECTORCH *v, MATRIXCH *m)
 
 {
+    VECTORCH XVector;
+    VECTORCH YVector;
 
-	VECTORCH XVector;
-	VECTORCH YVector;
+    VECTORCH zero = {0, 0, 0};
 
-	VECTORCH zero = {0, 0, 0};
+    XVector.vx = v->vz;
+    XVector.vy = 0;
+    XVector.vz = -v->vx;
 
+    Normalise(&XVector);
 
-	XVector.vx = v->vz;
-	XVector.vy = 0;
-	XVector.vz = -v->vx;
+    MakeNormal(&zero, &XVector, v, &YVector);
 
-	Normalise(&XVector);
+    m->mat11 = XVector.vx;
+    m->mat12 = XVector.vy;
+    m->mat13 = XVector.vz;
 
-	MakeNormal(&zero, &XVector, v, &YVector);
+    m->mat21 = -YVector.vx;
+    m->mat22 = -YVector.vy;
+    m->mat23 = -YVector.vz;
 
-	m->mat11 = XVector.vx;
-	m->mat12 = XVector.vy;
-	m->mat13 = XVector.vz;
-
-	m->mat21 = -YVector.vx;
-	m->mat22 = -YVector.vy;
-	m->mat23 = -YVector.vz;
-
-	m->mat31 = v->vx;
-	m->mat32 = v->vy;
-	m->mat33 = v->vz;
-
+    m->mat31 = v->vx;
+    m->mat32 = v->vy;
+    m->mat33 = v->vz;
 }
-
-
-
-
-
-
-
-
-
 
 /*
 
  Distance Functions
 
 */
-
 
 /*
 
@@ -1760,26 +1575,26 @@ void MatrixFromZVector(VECTORCH *v, MATRIXCH *m)
 int FandVD_Distance_2d(VECTOR2D *v0, VECTOR2D *v1)
 
 {
+    int max;
+    int d;
 
-	int max;
-	int d;
+    int dx = v1->vx - v0->vx;
+    int dy = v1->vy - v0->vy;
 
+    if (dx < 0)
+        dx = -dx;
+    if (dy < 0)
+        dy = -dy;
 
-	int dx = v1->vx - v0->vx;
-	int dy = v1->vy - v0->vy;
+    if (dx > dy)
+        max = dx;
+    else
+        max = dy;
 
-	if(dx < 0) dx = -dx;
-	if(dy < 0) dy = -dy;
+    d = (dx + dy + (max * 2));
 
-	if(dx > dy) max = dx;
-	else max = dy;
-
-	d = (dx + dy + (max * 2));
-
-	return d;
-
+    return d;
 }
-
 
 /*
 
@@ -1794,24 +1609,24 @@ int FandVD_Distance_2d(VECTOR2D *v0, VECTOR2D *v1)
 int FandVD_Distance_3d(VECTORCH *v0, VECTORCH *v1)
 
 {
+    int dxy, max;
 
-	int dxy, max;
+    int dz = v1->vz - v0->vz;
 
-	int dz = v1->vz - v0->vz;
+    if (dz < 0)
+        dz = -dz;
 
-	if(dz < 0) dz = -dz;
+    dz *= 3;
 
-	dz *= 3;
+    dxy = FandVD_Distance_2d((VECTOR2D *) v0, (VECTOR2D *) v1);
 
-	dxy = FandVD_Distance_2d((VECTOR2D *) v0, (VECTOR2D *) v1);
+    if (dxy > dz)
+        max = dxy;
+    else
+        max = dz;
 
-	if(dxy > dz) max = dxy;
-	else max = dz;
-
-	return (dxy + dz + (max * 2));
-
+    return (dxy + dz + (max * 2));
 }
-
 
 /*
 
@@ -1824,17 +1639,13 @@ int FandVD_Distance_3d(VECTORCH *v0, VECTORCH *v1)
 int NextLowPower2(int i)
 
 {
+    int n = 1;
 
-	int n = 1;
+    while (n <= i)
+        n <<= 1;
 
-
-	while(n <= i)
-		n <<= 1;
-
-	return n >> 1;
-
+    return n >> 1;
 }
-
 
 /*
 
@@ -1858,24 +1669,17 @@ int NextLowPower2(int i)
 void MakeVectorLocal(VECTORCH *v1, VECTORCH *v2, VECTORCH *v3, MATRIXCH *m)
 
 {
+    MATRIXCH transmat;
 
-	MATRIXCH transmat;
+    CopyMatrix(m, &transmat);
+    TransposeMatrixCH(&transmat);
 
+    v2->vx = v1->vx - v3->vx;
+    v2->vy = v1->vy - v3->vy;
+    v2->vz = v1->vz - v3->vz;
 
-	CopyMatrix(m, &transmat);
-	TransposeMatrixCH(&transmat);
-
-	v2->vx = v1->vx - v3->vx;
-	v2->vy = v1->vy - v3->vy;
-	v2->vz = v1->vz - v3->vz;
-
-	RotateVector(v2, &transmat);
-
+    RotateVector(v2, &transmat);
 }
-
-
-
-
 
 /*
 
@@ -1915,391 +1719,343 @@ void MakeVectorLocal(VECTORCH *v1, VECTORCH *v2, VECTORCH *v3, MATRIXCH *m)
 int PointInPolygon(int *point, int *polygon, int c, int ppsize)
 
 {
+#if UseTimsPinp
 
+    /* Tim's New Point In Polygon test-- hopefully much faster, */
+    /* certainly much smaller. */
+    /* Uses Half-Line test for point-in-2D-polygon test */
+    /* Tests the half-line going from the point in the direction of positive z */
 
-	#if UseTimsPinp
+    int x, z;   /* point */
+    int sx, sz; /* vertex 1 */
+    int *polyp; /* vertex 2 pointer */
+    int t;
+    int dx, dz;     /* ABS(vertex 2 - vertex 1) */
+    int sgnx;       /* going left or going right */
+    int intersects; /* number of intersections so far discovered */
+    LONGLONGCH a_ll, b_ll;
 
+    /* reject lines and points */
+    if (c < 3)
+        return (No);
 
-  /* Tim's New Point In Polygon test-- hopefully much faster, */
-  /* certainly much smaller. */
-  /* Uses Half-Line test for point-in-2D-polygon test */
-  /* Tests the half-line going from the point in the direction of positive z */
+    intersects = 0;
 
-  int  x, z;        /* point */
-  int  sx, sz;      /* vertex 1 */
-  int *polyp;       /* vertex 2 pointer */
-  int  t;
-  int  dx, dz;      /* ABS(vertex 2 - vertex 1) */
-  int  sgnx;        /* going left or going right */
-  int  intersects;  /* number of intersections so far discovered */
-  LONGLONGCH a_ll, b_ll;
+    x = point[ix];
+    z = point[iy]; /* ! */
 
-  /* reject lines and points */
-  if (c < 3) return(No);
-
-  intersects = 0;
-
-  x = point[ix];
-  z = point[iy];  /* ! */
-
-  /* get last point */
-  polyp = polygon + ((c - 1) * ppsize);
-  sx = polyp[0];
-  sz = polyp[1];
-
-  /* go back to first point */
-  polyp = polygon;
-
-dx = 0; /* TODO: uninitialized?? */
-
-  /* for each point */
-  while (0 != c)
-  {
-    
-    /* is this line straddling the x co-ordinate of the point? */
-    /* if not it is not worth testing for intersection with the half-line */
-    /* we must be careful to get the strict and non-stict inequalities */
-    /* correct, or we may count intersections with vertices the wrong number */
-    /* of times. */
-    sgnx = 0;
-    if (sx < x && x <= polyp[0])
-    {
-      /* going right */
-      sgnx = 1;
-      dx   = polyp[0] - sx;
-    }
-    if (polyp[0] < x && x <= sx)
-    {
-      /* going left */
-      sgnx = -1;
-      dx   = sx - polyp[0];
-    }
-
-    /* if sgnx is zero then neither of the above conditions are true, */
-    /* hence the line does not straddle the point in x */
-    if (0 != sgnx)
-    {
-      /* next do trivial cases of line totally above or below point */
-      if (z < sz && z < polyp[1])
-      {
-        /* line totally above point -- intersection */
-        intersects++;
-      }
-      else if (z <= sz || z <= polyp[1])
-      {
-        /* line straddles point in both x and z -- we must do interpolation */
-
-        /* get absolute differences between line end z co-ordinates */
-        dz = (sz < polyp[1])?(polyp[1] - sz):(sz - polyp[1]);
-
-        /* B504 is the square root of 7FFFFFFF */
-        if (0xB504L < dx || 0xB504L < dz)
-        {
-          /* LARGE line -- use 64-bit values */
-          /* interpolate z */
-          MUL_I_WIDE(polyp[1] - sz, x - sx, &a_ll);
-          MUL_I_WIDE(polyp[0] - sx, z - sz, &b_ll);
-          if(CMP_LL(&a_ll, &b_ll) == sgnx)
-          {
-            /* we have an intersection */
-            intersects++;
-          }
-        }
-        else
-        {
-          /* small line -- use 32-bit values */
-          /* interpolate z */
-          t = (polyp[1] - sz) * (x - sx) - (polyp[0] - sx) * (z - sz);
-          if ((t < 0 && sgnx < 0) || (0 < t && 0 < sgnx))
-          {
-            /* we have an intersection */
-            intersects++;
-          }
-        }
-      } /* (if line straddles point in z) */
-    } /* (if line straddles point in x) */
-
-    /* get next line : */
-    /* new vertex 1 is old vertex 2 */
+    /* get last point */
+    polyp = polygon + ((c - 1) * ppsize);
     sx = polyp[0];
     sz = polyp[1];
 
-    /* new vertex 2 is next point */
-    polyp += ppsize;
+    /* go back to first point */
+    polyp = polygon;
 
-    /* next vertex */
-    c--;
-  }
+    dx = 0; /* TODO: uninitialized?? */
 
-  if (intersects & 1)
-  {
-    /* Odd number of intersections -- point is inside polygon */
-    return(Yes);
-  }
-  else
-  {
-    /* even number of intersections -- point is outside polygon */
-    return(No);
-  }
+    /* for each point */
+    while (0 != c) {
+        /* is this line straddling the x co-ordinate of the point? */
+        /* if not it is not worth testing for intersection with the half-line */
+        /* we must be careful to get the strict and non-stict inequalities */
+        /* correct, or we may count intersections with vertices the wrong number */
+        /* of times. */
+        sgnx = 0;
+        if (sx < x && x <= polyp[0]) {
+            /* going right */
+            sgnx = 1;
+            dx = polyp[0] - sx;
+        }
+        if (polyp[0] < x && x <= sx) {
+            /* going left */
+            sgnx = -1;
+            dx = sx - polyp[0];
+        }
 
+        /* if sgnx is zero then neither of the above conditions are true, */
+        /* hence the line does not straddle the point in x */
+        if (0 != sgnx) {
+            /* next do trivial cases of line totally above or below point */
+            if (z < sz && z < polyp[1]) {
+                /* line totally above point -- intersection */
+                intersects++;
+            } else if (z <= sz || z <= polyp[1]) {
+                /* line straddles point in both x and z -- we must do interpolation */
 
+                /* get absolute differences between line end z co-ordinates */
+                dz = (sz < polyp[1]) ? (polyp[1] - sz) : (sz - polyp[1]);
+
+                /* B504 is the square root of 7FFFFFFF */
+                if (0xB504L < dx || 0xB504L < dz) {
+                    /* LARGE line -- use 64-bit values */
+                    /* interpolate z */
+                    MUL_I_WIDE(polyp[1] - sz, x - sx, &a_ll);
+                    MUL_I_WIDE(polyp[0] - sx, z - sz, &b_ll);
+                    if (CMP_LL(&a_ll, &b_ll) == sgnx) {
+                        /* we have an intersection */
+                        intersects++;
+                    }
+                } else {
+                    /* small line -- use 32-bit values */
+                    /* interpolate z */
+                    t = (polyp[1] - sz) * (x - sx) - (polyp[0] - sx) * (z - sz);
+                    if ((t < 0 && sgnx < 0) || (0 < t && 0 < sgnx)) {
+                        /* we have an intersection */
+                        intersects++;
+                    }
+                }
+            } /* (if line straddles point in z) */
+        } /* (if line straddles point in x) */
+
+        /* get next line : */
+        /* new vertex 1 is old vertex 2 */
+        sx = polyp[0];
+        sz = polyp[1];
+
+        /* new vertex 2 is next point */
+        polyp += ppsize;
+
+        /* next vertex */
+        c--;
+    }
+
+    if (intersects & 1) {
+        /* Odd number of intersections -- point is inside polygon */
+        return (Yes);
+    } else {
+        /* even number of intersections -- point is outside polygon */
+        return (No);
+    }
 
 #else
 
+    int i;
+    int si, ti;
+    int s0, t0;
+    int s1, t1;
+    int *v0;
+    int *v1;
+    int ivdot, ivdotcnt, sgn_currivdot, sgn_ivdot, ivstate;
+    int ns, nt;
+    int x_scale, y_scale;
+    int DotNudge;
 
-	int i;
-	int si, ti;
-	int s0, t0;
-	int s1, t1;
-	int *v0;
-	int *v1;
-	int ivdot, ivdotcnt, sgn_currivdot, sgn_ivdot, ivstate;
-	int ns, nt;
-	int x_scale, y_scale;
-	int DotNudge;
+    int x, z;
+    LONGLONGCH xx;
+    LONGLONGCH zz;
+    LONGLONGCH xx_tmp;
+    LONGLONGCH zz_tmp;
+    VECTORCH PolyAvgPt;
 
-	int x, z;
-	LONGLONGCH xx;
-	LONGLONGCH zz;
-	LONGLONGCH xx_tmp;
-	LONGLONGCH zz_tmp;
-	VECTORCH PolyAvgPt;
+    /* Reject points and lines */
 
+    if (c < 3)
+        return No;
 
-	/* Reject points and lines */
+    /* Find the average point */
 
-	if(c < 3) return No;
+    v0 = polygon;
 
+    EQUALS_LL(&xx, &ll_zero);
+    EQUALS_LL(&zz, &ll_zero);
 
-	/* Find the average point */
+    for (i = c; i != 0; i--) {
+        x = v0[0];
+        z = v0[1];
 
-	v0 = polygon;
+        IntToLL(&xx_tmp, &x); /* xx_tmp = (long long)x */
+        IntToLL(&zz_tmp, &z); /* zz_tmp = (long long)z */
 
-	EQUALS_LL(&xx, &ll_zero);
-	EQUALS_LL(&zz, &ll_zero);
+        ADD_LL_PP(&xx, &xx_tmp); /* xx += xx_tmp */
+        ADD_LL_PP(&zz, &zz_tmp); /* zz += zz_tmp */
 
-	for(i = c; i!=0; i--) {
+        v0 += ppsize;
+    }
 
-		x = v0[0];
-		z = v0[1];
+    PolyAvgPt.vx = NarrowDivide(&xx, c);
+    PolyAvgPt.vz = NarrowDivide(&zz, c);
 
-		IntToLL(&xx_tmp, &x);		/* xx_tmp = (long long)x */
-		IntToLL(&zz_tmp, &z);		/* zz_tmp = (long long)z */
+    /* Centre the polygon */
 
-		ADD_LL_PP(&xx, &xx_tmp);	/* xx += xx_tmp */
-		ADD_LL_PP(&zz, &zz_tmp);	/* zz += zz_tmp */
+    v0 = polygon;
 
-		v0 += ppsize;
+    for (i = c; i != 0; i--) {
+        v0[0] -= PolyAvgPt.vx;
+        v0[1] -= PolyAvgPt.vz;
 
-	}
+        v0 += ppsize;
+    }
 
-	PolyAvgPt.vx = NarrowDivide(&xx, c);
-	PolyAvgPt.vz = NarrowDivide(&zz, c);
+    /* Centre the test point */
 
+    point[0] -= PolyAvgPt.vx;
+    point[1] -= PolyAvgPt.vz;
 
-	/* Centre the polygon */
+    /* Scale to avoid maths overflow */
 
-	v0 = polygon;
+    v0 = polygon;
 
-	for(i = c; i!=0; i--) {
+    s0 = 0;
+    t0 = 0;
 
-		v0[0] -= PolyAvgPt.vx;
-		v0[1] -= PolyAvgPt.vz;
+    for (i = c; i != 0; i--) {
+        si = v0[0];
+        if (si < 0)
+            si = -si;
+        if (si > s0)
+            s0 = si;
 
-		v0 += ppsize;
+        ti = v0[1];
+        if (ti < 0)
+            ti = -ti;
+        if (ti > t0)
+            t0 = ti;
 
-	}
+        v0 += ppsize;
+    }
 
+    si = point[ix];
+    if (si < 0)
+        si = -si;
+    if (si > s0)
+        s0 = si;
 
-	/* Centre the test point */
+    ti = point[iy];
+    if (ti < 0)
+        ti = -ti;
+    if (ti > t0)
+        t0 = ti;
 
-	point[0] -= PolyAvgPt.vx;
-	point[1] -= PolyAvgPt.vz;
-
-
-	/* Scale to avoid maths overflow */
-
-	v0 = polygon;
-
-	s0 = 0;
-	t0 = 0;
-
-	for(i = c; i!=0; i--) {
-
-		si = v0[0]; if(si < 0) si = -si;
-		if(si > s0) s0 = si;
-
-		ti = v0[1]; if(ti < 0) ti = -ti;
-		if(ti > t0) t0 = ti;
-
-		v0 += ppsize;
-
-	}
-
-	si = point[ix]; if(si < 0) si = -si;
-	if(si > s0) s0 = si;
-
-	ti = point[iy]; if(ti < 0) ti = -ti;
-	if(ti > t0) t0 = ti;
-
-
-	#if 0
+#if 0
 	textprint("\nmax x = %d\n", s0);
 	textprint("max y = %d\n", t0);
-	#endif
+#endif
 
+    x_scale = FindShift32(s0, 16383);
+    y_scale = FindShift32(t0, 16383);
 
-	x_scale = FindShift32(s0, 16383);
-	y_scale = FindShift32(t0, 16383);
-
-
-	#if 0
+#if 0
 	textprint("scales = %d, %d\n", x_scale, y_scale);
-	#endif
+#endif
 
+    v0 = polygon;
 
-	v0 = polygon;
+    for (i = c; i != 0; i--) {
+        v0[0] >>= x_scale;
+        v0[1] >>= y_scale;
 
-	for(i = c; i!=0; i--) {
+        /*textprint("(%d, %d)\n", v0[0], v0[1]);*/
 
-		v0[0] >>= x_scale;
-		v0[1] >>= y_scale;
+        v0 += ppsize;
+    }
 
-		/*textprint("(%d, %d)\n", v0[0], v0[1]);*/
-
-		v0 += ppsize;
-
-	}
-
-	point[ix] >>= x_scale;
-	point[iy] >>= y_scale;
-
-
-
+    point[ix] >>= x_scale;
+    point[iy] >>= y_scale;
 
 #if 1
 
-	/* Clockwise or Anti-Clockwise? */
+    /* Clockwise or Anti-Clockwise? */
 
-	ns = -(polygon[iy + ppsize] - polygon[iy]);
-	nt =  (polygon[ix + ppsize] - polygon[ix]);
+    ns = -(polygon[iy + ppsize] - polygon[iy]);
+    nt = (polygon[ix + ppsize] - polygon[ix]);
 
-	si = polygon[(ppsize*2) + ix] - polygon[ix];
-	ti = polygon[(ppsize*2) + iy] - polygon[iy];
+    si = polygon[(ppsize * 2) + ix] - polygon[ix];
+    ti = polygon[(ppsize * 2) + iy] - polygon[iy];
 
-	ivdot = (ns * si) + (nt * ti);
+    ivdot = (ns * si) + (nt * ti);
 
-	if(ivdot < 0) DotNudge = -1;
-	else DotNudge = 1;
+    if (ivdot < 0)
+        DotNudge = -1;
+    else
+        DotNudge = 1;
 
 #endif
 
-
-
-	#if 0
+#if 0
 	if(ivdot < 0) textprint("Clockwise\n");
 	WaitForReturn();
-	#endif
-
-
-	/* Point to test */
-
-	si = point[ix];
-	ti = point[iy];
-
-
-	#if 0
-	textprint("p_test %d, %d\n", si, ti);
-	#endif
-
-
-	/* Polygon Vector pointers */
-
-	v0 = polygon;
-	v1 = v0 + ppsize;
-
-
-	/* Dot result monitor */
-
-	ivdotcnt = 0;
-	ivstate  = Yes;			/* assume inside */
-
-
-	/* Test v(s, t) against the vectors */
-
-	for(i = c; i!=0 && ivstate == Yes; i--) {
-
-
-		/* second vector pointer wraps once */
-
-		if(i == 1) v1 = polygon;
-
-
-		/* get the vector */
-
-		s0 = v0[ix];
-		t0 = v0[iy];
-
-		s1 = v1[ix];
-		t1 = v1[iy];
-
-
-		#if 0
-		textprint("%d,%d; %d,%d\n", s0, t0, s1, t1);
-		#endif
-
-
-		/* get the vector normal */
-
-		ns = -(t1 - t0);		/* s -> -t */
-		nt = s1 - s0;			/* t -> s  */
-
-
-		/* Dot with intersection point */
-
-		ivdot = (ns * (si - s0)) + (nt * (ti - t0));
-
-
-		/* TEST */
-		ivdot += DotNudge;
-
-
-		sgn_ivdot = 1;
-		if(ivdot < 0) sgn_ivdot = -1;
-
-
-		/* only continue if current dot is same as last, else quit */
-
-		if(ivdotcnt == 0) sgn_currivdot = sgn_ivdot;
-
-		else {
-
-			if(sgn_ivdot != sgn_currivdot) ivstate = No;
-			sgn_currivdot = sgn_ivdot;
-
-		}
-
-		v0 += ppsize;
-		v1 += ppsize;
-
-		ivdotcnt++;
-
-	}
-
-	if(ivstate) return Yes;
-	else return No;
-
-
 #endif
 
+    /* Point to test */
 
+    si = point[ix];
+    ti = point[iy];
+
+#if 0
+	textprint("p_test %d, %d\n", si, ti);
+#endif
+
+    /* Polygon Vector pointers */
+
+    v0 = polygon;
+    v1 = v0 + ppsize;
+
+    /* Dot result monitor */
+
+    ivdotcnt = 0;
+    ivstate = Yes; /* assume inside */
+
+    /* Test v(s, t) against the vectors */
+
+    for (i = c; i != 0 && ivstate == Yes; i--) {
+        /* second vector pointer wraps once */
+
+        if (i == 1)
+            v1 = polygon;
+
+        /* get the vector */
+
+        s0 = v0[ix];
+        t0 = v0[iy];
+
+        s1 = v1[ix];
+        t1 = v1[iy];
+
+#if 0
+		textprint("%d,%d; %d,%d\n", s0, t0, s1, t1);
+#endif
+
+        /* get the vector normal */
+
+        ns = -(t1 - t0); /* s -> -t */
+        nt = s1 - s0;    /* t -> s  */
+
+        /* Dot with intersection point */
+
+        ivdot = (ns * (si - s0)) + (nt * (ti - t0));
+
+        /* TEST */
+        ivdot += DotNudge;
+
+        sgn_ivdot = 1;
+        if (ivdot < 0)
+            sgn_ivdot = -1;
+
+        /* only continue if current dot is same as last, else quit */
+
+        if (ivdotcnt == 0)
+            sgn_currivdot = sgn_ivdot;
+
+        else {
+            if (sgn_ivdot != sgn_currivdot)
+                ivstate = No;
+            sgn_currivdot = sgn_ivdot;
+        }
+
+        v0 += ppsize;
+        v1 += ppsize;
+
+        ivdotcnt++;
+    }
+
+    if (ivstate)
+        return Yes;
+    else
+        return No;
+
+#endif
 }
-
-
-
-
-
-
 
 /*
 
@@ -2308,60 +2064,49 @@ dx = 0; /* TODO: uninitialized?? */
 
 */
 
-#define DEG_3	31
-#define SEP_3	3
+#define DEG_3 31
+#define SEP_3 3
 
-static int32_t table [DEG_3] =
-{
-  -851904987, -43806228, -2029755270, 1390239686, -1912102820,
-  -485608943, 1969813258, -1590463333, -1944053249, 455935928,
-  508023712, -1714531963, 1800685987, -2015299881, 654595283,
-  -1149023258, -1470005550, -1143256056, -1325577603, -1568001885,
-  1275120390, -607508183, -205999574, -1696891592, 1492211999,
-  -1528267240, -952028296, -189082757, 362343714, 1424981831,
-  2039449641
-};
+static int32_t table[DEG_3] = {-851904987,  -43806228,   -2029755270, 1390239686,  -1912102820,
+                               -485608943,  1969813258,  -1590463333, -1944053249, 455935928,
+                               508023712,   -1714531963, 1800685987,  -2015299881, 654595283,
+                               -1149023258, -1470005550, -1143256056, -1325577603, -1568001885,
+                               1275120390,  -607508183,  -205999574,  -1696891592, 1492211999,
+                               -1528267240, -952028296,  -189082757,  362343714,   1424981831,
+                               2039449641};
 
-#define TABLE_END (table + sizeof (table) / sizeof (table [0]))
+#define TABLE_END (table + sizeof(table) / sizeof(table[0]))
 
-static int32_t * front_ptr = table + SEP_3;
-static int32_t * rear_ptr = table;
-
+static int32_t *front_ptr = table + SEP_3;
+static int32_t *rear_ptr = table;
 
 void SetSeededFastRandom(int seed);
 void SetFastRandom(void)
 
 {
+    int i;
+    long number = GetTickCount();
 
-	int i;
-	long number = GetTickCount();
+    for (i = 0; i < DEG_3; ++i) {
+        number = 1103515145 * number + 12345;
+        table[i] = number;
+    }
 
+    front_ptr = table + SEP_3;
+    rear_ptr = table;
 
-	for(i = 0; i < DEG_3; ++i) {
+    for (i = 0; i < 10 * DEG_3; ++i)
+        (void) FastRandom();
 
-      number   = 1103515145 * number + 12345;
-      table[i] = number;
-
-	}
-
-	front_ptr = table + SEP_3;
-	rear_ptr  = table;
-
-	for(i = 0; i < 10 * DEG_3; ++i)
-		(void) FastRandom ();
-
-	SetSeededFastRandom(FastRandom());
-
+    SetSeededFastRandom(FastRandom());
 }
-
 
 int FastRandom(void)
 
 {
+    int32_t i;
 
-	int32_t i;
-
-	/*
+    /*
 
 	Discard least random bit.
 	Shift as unsigned to avoid replicating sign bit.
@@ -2369,55 +2114,50 @@ int FastRandom(void)
 
 	*/
 
-	*front_ptr += *rear_ptr;
-	i = (int32_t) ((uint32_t) *front_ptr >> 1);
+    *front_ptr += *rear_ptr;
+    i = (int32_t) ((uint32_t) *front_ptr >> 1);
 
-	/* `front_ptr' and `rear_ptr' can't wrap at the same time. */
+    /* `front_ptr' and `rear_ptr' can't wrap at the same time. */
 
-	++front_ptr;
+    ++front_ptr;
 
-	if(front_ptr < TABLE_END) {
+    if (front_ptr < TABLE_END) {
+        ++rear_ptr;
 
-      ++rear_ptr;
+        if (rear_ptr < TABLE_END)
+            return i;
 
-      if (rear_ptr < TABLE_END) return i;
+        rear_ptr = table;
 
-      rear_ptr = table;
+    }
 
-	}
+    else { /* front_ptr >= TABLE_END */
 
-	else {				/* front_ptr >= TABLE_END */
+        front_ptr = table;
+        ++rear_ptr;
+    }
 
-		front_ptr = table;
-		++rear_ptr;
-
-	}
-
-	return (int) i;
-
+    return (int) i;
 }
 
 /*a second copy of the random number generator for getting random numbers from a single seed*/
 
-#define SEEDED_DEG_3	13
-#define SEEDED_SEP_3	3
+#define SEEDED_DEG_3 13
+#define SEEDED_SEP_3 3
 
-static int32_t seeded_table [SEEDED_DEG_3];
+static int32_t seeded_table[SEEDED_DEG_3];
 
-#define SEEDED_TABLE_END (seeded_table + sizeof (seeded_table) / sizeof (seeded_table [0]))
+#define SEEDED_TABLE_END (seeded_table + sizeof(seeded_table) / sizeof(seeded_table[0]))
 
-static int32_t * seeded_front_ptr = seeded_table + SEEDED_SEP_3;
-static int32_t * seeded_rear_ptr = seeded_table;
-
-
+static int32_t *seeded_front_ptr = seeded_table + SEEDED_SEP_3;
+static int32_t *seeded_rear_ptr = seeded_table;
 
 int SeededFastRandom(void)
 
 {
+    int32_t i;
 
-	int32_t i;
-
-	/*
+    /*
 
 	Discard least random bit.
 	Shift as unsigned to avoid replicating sign bit.
@@ -2425,55 +2165,48 @@ int SeededFastRandom(void)
 
 	*/
 
-	*seeded_front_ptr += *seeded_rear_ptr;
-	i = (int32_t) ((uint32_t) *seeded_front_ptr >> 1);
+    *seeded_front_ptr += *seeded_rear_ptr;
+    i = (int32_t) ((uint32_t) *seeded_front_ptr >> 1);
 
-	/* `front_ptr' and `rear_ptr' can't wrap at the same time. */
+    /* `front_ptr' and `rear_ptr' can't wrap at the same time. */
 
-	++seeded_front_ptr;
+    ++seeded_front_ptr;
 
-	if(seeded_front_ptr < SEEDED_TABLE_END) {
+    if (seeded_front_ptr < SEEDED_TABLE_END) {
+        ++seeded_rear_ptr;
 
-      ++seeded_rear_ptr;
+        if (seeded_rear_ptr < SEEDED_TABLE_END)
+            return i;
 
-      if (seeded_rear_ptr < SEEDED_TABLE_END) return i;
+        seeded_rear_ptr = seeded_table;
 
-      seeded_rear_ptr = seeded_table;
+    }
 
-	}
+    else { /* front_ptr >= TABLE_END */
 
-	else {				/* front_ptr >= TABLE_END */
+        seeded_front_ptr = seeded_table;
+        ++seeded_rear_ptr;
+    }
 
-		seeded_front_ptr = seeded_table;
-		++seeded_rear_ptr;
-
-	}
-
-	return (int) i;
-
+    return (int) i;
 }
 
 void SetSeededFastRandom(int seed)
 
 {
+    int i;
+    int32_t number = seed;
 
-	int i;
-	int32_t number = seed;
+    for (i = 0; i < SEEDED_DEG_3; ++i) {
+        number = 1103515145 * number + 12345;
+        seeded_table[i] = number;
+    }
 
+    seeded_front_ptr = seeded_table + SEEDED_SEP_3;
+    seeded_rear_ptr = seeded_table;
 
-	for(i = 0; i < SEEDED_DEG_3; ++i) {
-
-      number   = 1103515145 * number + 12345;
-      seeded_table[i] = number;
-
-	}
-
-	seeded_front_ptr = seeded_table + SEEDED_SEP_3;
-	seeded_rear_ptr  = seeded_table;
-
-	for(i = 0; i < 2 * SEEDED_DEG_3; ++i)
-		(void) SeededFastRandom ();
-
+    for (i = 0; i < 2 * SEEDED_DEG_3; ++i)
+        (void) SeededFastRandom();
 }
 
 #if StandardShapeLanguage
@@ -2487,70 +2220,60 @@ void SetSeededFastRandom(int seed)
 void PolyAveragePoint(POLYHEADER *pheader, int *spts, VECTORCH *apt)
 
 {
+    int x, y, z;
+    LONGLONGCH xx;
+    LONGLONGCH yy;
+    LONGLONGCH zz;
+    LONGLONGCH xx_tmp;
+    LONGLONGCH yy_tmp;
+    LONGLONGCH zz_tmp;
+    int *mypolystart = &pheader->Poly1stPt;
+    int numpolypts;
 
-	int x, y, z;
-	LONGLONGCH xx;
-	LONGLONGCH yy;
-	LONGLONGCH zz;
-	LONGLONGCH xx_tmp;
-	LONGLONGCH yy_tmp;
-	LONGLONGCH zz_tmp;
-	int *mypolystart = &pheader->Poly1stPt;
-	int numpolypts;
+    /* Find the average point */
 
+    EQUALS_LL(&xx, &ll_zero);
+    EQUALS_LL(&yy, &ll_zero);
+    EQUALS_LL(&zz, &ll_zero);
 
-	/* Find the average point */
+    numpolypts = 0;
 
-	EQUALS_LL(&xx, &ll_zero);
-	EQUALS_LL(&yy, &ll_zero);
-	EQUALS_LL(&zz, &ll_zero);
+    while (*mypolystart != Term) {
+        x = *(spts + *mypolystart + ix);
+        y = *(spts + *mypolystart + iy);
+        z = *(spts + *mypolystart + iz);
 
-	numpolypts = 0;
+        IntToLL(&xx_tmp, &x); /* xx_tmp = (long long)x */
+        IntToLL(&yy_tmp, &y); /* yy_tmp = (long long)y */
+        IntToLL(&zz_tmp, &z); /* zz_tmp = (long long)z */
 
-	while(*mypolystart != Term) {
+        ADD_LL_PP(&xx, &xx_tmp); /* xx += xx_tmp */
+        ADD_LL_PP(&yy, &yy_tmp); /* yy += yy_tmp */
+        ADD_LL_PP(&zz, &zz_tmp); /* zz += zz_tmp */
 
-		x = *(spts + *mypolystart + ix);
-		y = *(spts + *mypolystart + iy);
-		z = *(spts + *mypolystart + iz);
+        numpolypts++;
+        mypolystart++;
+    }
 
-		IntToLL(&xx_tmp, &x);		/* xx_tmp = (long long)x */
-		IntToLL(&yy_tmp, &y);		/* yy_tmp = (long long)y */
-		IntToLL(&zz_tmp, &z);		/* zz_tmp = (long long)z */
-
-		ADD_LL_PP(&xx, &xx_tmp);	/* xx += xx_tmp */
-		ADD_LL_PP(&yy, &yy_tmp);	/* yy += yy_tmp */
-		ADD_LL_PP(&zz, &zz_tmp);	/* zz += zz_tmp */
-
-		numpolypts++;
-		mypolystart++;
-
-	}
-
-	apt->vx = NarrowDivide(&xx, numpolypts);
-	apt->vy = NarrowDivide(&yy, numpolypts);
-	apt->vz = NarrowDivide(&zz, numpolypts);
-
+    apt->vx = NarrowDivide(&xx, numpolypts);
+    apt->vy = NarrowDivide(&yy, numpolypts);
+    apt->vz = NarrowDivide(&zz, numpolypts);
 }
 
-#endif	/* StandardShapeLanguage */
-
-
-
-
-
+#endif /* StandardShapeLanguage */
 
 /* KJL 15:07:39 01/08/97 - Returns the magnitude of the 
    cross product of two vectors a and b. */
 int MagnitudeOfCrossProduct(VECTORCH *a, VECTORCH *b)
 
 {
-	VECTORCH c;				 
-    
-	c.vx = MUL_FIXED(a->vy,b->vz) - MUL_FIXED(a->vz,b->vy);
-	c.vy = MUL_FIXED(a->vz,b->vx) - MUL_FIXED(a->vx,b->vz);
-	c.vz = MUL_FIXED(a->vx,b->vy) - MUL_FIXED(a->vy,b->vx);
-    
-	return Magnitude(&c);
+    VECTORCH c;
+
+    c.vx = MUL_FIXED(a->vy, b->vz) - MUL_FIXED(a->vz, b->vy);
+    c.vy = MUL_FIXED(a->vz, b->vx) - MUL_FIXED(a->vx, b->vz);
+    c.vz = MUL_FIXED(a->vx, b->vy) - MUL_FIXED(a->vy, b->vx);
+
+    return Magnitude(&c);
 }
 
 /* KJL 15:08:01 01/08/97 - sets the vector c to be the
@@ -2558,53 +2281,43 @@ int MagnitudeOfCrossProduct(VECTORCH *a, VECTORCH *b)
 void CrossProduct(VECTORCH *a, VECTORCH *b, VECTORCH *c)
 
 {
-	c->vx = MUL_FIXED(a->vy,b->vz) - MUL_FIXED(a->vz,b->vy);
-	c->vy = MUL_FIXED(a->vz,b->vx) - MUL_FIXED(a->vx,b->vz);
-	c->vz = MUL_FIXED(a->vx,b->vy) - MUL_FIXED(a->vy,b->vx);
+    c->vx = MUL_FIXED(a->vy, b->vz) - MUL_FIXED(a->vz, b->vy);
+    c->vy = MUL_FIXED(a->vz, b->vx) - MUL_FIXED(a->vx, b->vz);
+    c->vz = MUL_FIXED(a->vx, b->vy) - MUL_FIXED(a->vy, b->vx);
 }
-
-
 
 /* KJL 12:01:08 7/16/97 - returns the magnitude of a vector - max error about 13%, though average error
 less than half this. Very fast compared to other approaches. */
 int Approximate3dMagnitude(VECTORCH *v)
 {
-	int dx,dy,dz;
+    int dx, dy, dz;
 
-	dx = v->vx;
-	if (dx<0) dx = -dx;
-	
-	dy = v->vy;
-	if (dy<0) dy = -dy;
-	
-	dz = v->vz;	 	 
-	if (dz<0) dz = -dz;
-						 
-	
-	if (dx>dy)
-	{
-		if (dx>dz)
-		{
-			return dx + ((dy+dz)>>2);
-		}
-		else
-		{
-			return dz + ((dy+dx)>>2);
-		}
-	}
-	else
-	{
-		if (dy>dz)
-		{
-			return dy + ((dx+dz)>>2);
-		}
-		else
-		{
-			return dz + ((dx+dy)>>2);
-		}
-	}
+    dx = v->vx;
+    if (dx < 0)
+        dx = -dx;
+
+    dy = v->vy;
+    if (dy < 0)
+        dy = -dy;
+
+    dz = v->vz;
+    if (dz < 0)
+        dz = -dz;
+
+    if (dx > dy) {
+        if (dx > dz) {
+            return dx + ((dy + dz) >> 2);
+        } else {
+            return dz + ((dy + dx) >> 2);
+        }
+    } else {
+        if (dy > dz) {
+            return dy + ((dx + dz) >> 2);
+        } else {
+            return dz + ((dx + dy) >> 2);
+        }
+    }
 }
-
 
 /*
 
@@ -2621,24 +2334,23 @@ int Approximate3dMagnitude(VECTORCH *v)
 
 */
 
-void QuatToMat(QUAT *q,MATRIXCH *m)
+void QuatToMat(QUAT *q, MATRIXCH *m)
 {
+    int q_w, q_x, q_y, q_z;
 
-	int q_w, q_x, q_y, q_z;
+    int q_2x, q_2y, q_2z;
 
-	int q_2x, q_2y, q_2z;
+    int q_2xw;
+    int q_2xx;
+    int q_2xy;
+    int q_2xz;
+    int q_2yw;
+    int q_2yy;
+    int q_2yz;
+    int q_2zw;
+    int q_2zz;
 
-	int q_2xw;
-	int q_2xx;
-	int q_2xy;
-	int q_2xz;
-	int q_2yw;
-	int q_2yy;
-	int q_2yz;
-	int q_2zw;
-	int q_2zz;
-
-/*
+    /*
 
  The most efficient way to create the matrix is as follows
 
@@ -2646,16 +2358,16 @@ void QuatToMat(QUAT *q,MATRIXCH *m)
 
 */
 
-	q_w=q->quatw;
-	q_x=q->quatx;
-	q_y=q->quaty;
-	q_z=q->quatz;
+    q_w = q->quatw;
+    q_x = q->quatx;
+    q_y = q->quaty;
+    q_z = q->quatz;
 
-	q_2x=q_x*2;
-	q_2y=q_y*2;
-	q_2z=q_z*2;
+    q_2x = q_x * 2;
+    q_2y = q_y * 2;
+    q_2z = q_z * 2;
 
-/*
+    /*
 
  2/ Form their products with w, x, y & z
     These are
@@ -2667,54 +2379,52 @@ void QuatToMat(QUAT *q,MATRIXCH *m)
 
 */
 
-	q_2xw=MUL_FIXED(q_2x,q_w);
-	q_2yw=MUL_FIXED(q_2y,q_w);
-	q_2zw=MUL_FIXED(q_2z,q_w);
+    q_2xw = MUL_FIXED(q_2x, q_w);
+    q_2yw = MUL_FIXED(q_2y, q_w);
+    q_2zw = MUL_FIXED(q_2z, q_w);
 
-	q_2xx=MUL_FIXED(q_2x,q_x);
+    q_2xx = MUL_FIXED(q_2x, q_x);
 
-	q_2xy=MUL_FIXED(q_2x,q_y);
-	q_2yy=MUL_FIXED(q_2y,q_y);
+    q_2xy = MUL_FIXED(q_2x, q_y);
+    q_2yy = MUL_FIXED(q_2y, q_y);
 
-	q_2xz=MUL_FIXED(q_2x,q_z);
-	q_2yz=MUL_FIXED(q_2y,q_z);
-	q_2zz=MUL_FIXED(q_2z,q_z);
+    q_2xz = MUL_FIXED(q_2x, q_z);
+    q_2yz = MUL_FIXED(q_2y, q_z);
+    q_2zz = MUL_FIXED(q_2z, q_z);
 
+    /* mat11 = 1 - 2y^2 - 2z^2	 */
 
-/* mat11 = 1 - 2y^2 - 2z^2	 */
+    m->mat11 = ONE_FIXED - q_2yy - q_2zz;
 
-	m->mat11=ONE_FIXED-q_2yy-q_2zz;
+    /* mat12 = 2xy - 2wz */
 
-/* mat12 = 2xy - 2wz */
+    m->mat12 = q_2xy - q_2zw;
 
-	m->mat12=q_2xy-q_2zw;
+    /* mat13 = 2xz + 2wy */
 
-/* mat13 = 2xz + 2wy */
+    m->mat13 = q_2xz + q_2yw;
 
-	m->mat13=q_2xz+q_2yw;
+    /* mat21 = 2xy + 2wz */
 
-/* mat21 = 2xy + 2wz */
+    m->mat21 = q_2xy + q_2zw;
 
-	m->mat21=q_2xy+q_2zw;
+    /* mat22 = 1 - 2x^2 - 2z^2 */
 
-/* mat22 = 1 - 2x^2 - 2z^2 */
+    m->mat22 = ONE_FIXED - q_2xx - q_2zz;
 
-	m->mat22=ONE_FIXED-q_2xx-q_2zz;
+    /* mat23 = 2yz - 2wx	 */
 
-/* mat23 = 2yz - 2wx	 */
+    m->mat23 = q_2yz - q_2xw;
 
-	m->mat23=q_2yz-q_2xw;
+    /* mat31 = 2xz - 2wy */
 
-/* mat31 = 2xz - 2wy */
+    m->mat31 = q_2xz - q_2yw;
 
-	m->mat31=q_2xz-q_2yw;
+    /* mat32 = 2yz + 2wx */
 
-/* mat32 = 2yz + 2wx */
+    m->mat32 = q_2yz + q_2xw;
 
-	m->mat32=q_2yz+q_2xw;
+    /* mat33 = 1 - 2x^2 - 2y^2 */
 
-/* mat33 = 1 - 2x^2 - 2y^2 */
-
-	m->mat33=ONE_FIXED-q_2xx-q_2yy;
-
+    m->mat33 = ONE_FIXED - q_2xx - q_2yy;
 }

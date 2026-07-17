@@ -89,83 +89,94 @@ extern void MMXAsm_VectorDot16(void);
 /* inline calls to MMX functions with correct parameters set */
 #if defined(_MSC_VER)
 
-_asmcall void MMX_VectorTransform(struct vectorch * vector, struct matrixch const * matrix)
+_asmcall void MMX_VectorTransform(struct vectorch *vector, struct matrixch const *matrix)
 {
-	_asm
-	{
+    _asm
+    {
 		mov eax,vector
 		mov edx,matrix
 		call MMXAsm_VectorTransform
-	}
+    }
 }
-_asmcall void MMX_VectorTransformed(struct vectorch * v_result, struct vectorch const * v_parm, struct matrixch const * matrix)
+_asmcall void MMX_VectorTransformed(
+    struct vectorch *v_result, struct vectorch const *v_parm, struct matrixch const *matrix)
 {
-	_asm
-	{
+    _asm
+    {
 		mov eax,v_result
 		mov edx,v_parm
 		mov ecx,matrix
 		call MMXAsm_VectorTransformed
-	}
+    }
 }
-_asmcall void MMX_VectorTransformAndAdd(struct vectorch * vector, struct matrixch const * matrix, struct vectorch const * v_add)
+_asmcall void MMX_VectorTransformAndAdd(
+    struct vectorch *vector, struct matrixch const *matrix, struct vectorch const *v_add)
 {
-	_asm
-	{
+    _asm
+    {
 		mov eax,vector
 		mov edx,matrix
 		mov ecx,v_add
 		call MMXAsm_VectorTransformAndAdd
-	}
+    }
 }
-_asmcall void MMX_VectorTransformedAndAdd(struct vectorch * v_result, struct vectorch const * v_parm, struct matrixch const * matrix, struct vectorch const * v_add)
+_asmcall void MMX_VectorTransformedAndAdd(
+    struct vectorch *v_result,
+    struct vectorch const *v_parm,
+    struct matrixch const *matrix,
+    struct vectorch const *v_add)
 {
-	_asm
-	{
+    _asm
+    {
 		mov eax,v_result
 		mov edx,v_parm
 		mov ecx,matrix
 		mov ebx,v_add
 		call MMXAsm_VectorTransformedAndAdd
-	}
+    }
 }
-_asmcall signed MMX_VectorDot(struct vectorch const * v1, struct vectorch const * v2)
+_asmcall signed MMX_VectorDot(struct vectorch const *v1, struct vectorch const *v2)
 {
-	signed retval;
-	_asm
-	{
+    signed retval;
+    _asm
+    {
 		mov eax,v1
 		mov edx,v2
 		call MMXAsm_VectorDot
 		mov retval,eax
-	}
-	return retval;
+    }
+    return retval;
 }
-_asmcall signed MMX_VectorDot16(struct vectorch const * v1, struct vectorch const * v2)
+_asmcall signed MMX_VectorDot16(struct vectorch const *v1, struct vectorch const *v2)
 {
-	signed retval;
-	_asm
-	{
+    signed retval;
+    _asm
+    {
 		mov eax,v1
 		mov edx,v2
 		call MMXAsm_VectorDot16
 		mov retval,eax
-	}
-	return retval;
+    }
+    return retval;
 }
 
 #else
 
 /* #error "Unknown compiler" */
-void MMX_VectorTransform(struct vectorch * vector, struct matrixch const * matrix);
-void MMX_VectorTransformed(struct vectorch * v_result, struct vectorch const * v_parm, struct matrixch const * matrix);
-void MMX_VectorTransformAndAdd(struct vectorch * vector, struct matrixch const * matrix, struct vectorch const * v_add);
-void MMX_VectorTransformedAndAdd(struct vectorch * v_result, struct vectorch const * v_parm, struct matrixch const * matrix, struct vectorch const * v_add);
-int MMX_VectorDot(struct vectorch const * v1, struct vectorch const * v2);
-int MMX_VectorDot16(struct vectorch const * v1, struct vectorch const * v2);
+void MMX_VectorTransform(struct vectorch *vector, struct matrixch const *matrix);
+void MMX_VectorTransformed(
+    struct vectorch *v_result, struct vectorch const *v_parm, struct matrixch const *matrix);
+void MMX_VectorTransformAndAdd(
+    struct vectorch *vector, struct matrixch const *matrix, struct vectorch const *v_add);
+void MMX_VectorTransformedAndAdd(
+    struct vectorch *v_result,
+    struct vectorch const *v_parm,
+    struct matrixch const *matrix,
+    struct vectorch const *v_add);
+int MMX_VectorDot(struct vectorch const *v1, struct vectorch const *v2);
+int MMX_VectorDot16(struct vectorch const *v1, struct vectorch const *v2);
 
 #endif
-
 
 /* Cross product? Mod? MatrixMultiply? */
 
@@ -180,11 +191,11 @@ extern const __int64 mmx_one_fixed_h;
 
 #if defined(_MSC_VER)
 
-_asminline signed MMXInline_VectorDot(struct vectorch const * v1, struct vectorch const * v2)
+_asminline signed MMXInline_VectorDot(struct vectorch const *v1, struct vectorch const *v2)
 {
-	signed retval;
-	_asm
-	{
+    signed retval;
+    _asm
+    {
 		mov edx,v1
 		mov eax,v2
 
@@ -268,15 +279,15 @@ _asminline signed MMXInline_VectorDot(struct vectorch const * v1, struct vectorc
 		movd retval,mm1
 
 		emms
-	}
-	return retval+1;
+    }
+    return retval + 1;
 }
 
-_asminline signed MMXInline_VectorDot16(struct vectorch const * v1, struct vectorch const * v2)
+_asminline signed MMXInline_VectorDot16(struct vectorch const *v1, struct vectorch const *v2)
 {
-	signed retval;
-	_asm
-	{
+    signed retval;
+    _asm
+    {
 		mov eax,v1
 		mov edx,v2
 
@@ -298,15 +309,15 @@ _asminline signed MMXInline_VectorDot16(struct vectorch const * v1, struct vecto
 		movd retval,mm0
 
 		emms
-	}
-	return retval;
+    }
+    return retval;
 }
 
 #else
 
 /* #error "Unknown compiler" */
-int MMXInline_VectorDot(struct vectorch const * v1, struct vectorch const * v2);
-int MMXInline_VectorDot16(struct vectorch const * v1, struct vectorch const * v2);
+int MMXInline_VectorDot(struct vectorch const *v1, struct vectorch const *v2);
+int MMXInline_VectorDot16(struct vectorch const *v1, struct vectorch const *v2);
 
 #endif
 

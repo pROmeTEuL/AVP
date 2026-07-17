@@ -225,454 +225,418 @@
 #define HASH_TEMPLATE_VERSION 12 // v1.2
 
 #include <stddef.h>
-#include <ctype.h>// for toupper
+#include <ctype.h> // for toupper
 
 // v1,0 Default Hash Functions defined:
 // HashFunction(unsigned), HashFunction(void const *), HashFunction(char const *)
 // you can disable the default hash functions by defining HT_NODEFAULTFNS
 
 #ifndef HT_NODEFAULTFNS
-	// a hash function for integral (unsigned) values
-	inline unsigned HashFunction(unsigned const _i)
-	{
-		return _i ^ _i>>4 ^ _i>>9 ^ _i>>15 ^ _i>>22;
-	}
+// a hash function for integral (unsigned) values
+inline unsigned HashFunction(unsigned const _i)
+{
+    return _i ^ _i >> 4 ^ _i >> 9 ^ _i >> 15 ^ _i >> 22;
+}
 
-	// a hash function for pointers
-	inline unsigned HashFunction(void const * const _vP)
-	{
-		// treat as integer
-		return HashFunction(reinterpret_cast<uintptr_t>(_vP));
-	}
+// a hash function for pointers
+inline unsigned HashFunction(void const *const _vP)
+{
+    // treat as integer
+    return HashFunction(reinterpret_cast<uintptr_t>(_vP));
+}
 
-	// a hash function for strings
-	inline unsigned HashFunction(char const * _sP)
-	{
-		unsigned rv = 0;
-		while (*_sP) rv += toupper(*_sP++);
-		return rv;
-	}
+// a hash function for strings
+inline unsigned HashFunction(char const *_sP)
+{
+    unsigned rv = 0;
+    while (*_sP)
+        rv += toupper(*_sP++);
+    return rv;
+}
 #endif
 
 // v1,0 Default (initial) table size (log2 of)
-// Define this to another value if you like, 
+// Define this to another value if you like,
 // or just override in the constructor.
 // in v1.0, the table is not self-expanding,
-// but if this feature is implememted, then 
+// but if this feature is implememted, then
 // this value will become the log2(initial table size),
 // and if table becomes is self-contracting,
 // this value will also give the minimum table size
 
 #ifndef HT_DEFAULTTABLESIZESHIFT
-	#define HT_DEFAULTTABLESIZESHIFT 6
+#define HT_DEFAULTTABLESIZESHIFT 6
 #endif
 
 // for asserted functions, define HT_FAIL to be your function
 // to be triggered upon a failure, eg.
 // #define HT_FAIL(strP) fprintf(stderr,"%s\n",strP)
 #ifndef HT_FAIL
-	#define HT_FAIL(strP) ((void)0)
+#define HT_FAIL(strP) ((void) 0)
 #endif
 
-template <class TYPE, class ARG_TYPE, class CMP_ARG_TYPE>
+template<class TYPE, class ARG_TYPE, class CMP_ARG_TYPE>
 class _base_HashTable
 {
-	public:
-		class Iterator;
-		class ConstIterator;
-		class ValueIterator;
-		class Node;
-		
-	public:
-		// V1.0 Functionality
-		
-		// empty constructor, with argument specifying initial table size (log2 of)
-		_base_HashTable(unsigned = HT_DEFAULTTABLESIZESHIFT);
-		
-		// destructor
-		virtual ~_base_HashTable();
-		
-		// copy constructor and assignment not provided in v1.0
-		_base_HashTable(_base_HashTable<TYPE,ARG_TYPE,CMP_ARG_TYPE> const &);
-		_base_HashTable<TYPE,ARG_TYPE,CMP_ARG_TYPE> & operator = (_base_HashTable<TYPE,ARG_TYPE,CMP_ARG_TYPE> const &);
-		
-		// add, checking that an equivalent entry does not already exist
-		// returns non-zero if entry was added
-		bool AddChecked(ARG_TYPE);
-		
-		// add, regardless of whether an equivalent entry already exists
-		void AddRegardless(ARG_TYPE);
-		
-		// add, checking that an equivalent entry does not already exist
-		// triggering fail function if one does
-		void AddAsserted(ARG_TYPE);
-		
-		// see if entry exists, get pointer to it if it does
-		TYPE const * Contains(CMP_ARG_TYPE) const;
-		
-		// remove an entry (once only in the case of equivalent entries listed multiple times)
-		// returns non-zero if entry existed and was removed
-		bool Remove(CMP_ARG_TYPE);
-		
-		// remove an entry (once only in the case of equivalent entries listed multiple times)
-		// triggers fail function if no entry existed to remove
-		void RemoveAsserted(CMP_ARG_TYPE);
-		
-		// empty the table
-		void RemoveAll();
-		
-		// return num entries in table
-		unsigned Size() const;
+public:
+    class Iterator;
+    class ConstIterator;
+    class ValueIterator;
+    class Node;
 
-		// a _base_HashTable const iterator
-		class ConstIterator
-		{
-				// Nested class functions apparently have to be declared here for MSVC compatability
-			public:
-				// construct from const hash table
-				ConstIterator(_base_HashTable<TYPE,ARG_TYPE,CMP_ARG_TYPE> const & tableR)
-					: chainPP(tableR.chainPA)
-					, nChainsRemaining(tableR.tableSize)
-					, nEntriesRemaining(tableR.nEntries)
-				{
-					if (nEntriesRemaining)
-					{
-						while (!*chainPP)
-						{
-							++ chainPP;
-							-- nChainsRemaining;
-						}
-						nodePP = chainPP;
-					}
-				}
+public:
+    // V1.0 Functionality
 
-				// returns non-zero if there are no more entries to get
-				inline bool Done() const
-				{
-					return ! nEntriesRemaining;
-				}
+    // empty constructor, with argument specifying initial table size (log2 of)
+    _base_HashTable(unsigned = HT_DEFAULTTABLESIZESHIFT);
 
-				inline void Restart(_base_HashTable<TYPE,ARG_TYPE,CMP_ARG_TYPE> const & tableR)
-				{
-					chainPP = tableR.chainPA;
-					nChainsRemaining = tableR.tableSize;
-					nEntriesRemaining = tableR.nEntries;
+    // destructor
+    virtual ~_base_HashTable();
 
-					if (nEntriesRemaining)
-					{
-						while (!*chainPP)
-						{
-							++ chainPP;
-							-- nChainsRemaining;
-						}
-						nodePP = chainPP;
-					}
-				}
+    // copy constructor and assignment not provided in v1.0
+    _base_HashTable(_base_HashTable<TYPE, ARG_TYPE, CMP_ARG_TYPE> const &);
+    _base_HashTable<TYPE, ARG_TYPE, CMP_ARG_TYPE> &operator=(
+        _base_HashTable<TYPE, ARG_TYPE, CMP_ARG_TYPE> const &);
 
-				// get the current entry pointed to, either with Get() or cast operator
-				inline operator ARG_TYPE () const
-				{
-					return Get();
-				}
-				inline ARG_TYPE Get() const
-				{
-					if( Done() )
-					{
-						HT_FAIL("HTT: Tried to Get() from an iterator which was Done()");
-					}
-					return (*nodePP)->d;
-				}
+    // add, checking that an equivalent entry does not already exist
+    // returns non-zero if entry was added
+    bool AddChecked(ARG_TYPE);
 
-				// advance to the next entry
-				void Next()
-				{
-					if (!nEntriesRemaining)
-					{
-						HT_FAIL("HTT: Tried to do Next() on an iterator which was Done()");
-					}
-					if ((*nodePP)->nextP)
-					{
-						nodePP = &(*nodePP)->nextP;
-					}
-					else
-					{
-						do
-						{
-							++ chainPP;
-							-- nChainsRemaining;
-						}
-						while (nChainsRemaining && !*chainPP);
-						nodePP = chainPP;
-					}
-					-- nEntriesRemaining;
-				}
-				
-			private:
-			
-				Node * * chainPP;
-				Node * * nodePP;
-				unsigned nChainsRemaining;
-				unsigned nEntriesRemaining;
-				
-				friend class Iterator;
-		};
+    // add, regardless of whether an equivalent entry already exists
+    void AddRegardless(ARG_TYPE);
 
-		// a _base_HashTable non-const iterator - can remove entry pointed to
-		class Iterator : public ConstIterator
-		{
-				// Nested class functions apparently have to be declared here for MSVC compatability
-			public:
-				// construct from hash table
-				inline Iterator(_base_HashTable<TYPE,ARG_TYPE,CMP_ARG_TYPE> & tableR)
-					: ConstIterator(tableR)
-					, tableNEntriesP(&tableR.nEntries)
-				{
-				}
-				
-				// remove the current entry pointed to, advancing to the next
-				void Remove()
-				{
-					if (!ConstIterator::nEntriesRemaining)
-					{
-						HT_FAIL("HTT: Tried to Remove() via an iterator which was Done()");
-					}
-					Node * oldP = *ConstIterator::nodePP;
-					*ConstIterator::nodePP = oldP->nextP;
-					delete oldP;
-					if (!*ConstIterator::nodePP)
-					{
-						do
-						{
-							++ ConstIterator::chainPP;
-							-- ConstIterator::nChainsRemaining;
-						}
-						while (ConstIterator::nChainsRemaining && !*ConstIterator::chainPP);
-						ConstIterator::nodePP = ConstIterator::chainPP;
-					}
-					-- ConstIterator::nEntriesRemaining;
-					-- *tableNEntriesP;
-				}
+    // add, checking that an equivalent entry does not already exist
+    // triggering fail function if one does
+    void AddAsserted(ARG_TYPE);
 
-			private:
-				unsigned * tableNEntriesP;
-		};
+    // see if entry exists, get pointer to it if it does
+    TYPE const *Contains(CMP_ARG_TYPE) const;
 
-		// v1.2 extended functionality
-		// a _base_HashTable iterator through a specific hash value
-		class ValueIterator
-		{
-				// Nested class functions apparently have to be declared here for MSVC compatability
-			public:
-				// construct from const hash table
-				ValueIterator(_base_HashTable<TYPE,ARG_TYPE,CMP_ARG_TYPE> & tableR, unsigned value)
-					: chainPP(tableR.chainPA)
-					, value(value)
-					, tableNEntriesP(&tableR.nEntries)
-				{
-					chainPP += (value & tableR.tableSizeMask);
-					nodePP = chainPP;
-				}
+    // remove an entry (once only in the case of equivalent entries listed multiple times)
+    // returns non-zero if entry existed and was removed
+    bool Remove(CMP_ARG_TYPE);
 
-				// returns non-zero if there are no more entries to get
-				inline bool Done() const
-				{
-					return( !(*nodePP) );
-				}
+    // remove an entry (once only in the case of equivalent entries listed multiple times)
+    // triggers fail function if no entry existed to remove
+    void RemoveAsserted(CMP_ARG_TYPE);
 
-				inline operator ARG_TYPE () const
-				{
-					return Get();
-				}
-				inline ARG_TYPE Get() const
-				{
-					if( Done() )
-					{
-						HT_FAIL("HTT: Tried to Get() from an iterator which was Done()");
-					}
-					return (*nodePP)->d;
-				}
+    // empty the table
+    void RemoveAll();
 
-				inline void Restart(_base_HashTable<TYPE,ARG_TYPE,CMP_ARG_TYPE> const & tableR)
-				{
-					chainPP = tableR.chainPA + (value & tableR.tableSizeMask);
-					nodePP = chainPP;
-				}
+    // return num entries in table
+    unsigned Size() const;
 
-				// advance to the next entry
-				void Next()
-				{
-					if( *nodePP )
-					{
-						nodePP = &(*nodePP)->nextP;	// even if it's NULL for ValueIterator
-					}
-					else
-					{
-						HT_FAIL("HTT: Tried to do Next() on a Value iterator which was Done()");
-					}
-				}
+    // a _base_HashTable const iterator
+    class ConstIterator
+    {
+        // Nested class functions apparently have to be declared here for MSVC compatability
+    public:
+        // construct from const hash table
+        ConstIterator(_base_HashTable<TYPE, ARG_TYPE, CMP_ARG_TYPE> const &tableR)
+            : chainPP(tableR.chainPA)
+            , nChainsRemaining(tableR.tableSize)
+            , nEntriesRemaining(tableR.nEntries)
+        {
+            if (nEntriesRemaining) {
+                while (!*chainPP) {
+                    ++chainPP;
+                    --nChainsRemaining;
+                }
+                nodePP = chainPP;
+            }
+        }
 
-				// remove the current entry pointed to, advancing to the next
-				void Remove()
-				{
-					if( *nodePP )
-					{
-						Node * oldP = *nodePP;
-						*nodePP = oldP->nextP;
-						delete oldP;
-						-- *tableNEntriesP;
-					}
-					else
-					{
-						HT_FAIL("HTT: Tried to Remove() via an iterator which was Done()");
-					}
-				}
+        // returns non-zero if there are no more entries to get
+        inline bool Done() const { return !nEntriesRemaining; }
 
-			private:
+        inline void Restart(_base_HashTable<TYPE, ARG_TYPE, CMP_ARG_TYPE> const &tableR)
+        {
+            chainPP = tableR.chainPA;
+            nChainsRemaining = tableR.tableSize;
+            nEntriesRemaining = tableR.nEntries;
 
-				Node * * chainPP;
-				Node * * nodePP;
+            if (nEntriesRemaining) {
+                while (!*chainPP) {
+                    ++chainPP;
+                    --nChainsRemaining;
+                }
+                nodePP = chainPP;
+            }
+        }
 
-				unsigned value;
-				unsigned * tableNEntriesP;
-		};
+        // get the current entry pointed to, either with Get() or cast operator
+        inline operator ARG_TYPE() const { return Get(); }
+        inline ARG_TYPE Get() const
+        {
+            if (Done()) {
+                HT_FAIL("HTT: Tried to Get() from an iterator which was Done()");
+            }
+            return (*nodePP)->d;
+        }
 
-		// V1.1 extended functionality
-		// allow user to create nodes, change
-		// the data using this pointer,
-		// then insert the node into the
-		// correct chain, without having
-		// to create a copy of the data to
-		// be added on the stack
-		virtual Node * NewNode();
-		// add, checking that an equivalent entry does not already exist
-		// triggering fail function if one does
-		void AddAsserted(Node *);
-		// add, regardless of whether an equivalent entry already exists
-		void AddRegardless(Node *);
-		// V1.11 allows AddChecked for the Node-adding interface
-		bool AddChecked(Node *);
-		// if add checked fails, you should avoid the memory leak with this function
-		virtual void DeleteNode(Node *);
+        // advance to the next entry
+        void Next()
+        {
+            if (!nEntriesRemaining) {
+                HT_FAIL("HTT: Tried to do Next() on an iterator which was Done()");
+            }
+            if ((*nodePP)->nextP) {
+                nodePP = &(*nodePP)->nextP;
+            } else {
+                do {
+                    ++chainPP;
+                    --nChainsRemaining;
+                } while (nChainsRemaining && !*chainPP);
+                nodePP = chainPP;
+            }
+            --nEntriesRemaining;
+        }
 
-		class Node
-		{
-			public:
-				TYPE d;
-			private:
-				Node * nextP;
-				// Nested class functions apparently have to be declared here for MSVC compatability
-				inline Node(ARG_TYPE _dataR,Node * _nextP)
-					: d(_dataR)
-					, nextP(_nextP)
-				{
-				}
-				inline Node()
-				{
-				}
-				inline ~Node()
-				{
-				}
-				void DeleteChain()
-				{
-					if (nextP) nextP->DeleteChain();
-					delete this;
-				}
+    private:
+        Node **chainPP;
+        Node **nodePP;
+        unsigned nChainsRemaining;
+        unsigned nEntriesRemaining;
 
-				friend class ConstIterator;
-				friend class Iterator;
-				friend class ValueIterator;
-				friend class _base_HashTable<TYPE,ARG_TYPE,CMP_ARG_TYPE>;
-		};
-		
-	private:
-		// virtual functions for future expansion
-		virtual Node * NewNode(ARG_TYPE,Node *);
-		
-		unsigned nEntries;
-		unsigned tableSize;
-		unsigned tableSizeMask;
-		Node * * chainPA;
+        friend class Iterator;
+    };
 
-		friend class ConstIterator;
-		friend class Iterator;
-		friend class ValueIterator;
-		
-		inline void Xx(){}
+    // a _base_HashTable non-const iterator - can remove entry pointed to
+    class Iterator : public ConstIterator
+    {
+        // Nested class functions apparently have to be declared here for MSVC compatability
+    public:
+        // construct from hash table
+        inline Iterator(_base_HashTable<TYPE, ARG_TYPE, CMP_ARG_TYPE> &tableR)
+            : ConstIterator(tableR)
+            , tableNEntriesP(&tableR.nEntries)
+        {}
+
+        // remove the current entry pointed to, advancing to the next
+        void Remove()
+        {
+            if (!ConstIterator::nEntriesRemaining) {
+                HT_FAIL("HTT: Tried to Remove() via an iterator which was Done()");
+            }
+            Node *oldP = *ConstIterator::nodePP;
+            *ConstIterator::nodePP = oldP->nextP;
+            delete oldP;
+            if (!*ConstIterator::nodePP) {
+                do {
+                    ++ConstIterator::chainPP;
+                    --ConstIterator::nChainsRemaining;
+                } while (ConstIterator::nChainsRemaining && !*ConstIterator::chainPP);
+                ConstIterator::nodePP = ConstIterator::chainPP;
+            }
+            --ConstIterator::nEntriesRemaining;
+            --*tableNEntriesP;
+        }
+
+    private:
+        unsigned *tableNEntriesP;
+    };
+
+    // v1.2 extended functionality
+    // a _base_HashTable iterator through a specific hash value
+    class ValueIterator
+    {
+        // Nested class functions apparently have to be declared here for MSVC compatability
+    public:
+        // construct from const hash table
+        ValueIterator(_base_HashTable<TYPE, ARG_TYPE, CMP_ARG_TYPE> &tableR, unsigned value)
+            : chainPP(tableR.chainPA)
+            , value(value)
+            , tableNEntriesP(&tableR.nEntries)
+        {
+            chainPP += (value & tableR.tableSizeMask);
+            nodePP = chainPP;
+        }
+
+        // returns non-zero if there are no more entries to get
+        inline bool Done() const { return (!(*nodePP)); }
+
+        inline operator ARG_TYPE() const { return Get(); }
+        inline ARG_TYPE Get() const
+        {
+            if (Done()) {
+                HT_FAIL("HTT: Tried to Get() from an iterator which was Done()");
+            }
+            return (*nodePP)->d;
+        }
+
+        inline void Restart(_base_HashTable<TYPE, ARG_TYPE, CMP_ARG_TYPE> const &tableR)
+        {
+            chainPP = tableR.chainPA + (value & tableR.tableSizeMask);
+            nodePP = chainPP;
+        }
+
+        // advance to the next entry
+        void Next()
+        {
+            if (*nodePP) {
+                nodePP = &(*nodePP)->nextP; // even if it's NULL for ValueIterator
+            } else {
+                HT_FAIL("HTT: Tried to do Next() on a Value iterator which was Done()");
+            }
+        }
+
+        // remove the current entry pointed to, advancing to the next
+        void Remove()
+        {
+            if (*nodePP) {
+                Node *oldP = *nodePP;
+                *nodePP = oldP->nextP;
+                delete oldP;
+                --*tableNEntriesP;
+            } else {
+                HT_FAIL("HTT: Tried to Remove() via an iterator which was Done()");
+            }
+        }
+
+    private:
+        Node **chainPP;
+        Node **nodePP;
+
+        unsigned value;
+        unsigned *tableNEntriesP;
+    };
+
+    // V1.1 extended functionality
+    // allow user to create nodes, change
+    // the data using this pointer,
+    // then insert the node into the
+    // correct chain, without having
+    // to create a copy of the data to
+    // be added on the stack
+    virtual Node *NewNode();
+    // add, checking that an equivalent entry does not already exist
+    // triggering fail function if one does
+    void AddAsserted(Node *);
+    // add, regardless of whether an equivalent entry already exists
+    void AddRegardless(Node *);
+    // V1.11 allows AddChecked for the Node-adding interface
+    bool AddChecked(Node *);
+    // if add checked fails, you should avoid the memory leak with this function
+    virtual void DeleteNode(Node *);
+
+    class Node
+    {
+    public:
+        TYPE d;
+
+    private:
+        Node *nextP;
+        // Nested class functions apparently have to be declared here for MSVC compatability
+        inline Node(ARG_TYPE _dataR, Node *_nextP)
+            : d(_dataR)
+            , nextP(_nextP)
+        {}
+        inline Node() {}
+        inline ~Node() {}
+        void DeleteChain()
+        {
+            if (nextP)
+                nextP->DeleteChain();
+            delete this;
+        }
+
+        friend class ConstIterator;
+        friend class Iterator;
+        friend class ValueIterator;
+        friend class _base_HashTable<TYPE, ARG_TYPE, CMP_ARG_TYPE>;
+    };
+
+private:
+    // virtual functions for future expansion
+    virtual Node *NewNode(ARG_TYPE, Node *);
+
+    unsigned nEntries;
+    unsigned tableSize;
+    unsigned tableSizeMask;
+    Node **chainPA;
+
+    friend class ConstIterator;
+    friend class Iterator;
+    friend class ValueIterator;
+
+    inline void Xx() {}
 };
 
 /*******************/
 /* Defined to Fail */
 /**************Jake*/
 
-template <class TYPE,class ARG_TYPE,class CMP_ARG_TYPE>
-inline _base_HashTable<TYPE,ARG_TYPE,CMP_ARG_TYPE> & _base_HashTable<TYPE,ARG_TYPE,CMP_ARG_TYPE>::operator = (_base_HashTable<TYPE,ARG_TYPE,CMP_ARG_TYPE> const &)
+template<class TYPE, class ARG_TYPE, class CMP_ARG_TYPE>
+inline _base_HashTable<TYPE, ARG_TYPE, CMP_ARG_TYPE> &
+_base_HashTable<TYPE, ARG_TYPE, CMP_ARG_TYPE>::operator=(
+    _base_HashTable<TYPE, ARG_TYPE, CMP_ARG_TYPE> const &)
 {
-  	HT_FAIL("HTT: assignment operator not allowed in this version");
-  	return *this;
+    HT_FAIL("HTT: assignment operator not allowed in this version");
+    return *this;
 }
 
 /*******************************/
 /* Inline Function Definitions */
 /**************************Jake*/
 
-template <class TYPE,class ARG_TYPE,class CMP_ARG_TYPE>
-inline void _base_HashTable<TYPE,ARG_TYPE,CMP_ARG_TYPE>::AddRegardless(ARG_TYPE _dataR)
+template<class TYPE, class ARG_TYPE, class CMP_ARG_TYPE>
+inline void _base_HashTable<TYPE, ARG_TYPE, CMP_ARG_TYPE>::AddRegardless(ARG_TYPE _dataR)
 {
-	Node * & chainPR = chainPA[HashFunction(_dataR) & tableSizeMask];
-	chainPR = new Node(_dataR,chainPR);
-	++ nEntries;
+    Node *&chainPR = chainPA[HashFunction(_dataR) & tableSizeMask];
+    chainPR = new Node(_dataR, chainPR);
+    ++nEntries;
 }
 
-template <class TYPE,class ARG_TYPE,class CMP_ARG_TYPE>
-inline void _base_HashTable<TYPE,ARG_TYPE,CMP_ARG_TYPE>::AddRegardless(Node * _nodeP)
+template<class TYPE, class ARG_TYPE, class CMP_ARG_TYPE>
+inline void _base_HashTable<TYPE, ARG_TYPE, CMP_ARG_TYPE>::AddRegardless(Node *_nodeP)
 {
-	Node * & chainPR = chainPA[HashFunction(_nodeP->d) & tableSizeMask];
-	_nodeP->nextP = chainPR;
-	chainPR = _nodeP;
-	++ nEntries;
+    Node *&chainPR = chainPA[HashFunction(_nodeP->d) & tableSizeMask];
+    _nodeP->nextP = chainPR;
+    chainPR = _nodeP;
+    ++nEntries;
 }
 
 // with NDEBUG on these functions evaluate to be identical to AddRegardless
 #ifdef NDEBUG
-template <class TYPE,class ARG_TYPE,class CMP_ARG_TYPE>
-inline void _base_HashTable<TYPE,ARG_TYPE,CMP_ARG_TYPE>::AddAsserted(ARG_TYPE _dataR)
+template<class TYPE, class ARG_TYPE, class CMP_ARG_TYPE>
+inline void _base_HashTable<TYPE, ARG_TYPE, CMP_ARG_TYPE>::AddAsserted(ARG_TYPE _dataR)
 {
-	AddRegardless(_dataR);
+    AddRegardless(_dataR);
 }
 
-template <class TYPE,class ARG_TYPE,class CMP_ARG_TYPE>
-inline void _base_HashTable<TYPE,ARG_TYPE,CMP_ARG_TYPE>::AddAsserted(Node * _nodeP)
+template<class TYPE, class ARG_TYPE, class CMP_ARG_TYPE>
+inline void _base_HashTable<TYPE, ARG_TYPE, CMP_ARG_TYPE>::AddAsserted(Node *_nodeP)
 {
-	AddRegardless(_nodeP);
+    AddRegardless(_nodeP);
 }
 #endif
 
-template <class TYPE,class ARG_TYPE,class CMP_ARG_TYPE>
-inline TYPE const * _base_HashTable<TYPE,ARG_TYPE,CMP_ARG_TYPE>::Contains(CMP_ARG_TYPE _dataR) const
+template<class TYPE, class ARG_TYPE, class CMP_ARG_TYPE>
+inline TYPE const *_base_HashTable<TYPE, ARG_TYPE, CMP_ARG_TYPE>::Contains(CMP_ARG_TYPE _dataR) const
 {
-	for (Node const * nodeP = chainPA[HashFunction(_dataR) & tableSizeMask]; nodeP; nodeP = nodeP->nextP)
-	{
-		if (nodeP->d == _dataR) return &nodeP->d;
-	}
-	return NULL;
+    for (Node const *nodeP = chainPA[HashFunction(_dataR) & tableSizeMask]; nodeP;
+         nodeP = nodeP->nextP) {
+        if (nodeP->d == _dataR)
+            return &nodeP->d;
+    }
+    return NULL;
 }
 
-template <class TYPE,class ARG_TYPE,class CMP_ARG_TYPE>
-inline unsigned _base_HashTable<TYPE,ARG_TYPE,CMP_ARG_TYPE>::Size() const
+template<class TYPE, class ARG_TYPE, class CMP_ARG_TYPE>
+inline unsigned _base_HashTable<TYPE, ARG_TYPE, CMP_ARG_TYPE>::Size() const
 {
-	return nEntries;
+    return nEntries;
 }
 
-template <class TYPE,class ARG_TYPE,class CMP_ARG_TYPE>
-inline void _base_HashTable<TYPE,ARG_TYPE,CMP_ARG_TYPE>::RemoveAll()
+template<class TYPE, class ARG_TYPE, class CMP_ARG_TYPE>
+inline void _base_HashTable<TYPE, ARG_TYPE, CMP_ARG_TYPE>::RemoveAll()
 {
-	for (unsigned i=0; i<tableSize; ++i)
-		if (chainPA[i])
-		{
-			chainPA[i]->DeleteChain();
-			chainPA[i] = NULL;
-		}
-	nEntries = 0;
+    for (unsigned i = 0; i < tableSize; ++i)
+        if (chainPA[i]) {
+            chainPA[i]->DeleteChain();
+            chainPA[i] = NULL;
+        }
+    nEntries = 0;
 }
 
 /*************************************************************/
@@ -680,166 +644,165 @@ inline void _base_HashTable<TYPE,ARG_TYPE,CMP_ARG_TYPE>::RemoveAll()
 /* MS Visual C will link if they're in their own source file */
 /********************************************************Jake*/
 
-template <class TYPE,class ARG_TYPE,class CMP_ARG_TYPE>
-_base_HashTable<TYPE,ARG_TYPE,CMP_ARG_TYPE>::_base_HashTable(unsigned _initialTableSizeShift)
-	: nEntries(0)
-	, tableSize(1<<_initialTableSizeShift)
-	, tableSizeMask(tableSize-1)
-	, chainPA(new Node * [tableSize])
+template<class TYPE, class ARG_TYPE, class CMP_ARG_TYPE>
+_base_HashTable<TYPE, ARG_TYPE, CMP_ARG_TYPE>::_base_HashTable(unsigned _initialTableSizeShift)
+    : nEntries(0)
+    , tableSize(1 << _initialTableSizeShift)
+    , tableSizeMask(tableSize - 1)
+    , chainPA(new Node *[tableSize])
 {
-	for (unsigned i=0; i<tableSize; ++i)
-		chainPA[i] = NULL;
+    for (unsigned i = 0; i < tableSize; ++i)
+        chainPA[i] = NULL;
 }
 
-template <class TYPE,class ARG_TYPE,class CMP_ARG_TYPE>
-inline _base_HashTable<TYPE,ARG_TYPE,CMP_ARG_TYPE>::_base_HashTable(_base_HashTable<TYPE,ARG_TYPE,CMP_ARG_TYPE> const & ht)
-	: nEntries(0)
-	, tableSize(ht.tableSize)
-	, tableSizeMask(tableSize-1)
-	, chainPA(new Node * [tableSize])
+template<class TYPE, class ARG_TYPE, class CMP_ARG_TYPE>
+inline _base_HashTable<TYPE, ARG_TYPE, CMP_ARG_TYPE>::_base_HashTable(
+    _base_HashTable<TYPE, ARG_TYPE, CMP_ARG_TYPE> const &ht)
+    : nEntries(0)
+    , tableSize(ht.tableSize)
+    , tableSizeMask(tableSize - 1)
+    , chainPA(new Node *[tableSize])
 {
-	for (unsigned i=0; i<tableSize; ++i) { chainPA[i] = NULL; }
+    for (unsigned i = 0; i < tableSize; ++i) {
+        chainPA[i] = NULL;
+    }
 
-	
-//	for(HashTable<TYPE>::ConstIterator it(ht); !it.Done(); it.Next() )
-	for (typename _base_HashTable::ConstIterator it(ht); !it.Done(); it.Next() )
-	{
-		AddRegardless( it.Get() );
-	}
+    //	for(HashTable<TYPE>::ConstIterator it(ht); !it.Done(); it.Next() )
+    for (typename _base_HashTable::ConstIterator it(ht); !it.Done(); it.Next()) {
+        AddRegardless(it.Get());
+    }
 }
 
-template <class TYPE,class ARG_TYPE,class CMP_ARG_TYPE>
-_base_HashTable<TYPE,ARG_TYPE,CMP_ARG_TYPE>::~_base_HashTable()
+template<class TYPE, class ARG_TYPE, class CMP_ARG_TYPE>
+_base_HashTable<TYPE, ARG_TYPE, CMP_ARG_TYPE>::~_base_HashTable()
 {
-	for (unsigned i=0; i<tableSize; ++i)
-		if (chainPA[i])
-			chainPA[i]->DeleteChain();
-	delete[] chainPA;
+    for (unsigned i = 0; i < tableSize; ++i)
+        if (chainPA[i])
+            chainPA[i]->DeleteChain();
+    delete[] chainPA;
 }
 
-template <class TYPE,class ARG_TYPE,class CMP_ARG_TYPE>
-bool _base_HashTable<TYPE,ARG_TYPE,CMP_ARG_TYPE>::AddChecked(ARG_TYPE _dataR)
+template<class TYPE, class ARG_TYPE, class CMP_ARG_TYPE>
+bool _base_HashTable<TYPE, ARG_TYPE, CMP_ARG_TYPE>::AddChecked(ARG_TYPE _dataR)
 {
-	Node * & chainPR = chainPA[HashFunction(_dataR) & tableSizeMask];
-	for (Node const * nodeP = chainPR; nodeP; nodeP = nodeP->nextP)
-	{
-		if (nodeP->d == _dataR) return false;
-	}
-	chainPR = new Node(_dataR,chainPR);
-	++ nEntries;
-	return true;
+    Node *&chainPR = chainPA[HashFunction(_dataR) & tableSizeMask];
+    for (Node const *nodeP = chainPR; nodeP; nodeP = nodeP->nextP) {
+        if (nodeP->d == _dataR)
+            return false;
+    }
+    chainPR = new Node(_dataR, chainPR);
+    ++nEntries;
+    return true;
 }
 
-template <class TYPE,class ARG_TYPE,class CMP_ARG_TYPE>
-bool _base_HashTable<TYPE,ARG_TYPE,CMP_ARG_TYPE>::AddChecked(Node * _nodeP)
+template<class TYPE, class ARG_TYPE, class CMP_ARG_TYPE>
+bool _base_HashTable<TYPE, ARG_TYPE, CMP_ARG_TYPE>::AddChecked(Node *_nodeP)
 {
-	Node * & chainPR = chainPA[HashFunction(_nodeP->d) & tableSizeMask];
-	for (Node const * nodeP = chainPR; nodeP; nodeP = nodeP->nextP)
-	{
-		if (nodeP->d == _nodeP->d) return false;
-	}
-	_nodeP->nextP = chainPR;
-	chainPR = _nodeP;
-	++ nEntries;
-	return true;
+    Node *&chainPR = chainPA[HashFunction(_nodeP->d) & tableSizeMask];
+    for (Node const *nodeP = chainPR; nodeP; nodeP = nodeP->nextP) {
+        if (nodeP->d == _nodeP->d)
+            return false;
+    }
+    _nodeP->nextP = chainPR;
+    chainPR = _nodeP;
+    ++nEntries;
+    return true;
 }
 
 // with NDEBUG on these functions evaluate to be identical to AddRegardless
 #ifndef NDEBUG
-template <class TYPE,class ARG_TYPE,class CMP_ARG_TYPE>
-void _base_HashTable<TYPE,ARG_TYPE,CMP_ARG_TYPE>::AddAsserted(ARG_TYPE _dataR)
+template<class TYPE, class ARG_TYPE, class CMP_ARG_TYPE>
+void _base_HashTable<TYPE, ARG_TYPE, CMP_ARG_TYPE>::AddAsserted(ARG_TYPE _dataR)
 {
-	Node * & chainPR = chainPA[HashFunction(_dataR) & tableSizeMask];
-	for (Node const * nodeP = chainPR; nodeP; nodeP = nodeP->nextP)
-	{
-		if (nodeP->d == _dataR)
-		{
-			HT_FAIL("HTT: Tried to add entry which was already contained in table");
-		}
-	}
-	chainPR = new Node(_dataR,chainPR);
-	++ nEntries;
+    Node *&chainPR = chainPA[HashFunction(_dataR) & tableSizeMask];
+    for (Node const *nodeP = chainPR; nodeP; nodeP = nodeP->nextP) {
+        if (nodeP->d == _dataR) {
+            HT_FAIL("HTT: Tried to add entry which was already contained in table");
+        }
+    }
+    chainPR = new Node(_dataR, chainPR);
+    ++nEntries;
 }
 
-template <class TYPE,class ARG_TYPE,class CMP_ARG_TYPE>
-void _base_HashTable<TYPE,ARG_TYPE,CMP_ARG_TYPE>::AddAsserted(Node * _nodeP)
+template<class TYPE, class ARG_TYPE, class CMP_ARG_TYPE>
+void _base_HashTable<TYPE, ARG_TYPE, CMP_ARG_TYPE>::AddAsserted(Node *_nodeP)
 {
-	Node * & chainPR = chainPA[HashFunction(_nodeP->d) & tableSizeMask];
-	for (Node const * nodeP = chainPR; nodeP; nodeP = nodeP->nextP)
-	{
-		if (nodeP->d == _nodeP->d)
-		{
-			HT_FAIL("HTT: Tried to add entry which was already contained in table");
-		}
-	}
-	_nodeP->nextP = chainPR;
-	chainPR = _nodeP;
-	++ nEntries;
+    Node *&chainPR = chainPA[HashFunction(_nodeP->d) & tableSizeMask];
+    for (Node const *nodeP = chainPR; nodeP; nodeP = nodeP->nextP) {
+        if (nodeP->d == _nodeP->d) {
+            HT_FAIL("HTT: Tried to add entry which was already contained in table");
+        }
+    }
+    _nodeP->nextP = chainPR;
+    chainPR = _nodeP;
+    ++nEntries;
 }
 #endif
 
-template <class TYPE,class ARG_TYPE,class CMP_ARG_TYPE>
-bool _base_HashTable<TYPE,ARG_TYPE,CMP_ARG_TYPE>::Remove(CMP_ARG_TYPE _dataR)
+template<class TYPE, class ARG_TYPE, class CMP_ARG_TYPE>
+bool _base_HashTable<TYPE, ARG_TYPE, CMP_ARG_TYPE>::Remove(CMP_ARG_TYPE _dataR)
 {
-	for (Node * * nodePP = &chainPA[HashFunction(_dataR) & tableSizeMask]; (*nodePP); nodePP = &(*nodePP)->nextP)
-	{
-		if ((*nodePP)->d == _dataR)
-		{
-			Node * oldP = *nodePP;
-			*nodePP = oldP->nextP;
-			delete oldP;
-			-- nEntries;
-			return true;
-		}
-	}
-	return false;
+    for (Node **nodePP = &chainPA[HashFunction(_dataR) & tableSizeMask]; (*nodePP);
+         nodePP = &(*nodePP)->nextP) {
+        if ((*nodePP)->d == _dataR) {
+            Node *oldP = *nodePP;
+            *nodePP = oldP->nextP;
+            delete oldP;
+            --nEntries;
+            return true;
+        }
+    }
+    return false;
 }
 
-template <class TYPE,class ARG_TYPE,class CMP_ARG_TYPE>
-void _base_HashTable<TYPE,ARG_TYPE,CMP_ARG_TYPE>::RemoveAsserted(CMP_ARG_TYPE _dataR)
+template<class TYPE, class ARG_TYPE, class CMP_ARG_TYPE>
+void _base_HashTable<TYPE, ARG_TYPE, CMP_ARG_TYPE>::RemoveAsserted(CMP_ARG_TYPE _dataR)
 {
-	for (Node * * nodePP = &chainPA[HashFunction(_dataR) & tableSizeMask]; (*nodePP); nodePP = &(*nodePP)->nextP)
-	{
-		if ((*nodePP)->d == _dataR)
-		{
-			Node * oldP = *nodePP;
-			*nodePP = oldP->nextP;
-			delete oldP;
-			-- nEntries;
-			return;
-		}
-	}
-	HT_FAIL("HTT: Tried to remove entry which was not contained in table");
+    for (Node **nodePP = &chainPA[HashFunction(_dataR) & tableSizeMask]; (*nodePP);
+         nodePP = &(*nodePP)->nextP) {
+        if ((*nodePP)->d == _dataR) {
+            Node *oldP = *nodePP;
+            *nodePP = oldP->nextP;
+            delete oldP;
+            --nEntries;
+            return;
+        }
+    }
+    HT_FAIL("HTT: Tried to remove entry which was not contained in table");
 }
 
-template <class TYPE,class ARG_TYPE,class CMP_ARG_TYPE>
-typename _base_HashTable<TYPE,ARG_TYPE,CMP_ARG_TYPE>::Node * _base_HashTable<TYPE,ARG_TYPE,CMP_ARG_TYPE>::NewNode(ARG_TYPE _dataR,Node * _nextP)
+template<class TYPE, class ARG_TYPE, class CMP_ARG_TYPE>
+typename _base_HashTable<TYPE, ARG_TYPE, CMP_ARG_TYPE>::Node *
+_base_HashTable<TYPE, ARG_TYPE, CMP_ARG_TYPE>::NewNode(ARG_TYPE _dataR, Node *_nextP)
 {
-	return new Node(_dataR,_nextP);
+    return new Node(_dataR, _nextP);
 }
 
-template <class TYPE,class ARG_TYPE,class CMP_ARG_TYPE>
-typename _base_HashTable<TYPE,ARG_TYPE,CMP_ARG_TYPE>::Node * _base_HashTable<TYPE,ARG_TYPE,CMP_ARG_TYPE>::NewNode()
+template<class TYPE, class ARG_TYPE, class CMP_ARG_TYPE>
+typename _base_HashTable<TYPE, ARG_TYPE, CMP_ARG_TYPE>::Node *
+_base_HashTable<TYPE, ARG_TYPE, CMP_ARG_TYPE>::NewNode()
 {
-	return new Node;
+    return new Node;
 }
 
-template <class TYPE,class ARG_TYPE,class CMP_ARG_TYPE>
-void _base_HashTable<TYPE,ARG_TYPE,CMP_ARG_TYPE>::DeleteNode(Node * _nodeP)
+template<class TYPE, class ARG_TYPE, class CMP_ARG_TYPE>
+void _base_HashTable<TYPE, ARG_TYPE, CMP_ARG_TYPE>::DeleteNode(Node *_nodeP)
 {
-	delete _nodeP;
+    delete _nodeP;
 }
 
-template <class TYPE> class HashTable;
+template<class TYPE>
+class HashTable;
 
-#define HT_DEFINITION(T1,T2,T3) \
-	: public _base_HashTable<T1,T2,T3> { public: HashTable(unsigned _initialTableSizeShift = HT_DEFAULTTABLESIZESHIFT) : _base_HashTable<T1,T2,T3>(_initialTableSizeShift){} };
+#define HT_DEFINITION(T1, T2, T3) \
+    : public _base_HashTable<T1,T2,T3> { public: HashTable(unsigned _initialTableSizeShift = HT_DEFAULTTABLESIZESHIFT) : _base_HashTable<T1,T2,T3>(_initialTableSizeShift){} };
 
 // for simple types
-#define HT_WATCOM_DEFINE_FOR_SIMPLE_TYPE(TYPE) \
-	class HashTable<TYPE> HT_DEFINITION(TYPE,TYPE,TYPE)
-	
-#define HT_DEFINE_FOR_SIMPLE_TYPE(SIMPLE_TYPE) template<> HT_WATCOM_DEFINE_FOR_SIMPLE_TYPE(SIMPLE_TYPE)
+#define HT_WATCOM_DEFINE_FOR_SIMPLE_TYPE(TYPE) class HashTable<TYPE> HT_DEFINITION(TYPE, TYPE, TYPE)
+
+#define HT_DEFINE_FOR_SIMPLE_TYPE(SIMPLE_TYPE) \
+    template<> \
+    HT_WATCOM_DEFINE_FOR_SIMPLE_TYPE(SIMPLE_TYPE)
 
 HT_DEFINE_FOR_SIMPLE_TYPE(unsigned long)
 HT_DEFINE_FOR_SIMPLE_TYPE(signed long)
@@ -865,8 +828,8 @@ class HashTable<TYPE const *> HT_DEFINITION(TYPE const *, TYPE const *, TYPE con
 #endif
 
 // for other types
-template <class TYPE>
-class HashTable HT_DEFINITION(TYPE,TYPE const &, TYPE const &)
+template<class TYPE>
+class HashTable HT_DEFINITION(TYPE, TYPE const &, TYPE const &)
 
 //template <class TYPE *> class HashTable : public _base_HashTable<TYPE *,TYPE *,TYPE const *> {};
 

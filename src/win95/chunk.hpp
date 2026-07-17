@@ -7,19 +7,16 @@
 
 #include "3dc.h"
 #include "mem3dc.h" // for debug new and delete
-	
-	
+
 #include "inline.h"
 
 #if SupportModules
 
-  #include "module.h"
+#include "module.h"
 
 #endif
 
 #include "list_tem.hpp"
-	
-
 
 #define CHUNK_FAILED_ON_LOAD -1
 #define CHUNK_FAILED_ON_LOAD_NOT_RECOGNISED -2
@@ -42,23 +39,21 @@
 #include "list_tem.hpp"
 
 #ifndef RIFF_OPTIMIZE // define this to get compiler errors where you are calling the old slow functions
-extern List<int> list_chunks_in_file (HANDLE &, const char * chunk_id);
+extern List<int> list_chunks_in_file(HANDLE &, const char *chunk_id);
 #endif
-extern void list_chunks_in_file (List<int> * pList, HANDLE, const char * chunk_id);
+extern void list_chunks_in_file(List<int> *pList, HANDLE, const char *chunk_id);
 
 // Structures for interfacing with the outside application
 // these are going to be basically very C-ee so that C
 // functions can also read them
-
-
 
 // The basic chunk class structure is as follows
 //
 //											Base_Chunk
 //											|				|
 //		Chunk_With_Children				Data Chunks
-// 			|							 				 
-// 	File_Chunk 
+// 			|
+// 	File_Chunk
 //
 
 // Most chunk classes are either derived from the Chunk
@@ -69,12 +64,12 @@ extern void list_chunks_in_file (List<int> * pList, HANDLE, const char * chunk_i
 //	class Sample_Data_Chunk : public Chunk
 //	{
 // 	public:
-//	
+//
 //	// Constructors are placed either here or may be private
 //	// The constructors for most shape data chunks are private
 //	// as only the Shape_Chunk can call them.  This is because
 //	// the shape chunk deals with the data.
-//	// 
+//	//
 //	// Any constuctor should initialise class chunk with the
 //	// correct identifier for the current chunk.
 //	//
@@ -85,7 +80,7 @@ extern void list_chunks_in_file (List<int> * pList, HANDLE, const char * chunk_i
 //	//
 //	// Any variables that are made available for the user should also
 //	// be placed here.
-//	// 
+//	//
 //	// The next three functions are vital for the io functions
 //	//
 //	virtual BOOL output_chunk (HANDLE &hand);
@@ -101,7 +96,7 @@ extern void list_chunks_in_file (List<int> * pList, HANDLE, const char * chunk_i
 //	// the same as the file data.  The data is assumed to be pre-allocated
 //	// with the size given by the size_chunk function.
 //	//
-//	} 
+//	}
 
 // A chunk with children is derived from the Chunk_With_Children class
 // as follows
@@ -117,18 +112,17 @@ extern void list_chunks_in_file (List<int> * pList, HANDLE, const char * chunk_i
 //	// Any constructor should initialise class Chunk_With_Children with
 //	// the correct identifier for the current chunk.
 //	//
-//	// The Destructor does not need to destroy child chunks as the 
+//	// The Destructor does not need to destroy child chunks as the
 //	// Chunk_With_Children destructor will automatically do this.
-//	// 
-//	// The three functions (size_chunk, output_chunk and fill_data_block) 
+//	//
+//	// The three functions (size_chunk, output_chunk and fill_data_block)
 //	// are not needed as Chunk_With_Children can deal with these - but may
 //	// be put in.
-//	// 
+//	//
 //	}
 
 //
 //
-
 
 // The logic behind the locking is as follows.
 
@@ -159,231 +153,226 @@ extern void list_chunks_in_file (List<int> * pList, HANDLE, const char * chunk_i
 // be with that shape in the header.  These objects will be locked
 // also.
 
-
-
 ///////////////////////////////////////////////
 
 class Chunk
 {
 public:
+    //destructor
+    virtual ~Chunk();
 
-	//destructor
-	virtual ~Chunk ();
+    // constructors
+    Chunk(class Chunk_With_Children *parent, const char *ident);
 
-	// constructors
-	Chunk (class Chunk_With_Children * parent, const char * ident);
+    virtual size_t size_chunk() = 0;
 
-	virtual size_t size_chunk () = 0;
+    virtual BOOL output_chunk(HANDLE &);
 
-	virtual BOOL output_chunk (HANDLE &);
+    virtual void fill_data_block(char *data_start) = 0;
 
-	virtual void fill_data_block (char * data_start) = 0;
+    // this function is virtual, but will probably not be used elsewhere
+    virtual char *make_data_block_from_chunk();
 
-	// this function is virtual, but will probably not be used elsewhere
-	virtual char * make_data_block_from_chunk ();
+    // Selective output functions, these are similar to the normal ones
+    // and will normally call the equivalents.
+    // special chunks will have there own functions which will only respond
+    // if they have a flag set
 
-	
-	// Selective output functions, these are similar to the normal ones
-	// and will normally call the equivalents.
-	// special chunks will have there own functions which will only respond
-	// if they have a flag set
+    virtual char *make_data_block_for_process();
 
-	virtual char * make_data_block_for_process();
+    virtual size_t size_chunk_for_process();
 
-	virtual size_t size_chunk_for_process();
-	
-	virtual void fill_data_block_for_process(char * data_start);	
+    virtual void fill_data_block_for_process(char *data_start);
 
-	// these functions are virtual, but will only be used sparingly
+    // these functions are virtual, but will only be used sparingly
 
-	virtual void prepare_for_output() 
-	{}
+    virtual void prepare_for_output() {}
 
-	virtual void post_input_processing()
-	{}
+    virtual void post_input_processing() {}
 
-	const char * identifier;
+    const char *identifier;
 
-	int error_code;
-	
-	// this allows chunks with children to trap miscellaneous chunks
-	// that shouldn't be miscellaneous !!!
-	virtual BOOL r_u_miscellaneous()
-	{ return FALSE; }
+    int error_code;
 
-	static void Register(const char* idChunk,const char* idParent ,Chunk * (* pfnCreate) (Chunk_With_Children* parent,const char* data) );
-	
+    // this allows chunks with children to trap miscellaneous chunks
+    // that shouldn't be miscellaneous !!!
+    virtual BOOL r_u_miscellaneous() { return FALSE; }
+
+    static void Register(
+        const char *idChunk,
+        const char *idParent,
+        Chunk *(*pfnCreate)(Chunk_With_Children *parent, const char *data));
+
 private:
+    // copy - private to stop chunks
+    // from being copied
+    Chunk(const Chunk &);
+    // ditto
+    void operator=(const Chunk &);
 
-	// copy - private to stop chunks
-	// from being copied
-	Chunk (const Chunk &);
-	// ditto
-	void operator=(const Chunk &);	
+    // pointers to siblings
 
-	// pointers to siblings
+    friend class Chunk_With_Children;
+    friend class Sprite_Header_Chunk; // sprite updating needs to scan through all child chunks
+    friend class File_Chunk;
+    friend class RIF_File_Chunk;
+    friend class Shape_Chunk;
 
-	friend class Chunk_With_Children;
-	friend class Sprite_Header_Chunk; // sprite updating needs to scan through all child chunks
-	friend class File_Chunk;
-	friend class RIF_File_Chunk;
-	friend class Shape_Chunk;
+    Chunk *next;
+    Chunk *previous;
 
-	Chunk * next;
-	Chunk * previous;
+    // identifier store
 
-	// identifier store
+    char identifier_store[9];
 
-	char identifier_store[9];
-	
 protected:
+    size_t chunk_size;
 
-	size_t chunk_size;
+    // pointer to parent
+    class Chunk_With_Children *parent;
 
-	// pointer to parent
-	class Chunk_With_Children * parent;
-
-public :
-
-	class Chunk_With_Children * GetRootChunk(void);
-	class Chunk_With_Children const * GetRootChunk(void) const;
-	
+public:
+    class Chunk_With_Children *GetRootChunk(void);
+    class Chunk_With_Children const *GetRootChunk(void) const;
 };
-
 
 ///////////////////////////////////////////////
 
 class Miscellaneous_Chunk : public Chunk
 {
 public:
+    Miscellaneous_Chunk(
+        Chunk_With_Children *parent, const char *identifier, const char *_data, size_t _data_size);
 
-	Miscellaneous_Chunk (Chunk_With_Children * parent, const char * identifier,
-									 const char * _data, size_t _data_size);
+    virtual ~Miscellaneous_Chunk();
 
+    virtual size_t size_chunk() { return (chunk_size = (data_size + 12)); }
 
-	virtual ~Miscellaneous_Chunk ();
+    virtual void fill_data_block(char *data_start);
 
-	virtual size_t size_chunk ()
-	{
-		return (chunk_size = (data_size + 12));
-	}
+    const size_t data_size;
+    const char *const data;
 
-	virtual void fill_data_block (char * data_start);
+    // this allows chunks with children to trap miscellaneous chunks
+    // that shouldn't be miscellaneous !!!
+    virtual BOOL r_u_miscellaneous() { return TRUE; }
 
-	const size_t data_size;
-	const char * const data;
-
-	// this allows chunks with children to trap miscellaneous chunks
-	// that shouldn't be miscellaneous !!!
-	virtual BOOL r_u_miscellaneous()
-	{ return TRUE; }
-	
 private:
-
-	char * data_store;
-
+    char *data_store;
 };
-
 
 ///////////////////////////////////////////////
 
 class Chunk_With_Children : public Chunk
 {
-
 public:
+    virtual ~Chunk_With_Children();
 
-	virtual ~Chunk_With_Children();
+    Chunk_With_Children(Chunk_With_Children *parent, const char *identifier)
+        : Chunk(parent, identifier)
+        , children(NULL)
+    {}
 
-	Chunk_With_Children (Chunk_With_Children * parent, const char * identifier)
-		: Chunk (parent, identifier), children (NULL) {}
+    virtual size_t size_chunk();
 
-	virtual size_t size_chunk ();
+    virtual BOOL output_chunk(HANDLE &);
 
-	virtual BOOL output_chunk (HANDLE &);
+    virtual void fill_data_block(char *data_start);
 
-	virtual void fill_data_block (char * data_start);
+    virtual void prepare_for_output();
 
-	virtual void prepare_for_output();	
+    virtual void post_input_processing();
 
-	virtual void post_input_processing();
+// look for child chunk(s)
+#ifndef RIFF_OPTIMIZE // define this to get compiler errors where you are calling the old slow functions
+    List<Chunk *> lookup_child(const char *) const;
+#endif
+    void lookup_child(const char *, List<Chunk *> &) const;
+    Chunk *lookup_single_child(const char *) const;
+    unsigned count_children(char const *) const;
 
-	// look for child chunk(s)
-	#ifndef RIFF_OPTIMIZE // define this to get compiler errors where you are calling the old slow functions
-	List<Chunk *> lookup_child (const char *) const;
-	#endif
-	void lookup_child (const char *,List<Chunk*>&) const;
-	Chunk* lookup_single_child(const char*) const;
-	unsigned count_children(char const *) const;
+    // Selective output functions, these are similar to the normal ones
+    // and will normally call the equivalents.
+    // special chunks will have there own functions which will only respond
+    // if they have a flag set
 
-	// Selective output functions, these are similar to the normal ones
-	// and will normally call the equivalents.
-	// special chunks will have there own functions which will only respond
-	// if they have a flag set
+    virtual size_t size_chunk_for_process();
 
-	virtual size_t size_chunk_for_process();
-	
-	virtual void fill_data_block_for_process(char * data_start);	
+    virtual void fill_data_block_for_process(char *data_start);
 
-
-	Chunk* DynCreate(const char* data);
+    Chunk *DynCreate(const char *data);
 
 protected:
+    friend class Chunk;
+    friend class File_Chunk;
 
-	friend class Chunk;
-	friend class File_Chunk;
-	
-	// points to a doubly linked list
-	Chunk * children;
-	
+    // points to a doubly linked list
+    Chunk *children;
 };
 
 /////////////////////////////////////////////
 // macros to save typing for chunk with children loader
 
-extern Chunk * Parent_File;
+extern Chunk *Parent_File;
 
 #define CHUNK_WITH_CHILDREN_LOADER_PARENT __parent
 
-#define CHUNK_WITH_CHILDREN_LOADER_INIT_PT1(id,chunkclass) \
-chunkclass::chunkclass(Chunk_With_Children * const CHUNK_WITH_CHILDREN_LOADER_PARENT, char const * __data, size_t const __size) \
-:Chunk_With_Children(CHUNK_WITH_CHILDREN_LOADER_PARENT,id)
+#define CHUNK_WITH_CHILDREN_LOADER_INIT_PT1(id, chunkclass) \
+    chunkclass::chunkclass( \
+        Chunk_With_Children *const CHUNK_WITH_CHILDREN_LOADER_PARENT, \
+        char const *__data, \
+        size_t const __size) \
+        : Chunk_With_Children(CHUNK_WITH_CHILDREN_LOADER_PARENT, id)
 
-#define CHUNK_WITH_CHILDREN_LOADER_INIT_PT2 { \
-	const char * const __buffer_ptr = __data; \
-	while (__data - __buffer_ptr < (signed)__size){ \
-		if (*(int *)(__data + 8) + (__data-__buffer_ptr) > (signed)__size){ \
-			Parent_File->error_code = CHUNK_FAILED_ON_LOAD_NOT_RECOGNISED; \
-			break;}
+#define CHUNK_WITH_CHILDREN_LOADER_INIT_PT2 \
+    { \
+        const char *const __buffer_ptr = __data; \
+        while (__data - __buffer_ptr < (signed) __size) { \
+            if (*(int *) (__data + 8) + (__data - __buffer_ptr) > (signed) __size) { \
+                Parent_File->error_code = CHUNK_FAILED_ON_LOAD_NOT_RECOGNISED; \
+                break; \
+            }
 
-#define LOCKABLE_CHUNK_WITH_CHILDREN_LOADER_INIT_PT1(id,chunkclass) \
-chunkclass::chunkclass(Chunk_With_Children * const CHUNK_WITH_CHILDREN_LOADER_PARENT, char const * __data, size_t const __size) \
-:Lockable_Chunk_With_Children(CHUNK_WITH_CHILDREN_LOADER_PARENT,id)
+#define LOCKABLE_CHUNK_WITH_CHILDREN_LOADER_INIT_PT1(id, chunkclass) \
+    chunkclass::chunkclass( \
+        Chunk_With_Children *const CHUNK_WITH_CHILDREN_LOADER_PARENT, \
+        char const *__data, \
+        size_t const __size) \
+        : Lockable_Chunk_With_Children(CHUNK_WITH_CHILDREN_LOADER_PARENT, id)
 
-#define LOCKABLE_CHUNK_WITH_CHILDREN_LOADER_INIT_PT2 { \
-	const char * const __buffer_ptr = __data; \
-	while (__data - __buffer_ptr < (signed) __size){ \
-		if (*(int *)(__data + 8) + (__data-__buffer_ptr) > (signed) __size){ \
-			Parent_File->error_code = CHUNK_FAILED_ON_LOAD_NOT_RECOGNISED; \
-			break;}
+#define LOCKABLE_CHUNK_WITH_CHILDREN_LOADER_INIT_PT2 \
+    { \
+        const char *const __buffer_ptr = __data; \
+        while (__data - __buffer_ptr < (signed) __size) { \
+            if (*(int *) (__data + 8) + (__data - __buffer_ptr) > (signed) __size) { \
+                Parent_File->error_code = CHUNK_FAILED_ON_LOAD_NOT_RECOGNISED; \
+                break; \
+            }
 
-#define CHUNK_WITH_CHILDREN_LOADER_INIT(id,chunkclass) \
-	CHUNK_WITH_CHILDREN_LOADER_INIT_PT1(id,chunkclass) \
-	CHUNK_WITH_CHILDREN_LOADER_INIT_PT2
+#define CHUNK_WITH_CHILDREN_LOADER_INIT(id, chunkclass) \
+    CHUNK_WITH_CHILDREN_LOADER_INIT_PT1(id, chunkclass) \
+    CHUNK_WITH_CHILDREN_LOADER_INIT_PT2
 
-#define LOCKABLE_CHUNK_WITH_CHILDREN_LOADER_INIT(id,chunkclass) \
-	LOCKABLE_CHUNK_WITH_CHILDREN_LOADER_INIT_PT1(id,chunkclass) \
-	LOCKABLE_CHUNK_WITH_CHILDREN_LOADER_INIT_PT2
+#define LOCKABLE_CHUNK_WITH_CHILDREN_LOADER_INIT(id, chunkclass) \
+    LOCKABLE_CHUNK_WITH_CHILDREN_LOADER_INIT_PT1(id, chunkclass) \
+    LOCKABLE_CHUNK_WITH_CHILDREN_LOADER_INIT_PT2
 
-#define CHUNK_WITH_CHILDREN_LOADER_FOR(id,chunkclass) \
-		else if (!strncmp(__data,id,8)){ \
-			new chunkclass(this,__data+12,*(int *)(__data+8)-12); \
-			__data += *(int *)(__data+8);}
+#define CHUNK_WITH_CHILDREN_LOADER_FOR(id, chunkclass) \
+    else if (!strncmp(__data, id, 8)) \
+    { \
+        new chunkclass(this, __data + 12, *(int *) (__data + 8) - 12); \
+        __data += *(int *) (__data + 8); \
+    }
 
 #define CHUNK_WITH_CHILDREN_LOADER_END \
-		else { \
-			new Miscellaneous_Chunk (this, __data, (__data + 12), (*(int *) (__data + 8)) -12 ); \
-			__data += *(int *)(__data + 8);}}}
-		
+    else \
+    { \
+        new Miscellaneous_Chunk(this, __data, (__data + 12), (*(int *) (__data + 8)) - 12); \
+        __data += *(int *) (__data + 8); \
+    } \
+    } \
+    }
+
 // example:
 //
 // CHUNK_WITH_CHILDREN_LOADER_INIT("GAMEMODE",Environment_Game_Mode_Chunk)
@@ -397,82 +386,77 @@ chunkclass::chunkclass(Chunk_With_Children * const CHUNK_WITH_CHILDREN_LOADER_PA
 //macros for use in chunk construction from buffer, assume buffer is called data
 
 //read variable of type 'type'
-#define CHUNK_EXTRACT(var,type) \
-	var=*(type*)data; \
-	data+=sizeof(type);
+#define CHUNK_EXTRACT(var, type) \
+    var = *(type *) data; \
+    data += sizeof(type);
 
 //read 4 byte aligned string
-#define CHUNK_EXTRACT_STRING(var) { \
-	int __length=strlen(data); \
-	if(__length) \
-	{ \
-		var=new char[__length+1]; \
-		strcpy(var,data); \
-	} \
-	else var=0; \
-	data+=(__length+4) &~3 ;}
+#define CHUNK_EXTRACT_STRING(var) \
+    { \
+        int __length = strlen(data); \
+        if (__length) { \
+            var = new char[__length + 1]; \
+            strcpy(var, data); \
+        } else \
+            var = 0; \
+        data += (__length + 4) & ~3; \
+    }
 
 //read array
 //length is an int (filled in by macro)
 //pointer is a pointer of type 'type'
-#define CHUNK_EXTRACT_ARRAY(length,pointer,type){\
-	CHUNK_EXTRACT(length,int) \
-	if(length) \
-	{ \
-		pointer=new type[length]; \
-		for(int __i=0;__i<length;__i++) \
-		{ \
-			CHUNK_EXTRACT(pointer[__i],type)	\
-		} \
-	} \
-	else pointer=0;}
-	
+#define CHUNK_EXTRACT_ARRAY(length, pointer, type) \
+    { \
+        CHUNK_EXTRACT(length, int) \
+        if (length) { \
+            pointer = new type[length]; \
+            for (int __i = 0; __i < length; __i++) { \
+                CHUNK_EXTRACT(pointer[__i], type) \
+            } \
+        } else \
+            pointer = 0; \
+    }
 
 //macros for use in fill_data_block
 
 #define CHUNK_FILL_START \
-	strncpy (data, identifier, 8); \
-	data += 8; \
-	*(int *) data = chunk_size; \
-	data += 4; 
-
+    strncpy(data, identifier, 8); \
+    data += 8; \
+    *(int *) data = chunk_size; \
+    data += 4;
 
 //write variable of type 'type'
-#define CHUNK_FILL(var,type) \
-	*(type*)data=var; \
-	data+=sizeof(type);
+#define CHUNK_FILL(var, type) \
+    *(type *) data = var; \
+    data += sizeof(type);
 
 //write 4 byte aligned string
 #define CHUNK_FILL_STRING(var) \
-	if(var) strcpy(data,var); \
-	else *data=0; \
-	data+=(strlen(data)+4)&~3; 
+    if (var) \
+        strcpy(data, var); \
+    else \
+        *data = 0; \
+    data += (strlen(data) + 4) & ~3;
 
-#define CHUNK_FILL_ARRAY(length,pointer,type){\
-	CHUNK_FILL(length,int) \
-	for(int __i=0;__i<length;__i++)	\
-	{ \
-		CHUNK_FILL(pointer[__i],type); \
-	}	\
-}
+#define CHUNK_FILL_ARRAY(length, pointer, type) \
+    { \
+        CHUNK_FILL(length, int) \
+        for (int __i = 0; __i < length; __i++) { \
+            CHUNK_FILL(pointer[__i], type); \
+        } \
+    }
 
 //macros for use in size_chunk
 
-#define CHUNK_SIZE_START \
-	chunk_size = 12 
-
+#define CHUNK_SIZE_START chunk_size = 12
 
 //size of variable of type 'type'
-#define CHUNK_SIZE(var,type) \
-	+ sizeof(type)
+#define CHUNK_SIZE(var, type) +sizeof(type)
 
 //size of 4 byte aligned string
-#define CHUNK_SIZE_STRING(string) \
-	+ (string ? (strlen(string)+4)&~3 : 4)
+#define CHUNK_SIZE_STRING(string) +(string ? (strlen(string) + 4) & ~3 : 4)
 
-#define CHUNK_SIZE_ARRAY(length,pointer,type) \
-	+ sizeof(int) \
-	+ (length * sizeof(type))
+#define CHUNK_SIZE_ARRAY(length, pointer, type) +sizeof(int) + (length * sizeof(type))
 
 #define CHUNK_SIZE_END ;
 
@@ -480,15 +464,13 @@ chunkclass::chunkclass(Chunk_With_Children * const CHUNK_WITH_CHILDREN_LOADER_PA
 
 class GodFather_Chunk : public Chunk_With_Children
 {
-public:	
+public:
+    GodFather_Chunk()
+        : Chunk_With_Children(NULL, "REBINFF2")
+    {}
 
-	GodFather_Chunk ()
-	: Chunk_With_Children (NULL, "REBINFF2")
-	{}
-	
-	GodFather_Chunk (char * buffer, size_t size);
+    GodFather_Chunk(char *buffer, size_t size);
 };
-
 
 ///////////////////////////////////////////////
 
@@ -497,90 +479,106 @@ Macro for adding chunk class to list of that can be created using DynCreate
 Chunks registered this way can be created as a child of any chunk
 */
 
-#define RIF_IMPLEMENT_DYNCREATE(idChunk,tokenClassName) _RIF_IMPLEMENT_DYNCREATE_LINE_EX(idChunk,tokenClassName,__LINE__)
-#define _RIF_IMPLEMENT_DYNCREATE_LINE_EX(idChunk,tokenClassName,nLine) _RIF_IMPLEMENT_DYNCREATE_LINE(idChunk,tokenClassName,nLine)
+#define RIF_IMPLEMENT_DYNCREATE(idChunk, tokenClassName) \
+    _RIF_IMPLEMENT_DYNCREATE_LINE_EX(idChunk, tokenClassName, __LINE__)
+#define _RIF_IMPLEMENT_DYNCREATE_LINE_EX(idChunk, tokenClassName, nLine) \
+    _RIF_IMPLEMENT_DYNCREATE_LINE(idChunk, tokenClassName, nLine)
 
-#define _RIF_IMPLEMENT_DYNCREATE_LINE(idChunk,tokenClassName,nLine) \
-static Chunk * RifCreateClassObject ## tokenClassName ##_## nLine (Chunk_With_Children* parent,const char* data) { \
-	Chunk * pChunk = new tokenClassName(parent,data+12,(*(int *) (data + 8))-12); \
-	return pChunk; \
-} \
- class RegisterRifChunkClass ## tokenClassName ##_## nLine { \
-	public: RegisterRifChunkClass ## tokenClassName ##_## nLine () { \
-		Chunk::Register(idChunk ,0,RifCreateClassObject ## tokenClassName ##_## nLine); \
-	} \
-} rifcc ## tokenClassName ##_## nLine;
+#define _RIF_IMPLEMENT_DYNCREATE_LINE(idChunk, tokenClassName, nLine) \
+    static Chunk * \
+    RifCreateClassObject##tokenClassName##_##nLine(Chunk_With_Children *parent, const char *data) \
+    { \
+        Chunk *pChunk = new tokenClassName(parent, data + 12, (*(int *) (data + 8)) - 12); \
+        return pChunk; \
+    } \
+    class RegisterRifChunkClass##tokenClassName##_##nLine \
+    { \
+    public: \
+        RegisterRifChunkClass##tokenClassName##_##nLine() \
+        { \
+            Chunk::Register(idChunk, 0, RifCreateClassObject##tokenClassName##_##nLine); \
+        } \
+    } rifcc##tokenClassName##_##nLine;
 
 /*
 Macro for adding chunk class to list of that can be created using DynCreate.
 Chunks registered this way will only be created as children of the parent named
 */
 
+#define RIF_IMPLEMENT_DYNCREATE_DECLARE_PARENT(idChunk, tokenClassName, idParent, parentClassName) \
+    _RIF_IMPLEMENT_DYNCREATE_PARENT_LINE_EX( \
+        idChunk, tokenClassName, idParent, parentClassName, __LINE__)
+#define _RIF_IMPLEMENT_DYNCREATE_PARENT_LINE_EX( \
+    idChunk, tokenClassName, idParent, parentClassName, nLine) \
+    _RIF_IMPLEMENT_DYNCREATE_PARENT_LINE(idChunk, tokenClassName, idParent, parentClassName, nLine)
 
-#define RIF_IMPLEMENT_DYNCREATE_DECLARE_PARENT(idChunk,tokenClassName,idParent,parentClassName) _RIF_IMPLEMENT_DYNCREATE_PARENT_LINE_EX(idChunk,tokenClassName,idParent,parentClassName,__LINE__)
-#define _RIF_IMPLEMENT_DYNCREATE_PARENT_LINE_EX(idChunk,tokenClassName,idParent,parentClassName,nLine) _RIF_IMPLEMENT_DYNCREATE_PARENT_LINE(idChunk,tokenClassName,idParent,parentClassName,nLine)
-
-#define _RIF_IMPLEMENT_DYNCREATE_PARENT_LINE(idChunk,tokenClassName,idParent,parentClassName,nLine) \
-static Chunk * RifCreateClassObject ## tokenClassName ##_## nLine (Chunk_With_Children* parent,const char* data) { \
-	Chunk * pChunk = new tokenClassName((parentClassName*)parent,data+12,(*(int *) (data + 8))-12); \
-	return pChunk; \
-} \
- class RegisterRifChunkClass ## tokenClassName ##_## nLine { \
-	public: RegisterRifChunkClass ## tokenClassName ##_## nLine () { \
-		Chunk::Register(idChunk ,idParent,RifCreateClassObject ## tokenClassName ##_## nLine); \
-	} \
-} rifcc ## tokenClassName ##_## nLine;
-
+#define _RIF_IMPLEMENT_DYNCREATE_PARENT_LINE( \
+    idChunk, tokenClassName, idParent, parentClassName, nLine) \
+    static Chunk * \
+    RifCreateClassObject##tokenClassName##_##nLine(Chunk_With_Children *parent, const char *data) \
+    { \
+        Chunk *pChunk \
+            = new tokenClassName((parentClassName *) parent, data + 12, (*(int *) (data + 8)) - 12); \
+        return pChunk; \
+    } \
+    class RegisterRifChunkClass##tokenClassName##_##nLine \
+    { \
+    public: \
+        RegisterRifChunkClass##tokenClassName##_##nLine() \
+        { \
+            Chunk::Register(idChunk, idParent, RifCreateClassObject##tokenClassName##_##nLine); \
+        } \
+    } rifcc##tokenClassName##_##nLine;
 
 /*
 Load from buffer function for standard Chunk_With_Children
 */
 
-#define CHUNK_WITH_CHILDREN_LOADER(id,chunk_class) \
-chunk_class::chunk_class(Chunk_With_Children * const parent,char const * __data, size_t const __size)\
-:Chunk_With_Children(parent,id)\
-{\
-	const char * __buffer_ptr = __data;\
-	while ((__data-__buffer_ptr)< (signed) __size) {\
-		if ((*(int *)(__data + 8)) + (__data-__buffer_ptr) > (signed) __size) {\
-			Parent_File->error_code = CHUNK_FAILED_ON_LOAD_NOT_RECOGNISED;\
-			break;\
-		}\
-		\
-		DynCreate(__data);\
-		__data += *(int *)(__data + 8);\
-	}\
-}
+#define CHUNK_WITH_CHILDREN_LOADER(id, chunk_class) \
+    chunk_class::chunk_class( \
+        Chunk_With_Children *const parent, char const *__data, size_t const __size) \
+        : Chunk_With_Children(parent, id) \
+    { \
+        const char *__buffer_ptr = __data; \
+        while ((__data - __buffer_ptr) < (signed) __size) { \
+            if ((*(int *) (__data + 8)) + (__data - __buffer_ptr) > (signed) __size) { \
+                Parent_File->error_code = CHUNK_FAILED_ON_LOAD_NOT_RECOGNISED; \
+                break; \
+            } \
+\
+            DynCreate(__data); \
+            __data += *(int *) (__data + 8); \
+        } \
+    }
 /*
 Load from buffer function for standard Lockable_Chunk_With_Children
 */
 
-#define LOCKABLE_CHUNK_WITH_CHILDREN_LOADER(id,chunk_class) \
-chunk_class::chunk_class(Chunk_With_Children * const parent,char const * __data, size_t const __size)\
-:Lockable_Chunk_With_Children(parent,id)\
-{\
-	const char * __buffer_ptr = __data;\
-	while ((__data-__buffer_ptr)< (signed) __size) {\
-		if ((*(int *)(__data + 8)) + (__data-__buffer_ptr) > (signed) __size) {\
-			Parent_File->error_code = CHUNK_FAILED_ON_LOAD_NOT_RECOGNISED;\
-			break;\
-		}\
-		\
-		DynCreate(__data);\
-		__data += *(int *)(__data + 8);\
-	}\
-}
-	
+#define LOCKABLE_CHUNK_WITH_CHILDREN_LOADER(id, chunk_class) \
+    chunk_class::chunk_class( \
+        Chunk_With_Children *const parent, char const *__data, size_t const __size) \
+        : Lockable_Chunk_With_Children(parent, id) \
+    { \
+        const char *__buffer_ptr = __data; \
+        while ((__data - __buffer_ptr) < (signed) __size) { \
+            if ((*(int *) (__data + 8)) + (__data - __buffer_ptr) > (signed) __size) { \
+                Parent_File->error_code = CHUNK_FAILED_ON_LOAD_NOT_RECOGNISED; \
+                break; \
+            } \
+\
+            DynCreate(__data); \
+            __data += *(int *) (__data + 8); \
+        } \
+    }
 
 //macros for forcing inclusion of chunk files from a library
 #define FORCE_CHUNK_INCLUDE_START //not needed anymore
 
-#define FORCE_CHUNK_INCLUDE(filename)\
-	extern int __Chunk_Include_##filename;\
-	int* p__Chunk_Include_##filename =& __Chunk_Include_##filename;
+#define FORCE_CHUNK_INCLUDE(filename) \
+    extern int __Chunk_Include_##filename; \
+    int *p__Chunk_Include_##filename = &__Chunk_Include_##filename;
 
 #define FORCE_CHUNK_INCLUDE_END //not needed anymore
-
 
 #define FORCE_CHUNK_INCLUDE_IMPLEMENT(filename) int __Chunk_Include_##filename;
 
