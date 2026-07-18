@@ -19,10 +19,6 @@
 #include "ourbool.h"
 #endif
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* Version settings *****************************************************/
 
 /* Constants  ***********************************************************/
@@ -95,9 +91,5 @@ extern void STRUTIL_SC_SafeCat(
 extern size_t STRUTIL_SC_NumBytes(const ProjChar *pProjCh);
 
 /* End of the header ****************************************************/
-
-#ifdef __cplusplus
-};
-#endif
 
 #endif

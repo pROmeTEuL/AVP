@@ -11,10 +11,6 @@
 #include "module.h"
 #endif
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* Version settings *****************************************************/
 
 /* Constants  ***********************************************************/
@@ -38,9 +34,5 @@ void TeleportPlayerToModule(MODULE *pModule_Dst);
 }; // namespace ModuleCommands
 
 /* End of the header ****************************************************/
-
-#ifdef __cplusplus
-};
-#endif
 
 #endif

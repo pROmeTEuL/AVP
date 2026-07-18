@@ -1,20 +1,16 @@
 #ifndef INLINE_INCLUDED
 #define INLINE_INCLUDED
 
-#ifndef min
-#define min(a, b) (((a) < (b)) ? (a) : (b))
-#endif
+#include <algorithm>
 
-#ifndef max
-#define max(a, b) (((a) > (b)) ? (a) : (b))
+#ifndef AVP_MINMAX_DEFINED
+#define AVP_MINMAX_DEFINED
+using std::max;
+using std::min;
 #endif
 
 #if SUPPORT_MMX
 #include "mmx_math.h"
-#endif
-
-#ifdef __cplusplus
-extern "C" {
 #endif
 
 /* 
@@ -640,9 +636,5 @@ void RotVect(VECTORCH *v, MATRIXCH *m);
 #define DotProduct(v1, v2) (_DotProduct((v1), (v2)))
 
 #endif /* ? SUPPORT_MMX */
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif

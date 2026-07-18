@@ -52,7 +52,6 @@
 #include "db.h"
 #include "pldnet.h"
 
-extern "C" {
 #include "inventry.h"
 
 extern int VideoMode;
@@ -69,12 +68,11 @@ extern FARENTRYPOINTSHEADER *FALLP_EntryPoints;
 
 extern RIFFHANDLE env_rif;
 
-extern void NewOnScreenMessage(char *messagePtr);
+extern void NewOnScreenMessage(unsigned char *messagePtr);
 
 extern BOOL KeepMainRifFile;
 
 BOOL LevelHasStars;
-};
 
 // these are to link with chnkimag.cpp
 const char *ToolsTex_Directory = "\\\\Kate\\Kate Share\\avp\\ToolsTex\\";
@@ -214,11 +212,9 @@ void setup_paths(RIFFHANDLE h)
     }
 }
 
-extern "C" {
 extern int SkyColour_R;
 extern int SkyColour_G;
 extern int SkyColour_B;
-};
 
 void set_environment_properties(Environment_Data_Chunk *edc)
 {
@@ -403,7 +399,7 @@ void unload_placed_hierarchies()
 // stuff for handling hierarchies
 
 extern int GetSequenceID(int sequence_type, int sub_sequence);
-extern "C" void MulQuat(QUAT *q1, QUAT *q2, QUAT *output);
+extern void MulQuat(QUAT *q1, QUAT *q2, QUAT *output);
 
 List<Global_Hierarchy_Store *> Global_Hierarchy_Library;
 List<Hierarchy_ID_Time_Pair *> Global_Hierarchy_Store::time_list;
@@ -1077,7 +1073,7 @@ SECTION *Global_Hierarchy_Store::build_hierarchy(Object_Hierarchy_Chunk *ohc, ch
                     if (frame_no < num_frames) {
                         //calculate sequence length , making sure it doesn't overflow an unsigned short
                         kfd->Sequence_Length = (unsigned short)
-                            min(frame_array[frame_no]->at_frame_no - this_frame_no, 65535);
+                            min((int) (frame_array[frame_no]->at_frame_no - this_frame_no), 65535);
                     } else {
                         kfd->Sequence_Length = (unsigned short) min(65536 - this_frame_no, 65535);
                     }
@@ -1442,8 +1438,6 @@ static BOOL copy_rif_data_as_hierarchy(
 ///////////////////////////////////////////////////////////////////////////////
 // Library management functions
 
-extern "C" {
-
 SECTION *GetNamedHierarchyFromLibrary(const char *rif_name, const char *hier_name);
 
 SECTION *GetHierarchyFromLibrary(const char *rif_name)
@@ -1567,7 +1561,6 @@ void DeleteHierarchyLibraryEntry(RIFFHANDLE h)
         }
     }
 }
-};
 ///////////////////////////////////////////////////////////////////////////////
 
 extern void SetupFragmentType(Fragment_Type_Chunk *ftc);
@@ -2790,9 +2783,7 @@ RIFFHANDLE avp_load_rif_non_env(const char *fname)
 }
 
 #if debug
-extern "C" {
 extern VIEWDESCRIPTORBLOCK *Global_VDB_Ptr;
-}
 void LoadModuleData()
 {
     GLOBALASSERT(env_rif);
@@ -3039,7 +3030,6 @@ static void MakeBackupFile(File_Chunk *fc)
     delete[] Name1;
     delete[] Name2;
 }
-extern "C" {
 
 void save_preplaced_decals()
 {
@@ -3117,14 +3107,12 @@ void check_preplaced_decal_modules()
         }
     }
 }
-};
 
 extern void DeallocateAllFragments();
 extern void LoseAllNonCommonSounds();
 extern void deallocate_behaviour_list();
 extern void PurgeMSLShapeList();
 
-extern "C" {
 void DeallocateSoundsAndPoolAllocatedMemory()
 {
     deallocate_behaviour_list();
@@ -3139,4 +3127,3 @@ void DeallocateSoundsAndPoolAllocatedMemory()
 
     PurgeMSLShapeList();
 }
-};

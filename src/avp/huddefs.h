@@ -8,10 +8,6 @@
 #ifndef _huddefs_h
 #define _huddefs_h 1
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /*KJL****************************************************************************************
 * 										D E F I N E S 										*
 ****************************************************************************************KJL*/
@@ -233,9 +229,5 @@ extern void NewOnScreenMessage(unsigned char *messagePtr);
 * the time defined in ON_SCREEN_MESSAGE_LIFETIME. Any previous message  *
 * still being displayed will be overwritten.                            *
 ********************************************************************KJL*/
-
-#ifdef __cplusplus
-}; /* end of C-Linkage spec */
-#endif
 
 #endif /* one-time only guard */

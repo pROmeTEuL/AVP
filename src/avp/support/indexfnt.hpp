@@ -163,7 +163,7 @@ public:
 
     void RenderChar_Unclipped(struct r2pos &R2Pos_Cursor, int FixP_Alpha, ProjChar ProjCh) const;
 
-    OurBool bCanRender(ProjChar ProjCh_In) const { return Yes; }
+    OurBool bCanRender(ProjChar ProjCh_In) const { return true; }
 
     inline int GetMaxWidth(void) const { return HUD_FONT_WIDTH; }
 
@@ -343,13 +343,7 @@ inline int IndexedFont_Proportional_PF::GetMaxWidth(void) const
 /* Exported globals *****************************************************/
 
 /* Function prototypes **************************************************/
-#ifdef __cplusplus
-extern "C" {
-#endif
 extern void INDEXFNT_PFLoadHook(FontIndex I_Font_New, PFFONT *pffont_New);
-#ifdef __cplusplus
-};
-#endif
 
 /* End of the header ****************************************************/
 

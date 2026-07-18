@@ -9,12 +9,6 @@
 
 #include "shpanim.h"
 
-#ifdef __cplusplus
-
-extern "C" {
-
-#endif
-
 #include "mem3dc.h"
 
 /*
@@ -2257,10 +2251,5 @@ void CrossProduct(VECTORCH *a, VECTORCH *b, VECTORCH *c);
 /* KJL 12:01:08 7/16/97 - returns the magnitude of a vector - max error about 13%, though average error
    less than half this. Very fast compared to other approaches. */
 int Approximate3dMagnitude(VECTORCH *v);
-
-#ifdef __cplusplus
-};
-
-#endif
 
 #endif

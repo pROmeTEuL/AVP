@@ -8,10 +8,6 @@
 #ifndef _ourbool
 #define _ourbool 1
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* Version settings *****************************************************/
 
 /* Constants  ***********************************************************/
@@ -27,9 +23,5 @@ typedef char OurBool;
 /* Function prototypes **************************************************/
 
 /* End of the header ****************************************************/
-
-#ifdef __cplusplus
-};
-#endif
 
 #endif

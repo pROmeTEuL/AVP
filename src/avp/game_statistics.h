@@ -1,10 +1,6 @@
 #ifndef _game_stats_h_
 #define _game_stats_h_ 1
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* KJL 99/2/12 - Statistics of current game */
 #include "equipmnt.h"
 
@@ -102,9 +98,5 @@ extern void InitialiseCurrentGameStatistics(void);
 extern void CurrentGameStats_Initialise(void);
 extern void DoFailedLevelStatisticsScreen(void);
 extern void DoStatisticsScreen(int completed_level);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif

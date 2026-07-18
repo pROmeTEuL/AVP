@@ -18,27 +18,21 @@
 #include "scrobj.hpp"
 #endif
 
-#define UseLocalAssert Yes
+#define UseLocalAssert true
 #include "ourasert.h"
 
 /* Constants *******************************************************/
-#define UseRealFrameTime Yes
+#define UseRealFrameTime true
 
 /* Imported function prototypes ************************************/
 
 /* Imported data ***************************************************/
-#ifdef __cplusplus
-extern "C" {
-#endif
 #if 0
 	extern OurBool			DaveDebugOn;
 	extern FDIEXTENSIONTAG	FDIET_Dummy;
 	extern IFEXTENSIONTAG	IFET_Dummy;
 	extern FDIQUAD			FDIQuad_WholeScreen;
 	extern FDIPOS			FDIPos_Origin;
-#endif
-#ifdef __cplusplus
-};
 #endif
 
 /* Internal function prototypes ************************************/
@@ -109,7 +103,7 @@ Daemon ::Daemon(OurBool fActive)
     pFirstHook = NULL;
 #endif
 
-    fIsActive_Val = No;
+    fIsActive_Val = false;
 
     if (fActive) {
         Start();
@@ -155,7 +149,7 @@ void Daemon ::Start(void)
 
         p666_FirstActive = this;
 
-        fIsActive_Val = Yes;
+        fIsActive_Val = true;
     }
 }
 
@@ -190,7 +184,7 @@ void Daemon ::Stop(void)
             }
         }
 
-        fIsActive_Val = No;
+        fIsActive_Val = false;
     }
 }
 
@@ -322,13 +316,11 @@ void Daemon ::Maintain(int FixP_Time_ToUse)
 
 void DAEMON_Init(void) {}
 
-extern "C" {
 #if UseRealFrameTime
 extern int RealFrameTime;
 #else
 extern int NormalFrameTime;
 #endif
-}
 
 void DAEMON_Maintain(void)
 {

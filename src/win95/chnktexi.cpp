@@ -40,9 +40,7 @@ char const *cl_pszGameMode = NULL;
 // used to determine if the display is palettized
 // currently assuming that if this is <= 8 then all
 // surfaces et. except d3d textures have a global palette
-extern "C" {
 extern int VideoModeColourDepth;
-};
 
 // useful filename handling functions
 
@@ -649,9 +647,7 @@ char *CL_GetImageFileName(
     }
 }
 
-extern "C" {
 extern void CheckForWindowsMessages(void);
-};
 
 int CL_LoadImageOnce(char const *pszFileName, unsigned fFlagsEtc)
 {

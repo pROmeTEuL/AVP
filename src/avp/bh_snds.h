@@ -7,12 +7,6 @@
 
 #include "jsndsup.h"
 
-#ifdef __cplusplus
-
-extern "C" {
-
-#endif
-
 typedef struct sound_tools_template
 {
     VECTORCH position;
@@ -61,11 +55,5 @@ void SoundBehaveDestroy(STRATEGYBLOCK *sbptr);
 
 void StartPlacedSoundPlaying(STRATEGYBLOCK *sbptr);
 void StopPlacedSoundPlaying(STRATEGYBLOCK *sbptr);
-
-#ifdef __cplusplus
-
-}; // end of extern "c"
-
-#endif
 
 #endif

@@ -1,12 +1,6 @@
 #ifndef _bh_fan_h_
 #define _bh_fan_h_ 1
 
-#ifdef __cplusplus
-
-extern "C" {
-
-#endif
-
 void *FanBehaveInit(void *bhdata, STRATEGYBLOCK *sbptr);
 void FanBehaveFun(STRATEGYBLOCK *sbptr);
 
@@ -50,10 +44,5 @@ typedef struct fan_tools_template
     VECTORCH fan_wind_direction; //normalised vector
     int fan_wind_strength;       //fixed point multiplier
 } FAN_TOOLS_TEMPLATE;
-
-#ifdef __cplusplus
-};
-
-#endif
 
 #endif

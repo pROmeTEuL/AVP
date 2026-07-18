@@ -439,10 +439,8 @@ void PurgeMSLShapeList()
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-extern "C" {
 extern unsigned char *TextureLightingTable;
 extern int ScanDrawMode;
-};
 
 /////////////////////////////////////////
 // Functions which operate on RIFFHANDLEs

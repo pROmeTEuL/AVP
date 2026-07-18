@@ -17,7 +17,7 @@
 //#endif
 
 /* Version settings *****************************************************/
-#define UseTemplates No
+#define UseTemplates false
 
 /* Constants  ***********************************************************/
 
@@ -73,10 +73,10 @@ inline int r2pos::bIsOrigin(void) const
 {
     if (x == 0) {
         if (y == 0) {
-            return Yes;
+            return true;
         }
     }
-    return No;
+    return false;
 }
 
 inline void r2pos::operator+=(const r2pos &R2Pos)
@@ -137,12 +137,12 @@ struct size2d
     {
         // Does this size have non-zero area?:
         if (w <= 0) {
-            return No;
+            return false;
         }
         if (h <= 0) {
-            return No;
+            return false;
         }
-        return Yes;
+        return true;
     }
     void VCompose(const size2d &Size2D_Other)
     {
@@ -218,12 +218,12 @@ inline int r2size::bHasArea(void)
 {
     // Does this size have non-zero area?:
     if (w <= 0) {
-        return No;
+        return false;
     }
     if (h <= 0) {
-        return No;
+        return false;
     }
-    return Yes;
+    return true;
 }
 inline void r2size::VCompose(const r2size &R2Size_Other)
 {
@@ -361,12 +361,12 @@ private:
 inline int r2rect::bHasArea(void) const
 {
     if (x1 <= x0) {
-        return No;
+        return false;
     }
     if (y1 <= y0) {
-        return No;
+        return false;
     }
-    return Yes;
+    return true;
 }
 inline struct r2pos r2rect::GetPos(void) const
 {
@@ -395,50 +395,50 @@ inline void r2rect::SetHeight(int h_New)
 inline int r2rect::bWithin(const struct r2pos &R2Pos) const
 {
     if (R2Pos.x < x0) {
-        return No;
+        return false;
     }
     if (R2Pos.y < y0) {
-        return No;
+        return false;
     }
     if (R2Pos.x >= x1) {
-        return No;
+        return false;
     }
     if (R2Pos.y >= y1) {
-        return No;
+        return false;
     }
-    return Yes;
+    return true;
 }
 inline int r2rect::bFitsIn(const struct r2rect &R2Rect) const
 {
     if (x0 < R2Rect.x0) {
-        return No;
+        return false;
     }
     if (y0 < R2Rect.y0) {
-        return No;
+        return false;
     }
     if (x1 > R2Rect.x1) {
-        return No;
+        return false;
     }
     if (y1 > R2Rect.y1) {
-        return No;
+        return false;
     }
-    return Yes;
+    return true;
 }
 inline int r2rect::bOverlap(const struct r2rect &R2Rect_ToTest) const
 {
     if (x0 >= R2Rect_ToTest.x1) {
-        return No;
+        return false;
     }
     if (y0 >= R2Rect_ToTest.y1) {
-        return No;
+        return false;
     }
     if (x1 <= R2Rect_ToTest.x0) {
-        return No;
+        return false;
     }
     if (y1 <= R2Rect_ToTest.y0) {
-        return No;
+        return false;
     }
-    return Yes;
+    return true;
 }
 inline void r2rect::Clip(struct r2rect &R2Rect_ToClip) const
 {
@@ -470,26 +470,26 @@ inline int r2rect::bValidPhys(void) const
     // is this a valid rect within the physical screen?
     // useful for asserting in a rendering routine
     if (x0 < 0) {
-        return No;
+        return false;
     }
     if (y0 < 0) {
-        return No;
+        return false;
     }
     if (x1 > R2Rect_PhysicalScreen.x1) {
-        return No;
+        return false;
     }
     if (y1 > R2Rect_PhysicalScreen.y1) {
-        return No;
+        return false;
     }
     // Check for well-formedness:
     if (x0 > x1) {
-        return No;
+        return false;
     }
     if (y0 > y1) {
-        return No;
+        return false;
     }
 
-    return Yes;
+    return true;
 }
 inline r2pos r2rect::Hotspot_TL(void) const
 {

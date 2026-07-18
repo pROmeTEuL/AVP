@@ -4,8 +4,8 @@
 #if defined(_MSC_VER)
 
 // just include the windows header to get everything.
-#undef Yes // sigh
-#undef No  // sigh
+#undef true  // sigh
+#undef false // sigh
 #include <windows.h>
 #include <tchar.h>
 #include <mbstring.h>
@@ -30,6 +30,7 @@
 
 #else
 
+#include <algorithm>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -38,21 +39,15 @@
 
 #include "files.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #define PACKED_PUSH
 #define PACKED_POP
 #define PACKED __attribute__((packed))
 
 /* windows junk */
-#ifndef min
-#define min(a, b) (((a) < (b)) ? (a) : (b))
-#endif
-
-#ifndef max
-#define max(a, b) (((a) > (b)) ? (a) : (b))
+#ifndef AVP_MINMAX_DEFINED
+#define AVP_MINMAX_DEFINED
+using std::max;
+using std::min;
 #endif
 
 #define __cdecl
@@ -188,15 +183,8 @@ typedef struct JOYCAPS
     int wCaps;
 } JOYCAPS;
 
-#ifdef __cplusplus
-};
 #endif
 
-#endif
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 // unused placeholder directplay code.
 typedef int DPID;
 
@@ -256,8 +244,5 @@ typedef struct DPMSG_DESTROYPLAYERORGROUP
     int dwPlayerType;
 } DPMSG_DESTROYPLAYERORGROUP;
 typedef DPMSG_DESTROYPLAYERORGROUP *LPDPMSG_DESTROYPLAYERORGROUP;
-#ifdef __cplusplus
-};
-#endif
 
 #endif

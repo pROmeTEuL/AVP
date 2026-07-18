@@ -17,10 +17,6 @@
 #include "gadget.h"
 #endif
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* Version settings *****************************************************/
 
 /* Constants  ***********************************************************/
@@ -46,9 +42,5 @@ extern void IOFOCUS_Toggle(void);
 #endif /* UseGadgets */
 
 /* End of the header ****************************************************/
-
-#ifdef __cplusplus
-};
-#endif
 
 #endif

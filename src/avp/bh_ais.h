@@ -3,10 +3,6 @@
 #ifndef _bhais_h_
 #define _bhais_h_ 1
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /*-----------------------------
 General AI Support
 -------------------------------*/
@@ -328,9 +324,5 @@ typedef struct pathheader
 
 extern int PathArraySize;
 extern PATHHEADER *PathArray;
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif

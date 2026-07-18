@@ -6,10 +6,6 @@
 #ifndef PSND_H
 #define PSND_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include "psndproj.h"
 
 /* Patrick 10/6/97 --------------------------------------------------------------
@@ -149,9 +145,5 @@ extern unsigned int SoundNumActiveVoices();
 
 extern void Load_SoundState(int *soundHandle);
 extern void Save_SoundState(int *soundHandle);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif

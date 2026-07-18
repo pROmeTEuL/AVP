@@ -4,12 +4,6 @@
 	Contains game specific defininitions of structures
 */
 
-#ifdef __cplusplus
-
-extern "C" {
-
-#endif
-
 #include "module.h"
 
 /***********************************************
@@ -256,11 +250,6 @@ extern int memoryInitialisationFailure;
 extern void DealWithElapsedTime();
 extern void FadeScreen(int colour, int screen, int rate);
 extern volatile char StillFading;
-
-#ifdef __cplusplus
-};
-
-#endif
 
 #define GAMEDEF_INCLUDED
 

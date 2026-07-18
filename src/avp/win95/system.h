@@ -7,26 +7,25 @@
 
 */
 
-#ifdef __cplusplus
-
-extern "C" {
-
-#endif
-
 /********************* SYSTEM, PLATFORM AND GAME************/
 
-#define Yes 1
-#define No 0
-
-#ifdef _DEBUG /* standard compiler command line debugging-ON switch */
-#define debug Yes
-#elif defined(NDEBUG) /* standard compiler command line debugging-OFF switch */
-#define debug No
-#else /* default switch */
-#define debug Yes
+#ifndef Yes
+#define Yes true
 #endif
 
-#define SuppressWarnings Yes
+#ifndef No
+#define No false
+#endif
+
+#ifdef _DEBUG /* standard compiler command line debugging-ON switch */
+#define debug true
+#elif defined(NDEBUG) /* standard compiler command line debugging-OFF switch */
+#define debug false
+#else /* default switch */
+#define debug true
+#endif
+
+#define SuppressWarnings true
 
 #define Term -1
 
@@ -39,7 +38,7 @@ extern "C" {
 #define ONE_FIXED 65536
 #define ONE_FIXED_SHIFT 16
 
-#define Digital No
+#define Digital false
 
 /* Offsets from *** int pointer *** for vectors and vertices */
 
@@ -51,14 +50,14 @@ typedef enum {
 
 } PTARRAYINDICES;
 
-#define StopCompilationOnMultipleInclusions No
-#define UseProjPlatAssert Yes /* assert fired functions are in dxlog.c */
+#define StopCompilationOnMultipleInclusions false
+#define UseProjPlatAssert true /* assert fired functions are in dxlog.c */
 
 /***************  CAMERA AND VIEW VOL********************/
 #define NearZ 1024
 #define FarZ ONE_FIXED
 
-#define SupportMultiCamModules Yes
+#define SupportMultiCamModules true
 
 /************* Timer and Frame Rate Independence *************/
 
@@ -110,33 +109,33 @@ extern int maxshapes;
 
 #undef RIFF_SYSTEM
 #define RIFF_SYSTEM
-#define TestRiffLoaders Yes
-#define LoadingMapsShapesAndTexturesEtc No
+#define TestRiffLoaders true
+#define LoadingMapsShapesAndTexturesEtc false
 
-#define pc_backdrops No
+#define pc_backdrops false
 
 /***************** DRAW SORT *******************/
 
-#define SupportTrackOptimisation No
+#define SupportTrackOptimisation false
 
-#define SupportBSP No
+#define SupportBSP false
 
-#define SupportZBuffering Yes
-#define ZBufferTest No
+#define SupportZBuffering true
+#define ZBufferTest false
 
 /***************** SHAPE DATA DEFINES************/
 
-#define StandardShapeLanguage Yes
+#define StandardShapeLanguage true
 
-#define SupportModules Yes
-#define IncludeModuleFunctionPrototypes Yes
+#define SupportModules true
+#define IncludeModuleFunctionPrototypes true
 
-#define SupportMorphing Yes
-#define LazyEvaluationForMorphing No
+#define SupportMorphing true
+#define LazyEvaluationForMorphing false
 
 /***************** COLLISION DEFINES*************/
-#define StandardStrategyAndCollisions No
-#define IntermediateSSACM No /* User preference */
+#define StandardStrategyAndCollisions false
+#define IntermediateSSACM false /* User preference */
 
 /************** TEXTURE DEFINES*******************/
 
@@ -160,9 +159,9 @@ extern int maxshapes;
  1/Z now reaches 0 at 2^29 = 537km
 */
 
-#define support3dtextures Yes
-#define int3dtextures No /* there is no D3D Zbuffer support for int 3d textures */
-#define SupportGouraud3dTextures Yes
+#define support3dtextures true
+#define int3dtextures false /* there is no D3D Zbuffer support for int 3d textures */
+#define SupportGouraud3dTextures true
 
 /*************************** WINDOWS 95 *********************/
 
@@ -171,12 +170,7 @@ extern int maxshapes;
 #define MaxD3DInstructions 1000 // includes state change instructions!!!
 #define MaxD3DVertices 256
 
-#define optimiseflip No  /* unstable at present */
-#define optimiseblit Yes /* unstable at present */
-
-#ifdef __cplusplus
-};
-
-#endif
+#define optimiseflip false /* unstable at present */
+#define optimiseblit true  /* unstable at present */
 
 #endif

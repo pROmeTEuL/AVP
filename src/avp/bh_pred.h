@@ -5,10 +5,6 @@
 #ifndef _bhpred_h_
 #define _bhpred_h_ 1
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include "bh_ais.h"
 #include "decal.h"
 
@@ -255,9 +251,5 @@ extern void PredatorIsDamaged(
 extern void ActivateDormantPredator(STRATEGYBLOCK *sbPtr);
 extern int NPCPredatorIsCloaked(STRATEGYBLOCK *sbPtr);
 extern void StartPredatorSelfDestructExplosion(STRATEGYBLOCK *sbPtr);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif

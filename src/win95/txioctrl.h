@@ -11,10 +11,6 @@
 
 #ifdef MaxImageGroups
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 void ImageGroupFreed(int img_group);
 
 void MarkImageInUseByGroup(int img_group, int img_num_offset, int group_using);
@@ -40,10 +36,6 @@ void EnumSharedImages(
 
 void EnumLeftoverImages(
     int group_num, int numimages, ImageNumberCallbackFunction callback_fn, void *user);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif /* MaxImageGroups */
 

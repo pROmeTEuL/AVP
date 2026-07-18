@@ -1,4 +1,3 @@
-extern "C" {
 
 #include "3dc.h"
 #include "videomodes.h"
@@ -339,4 +338,3 @@ extern void LoadDeviceAndVideoModePreferences(void)
     fclose(file);
     GetDeviceAndVideoModePrefences();
 }
-};

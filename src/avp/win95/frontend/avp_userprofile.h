@@ -142,10 +142,6 @@ typedef struct
 #define USER_PROFILES_WILDCARD_NAME "*.prf"
 #define USER_PROFILES_SUFFIX ".prf"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 extern void ExamineSavedUserProfiles(void);
 extern int NumberOfUserProfiles(void);
 extern AVP_USER_PROFILE *GetFirstUserProfile(void);
@@ -163,9 +159,5 @@ extern AVP_USER_PROFILE *UserProfilePtr;
 extern int CheatMode_Active;
 extern int CheatMode_Species;
 extern int CheatMode_Environment;
-
-#ifdef __cplusplus
-}; // extern "C"
-#endif
 
 #endif

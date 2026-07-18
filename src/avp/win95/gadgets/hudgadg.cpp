@@ -16,7 +16,7 @@
 //#include "phudgadg.hpp"
 #include "trepgadg.hpp"
 
-#define UseLocalAssert Yes
+#define UseLocalAssert true
 #include "ourasert.h"
 
 /* Version settings ************************************************/
@@ -28,9 +28,6 @@
 /* Imported function prototypes ************************************/
 
 /* Imported data ***************************************************/
-#ifdef __cplusplus
-extern "C" {
-#endif
 #if 0
 		extern OurBool			DaveDebugOn;
 		extern FDIEXTENSIONTAG	FDIET_Dummy;
@@ -42,9 +39,6 @@ extern "C" {
 		extern UncompressedGlobalPlotAtomID UGPAID_StandardNull;
 		extern IFCOLOUR			IFColour_Dummy;
  		extern IFVECTOR			IFVec_Zero;
-#endif
-#ifdef __cplusplus
-};
 #endif
 
 /* Exported globals ************************************************/

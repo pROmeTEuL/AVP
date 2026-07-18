@@ -4,7 +4,7 @@
 #include "chunk.hpp"
 
 // for assert
-#define UseLocalAssert No
+#define UseLocalAssert false
 #include "ourasert.h"
 #define assert(x) GLOBALASSERT(x)
 

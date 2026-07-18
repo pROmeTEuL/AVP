@@ -55,20 +55,16 @@
 
 #include "pldnet.h"
 
-extern "C" {
 #include "3dc.h"
 extern MAPSETVDB chnk_playcam_vdb;
 extern int GlobalAmbience;
 extern VIEWDESCRIPTORBLOCK *ActiveVDBList[];
 extern VIEWDESCRIPTORBLOCK *Global_VDB_Ptr;
-};
 
 static void get_marine_facing_point(VECTORCH &pos, EULER &euler, VECTORCH &facing_point);
 
 //if this number is non-negative , use this value for all random location dierolls
-extern "C" {
 int QuantumObjectDieRollOveride = -1;
-};
 
 struct BehaviourBlockData
 {
@@ -1696,15 +1692,15 @@ static void add_prox_door(Object_Chunk *ob, int shp1, int shp2, MODULE *mod, AVP
     PROX_DOOR_TOOLS_TEMPLATE *pdtt = (PROX_DOOR_TOOLS_TEMPLATE *) PoolAllocateMem(
         sizeof(PROX_DOOR_TOOLS_TEMPLATE));
 
-    pdtt->has_lock_target = No;
+    pdtt->has_lock_target = false;
     pdtt->door_opening_speed = 1 << 16;
     pdtt->door_closing_speed = 1 << 17;
     if (asc) {
         DoorStrategy *ds = (DoorStrategy *) asc->Strategy;
         if (ds->DoorFlags & DoorFlag_Locked)
-            pdtt->door_is_locked = Yes;
+            pdtt->door_is_locked = true;
         else
-            pdtt->door_is_locked = No;
+            pdtt->door_is_locked = false;
 
         if (ds->DoorFlags & DoorFlag_Horizontal) {
             mod->m_flags |= MODULEFLAG_HORIZONTALDOOR;
@@ -1717,7 +1713,7 @@ static void add_prox_door(Object_Chunk *ob, int shp1, int shp2, MODULE *mod, AVP
         }
 
     } else
-        pdtt->door_is_locked = No;
+        pdtt->door_is_locked = false;
     pdtt->shape_open = shp1;
     pdtt->shape_closed = shp2;
     *((int *) pdtt->my_module.mref_name) = *((int *) mod->m_name);
@@ -2754,9 +2750,7 @@ static void add_xenoborg(AVP_Generator_Chunk *agc)
         agc->flags);
 }
 
-extern "C" {
 extern void SetHiveParamaters(int enemytype, int max, int genpermin, int deltagenpermin, int time);
-};
 
 void setup_generators(Environment_Data_Chunk *envd)
 {
@@ -3570,7 +3564,7 @@ void setup_particle_generators(Environment_Data_Chunk *envd)
         if (data_chunk->type == PARGEN_TYPE_SPARK)
             part_temp->frequency = (data_chunk->time * ONE_FIXED) / 10;
         else
-            part_temp->frequency = ONE_FIXED / max(data_chunk->quantity, 1);
+            part_temp->frequency = ONE_FIXED / max((int) data_chunk->quantity, 1);
 
         part_temp->active = !(data_chunk->flags & ParticleGeneratorFlag_Inactive);
 

@@ -22,7 +22,7 @@
 #include "strutil.h"
 #endif
 
-#define UseLocalAssert Yes
+#define UseLocalAssert true
 #include "ourasert.h"
 
 /* Version settings ************************************************/
@@ -34,9 +34,6 @@
 /* Imported function prototypes ************************************/
 
 /* Imported data ***************************************************/
-#ifdef __cplusplus
-extern "C" {
-#endif
 #if 0
 		extern OurBool			DaveDebugOn;
 		extern FDIEXTENSIONTAG	FDIET_Dummy;
@@ -49,12 +46,9 @@ extern "C" {
 		extern IFCOLOUR			IFColour_Dummy;
  		extern IFVECTOR			IFVec_Zero;
 #endif
-#ifdef __cplusplus
-};
-#endif
 
 /* Exported globals ************************************************/
-/*static*/ OurBool TextInputState ::bOverwrite_Val = No;
+/*static*/ OurBool TextInputState ::bOverwrite_Val = false;
 
 /* Internal type definitions ***************************************/
 
@@ -452,10 +446,10 @@ int TextInputState ::bOvertypeAt(ProjChar ProjCh_In, int Pos_Where)
                     FullyManual();
 #endif
 
-                    return Yes;
+                    return true;
                 } else {
                     // can't; the line is full
-                    return No;
+                    return false;
                 }
             } else {
                 GLOBALASSERT(0 != ProjCh[Pos_Where]);
@@ -467,7 +461,7 @@ int TextInputState ::bOvertypeAt(ProjChar ProjCh_In, int Pos_Where)
                 FullyManual();
 #endif
 
-                return Yes;
+                return true;
             }
         }
 #else
@@ -526,10 +520,10 @@ int TextInputState ::bInsertAt(ProjChar ProjCh_In, int Pos_Where)
                     FullyManual();
 #endif
 
-                    return Yes;
+                    return true;
                 } else {
                     // can't; the line is full
-                    return No;
+                    return false;
                 }
             } else {
                 GLOBALASSERT(0 != ProjCh[Pos_Where]);
@@ -555,10 +549,10 @@ int TextInputState ::bInsertAt(ProjChar ProjCh_In, int Pos_Where)
                     FullyManual();
 #endif
 
-                    return Yes;
+                    return true;
                 } else {
                     // can't insert; the line is full
-                    return No;
+                    return false;
                 }
             }
         }
@@ -765,7 +759,7 @@ OurBool TextInputState ::bManualMatch(ProjChar *pProjCh) const
 
     while ((Count > 0) && (*String1 != '\0') && (*String2 != '\0')) {
         if ((*String1) != (*String2)) {
-            return No;
+            return false;
         }
         String1++;
         String2++;
@@ -777,7 +771,7 @@ OurBool TextInputState ::bManualMatch(ProjChar *pProjCh) const
         return ((*String1) == (*String2));
     } else {
         // There was a match in the first n characters...
-        return Yes;
+        return true;
     }
 }
 OurBool TextInputState ::bManualMatchInsensitive(ProjChar *pProjCh) const
@@ -795,7 +789,7 @@ OurBool TextInputState ::bManualMatchInsensitive(ProjChar *pProjCh) const
 
     while ((Count > 0) && (*String1 != '\0') && (*String2 != '\0')) {
         if ((tolower(*String1)) != (tolower(*String2))) {
-            return No;
+            return false;
         }
         String1++;
         String2++;
@@ -807,7 +801,7 @@ OurBool TextInputState ::bManualMatchInsensitive(ProjChar *pProjCh) const
         return ((tolower(*String1)) == (tolower(*String2)));
     } else {
         // There was a match in the first n characters...
-        return Yes;
+        return true;
     }
 }
 

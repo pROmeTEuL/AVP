@@ -1,4 +1,3 @@
-extern "C" {
 
 #include "3dc.h"
 #include "vramtime.h"
@@ -7,23 +6,23 @@ extern "C" {
 #include "scrshot.hpp"
 #include "awTexLd.h" // to set the surface format for Aw gfx dd surface loads
 
-#define UseLocalAssert No
+#define UseLocalAssert false
 #include "ourasert.h"
 
 // for 640x480x8 experiment
-#define InterlaceExperiment No
+#define InterlaceExperiment false
 
 // In as separate define to debug because we
 // might want to leave it even in a published
 // game.
-#define AllowReboot Yes
+#define AllowReboot true
 
 // In as #define since there is no
 // obvious good behaviour on failure
-#define CheckForModeXInSubWindow No
+#define CheckForModeXInSubWindow false
 
 // Temporary hack!
-#define NoPalette No
+#define NoPalette false
 extern void TimeStampedMessage(char *s);
 
 // Nasty hack to try and fix non-appearance of font
@@ -35,12 +34,12 @@ extern void TimeStampedMessage(char *s);
 // PS Source colour keying works, but the font
 // still doesn't appear on my machine in SubWindow
 // mode... Ho hum...
-#define NoBltFastOnFont No
+#define NoBltFastOnFont false
 
 // Check to see if video mode is valid
 // and rewrite it if it isn't reported
 
-#define CheckVideoMode No
+#define CheckVideoMode false
 
 /*
 	Globals
@@ -117,7 +116,7 @@ DDPIXELFORMAT DisplayPixelFormat;
 
 // For locking against other processes, e.g.
 // mouse pointer display
-unsigned char GlobalFlipLock = No;
+unsigned char GlobalFlipLock = false;
 
 /* Externs */
 
@@ -199,22 +198,22 @@ void GenerateDirectDrawSurface()
     switch (ScreenDescriptorBlock.SDB_ScreenDepth) {
     case VideoModeType_8:
         VideoModeColourDepth = 8;
-        Mode8T = No;
+        Mode8T = false;
         break;
     case VideoModeType_15:
         VideoModeColourDepth = 16;
-        Mode8T = No;
+        Mode8T = false;
         break;
     case VideoModeType_24:
         if (really_32_bit)
             VideoModeColourDepth = 32;
         else
             VideoModeColourDepth = 24;
-        Mode8T = No;
+        Mode8T = false;
         break;
     case VideoModeType_8T:
         VideoModeColourDepth = 8;
-        Mode8T = Yes;
+        Mode8T = true;
         break;
     default:
         VideoModeColourDepth = 16; // default is 16 bit colour
@@ -244,7 +243,7 @@ void GenerateDirectDrawSurface()
         {
             if ((ddrval == DDERR_INVALIDMODE) || (ddrval == DDERR_GENERIC)
                 || (ddrval == DDERR_INVALIDPIXELFORMAT)) {
-                AttemptVideoModeRestart = Yes;
+                AttemptVideoModeRestart = true;
                 VideoRestartMode = RestartDisplayModeNotAvailable;
             }
             return;
@@ -380,12 +379,12 @@ void GenerateDirectDrawSurface()
                         || (VideoMode == VideoMode_DX_320x200x8T)
                         || (VideoMode == VideoMode_DX_320x240x8)
                         || (VideoMode == VideoMode_DX_320x200x15))) {
-                    AttemptVideoModeRestart = Yes;
+                    AttemptVideoModeRestart = true;
                     VideoRestartMode = RestartOutOfVidMemForPrimary;
                 } else if (
                     (ddrval == DDERR_INVALIDMODE) || (ddrval == DDERR_GENERIC)
                     || (ddrval == DDERR_INVALIDPIXELFORMAT)) {
-                    AttemptVideoModeRestart = Yes;
+                    AttemptVideoModeRestart = true;
                     VideoRestartMode = RestartDisplayModeNotAvailable;
                 }
 
@@ -719,7 +718,7 @@ void FlipBuffers(void)
 
     // for locking against other draw processes,
     // e.g. mouse pointer
-    GlobalFlipLock = Yes;
+    GlobalFlipLock = true;
 
     // IMPORTANT!!! OptimiseFlip, Blit are
     // not supported in SubWindow mode!!!
@@ -794,7 +793,7 @@ void FlipBuffers(void)
         }
     }
 
-    GlobalFlipLock = No;
+    GlobalFlipLock = false;
 
     ProjectSpecificBufferFlipPostProcessing();
 
@@ -813,7 +812,7 @@ void InGameFlipBuffers(void)
 
     // for locking against other draw processes,
     // e.g. mouse pointer
-    GlobalFlipLock = Yes;
+    GlobalFlipLock = true;
 
     // IMPORTANT!!! OptimiseFlip, Blit are
     // not supported in SubWindow mode!!!
@@ -889,7 +888,7 @@ void InGameFlipBuffers(void)
         }
     }
 
-    GlobalFlipLock = No;
+    GlobalFlipLock = false;
 
     ProjectSpecificBufferFlipPostProcessing();
 
@@ -1811,7 +1810,7 @@ int ChangePalette(unsigned char *NewPalette)
     // interface.
 
     if ((VideoModeTypeScreen != VideoModeType_8) && (VideoModeTypeScreen != VideoModeType_8T))
-        return No;
+        return false;
 
     // Check for FullScreen mode
     // if (WindowMode != WindowModeFullScreen)
@@ -1825,7 +1824,7 @@ int ChangePalette(unsigned char *NewPalette)
         || (VideoModeTypeScreen == VideoModeType_8T))
         NumEntries = 256;
     else
-        return No; // undefined behaviour
+        return false; // undefined behaviour
 
     // Convert to DirectDraw 4 bytes, 8 bit format
     // with all flag entries set to zero
@@ -1839,7 +1838,7 @@ int ChangePalette(unsigned char *NewPalette)
     // Set all entries in palette to new values
     lpDDPal[0]->SetEntries(0, 0, NumEntries, (LPPALETTEENTRY) DDPalette);
 
-    return Yes;
+    return true;
 }
 
 // At some stage it may be worth expanding this function
@@ -1946,7 +1945,7 @@ void HandleVideoModeRestarts(HINSTANCE hInstance, int nCmdShow)
             }
 
             // Clear variables
-            AttemptVideoModeRestart = No;
+            AttemptVideoModeRestart = false;
             VideoRestartMode = NoRestartRequired;
 
             ChangeDisplayModes(
@@ -1970,7 +1969,7 @@ void HandleVideoModeRestarts(HINSTANCE hInstance, int nCmdShow)
                 VideoMode = VideoMode_DX_640x480x15;
 
             // Clear variables
-            AttemptVideoModeRestart = No;
+            AttemptVideoModeRestart = false;
             VideoRestartMode = NoRestartRequired;
 
             ChangeDisplayModes(
@@ -2144,6 +2143,3 @@ BOOL LeaveGDISurface(void)
 
     return TRUE;
 }
-
-/************ for extern "C"*****************/
-};

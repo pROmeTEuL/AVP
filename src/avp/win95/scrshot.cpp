@@ -9,7 +9,6 @@
 #include "ourasert.h"
 #include "frontend/avp_menus.h"
 
-extern "C" {
 extern SCREENDESCRIPTORBLOCK ScreenDescriptorBlock;
 extern int VideoModeTypeScreen;
 extern unsigned char *ScreenBuffer;
@@ -18,7 +17,6 @@ extern unsigned char KeyboardInput[];
 extern unsigned char DebouncedKeyboardInput[];
 extern VIEWDESCRIPTORBLOCK *Global_VDB_Ptr;
 extern MODULE *playerPherModule;
-};
 
 typedef VOID (*PutWord_F)(WORD, FILE *);
 typedef VOID (*PutDword_F)(DWORD, FILE *);
@@ -95,9 +93,7 @@ void HandleScreenShot()
 #endif
 }
 
-extern "C" {
 unsigned char *GetScreenShot24(int *width, int *height);
-};
 
 void ScreenShot()
 {

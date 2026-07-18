@@ -66,236 +66,480 @@ IF(NOT OPENAL_FOUND)
     MESSAGE(FATAL_ERROR "OpenAL is required but CMake couldn't find it")
 ENDIF(NOT OPENAL_FOUND)
 
-# required source files
-LIST(APPEND source src/files.c)
-LIST(APPEND source src/winapi.c)
-LIST(APPEND source src/stubs.c)
-LIST(APPEND source src/version.c)
-LIST(APPEND source src/mathline.c)
-LIST(APPEND source src/net.c)
-LIST(APPEND source src/frustum.c)
-LIST(APPEND source src/kshape.c)
-LIST(APPEND source src/map.c)
-LIST(APPEND source src/maths.c)
-LIST(APPEND source src/md5.c)
-LIST(APPEND source src/mem3dc.c)
-LIST(APPEND source src/mem3dcpp.cpp)
-LIST(APPEND source src/module.c)
-LIST(APPEND source src/morph.c)
-LIST(APPEND source src/object.c)
-LIST(APPEND source src/shpanim.c)
-LIST(APPEND source src/sphere.c)
-LIST(APPEND source src/tables.c)
-LIST(APPEND source src/vdb.c)
-LIST(APPEND source src/avp/ai_sight.c)
-LIST(APPEND source src/avp/avpview.c)
-LIST(APPEND source src/avp/bh_agun.c)
-LIST(APPEND source src/avp/bh_ais.c)
-LIST(APPEND source src/avp/bh_alien.c)
-LIST(APPEND source src/avp/bh_binsw.c)
-LIST(APPEND source src/avp/bh_cable.c)
-LIST(APPEND source src/avp/bh_corpse.c)
-LIST(APPEND source src/avp/bh_deathvol.c)
-LIST(APPEND source src/avp/bh_debri.c)
-LIST(APPEND source src/avp/bh_dummy.c)
-LIST(APPEND source src/avp/bh_fan.c)
-LIST(APPEND source src/avp/bh_far.c)
-LIST(APPEND source src/avp/bh_fhug.c)
-LIST(APPEND source src/avp/bh_gener.c)
-LIST(APPEND source src/avp/bh_ldoor.c)
-LIST(APPEND source src/avp/bh_lift.c)
-LIST(APPEND source src/avp/bh_light.c)
-LIST(APPEND source src/avp/bh_lnksw.c)
-LIST(APPEND source src/avp/bh_ltfx.c)
-LIST(APPEND source src/avp/bh_marin.c)
-LIST(APPEND source src/avp/bh_mission.c)
-LIST(APPEND source src/avp/bh_near.c)
-LIST(APPEND source src/avp/bh_pargen.c)
-LIST(APPEND source src/avp/bh_plachier.c)
-LIST(APPEND source src/avp/bh_plift.c)
-LIST(APPEND source src/avp/bh_pred.c)
-LIST(APPEND source src/avp/bh_queen.c)
-LIST(APPEND source src/avp/bh_rubberduck.c)
-LIST(APPEND source src/avp/bh_selfdest.c)
-LIST(APPEND source src/avp/bh_snds.c)
-LIST(APPEND source src/avp/bh_spcl.c)
-LIST(APPEND source src/avp/bh_swdor.c)
-LIST(APPEND source src/avp/bh_track.c)
-LIST(APPEND source src/avp/bh_types.c)
-LIST(APPEND source src/avp/bh_videoscreen.c)
-LIST(APPEND source src/avp/bh_waypt.c)
-LIST(APPEND source src/avp/bh_weap.c)
-LIST(APPEND source src/avp/bh_xeno.c)
-LIST(APPEND source src/avp/bonusabilities.c)
-LIST(APPEND source src/avp/cconvars.cpp)
-LIST(APPEND source src/avp/cdtrackselection.cpp)
-LIST(APPEND source src/avp/cheatmodes.c)
-LIST(APPEND source src/avp/comp_map.c)
-LIST(APPEND source src/avp/comp_shp.c)
-LIST(APPEND source src/avp/consolelog.cpp)
-LIST(APPEND source src/avp/davehook.cpp)
-LIST(APPEND source src/avp/deaths.c)
-LIST(APPEND source src/avp/decal.c)
-LIST(APPEND source src/avp/detaillevels.c)
-LIST(APPEND source src/avp/dynamics.c)
-LIST(APPEND source src/avp/dynblock.c)
-LIST(APPEND source src/avp/equipmnt.c)
-LIST(APPEND source src/avp/extents.c)
-LIST(APPEND source src/avp/game.c)
-LIST(APPEND source src/avp/game_statistics.c)
-LIST(APPEND source src/avp/gamecmds.cpp)
-LIST(APPEND source src/avp/gamevars.cpp)
-LIST(APPEND source src/avp/hmodel.c)
-LIST(APPEND source src/avp/hud.c)
-LIST(APPEND source src/avp/inventry.c)
-LIST(APPEND source src/avp/language.c)
-LIST(APPEND source src/avp/lighting.c)
-LIST(APPEND source src/avp/load_shp.c)
-LIST(APPEND source src/avp/los.c)
-LIST(APPEND source src/avp/mempool.c)
-LIST(APPEND source src/avp/messagehistory.c)
-LIST(APPEND source src/avp/missions.cpp)
-LIST(APPEND source src/avp/movement.c)
-LIST(APPEND source src/avp/paintball.c)
-LIST(APPEND source src/avp/particle.c)
-LIST(APPEND source src/avp/pfarlocs.c)
-LIST(APPEND source src/avp/pheromon.c)
-LIST(APPEND source src/avp/player.c)
-LIST(APPEND source src/avp/pmove.c)
-LIST(APPEND source src/avp/psnd.c)
-LIST(APPEND source src/avp/psndproj.c)
-LIST(APPEND source src/avp/pvisible.c)
-LIST(APPEND source src/avp/savegame.c)
-LIST(APPEND source src/avp/scream.cpp)
-LIST(APPEND source src/avp/secstats.c)
-LIST(APPEND source src/avp/sfx.c)
-LIST(APPEND source src/avp/stratdef.c)
-LIST(APPEND source src/avp/targeting.c)
-LIST(APPEND source src/avp/track.c)
-LIST(APPEND source src/avp/triggers.c)
-LIST(APPEND source src/avp/weapons.c)
-LIST(APPEND source src/avp/shapes/cube.c)
-LIST(APPEND source src/avp/support/consbind.cpp)
-LIST(APPEND source src/avp/support/consbtch.cpp)
-LIST(APPEND source src/avp/support/coordstr.cpp)
-LIST(APPEND source src/avp/support/daemon.cpp)
-LIST(APPEND source src/avp/support/indexfnt.cpp)
-LIST(APPEND source src/avp/support/r2base.cpp)
-LIST(APPEND source src/avp/support/r2pos666.cpp)
-LIST(APPEND source src/avp/support/reflist.cpp)
-LIST(APPEND source src/avp/support/refobj.cpp)
-LIST(APPEND source src/avp/support/rentrntq.cpp)
-LIST(APPEND source src/avp/support/scstring.cpp)
-LIST(APPEND source src/avp/support/strtab.cpp)
-LIST(APPEND source src/avp/support/strutil.c)
-LIST(APPEND source src/avp/support/trig666.cpp)
-LIST(APPEND source src/avp/support/wrapstr.cpp)
-LIST(APPEND source src/avp/win95/avpchunk.cpp)
-LIST(APPEND source src/avp/win95/cheat.c)
-LIST(APPEND source src/avp/win95/chtcodes.cpp)
-LIST(APPEND source src/avp/win95/d3d_hud.cpp)
-LIST(APPEND source src/avp/win95/ddplat.cpp)
-LIST(APPEND source src/avp/win95/endianio.c)
-LIST(APPEND source src/avp/win95/ffread.cpp)
-LIST(APPEND source src/avp/win95/ffstdio.cpp)
-LIST(APPEND source src/avp/win95/gammacontrol.cpp)
-LIST(APPEND source src/avp/win95/hierplace.cpp)
-LIST(APPEND source src/avp/win95/iofocus.cpp)
-LIST(APPEND source src/avp/win95/jsndsup.cpp)
-LIST(APPEND source src/avp/win95/kzsort.c)
-LIST(APPEND source src/avp/win95/langplat.c)
-LIST(APPEND source src/avp/win95/modcmds.cpp)
-LIST(APPEND source src/avp/win95/npcsetup.cpp)
-LIST(APPEND source src/avp/win95/objsetup.cpp)
-LIST(APPEND source src/avp/win95/pathchnk.cpp)
-LIST(APPEND source src/avp/win95/platsup.c)
-LIST(APPEND source src/avp/win95/pldghost.c)
-LIST(APPEND source src/avp/win95/pldnet.c)
-LIST(APPEND source src/avp/win95/progress_bar.cpp)
-LIST(APPEND source src/avp/win95/projload.cpp)
-LIST(APPEND source src/avp/win95/scrshot.cpp)
-LIST(APPEND source src/avp/win95/strachnk.cpp)
-LIST(APPEND source src/avp/win95/system.c)
-LIST(APPEND source src/avp/win95/usr_io.c)
-LIST(APPEND source src/avp/win95/vision.c)
-LIST(APPEND source src/avp/win95/frontend/avp_envinfo.c)
-LIST(APPEND source src/avp/win95/frontend/avp_intro.cpp)
-LIST(APPEND source src/avp/win95/frontend/avp_menudata.c)
-LIST(APPEND source src/avp/win95/frontend/avp_menus.c)
-LIST(APPEND source src/avp/win95/frontend/avp_mp_config.cpp)
-LIST(APPEND source src/avp/win95/frontend/avp_userprofile.cpp)
-LIST(APPEND source src/avp/win95/gadgets/ahudgadg.cpp)
-LIST(APPEND source src/avp/win95/gadgets/conscmnd.cpp)
-LIST(APPEND source src/avp/win95/gadgets/conssym.cpp)
-LIST(APPEND source src/avp/win95/gadgets/consvar.cpp)
-LIST(APPEND source src/avp/win95/gadgets/gadget.cpp)
-LIST(APPEND source src/avp/win95/gadgets/hudgadg.cpp)
-LIST(APPEND source src/avp/win95/gadgets/rootgadg.cpp)
-LIST(APPEND source src/avp/win95/gadgets/t_ingadg.cpp)
-LIST(APPEND source src/avp/win95/gadgets/teletype.cpp)
-LIST(APPEND source src/avp/win95/gadgets/textexp.cpp)
-LIST(APPEND source src/avp/win95/gadgets/textin.cpp)
-LIST(APPEND source src/avp/win95/gadgets/trepgadg.cpp)
-LIST(APPEND source src/win95/animchnk.cpp)
-LIST(APPEND source src/win95/animobs.cpp)
-LIST(APPEND source src/win95/awtexld.cpp)
-LIST(APPEND source src/win95/awbmpld.cpp)
-LIST(APPEND source src/win95/awiffld.cpp)
-LIST(APPEND source src/win95/awpnmld.cpp)
-LIST(APPEND source src/win95/bmpnames.cpp)
-LIST(APPEND source src/win95/chnkload.cpp)
-LIST(APPEND source src/win95/chnktexi.cpp)
-LIST(APPEND source src/win95/chnktype.cpp)
-LIST(APPEND source src/win95/chunk.cpp)
-LIST(APPEND source src/win95/chunkpal.cpp)
-LIST(APPEND source src/win95/db.c)
-LIST(APPEND source src/win95/debuglog.cpp)
-LIST(APPEND source src/win95/dummyobjectchunk.cpp)
-LIST(APPEND source src/win95/enumchnk.cpp)
-LIST(APPEND source src/win95/enumsch.cpp)
-LIST(APPEND source src/win95/envchunk.cpp)
-LIST(APPEND source src/win95/fail.c)
-LIST(APPEND source src/win95/fragchnk.cpp)
-LIST(APPEND source src/win95/gsprchnk.cpp)
-LIST(APPEND source src/win95/hierchnk.cpp)
-LIST(APPEND source src/win95/huffman.cpp)
-LIST(APPEND source src/win95/iff.cpp)
-LIST(APPEND source src/win95/iff_ilbm.cpp)
-LIST(APPEND source src/win95/ilbm_ext.cpp)
-LIST(APPEND source src/win95/io.c)
-LIST(APPEND source src/win95/list_tem.cpp)
-LIST(APPEND source src/win95/ltchunk.cpp)
-LIST(APPEND source src/win95/media.cpp)
-LIST(APPEND source src/win95/mishchnk.cpp)
-LIST(APPEND source src/win95/obchunk.cpp)
-LIST(APPEND source src/win95/oechunk.cpp)
-LIST(APPEND source src/win95/our_mem.c)
-LIST(APPEND source src/win95/plat_shp.c)
-LIST(APPEND source src/win95/plspecfn.c)
-LIST(APPEND source src/win95/shpchunk.cpp)
-LIST(APPEND source src/win95/sndchunk.cpp)
-LIST(APPEND source src/win95/sprchunk.cpp)
-LIST(APPEND source src/win95/string.cpp)
-LIST(APPEND source src/win95/texio.c)
-LIST(APPEND source src/win95/toolchnk.cpp)
-LIST(APPEND source src/win95/txioctrl.cpp)
-LIST(APPEND source src/win95/wpchunk.cpp)
-LIST(APPEND source src/win95/zsp.cpp)
-LIST(APPEND source src/opengl.c)
-LIST(APPEND source src/oglfunc.c)
-LIST(APPEND source src/fmv.c)
-LIST(APPEND source src/openal.c)
-LIST(APPEND source src/cdplayer.c)
-LIST(APPEND source src/menus.c)
-
-# Include headers in the target so IDEs expose the complete project tree.
-FILE(GLOB_RECURSE headers
-    src/*.h
-    src/*.hpp
+# Sources and headers are listed explicitly (not globbed), grouped by
+# folder and sorted by name within each folder, so IDEs (Qt Creator,
+# CLion, Visual Studio, ...) present the full project tree in a sane,
+# deterministic order. Headers are included purely so IDEs index them;
+# only the .cpp files below actually get compiled.
+#
+# A handful of .cpp files under src/ are deliberately left out of this
+# list: legacy/unported Win95 code (alternate DirectPlay networking, the
+# old D3D immediate-mode renderer, alt-tab surface tracking, etc.) that
+# predates the OpenGL/SDL port and was never part of the build.
+SET(source
+    src/cdplayer.cpp
+    src/cdplayer.h
+    src/files.cpp
+    src/files.h
+    src/fixer.h
+    src/fmv.cpp
+    src/fmv.h
+    src/frustum.cpp
+    src/frustum.h
+    src/kshape.cpp
+    src/kshape.h
+    src/map.cpp
+    src/mathline.cpp
+    src/maths.cpp
+    src/maths.h
+    src/md5.cpp
+    src/md5.h
+    src/mem3dc.cpp
+    src/mem3dcpp.cpp
+    src/menus.cpp
+    src/module.cpp
+    src/morph.cpp
+    src/net.cpp
+    src/net.h
+    src/object.cpp
+    src/oglfunc.cpp
+    src/oglfunc.h
+    src/openal.cpp
+    src/opengl.cpp
+    src/opengl.h
+    src/shpanim.cpp
+    src/sphere.cpp
+    src/sphere.h
+    src/stubs.cpp
+    src/tables.cpp
+    src/vdb.cpp
+    src/version.cpp
+    src/version.h
+    src/winapi.cpp
+    src/avp/ai_sight.cpp
+    src/avp/ai_sight.h
+    src/avp/avpview.cpp
+    src/avp/avpview.h
+    src/avp/bh_agun.cpp
+    src/avp/bh_agun.h
+    src/avp/bh_ais.cpp
+    src/avp/bh_ais.h
+    src/avp/bh_alien.cpp
+    src/avp/bh_alien.h
+    src/avp/bh_binsw.cpp
+    src/avp/bh_binsw.h
+    src/avp/bh_cable.cpp
+    src/avp/bh_cable.h
+    src/avp/bh_corpse.cpp
+    src/avp/bh_corpse.h
+    src/avp/bh_deathvol.cpp
+    src/avp/bh_deathvol.h
+    src/avp/bh_debri.cpp
+    src/avp/bh_debri.h
+    src/avp/bh_dummy.cpp
+    src/avp/bh_dummy.h
+    src/avp/bh_fan.cpp
+    src/avp/bh_fan.h
+    src/avp/bh_far.cpp
+    src/avp/bh_far.h
+    src/avp/bh_fhug.cpp
+    src/avp/bh_fhug.h
+    src/avp/bh_gener.cpp
+    src/avp/bh_gener.h
+    src/avp/bh_ldoor.cpp
+    src/avp/bh_ldoor.h
+    src/avp/bh_lift.cpp
+    src/avp/bh_lift.h
+    src/avp/bh_light.cpp
+    src/avp/bh_light.h
+    src/avp/bh_lnksw.cpp
+    src/avp/bh_lnksw.h
+    src/avp/bh_ltfx.cpp
+    src/avp/bh_ltfx.h
+    src/avp/bh_marin.cpp
+    src/avp/bh_marin.h
+    src/avp/bh_mission.cpp
+    src/avp/bh_mission.h
+    src/avp/bh_near.cpp
+    src/avp/bh_near.h
+    src/avp/bh_paq.h
+    src/avp/bh_pargen.cpp
+    src/avp/bh_pargen.h
+    src/avp/bh_plachier.cpp
+    src/avp/bh_plachier.h
+    src/avp/bh_plift.cpp
+    src/avp/bh_plift.h
+    src/avp/bh_pred.cpp
+    src/avp/bh_pred.h
+    src/avp/bh_queen.cpp
+    src/avp/bh_queen.h
+    src/avp/bh_rubberduck.cpp
+    src/avp/bh_rubberduck.h
+    src/avp/bh_selfdest.cpp
+    src/avp/bh_selfdest.h
+    src/avp/bh_snds.cpp
+    src/avp/bh_snds.h
+    src/avp/bh_spcl.cpp
+    src/avp/bh_spcl.h
+    src/avp/bh_swdor.cpp
+    src/avp/bh_swdor.h
+    src/avp/bh_track.cpp
+    src/avp/bh_track.h
+    src/avp/bh_types.cpp
+    src/avp/bh_types.h
+    src/avp/bh_videoscreen.cpp
+    src/avp/bh_videoscreen.h
+    src/avp/bh_waypt.cpp
+    src/avp/bh_waypt.h
+    src/avp/bh_weap.cpp
+    src/avp/bh_weap.h
+    src/avp/bh_xeno.cpp
+    src/avp/bh_xeno.h
+    src/avp/bonusabilities.cpp
+    src/avp/bonusabilities.h
+    src/avp/cconvars.cpp
+    src/avp/cdtrackselection.cpp
+    src/avp/cdtrackselection.h
+    src/avp/cheatmodes.cpp
+    src/avp/cheatmodes.h
+    src/avp/comp_map.cpp
+    src/avp/comp_shp.cpp
+    src/avp/comp_shp.h
+    src/avp/consolelog.cpp
+    src/avp/consolelog.hpp
+    src/avp/davehook.cpp
+    src/avp/davehook.h
+    src/avp/deaths.cpp
+    src/avp/decal.cpp
+    src/avp/decal.h
+    src/avp/detaillevels.cpp
+    src/avp/detaillevels.h
+    src/avp/dynamics.cpp
+    src/avp/dynamics.h
+    src/avp/dynblock.cpp
+    src/avp/dynblock.h
+    src/avp/equates.h
+    src/avp/equipmnt.cpp
+    src/avp/equipmnt.h
+    src/avp/extents.cpp
+    src/avp/extents.h
+    src/avp/game.cpp
+    src/avp/game.h
+    src/avp/game_statistics.cpp
+    src/avp/game_statistics.h
+    src/avp/gamecmds.cpp
+    src/avp/gamedef.h
+    src/avp/gamevars.cpp
+    src/avp/hmodel.cpp
+    src/avp/hmodel.h
+    src/avp/hud.cpp
+    src/avp/hud.h
+    src/avp/huddefs.h
+    src/avp/inventry.cpp
+    src/avp/inventry.h
+    src/avp/langenum.h
+    src/avp/language.cpp
+    src/avp/language.h
+    src/avp/lighting.cpp
+    src/avp/lighting.h
+    src/avp/load_shp.cpp
+    src/avp/load_shp.h
+    src/avp/los.cpp
+    src/avp/los.h
+    src/avp/ltfx_exp.h
+    src/avp/mempool.cpp
+    src/avp/mempool.h
+    src/avp/messagehistory.cpp
+    src/avp/messagehistory.h
+    src/avp/missions.cpp
+    src/avp/missions.hpp
+    src/avp/movement.cpp
+    src/avp/paintball.cpp
+    src/avp/paintball.h
+    src/avp/particle.cpp
+    src/avp/particle.h
+    src/avp/pfarlocs.cpp
+    src/avp/pfarlocs.h
+    src/avp/pheromon.cpp
+    src/avp/pheromon.h
+    src/avp/player.cpp
+    src/avp/player.h
+    src/avp/pmove.cpp
+    src/avp/pmove.h
+    src/avp/projfont.h
+    src/avp/projtext.h
+    src/avp/psnd.cpp
+    src/avp/psnd.h
+    src/avp/psndproj.cpp
+    src/avp/psndproj.h
+    src/avp/pvisible.cpp
+    src/avp/pvisible.h
+    src/avp/savegame.cpp
+    src/avp/savegame.h
+    src/avp/scream.cpp
+    src/avp/scream.h
+    src/avp/secstats.cpp
+    src/avp/sequnces.h
+    src/avp/sfx.cpp
+    src/avp/sfx.h
+    src/avp/stratdef.cpp
+    src/avp/stratdef.h
+    src/avp/targeting.cpp
+    src/avp/targeting.h
+    src/avp/track.cpp
+    src/avp/track.h
+    src/avp/triggers.cpp
+    src/avp/triggers.h
+    src/avp/weapons.cpp
+    src/avp/weapons.h
+    src/avp/shapes/cube.cpp
+    src/avp/support/command.hpp
+    src/avp/support/consbind.cpp
+    src/avp/support/consbind.hpp
+    src/avp/support/consbtch.cpp
+    src/avp/support/consbtch.hpp
+    src/avp/support/coordstr.cpp
+    src/avp/support/coordstr.hpp
+    src/avp/support/daemon.cpp
+    src/avp/support/daemon.h
+    src/avp/support/dcontext.hpp
+    src/avp/support/indexfnt.cpp
+    src/avp/support/indexfnt.hpp
+    src/avp/support/ourbool.h
+    src/avp/support/r2base.cpp
+    src/avp/support/r2base.h
+    src/avp/support/r2pos666.cpp
+    src/avp/support/r2pos666.hpp
+    src/avp/support/reflist.cpp
+    src/avp/support/reflist.hpp
+    src/avp/support/refobj.cpp
+    src/avp/support/refobj.hpp
+    src/avp/support/rentrntq.cpp
+    src/avp/support/rentrntq.h
+    src/avp/support/scstring.cpp
+    src/avp/support/scstring.hpp
+    src/avp/support/strtab.cpp
+    src/avp/support/strtab.hpp
+    src/avp/support/strutil.cpp
+    src/avp/support/strutil.h
+    src/avp/support/tallfont.hpp
+    src/avp/support/trig666.cpp
+    src/avp/support/trig666.hpp
+    src/avp/support/wrapstr.cpp
+    src/avp/support/wrapstr.hpp
+    src/avp/win95/avpchunk.cpp
+    src/avp/win95/avpchunk.hpp
+    src/avp/win95/avpreg.hpp
+    src/avp/win95/bmp2.h
+    src/avp/win95/cheat.cpp
+    src/avp/win95/cheat.h
+    src/avp/win95/chtcodes.cpp
+    src/avp/win95/d3d_hud.cpp
+    src/avp/win95/d3d_hud.h
+    src/avp/win95/d3d_render.h
+    src/avp/win95/datatype.h
+    src/avp/win95/ddplat.cpp
+    src/avp/win95/dp_func.h
+    src/avp/win95/dplayext.h
+    src/avp/win95/endianio.cpp
+    src/avp/win95/endianio.h
+    src/avp/win95/ffread.cpp
+    src/avp/win95/ffread.hpp
+    src/avp/win95/ffstdio.cpp
+    src/avp/win95/ffstdio.h
+    src/avp/win95/font.h
+    src/avp/win95/gameplat.h
+    src/avp/win95/gammacontrol.cpp
+    src/avp/win95/gammacontrol.h
+    src/avp/win95/heap_tem.hpp
+    src/avp/win95/hierplace.cpp
+    src/avp/win95/hierplace.hpp
+    src/avp/win95/hud_data.h
+    src/avp/win95/hud_layout.h
+    src/avp/win95/hudgfx.h
+    src/avp/win95/iofocus.cpp
+    src/avp/win95/iofocus.h
+    src/avp/win95/jsndsup.cpp
+    src/avp/win95/jsndsup.h
+    src/avp/win95/kzsort.cpp
+    src/avp/win95/kzsort.h
+    src/avp/win95/langplat.cpp
+    src/avp/win95/modcmds.cpp
+    src/avp/win95/modcmds.hpp
+    src/avp/win95/multmenu.h
+    src/avp/win95/npcsetup.cpp
+    src/avp/win95/npcsetup.h
+    src/avp/win95/objsetup.cpp
+    src/avp/win95/objsetup.hpp
+    src/avp/win95/pathchnk.cpp
+    src/avp/win95/pathchnk.hpp
+    src/avp/win95/pcmenus.h
+    src/avp/win95/platsup.cpp
+    src/avp/win95/pldghost.cpp
+    src/avp/win95/pldghost.h
+    src/avp/win95/pldnet.cpp
+    src/avp/win95/pldnet.h
+    src/avp/win95/progress_bar.cpp
+    src/avp/win95/progress_bar.h
+    src/avp/win95/projload.cpp
+    src/avp/win95/projload.hpp
+    src/avp/win95/psndplat.h
+    src/avp/win95/scrshot.cpp
+    src/avp/win95/scrshot.hpp
+    src/avp/win95/strachnk.cpp
+    src/avp/win95/strachnk.hpp
+    src/avp/win95/system.cpp
+    src/avp/win95/system.h
+    src/avp/win95/usr_io.cpp
+    src/avp/win95/usr_io.h
+    src/avp/win95/vision.cpp
+    src/avp/win95/vision.h
+    src/avp/win95/vmanpset.h
+    src/avp/win95/frontend/avp_envinfo.cpp
+    src/avp/win95/frontend/avp_envinfo.h
+    src/avp/win95/frontend/avp_intro.cpp
+    src/avp/win95/frontend/avp_intro.h
+    src/avp/win95/frontend/avp_menudata.cpp
+    src/avp/win95/frontend/avp_menudata.h
+    src/avp/win95/frontend/avp_menugfx.hpp
+    src/avp/win95/frontend/avp_menus.cpp
+    src/avp/win95/frontend/avp_menus.h
+    src/avp/win95/frontend/avp_mp_config.cpp
+    src/avp/win95/frontend/avp_mp_config.h
+    src/avp/win95/frontend/avp_userprofile.cpp
+    src/avp/win95/frontend/avp_userprofile.h
+    src/avp/win95/gadgets/ahudgadg.cpp
+    src/avp/win95/gadgets/ahudgadg.hpp
+    src/avp/win95/gadgets/conscmnd.cpp
+    src/avp/win95/gadgets/conscmnd.hpp
+    src/avp/win95/gadgets/conssym.cpp
+    src/avp/win95/gadgets/conssym.hpp
+    src/avp/win95/gadgets/consvar.cpp
+    src/avp/win95/gadgets/consvar.hpp
+    src/avp/win95/gadgets/gadget.cpp
+    src/avp/win95/gadgets/gadget.h
+    src/avp/win95/gadgets/hudgadg.cpp
+    src/avp/win95/gadgets/hudgadg.hpp
+    src/avp/win95/gadgets/rootgadg.cpp
+    src/avp/win95/gadgets/rootgadg.hpp
+    src/avp/win95/gadgets/t_ingadg.cpp
+    src/avp/win95/gadgets/t_ingadg.hpp
+    src/avp/win95/gadgets/teletype.cpp
+    src/avp/win95/gadgets/teletype.hpp
+    src/avp/win95/gadgets/textexp.cpp
+    src/avp/win95/gadgets/textexp.hpp
+    src/avp/win95/gadgets/textin.cpp
+    src/avp/win95/gadgets/textin.hpp
+    src/avp/win95/gadgets/trepgadg.cpp
+    src/avp/win95/gadgets/trepgadg.hpp
+    src/include/3dc.h
+    src/include/mem3dc.h
+    src/include/module.h
+    src/include/prototyp.h
+    src/include/shape.h
+    src/win95/alt_tab.h
+    src/win95/animchnk.cpp
+    src/win95/animchnk.hpp
+    src/win95/animobs.cpp
+    src/win95/animobs.hpp
+    src/win95/aw.h
+    src/win95/awbmpld.cpp
+    src/win95/awiffld.cpp
+    src/win95/awpnmld.cpp
+    src/win95/awtexld.cpp
+    src/win95/awtexld.h
+    src/win95/awtexld.hpp
+    src/win95/bmpnames.cpp
+    src/win95/bmpnames.hpp
+    src/win95/cd_player.h
+    src/win95/chnkload.cpp
+    src/win95/chnkload.h
+    src/win95/chnkload.hpp
+    src/win95/chnktexi.cpp
+    src/win95/chnktexi.h
+    src/win95/chnktype.cpp
+    src/win95/chnktype.hpp
+    src/win95/chunk.cpp
+    src/win95/chunk.hpp
+    src/win95/chunkpal.cpp
+    src/win95/chunkpal.hpp
+    src/win95/d3_func.h
+    src/win95/db.cpp
+    src/win95/db.h
+    src/win95/debuglog.cpp
+    src/win95/debuglog.h
+    src/win95/debuglog.hpp
+    src/win95/dummyobjectchunk.cpp
+    src/win95/dummyobjectchunk.hpp
+    src/win95/dxlog.h
+    src/win95/enumchnk.cpp
+    src/win95/enumchnk.hpp
+    src/win95/enumsch.cpp
+    src/win95/enumsch.hpp
+    src/win95/envchunk.cpp
+    src/win95/envchunk.hpp
+    src/win95/fail.cpp
+    src/win95/fail.h
+    src/win95/fragchnk.cpp
+    src/win95/fragchnk.hpp
+    src/win95/gsprchnk.cpp
+    src/win95/gsprchnk.hpp
+    src/win95/hash_tem.hpp
+    src/win95/hierchnk.cpp
+    src/win95/hierchnk.hpp
+    src/win95/huffman.cpp
+    src/win95/huffman.hpp
+    src/win95/iff.cpp
+    src/win95/iff.hpp
+    src/win95/iff_ilbm.cpp
+    src/win95/iff_ilbm.hpp
+    src/win95/ilbm_ext.cpp
+    src/win95/ilbm_ext.hpp
+    src/win95/inline.h
+    src/win95/io.cpp
+    src/win95/list_tem.cpp
+    src/win95/list_tem.hpp
+    src/win95/ltchunk.cpp
+    src/win95/ltchunk.hpp
+    src/win95/media.cpp
+    src/win95/media.hpp
+    src/win95/mishchnk.cpp
+    src/win95/mishchnk.hpp
+    src/win95/mmx_math.h
+    src/win95/obchunk.cpp
+    src/win95/obchunk.hpp
+    src/win95/oechunk.cpp
+    src/win95/oechunk.h
+    src/win95/our_mem.cpp
+    src/win95/ourasert.h
+    src/win95/plat_shp.cpp
+    src/win95/plat_shp.h
+    src/win95/platform.h
+    src/win95/plspecfn.cpp
+    src/win95/showcmds.h
+    src/win95/shpanim.h
+    src/win95/shpchunk.cpp
+    src/win95/shpchunk.hpp
+    src/win95/sndchunk.cpp
+    src/win95/sndchunk.hpp
+    src/win95/sprchunk.cpp
+    src/win95/sprchunk.hpp
+    src/win95/string.cpp
+    src/win95/string.hpp
+    src/win95/texio.cpp
+    src/win95/toolchnk.cpp
+    src/win95/toolchnk.hpp
+    src/win95/txioctrl.cpp
+    src/win95/txioctrl.h
+    src/win95/videomodes.h
+    src/win95/wpchunk.cpp
+    src/win95/wpchunk.hpp
+    src/win95/zsp.cpp
+    src/win95/zsp.hpp
 )
 
 IF(SDL_TYPE STREQUAL "SDL")
-    LIST(APPEND source src/main.c)
+    LIST(APPEND source src/main.cpp)
 
     # SDL 1.2 on OS X requires this support file
     IF(APPLE AND ${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
@@ -304,12 +548,8 @@ IF(SDL_TYPE STREQUAL "SDL")
 ENDIF(SDL_TYPE STREQUAL "SDL")
 
 IF(SDL_TYPE STREQUAL "SDL2")
-    LIST(APPEND source src/main2.c)
+    LIST(APPEND source src/main2.cpp)
 ENDIF(SDL_TYPE STREQUAL "SDL2")
-
-### build all source as C++
-### (not normally used)
-##SET_SOURCE_FILES_PROPERTIES(${source} PROPERTIES LANGUAGE CXX)
 
 # auto-include directories with source files
 FOREACH(sourcefile IN LISTS source)
@@ -320,9 +560,14 @@ INCLUDE_DIRECTORIES(${include})
 
 # manually include src/include
 
-ADD_EXECUTABLE(avp ${source} ${headers})
+ADD_EXECUTABLE(avp ${source})
 TARGET_INCLUDE_DIRECTORIES(avp PRIVATE src/include)
 SET_PROPERTY(TARGET avp PROPERTY CXX_STANDARD 23)
+
+# the codebase relies throughout on implicit void*->T* and int->enum
+# conversions that were legal C but are ill-formed C++; keep them as
+# warnings rather than rewriting every call site.
+TARGET_COMPILE_OPTIONS(avp PRIVATE -fpermissive)
 
 # required dependencies
 IF(SDL_TYPE STREQUAL "SDL")

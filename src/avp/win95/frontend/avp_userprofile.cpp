@@ -1,6 +1,5 @@
 /* KJL 15:17:31 10/12/98 - user profile stuff */
 #include "list_tem.hpp"
-extern "C" {
 #include "3dc.h"
 #include "inline.h"
 #include "module.h"
@@ -12,7 +11,7 @@ extern "C" {
 #include "psnd.h"
 #include "cd_player.h"
 
-#define UseLocalAssert Yes
+#define UseLocalAssert true
 #include "ourasert.h"
 
 // Edmond
@@ -314,5 +313,3 @@ extern void FixCheatModesInUserProfile(AVP_USER_PROFILE *profilePtr)
         }
     }
 }
-
-}; // extern "C"

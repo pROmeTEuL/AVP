@@ -265,10 +265,6 @@ typedef struct
 #define DEFAULT_TRACKERBALL_VERTICAL_SENSITIVITY 32
 
 /* Global Variables */
-#ifdef __cplusplus
-// Linkage wrapping added by DHM 17/3/98:
-extern "C" {
-#endif
 
 /* Globals */
 extern PLAYER_INPUT_CONFIGURATION MarineInputPrimaryConfig;
@@ -303,10 +299,5 @@ extern void SaveKeyConfiguration(void);
 extern void LoadAKeyConfiguration(char *Filename);
 extern void SaveAKeyConfiguration(char *Filename);
 void LoadDefaultPrimaryConfigs(void);
-
-#ifdef __cplusplus
-};
-// ...linkage wrapping added by DHM 17/3/98
-#endif
 
 #endif

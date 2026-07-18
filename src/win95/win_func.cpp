@@ -7,8 +7,6 @@ not project specific.
 
 // To link code to main C functions
 
-extern "C" {
-
 #include "3dc.h"
 #include "inline.h"
 
@@ -17,7 +15,7 @@ extern "C" {
 // This is necessary to support full screen
 // ActiveMovie play.
 
-#define SupportAltTab Yes
+#define SupportAltTab true
 
 // Globals
 
@@ -299,4 +297,3 @@ PROCESSORTYPES ReadProcessorType(void)
 }
 
 // End of extern C declaration
-};

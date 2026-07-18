@@ -11,10 +11,6 @@
 #include "gadget.h"
 #endif
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* Version settings *****************************************************/
 
 /* Constants  ***********************************************************/
@@ -70,9 +66,5 @@ inline HUDGadget *RootGadget::GetHUD(void)
 /* Function prototypes **************************************************/
 
 /* End of the header ****************************************************/
-
-#ifdef __cplusplus
-};
-#endif
 
 #endif

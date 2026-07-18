@@ -23,12 +23,8 @@
 #include "strtab.hpp"
 #endif
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* Version settings *****************************************************/
-#define WithinTheGame Yes
+#define WithinTheGame true
 // as opposed to within the editor
 
 /* Constants  ***********************************************************/
@@ -231,9 +227,5 @@ void TestInit(void);
 };
 
 /* End of the header ****************************************************/
-
-#ifdef __cplusplus
-};
-#endif
 
 #endif

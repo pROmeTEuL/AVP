@@ -27,14 +27,12 @@
 #include "showcmds.h"
 #include "pfarlocs.h"
 
-#define UseLocalAssert Yes
+#define UseLocalAssert true
 #include "ourasert.h"
 
 #include "game_statistics.h"
 #include "avp_envinfo.h"
 #include "avp_userprofile.h"
-
-extern "C" {
 
 extern int Simplify_HModel_Rendering;
 
@@ -1077,5 +1075,3 @@ void CreateMoreGameSpecificConsoleVariables(void)
 
 #endif
 }
-
-}; // extern "C"

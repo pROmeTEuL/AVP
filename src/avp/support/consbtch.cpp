@@ -16,7 +16,7 @@
 #include "consbtch.hpp"
 #include "reflist.hpp"
 
-#define UseLocalAssert Yes
+#define UseLocalAssert true
 #include "ourasert.h"
 
 /* Version settings ************************************************/
@@ -30,9 +30,6 @@ enum { MaxBatchFileLineLength = 300, MaxBatchFileLineSize = (MaxBatchFileLineLen
 /* Imported function prototypes ************************************/
 
 /* Imported data ***************************************************/
-#ifdef __cplusplus
-extern "C" {
-#endif
 #if 0
 		extern OurBool			DaveDebugOn;
 		extern FDIEXTENSIONTAG	FDIET_Dummy;
@@ -44,9 +41,6 @@ extern "C" {
 		extern UncompressedGlobalPlotAtomID UGPAID_StandardNull;
 		extern IFCOLOUR			IFColour_Dummy;
  		extern IFVECTOR			IFVec_Zero;
-#endif
-#ifdef __cplusplus
-};
 #endif
 
 /* Exported globals ************************************************/
@@ -77,7 +71,7 @@ OurBool BatchFileProcessing ::Run(char *Filename)
         FILE *pFile = OpenGameFile(Filename, FILEMODE_READONLY, FILETYPE_CONFIG);
 
         if (NULL == pFile) {
-            return No;
+            return false;
         }
 
         // Read the file, line by line.
@@ -166,11 +160,11 @@ OurBool BatchFileProcessing ::Run(char *Filename)
         }
     }
 
-    return Yes;
+    return true;
 }
 
 // public:
 // static
-int BatchFileProcessing ::bEcho = No;
+int BatchFileProcessing ::bEcho = false;
 
 /* Internal function definitions ***********************************/

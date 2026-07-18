@@ -69,9 +69,6 @@
 //#include "advwin32.h"
 
 /* Permit use in a C++ source file. */
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /* ******************************************************************** *
  * 																		*
@@ -368,9 +365,6 @@ extern int db_option;
 /* E N D   W R A P P E R ********************************************** */
 
 /* Permit use in a C++ source file. */
-#ifdef __cplusplus
-}
-#endif
 
 /* Avoid multiple inclusions of this file in a single source file. */
 #endif

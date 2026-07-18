@@ -15,12 +15,8 @@
 #include "fail.h"
 #endif
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* Version settings *****************************************************/
-#define TrackReferenceCounted No
+#define TrackReferenceCounted false
 /*
 			This is a debug option that has a fair amount of run-time
 			cost.
@@ -174,9 +170,5 @@ protected:
 /* Function prototypes **************************************************/
 
 /* End of the header ****************************************************/
-
-#ifdef __cplusplus
-};
-#endif
 
 #endif

@@ -1,12 +1,6 @@
 #ifndef _shp_anim_h
 #define _shp_anim_h 1
 
-#ifdef __cplusplus
-
-extern "C" {
-
-#endif
-
 /*
 
 	Structures for animating shapes (not morphing)
@@ -167,10 +161,5 @@ void InitShapeAnimationControlData(SHAPEANIMATIONCONTROLDATA *);
 void DoAllShapeAnimations();
 
 void CopyAnimationFrameToShape(SHAPEANIMATIONCONTROLDATA *sacd, struct displayblock *dptr);
-
-#ifdef __cplusplus
-};
-
-#endif
 
 #endif

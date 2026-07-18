@@ -30,7 +30,7 @@
 #include "hudgadg.hpp"
 // for ClearTheQueue()
 
-#define UseLocalAssert Yes
+#define UseLocalAssert true
 #include "ourasert.h"
 
 /* Version settings ************************************************/
@@ -48,9 +48,6 @@
 /* Imported function prototypes ************************************/
 
 /* Imported data ***************************************************/
-#ifdef __cplusplus
-extern "C" {
-#endif
 #if 0
 		extern OurBool			DaveDebugOn;
 		extern FDIEXTENSIONTAG	FDIET_Dummy;
@@ -64,9 +61,6 @@ extern "C" {
  		extern IFVECTOR			IFVec_Zero;
 #endif
 extern int RealFrameTime;
-#ifdef __cplusplus
-};
-#endif
 
 static int NumberOfLinesToDisplay = 0;
 
@@ -669,7 +663,7 @@ TextReportDaemon_Scroll ::~TextReportDaemon_Scroll() {}
 // public:
 TextReportDaemon_Disappear ::TextReportDaemon_Disappear(TextReportGadget *pTextReportGadg)
     : PulsingTriggerDaemon(
-          Yes,                                      // OurBool fActive,
+          true,                                     // OurBool fActive,
           FIXP_SECONDS_UNTIL_TEXT_REPORTS_DISAPPEAR // int FixP_Period // interval between triggers in seconds
       )
 {
@@ -694,7 +688,7 @@ CheesyDaemon_Flash ::CheesyDaemon_Flash()
           0,               // int Int_InitialCoord,
           1,               // int Int_SecondCoord,
           (ONE_FIXED * 4), // int FixP_Velocity,
-          Yes              // OurBool fActive
+          true             // OurBool fActive
       )
 {
     // empty

@@ -27,7 +27,6 @@
 
 #include "scstring.hpp"
 
-extern "C" {
 #include "font.h"     // for the font stuff
 #include "language.h" /* KJL 14:43:53 05/04/97 - language internationalization code */
 #include "gameplat.h" // for AVP_ChangeDisplayMode
@@ -87,7 +86,6 @@ enum TexFmt {
     D3TF_MAX
 } d3d_desired_tex_fmt
     = D3TF_DEFAULT;
-}
 
 /***************************/
 /* PRIVATE MACRO-CONSTANTS */
@@ -887,7 +885,6 @@ extern int SetGameVideoMode(void)
     return 1;
 }
 
-extern "C" {
 /* KJL 17:11:26 19/07/98 - The 3 fns below are the interface between the
 video mode selection and the frontend menus. */
 
@@ -945,5 +942,4 @@ extern void SaveVideoModeSettings(void)
     fwrite(&mipmap_opt[VM3_D3D], 4, 1, fp);
     fclose(fp);
     return;
-}
 }

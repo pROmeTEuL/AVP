@@ -6,12 +6,6 @@
 
 */
 
-#ifdef __cplusplus
-
-extern "C" {
-
-#endif
-
 #if SupportModules
 
 #include "bh_waypt.h"
@@ -428,11 +422,6 @@ extern int AIModuleArraySize;
 extern AIMODULE *AIModuleArray;
 
 #endif /* SupportModules */
-
-#ifdef __cplusplus
-};
-
-#endif
 
 #define MODULE_INCLUDED
 

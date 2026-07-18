@@ -1,10 +1,6 @@
 #ifndef _chnkload_h_
 #define _chnkload_h_
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include "system.h"
 #include "equates.h"
 #include "platform.h"
@@ -215,11 +211,6 @@ extern MODULE Empty_Module;
 extern MODULE Term_Module;
 
 extern MODULEMAPBLOCK Empty_Module_Map;
-
-#endif
-
-#ifdef __cplusplus
-}
 
 #endif
 

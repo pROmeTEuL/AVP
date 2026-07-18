@@ -21,12 +21,8 @@
 #endif
 #endif
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* Version settings *****************************************************/
-#define OnlyOneStringTable Yes
+#define OnlyOneStringTable true
 
 /* Constants  ***********************************************************/
 
@@ -68,9 +64,5 @@ extern void UnloadTable(void);
 #endif
 
 /* End of the header ****************************************************/
-
-#ifdef __cplusplus
-};
-#endif
 
 #endif

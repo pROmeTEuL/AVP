@@ -5,12 +5,6 @@
 #ifndef _pmove_h_
 #define _pmove_h_ 1
 
-#ifdef __cplusplus
-
-extern "C" {
-
-#endif
-
 /*--------------Patrick 15/10/96 ---------------------
   Enumeration of player movement states
   Free movement indicates normal movement.
@@ -63,10 +57,5 @@ extern void ExecuteFreeMovement(STRATEGYBLOCK *sbPtr);
 void ThrowAFlare(void);
 void StartPlayerTaunt(void);
 void NetPlayerRespawn(STRATEGYBLOCK *sbPtr);
-
-#ifdef __cplusplus
-}
-
-#endif
 
 #endif

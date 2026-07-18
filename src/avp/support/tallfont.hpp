@@ -103,16 +103,16 @@ private:
     OurBool GetOffset(unsigned int &outputOffset, ProjChar inProjCh) const
     {
         if (inProjCh < ASCIICodeForOffset0) {
-            return No;
+            return false;
         }
 
         outputOffset = (inProjCh - ASCIICodeForOffset0);
 
         if (outputOffset >= NumChars) {
-            return No;
+            return false;
         }
 
-        return Yes;
+        return true;
     }
 };
 
@@ -201,16 +201,16 @@ private:
     OurBool GetOffset(unsigned int &outputOffset, ProjChar inProjCh) const
     {
         if (inProjCh < ASCIICodeForOffset0) {
-            return No;
+            return false;
         }
 
         outputOffset = (inProjCh - ASCIICodeForOffset0);
 
         if (outputOffset >= NumChars) {
-            return No;
+            return false;
         }
 
-        return Yes;
+        return true;
     }
 
     int CalcXInc(
@@ -242,13 +242,5 @@ private:
 /* Function prototypes **************************************************/
 
 /* End of the header ****************************************************/
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#ifdef __cplusplus
-};
-#endif
 
 #endif

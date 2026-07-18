@@ -49,7 +49,7 @@
 
 #include "consbtch.hpp"
 
-#define UseLocalAssert Yes
+#define UseLocalAssert true
 #include "ourasert.h"
 
 #include "avp_menus.h"
@@ -62,9 +62,6 @@
 /* Imported function prototypes ************************************/
 
 /* Imported data ***************************************************/
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 extern unsigned char KeyboardInput[];
 
@@ -74,10 +71,6 @@ extern int VideoModeColourDepth;
 extern int bEnableTextprint;
 extern int bEnableTextprintXY;
 extern signed int HUDTranslucencyLevel;
-
-#ifdef __cplusplus
-};
-#endif
 
 /* Exported globals ************************************************/
 #if 0
@@ -97,7 +90,7 @@ void DumpRefCounts(void);
 void DumpVideoMode(void);
 }; // namespace Testing
 
-static int bFirstFrame = No;
+static int bFirstFrame = false;
 
 /* Internal globals ************************************************/
 
@@ -339,7 +332,7 @@ void DAVEHOOK_Maintain(void)
         // in the menu get through to the first frame of the game and
         // for example, switch to typing mode (for CR presses)
 
-        bFirstFrame = No;
+        bFirstFrame = false;
     } else {
         // Flush the WinProc messages:
         RE_ENTRANT_QUEUE_WinMain_FlushMessages();
@@ -353,7 +346,7 @@ void DAVEHOOK_ScreenModeChange_Cleanup(void)
     R2BASE_ScreenModeChange_Cleanup();
     GADGET_ScreenModeChange_Cleanup();
 
-    bFirstFrame = Yes;
+    bFirstFrame = true;
     // to ensure a flush without processing of messages in first frame, so as to
     // avoid carriage returns/enter from menu selections triggering typing mode
 

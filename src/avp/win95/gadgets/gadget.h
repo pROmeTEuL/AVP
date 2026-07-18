@@ -12,10 +12,10 @@
 #define _gadget 1
 
 /* Version settings *****************************************************/
-#define UseGadgets Yes
+#define UseGadgets true
 /* If this is set to No all gadget code collapses to void macros */
 
-#define EnableStatusPanels No
+#define EnableStatusPanels false
 
 /* Constants  ***********************************************************/
 #define HUD_SPACING 20
@@ -146,9 +146,6 @@ inline char *Gadget::GetDebugName(void)
 /* Exported globals *****************************************************/
 
 /* Function prototypes **************************************************/
-#ifdef __cplusplus
-extern "C" {
-#endif
 #if UseGadgets
 
 extern void GADGET_Init(void);
@@ -184,9 +181,5 @@ extern void RemoveTheConsolePlease(void);
 #endif /* UseGadgets */
 
 /* End of the header ****************************************************/
-
-#ifdef __cplusplus
-};
-#endif
 
 #endif

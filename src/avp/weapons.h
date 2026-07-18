@@ -6,12 +6,6 @@
 #ifndef _weapons_h_
 #define _weapons_h_ 1
 
-#ifdef __cplusplus
-
-extern "C" {
-
-#endif
-
 /*KJL****************************************************************************************
 * 										D E F I N E S 										*
 ****************************************************************************************KJL*/
@@ -138,10 +132,5 @@ extern SECTION_DATA *HitLocationRoll(STRATEGYBLOCK *sbPtr, STRATEGYBLOCK *source
 
 #define SPEARS_PER_PICKUP 30
 #define MAX_SPEARS 99
-
-#ifdef __cplusplus
-}
-
-#endif
 
 #endif

@@ -8,10 +8,9 @@
 //#include "textexp.hpp"
 //#include "trepgadg.hpp"
 
-#define UseLocalAssert Yes
+#define UseLocalAssert true
 #include "ourasert.h"
 
-extern "C" {
 #include "module.h"
 #include "inline.h"
 
@@ -465,5 +464,3 @@ void CreateGameSpecificConsoleCommands(void)
     ConsoleCommand::Make("LOAD", "Load game from slot 1-8", ConsoleCommandLoad);
     ConsoleCommand::Make("SAVESLEFT", "", DisplaySavesLeft);
 }
-
-} // extern "C"

@@ -1,9 +1,6 @@
 /*-----------------------Patrick 7/5/97---------------------------
   Header file for Multiplayer menus: I have heavily modifies these
 ------------------------------------------------------------------*/
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 #ifndef MULTMENU_HPP_INCLUDED
 #define MULTMENU_HPP_INCLUDED 1
@@ -165,8 +162,4 @@ typedef enum muliplayer_endgame_items {
 extern int RunMultiplayerStartUp(int lobbied);
 extern void EndOfNetworkGameScreen(void);
 
-#endif
-
-#ifdef __cplusplus
-}
 #endif

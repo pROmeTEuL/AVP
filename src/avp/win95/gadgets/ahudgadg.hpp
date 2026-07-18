@@ -75,18 +75,10 @@ private:
 
 /* Exported globals *****************************************************/
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* Function prototypes **************************************************/
 void BringDownConsoleWithSayTypedIn();
 void BringDownConsoleWithSaySpeciesTypedIn();
 
 /* End of the header ****************************************************/
-
-#ifdef __cplusplus
-};
-#endif
 
 #endif

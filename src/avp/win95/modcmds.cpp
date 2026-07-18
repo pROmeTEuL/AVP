@@ -21,7 +21,7 @@
 #include "dynblock.h"
 #endif
 
-#define UseLocalAssert Yes
+#define UseLocalAssert true
 #include "ourasert.h"
 
 /* Version settings ************************************************/
@@ -33,9 +33,6 @@
 /* Imported function prototypes ************************************/
 
 /* Imported data ***************************************************/
-#ifdef __cplusplus
-extern "C" {
-#endif
 #if UseGadgets
 extern SCENEMODULE **Global_ModulePtr;
 extern DISPLAYBLOCK *Player;
@@ -52,9 +49,6 @@ extern DISPLAYBLOCK *Player;
 		extern UncompressedGlobalPlotAtomID UGPAID_StandardNull;
 		extern IFCOLOUR			IFColour_Dummy;
  		extern IFVECTOR			IFVec_Zero;
-#endif
-#ifdef __cplusplus
-};
 #endif
 
 /* Exported globals ************************************************/

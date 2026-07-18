@@ -1,4 +1,3 @@
-extern "C" {
 
 #include "3dc.h"
 #include "module.h"
@@ -46,4 +45,3 @@ void UpdateGammaSettings(void)
 
     ActualGammaSetting = RequestedGammaSetting;
 }
-};

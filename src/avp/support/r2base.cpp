@@ -13,7 +13,7 @@
 #include "r2base.h"
 #include "inline.h"
 
-#define UseLocalAssert Yes
+#define UseLocalAssert true
 #include "ourasert.h"
 
 /* Version settings ************************************************/
@@ -45,9 +45,7 @@ r2pos r2pos ::FixP_Scale(int FixP_ScaleFactor) const
     return r2pos(MUL_FIXED(x, FixP_ScaleFactor), MUL_FIXED(y, FixP_ScaleFactor));
 }
 
-extern "C" {
 void D3D_Rectangle(int x0, int y0, int x1, int y1, int r, int g, int b, int a);
-};
 
 void r2rect ::AlphaFill(
     unsigned char R, unsigned char G, unsigned char B, unsigned char translucency) const
@@ -73,9 +71,7 @@ extern void R2BASE_ScreenModeChange_Setup(void)
     }
 }
 
-extern "C" {
 extern SCREENDESCRIPTORBLOCK ScreenDescriptorBlock;
-};
 
 extern void R2BASE_ScreenModeChange_Cleanup(void)
 {

@@ -9,7 +9,6 @@
 #include "inline.h"
 #include "gamedef.h"
 #include "psnd.h"
-extern "C" {
 #include "language.h"
 #include "avp_menus.h"
 extern SCREENDESCRIPTORBLOCK ScreenDescriptorBlock;
@@ -29,7 +28,6 @@ extern int FadingGameInAfterLoading;
 extern void InGameFlipBuffers();
 
 extern void BltImage(RECT *dest, DDSurface *image, RECT *src);
-};
 
 static int CurrentPosition = 0;
 static int BarLeft;
@@ -193,8 +191,6 @@ void Set_Progress_Bar_Position(int pos)
     }
 }
 
-extern "C" {
-
 void Game_Has_Loaded(void)
 {
     extern int NormalFrameTime;
@@ -277,4 +273,3 @@ void Game_Has_Loaded(void)
         ReleaseDDSurface(LoadingBarFull);
     }
 }
-};

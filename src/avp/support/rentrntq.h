@@ -30,10 +30,6 @@
 #ifndef _rentrntq
 #define _rentrntq 1
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* Version settings *****************************************************/
 
 /* Constants  ***********************************************************/
@@ -55,9 +51,5 @@ extern void RE_ENTRANT_QUEUE_WinMain_FlushMessages(void);
 extern void RE_ENTRANT_QUEUE_WinMain_FlushMessagesWithoutProcessing(void);
 
 /* End of the header ****************************************************/
-
-#ifdef __cplusplus
-};
-#endif
 
 #endif

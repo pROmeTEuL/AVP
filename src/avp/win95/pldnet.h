@@ -3,9 +3,6 @@
   ----------------------------------------------------------------------*/
 #ifndef pldnet_h_included
 #define pldnet_h_included
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 #define EXTRAPOLATION_TEST 1
 
@@ -185,7 +182,7 @@ typedef struct netgame_gamedata
     NETGAME_STATES myGameState;
     NETGAME_CHARACTERTYPE myCharacterType;
     NETGAME_CHARACTERTYPE
-        myNextCharacterType; //if player is currently dead and about to become a new character
+    myNextCharacterType; //if player is currently dead and about to become a new character
     NETGAME_SPECIALISTCHARACTERTYPE myCharacterSubType;
     unsigned char myStartFlag;
     NETGAME_PLAYERDATA playerData[NET_MAXPLAYERS];
@@ -1137,8 +1134,4 @@ extern MULTIPLAYER_START *predatorStartPositions;
 #define LobbiedGame_Client 2
 extern int LobbiedGame;
 
-#ifdef __cplusplus
-}
-
-#endif
 #endif

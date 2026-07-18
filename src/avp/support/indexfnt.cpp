@@ -14,29 +14,22 @@
 #include "indexfnt.hpp"
 //#include "tallfont.hpp"
 
-extern "C" {
 #include "d3d_hud.h"
-};
-#define UseLocalAssert Yes
+#define UseLocalAssert true
 #include "ourasert.h"
 
 /* Version settings ************************************************/
-#define Use_BLT No
+#define Use_BLT false
 
 /* Constants *******************************************************/
 
 /* Macros **********************************************************/
 
 /* Imported function prototypes ************************************/
-extern "C" {
 extern void D3D_RenderHUDString(char *stringPtr, int x, int y, int colour);
 extern void D3D_RenderHUDString_Clipped(char *stringPtr, int x, int y, int colour);
-};
 
 /* Imported data ***************************************************/
-#ifdef __cplusplus
-extern "C" {
-#endif
 extern unsigned char *ScreenBuffer;
 extern long BackBufferPitch;
 #if 0 /* LINUX */	
@@ -45,10 +38,6 @@ extern long BackBufferPitch;
 #endif
 extern int CloudTable[128][128];
 extern int CloakingPhase;
-
-#ifdef __cplusplus
-};
-#endif
 
 /* Exported globals ************************************************/
 /*static*/ IndexedFont *IndexedFont ::pIndexedFont[IndexedFonts_MAX_NUMBER_OF_FONTS];
@@ -96,13 +85,13 @@ OurBool IndexedFont ::bCanRenderFully(ProjChar *pProjCh)
     // Assumes one byte-per-character:
     while (*pProjCh) {
         if (!bCanRender(*pProjCh)) {
-            return No;
+            return false;
         }
 
         pProjCh++;
     }
 
-    return Yes;
+    return true;
 }
 
 #if debug

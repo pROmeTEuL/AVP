@@ -1,10 +1,6 @@
 #ifndef FILES_H
 #define FILES_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include <stdio.h>
 #include <time.h>
 
@@ -38,9 +34,5 @@ void *OpenGameDirectory(const char *dirname, const char *pattern, int type);
 GameDirectoryFile *ScanGameDirectory(void *dir);
 int CloseGameDirectory(void *dir);
 void InitGameDirectories(char *argv0);
-
-#ifdef __cplusplus
-};
-#endif
 
 #endif

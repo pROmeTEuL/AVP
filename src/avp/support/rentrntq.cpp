@@ -25,7 +25,7 @@
 #include "consbind.hpp"
 #endif
 
-#define UseLocalAssert Yes
+#define UseLocalAssert true
 #include "ourasert.h"
 
 /* Version settings ************************************************/
@@ -68,10 +68,8 @@ struct Q_Entry
 static struct Q_Entry OurQ[MAX_Q_MESSAGES];
 static unsigned int NumQMessages = 0;
 
-extern "C" {
 void RE_ENTRANT_QUEUE_WinProc_AddMessage_WM_CHAR(char Ch);
 void RE_ENTRANT_QUEUE_WinProc_AddMessage_WM_KEYDOWN(WPARAM wParam);
-};
 
 /* Exported function definitions ***********************************/
 /* Functions callable within the Windows procedure */

@@ -7,12 +7,6 @@
 
 #include "pmove.h"
 
-#ifdef __cplusplus
-
-extern "C" {
-
-#endif
-
 /* 
 	I think I am going to devide the behaviour of objects into two different forms
 	
@@ -464,10 +458,5 @@ extern void FindMaxZXandYAverages(VECTORCH *vect, SHAPEHEADER *shapeptr);
 extern DISPLAYBLOCK *MakeObject(AVP_BEHAVIOUR_TYPE bhvr, VECTORCH *positionPtr);
 
 extern void SetupPlayerAutoGun();
-
-#ifdef __cplusplus
-};
-
-#endif
 
 #endif

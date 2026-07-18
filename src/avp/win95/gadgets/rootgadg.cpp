@@ -15,7 +15,7 @@
 #if UseGadgets
 #include "hudgadg.hpp"
 
-#define UseLocalAssert Yes
+#define UseLocalAssert true
 #include "ourasert.h"
 
 /* Version settings ************************************************/
@@ -27,9 +27,6 @@
 /* Imported function prototypes ************************************/
 
 /* Imported data ***************************************************/
-#ifdef __cplusplus
-extern "C" {
-#endif
 extern signed int HUDTranslucencyLevel;
 // ranges from 0 to 255 inclusive ; convert to fixed point...
 
@@ -44,9 +41,6 @@ extern signed int HUDTranslucencyLevel;
 		extern UncompressedGlobalPlotAtomID UGPAID_StandardNull;
 		extern IFCOLOUR			IFColour_Dummy;
  		extern IFVECTOR			IFVec_Zero;
-#endif
-#ifdef __cplusplus
-};
 #endif
 
 /* Exported globals ************************************************/

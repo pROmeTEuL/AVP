@@ -7,7 +7,6 @@
 #include "dxlog.h"
 #include "avp_menus.h"
 
-extern "C" {
 extern DISPLAYBLOCK *Player;
 
 struct ScreamSound
@@ -286,4 +285,3 @@ void PlayQueenSound(
 {
     QueenSounds.PlaySound(VoiceType, SoundCategory, PitchShift, ExternalRef, Location);
 }
-};

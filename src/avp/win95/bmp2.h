@@ -17,10 +17,6 @@
 #ifndef BMP2_H
 #define BMP2_H 1
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
-
 #include "datatype.h" /* Include the data type definitions */
 
 #define COMPRESS_RGB 0L  /* No compression               */
@@ -154,9 +150,5 @@ typedef struct _BmpHeader
 //VOID  WriteBmpHeader(BMPHEADER *, FILE *);
 //SHORT BmpEncodeScanLine(BYTE *, WORD, WORD, DWORD, FILE *);
 //SHORT BmpDecodeScanLine(BYTE *, WORD, WORD, DWORD, FILE *);
-
-#ifdef __cplusplus
-};
-#endif /* __cplusplus */
 
 #endif /* BMP2_H */

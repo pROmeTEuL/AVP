@@ -1,4 +1,3 @@
-extern "C" {
 
 #include "3dc.h"
 #include "inline.h"
@@ -22,7 +21,7 @@ extern "C" {
 
 #include "particle.h"
 
-#define UseLocalAssert No
+#define UseLocalAssert false
 #include "ourasert.h"
 extern "C++" {
 #include "r2base.h"
@@ -607,8 +606,8 @@ void ChangeTranslucencyMode(enum TRANSLUCENCY_TYPE translucencyRequired)
         switch (CurrentRenderStates.TranslucencyMode) {
         case TRANSLUCENCY_OFF: {
             if (TRIPTASTIC_CHEATMODE || MOTIONBLUR_CHEATMODE) {
-                if (D3DAlphaMode != Yes) {
-                    D3DAlphaMode = Yes;
+                if (D3DAlphaMode != true) {
+                    D3DAlphaMode = true;
                     OP_STATE_RENDER(1, ExecBufInstPtr);
                     STATE_DATA(D3DRENDERSTATE_ALPHABLENDENABLE, TRUE, ExecBufInstPtr);
                 }
@@ -616,8 +615,8 @@ void ChangeTranslucencyMode(enum TRANSLUCENCY_TYPE translucencyRequired)
                 STATE_DATA(D3DRENDERSTATE_SRCBLEND, D3DBLEND_INVSRCALPHA, ExecBufInstPtr);
                 STATE_DATA(D3DRENDERSTATE_DESTBLEND, D3DBLEND_SRCALPHA, ExecBufInstPtr);
             } else {
-                if (D3DAlphaMode != No) {
-                    D3DAlphaMode = No;
+                if (D3DAlphaMode != false) {
+                    D3DAlphaMode = false;
                     OP_STATE_RENDER(1, ExecBufInstPtr);
                     STATE_DATA(D3DRENDERSTATE_ALPHABLENDENABLE, FALSE, ExecBufInstPtr);
                 }
@@ -629,8 +628,8 @@ void ChangeTranslucencyMode(enum TRANSLUCENCY_TYPE translucencyRequired)
             break;
         }
         case TRANSLUCENCY_NORMAL: {
-            if (D3DAlphaMode != Yes) {
-                D3DAlphaMode = Yes;
+            if (D3DAlphaMode != true) {
+                D3DAlphaMode = true;
                 OP_STATE_RENDER(1, ExecBufInstPtr);
                 STATE_DATA(D3DRENDERSTATE_ALPHABLENDENABLE, TRUE, ExecBufInstPtr);
             }
@@ -641,8 +640,8 @@ void ChangeTranslucencyMode(enum TRANSLUCENCY_TYPE translucencyRequired)
             break;
         }
         case TRANSLUCENCY_COLOUR: {
-            if (D3DAlphaMode != Yes) {
-                D3DAlphaMode = Yes;
+            if (D3DAlphaMode != true) {
+                D3DAlphaMode = true;
                 OP_STATE_RENDER(1, ExecBufInstPtr);
                 STATE_DATA(D3DRENDERSTATE_ALPHABLENDENABLE, TRUE, ExecBufInstPtr);
             }
@@ -652,8 +651,8 @@ void ChangeTranslucencyMode(enum TRANSLUCENCY_TYPE translucencyRequired)
             break;
         }
         case TRANSLUCENCY_INVCOLOUR: {
-            if (D3DAlphaMode != Yes) {
-                D3DAlphaMode = Yes;
+            if (D3DAlphaMode != true) {
+                D3DAlphaMode = true;
                 OP_STATE_RENDER(1, ExecBufInstPtr);
                 STATE_DATA(D3DRENDERSTATE_ALPHABLENDENABLE, TRUE, ExecBufInstPtr);
             }
@@ -663,8 +662,8 @@ void ChangeTranslucencyMode(enum TRANSLUCENCY_TYPE translucencyRequired)
             break;
         }
         case TRANSLUCENCY_GLOWING: {
-            if (D3DAlphaMode != Yes) {
-                D3DAlphaMode = Yes;
+            if (D3DAlphaMode != true) {
+                D3DAlphaMode = true;
                 OP_STATE_RENDER(1, ExecBufInstPtr);
                 STATE_DATA(D3DRENDERSTATE_ALPHABLENDENABLE, TRUE, ExecBufInstPtr);
             }
@@ -674,8 +673,8 @@ void ChangeTranslucencyMode(enum TRANSLUCENCY_TYPE translucencyRequired)
             break;
         }
         case TRANSLUCENCY_DARKENINGCOLOUR: {
-            if (D3DAlphaMode != Yes) {
-                D3DAlphaMode = Yes;
+            if (D3DAlphaMode != true) {
+                D3DAlphaMode = true;
                 OP_STATE_RENDER(1, ExecBufInstPtr);
                 STATE_DATA(D3DRENDERSTATE_ALPHABLENDENABLE, TRUE, ExecBufInstPtr);
             }
@@ -685,8 +684,8 @@ void ChangeTranslucencyMode(enum TRANSLUCENCY_TYPE translucencyRequired)
             break;
         }
         case TRANSLUCENCY_JUSTSETZ: {
-            if (D3DAlphaMode != Yes) {
-                D3DAlphaMode = Yes;
+            if (D3DAlphaMode != true) {
+                D3DAlphaMode = true;
                 OP_STATE_RENDER(1, ExecBufInstPtr);
                 STATE_DATA(D3DRENDERSTATE_ALPHABLENDENABLE, TRUE, ExecBufInstPtr);
             }
@@ -890,8 +889,8 @@ void D3D_BackdropPolygon_Output(POLYHEADER *inputPolyPtr, RENDERVERTEX *renderVe
     // greater cost than the (rare) savings in floating pt divisions are worth.
     // Or so I claim...
 
-    if (D3DTexturePerspective != Yes) {
-        D3DTexturePerspective = Yes;
+    if (D3DTexturePerspective != true) {
+        D3DTexturePerspective = true;
         OP_STATE_RENDER(1, ExecBufInstPtr);
         STATE_DATA(D3DRENDERSTATE_TEXTUREPERSPECTIVE, TRUE, ExecBufInstPtr);
     }
@@ -1092,8 +1091,8 @@ void D3D_ZBufferedGouraudTexturedPolygon_Output(
     // greater cost than the (rare) savings in floating pt divisions are worth.
     // Or so I claim...
 
-    if (D3DTexturePerspective != Yes) {
-        D3DTexturePerspective = Yes;
+    if (D3DTexturePerspective != true) {
+        D3DTexturePerspective = true;
         OP_STATE_RENDER(1, ExecBufInstPtr);
         STATE_DATA(D3DRENDERSTATE_TEXTUREPERSPECTIVE, TRUE, ExecBufInstPtr);
     }
@@ -1449,8 +1448,8 @@ void D3D_ZBufferedCloakedPolygon_Output(POLYHEADER *inputPolyPtr, RENDERVERTEX *
     // greater cost than the (rare) savings in floating pt divisions are worth.
     // Or so I claim...
 
-    if (D3DTexturePerspective != Yes) {
-        D3DTexturePerspective = Yes;
+    if (D3DTexturePerspective != true) {
+        D3DTexturePerspective = true;
         OP_STATE_RENDER(1, ExecBufInstPtr);
         STATE_DATA(D3DRENDERSTATE_TEXTUREPERSPECTIVE, TRUE, ExecBufInstPtr);
     }
@@ -1563,8 +1562,8 @@ void D3D_CloakedPredatorPolygon_Output(POLYHEADER *inputPolyPtr, RENDERVERTEX *r
     // greater cost than the (rare) savings in floating pt divisions are worth.
     // Or so I claim...
 
-    if (D3DTexturePerspective != Yes) {
-        D3DTexturePerspective = Yes;
+    if (D3DTexturePerspective != true) {
+        D3DTexturePerspective = true;
         OP_STATE_RENDER(1, ExecBufInstPtr);
         STATE_DATA(D3DRENDERSTATE_TEXTUREPERSPECTIVE, TRUE, ExecBufInstPtr);
     }
@@ -1747,14 +1746,14 @@ void D3D_ZBufferedTexturedPolygon_Output(POLYHEADER *inputPolyPtr, RENDERVERTEX 
     // Or so I claim...
 
     if ((flags & iflag_drawtx3das2d) || (Global_VDB_Ptr->VDB_Flags & ViewDB_Flag_drawtx3das2d)) {
-        if (D3DTexturePerspective != No) {
-            D3DTexturePerspective = No;
+        if (D3DTexturePerspective != false) {
+            D3DTexturePerspective = false;
             OP_STATE_RENDER(1, ExecBufInstPtr);
             STATE_DATA(D3DRENDERSTATE_TEXTUREPERSPECTIVE, FALSE, ExecBufInstPtr);
         }
     } else {
-        if (D3DTexturePerspective != Yes) {
-            D3DTexturePerspective = Yes;
+        if (D3DTexturePerspective != true) {
+            D3DTexturePerspective = true;
             OP_STATE_RENDER(1, ExecBufInstPtr);
             STATE_DATA(D3DRENDERSTATE_TEXTUREPERSPECTIVE, TRUE, ExecBufInstPtr);
         }
@@ -1851,8 +1850,8 @@ void D3D_HUD_Setup(void)
     CheckTranslucencyModeIsCorrect(TRANSLUCENCY_GLOWING);
 
     // turn off perspective drawing
-    if (D3DTexturePerspective != No) {
-        D3DTexturePerspective = No;
+    if (D3DTexturePerspective != false) {
+        D3DTexturePerspective = false;
         OP_STATE_RENDER(1, ExecBufInstPtr);
         STATE_DATA(D3DRENDERSTATE_TEXTUREPERSPECTIVE, FALSE, ExecBufInstPtr);
     }
@@ -2368,8 +2367,8 @@ void D3D_Decal_Output(DECAL *decalPtr, RENDERVERTEX *renderVerticesPtr)
     /* Check translucency mode */
     CheckTranslucencyModeIsCorrect(decalDescPtr->TranslucencyType);
 
-    if (D3DTexturePerspective != Yes) {
-        D3DTexturePerspective = Yes;
+    if (D3DTexturePerspective != true) {
+        D3DTexturePerspective = true;
         OP_STATE_RENDER(1, ExecBufInstPtr);
         STATE_DATA(D3DRENDERSTATE_TEXTUREPERSPECTIVE, TRUE, ExecBufInstPtr);
     }
@@ -2502,8 +2501,8 @@ void D3D_Particle_Output(PARTICLE *particlePtr, RENDERVERTEX *renderVerticesPtr)
 
         CheckTranslucencyModeIsCorrect(particleDescPtr->TranslucencyType);
 
-        if (D3DTexturePerspective != Yes) {
-            D3DTexturePerspective = Yes;
+        if (D3DTexturePerspective != true) {
+            D3DTexturePerspective = true;
             OP_STATE_RENDER(1, ExecBufInstPtr);
             STATE_DATA(D3DRENDERSTATE_TEXTUREPERSPECTIVE, TRUE, ExecBufInstPtr);
         }
@@ -2585,8 +2584,8 @@ void D3D_FMVParticle_Output(RENDERVERTEX *renderVerticesPtr)
 
         CheckTranslucencyModeIsCorrect(TRANSLUCENCY_NORMAL);
 
-        if (D3DTexturePerspective != Yes) {
-            D3DTexturePerspective = Yes;
+        if (D3DTexturePerspective != true) {
+            D3DTexturePerspective = true;
             OP_STATE_RENDER(1, ExecBufInstPtr);
             STATE_DATA(D3DRENDERSTATE_TEXTUREPERSPECTIVE, TRUE, ExecBufInstPtr);
         }
@@ -4769,8 +4768,8 @@ void DrawNoiseOverlay(int t)
         STATE_DATA(D3DRENDERSTATE_TEXTUREHANDLE, NoiseTextureHandle, ExecBufInstPtr);
         CurrTextureHandle = NoiseTextureHandle;
     }
-    if (D3DTexturePerspective != No) {
-        D3DTexturePerspective = No;
+    if (D3DTexturePerspective != false) {
+        D3DTexturePerspective = false;
         OP_STATE_RENDER(1, ExecBufInstPtr);
         STATE_DATA(D3DRENDERSTATE_TEXTUREPERSPECTIVE, FALSE, ExecBufInstPtr);
     }
@@ -4849,8 +4848,8 @@ void DrawScanlinesOverlay(float level)
         STATE_DATA(D3DRENDERSTATE_TEXTUREHANDLE, NoiseTextureHandle, ExecBufInstPtr);
         CurrTextureHandle = NoiseTextureHandle;
     }
-    if (D3DTexturePerspective != No) {
-        D3DTexturePerspective = No;
+    if (D3DTexturePerspective != false) {
+        D3DTexturePerspective = false;
         OP_STATE_RENDER(1, ExecBufInstPtr);
         STATE_DATA(D3DRENDERSTATE_TEXTUREPERSPECTIVE, FALSE, ExecBufInstPtr);
     }
@@ -5194,9 +5193,9 @@ void DrawFBM(void)
 	        STATE_DATA(D3DRENDERSTATE_TEXTUREHANDLE, TextureHandle, ExecBufInstPtr);
 	        CurrTextureHandle = NoiseTextureHandle;
 		}
-	    if (D3DTexturePerspective != No)
+	    if (D3DTexturePerspective != false)
 		{
-			D3DTexturePerspective = No;
+			D3DTexturePerspective = false;
 			OP_STATE_RENDER(1, ExecBufInstPtr);
 			STATE_DATA(D3DRENDERSTATE_TEXTUREPERSPECTIVE, FALSE, ExecBufInstPtr);
 		}
@@ -5340,8 +5339,8 @@ void D3D_SkyPolygon_Output(POLYHEADER *inputPolyPtr, RENDERVERTEX *renderVertice
     // greater cost than the (rare) savings in floating pt divisions are worth.
     // Or so I claim...
 
-    if (D3DTexturePerspective != Yes) {
-        D3DTexturePerspective = Yes;
+    if (D3DTexturePerspective != true) {
+        D3DTexturePerspective = true;
         OP_STATE_RENDER(1, ExecBufInstPtr);
         STATE_DATA(D3DRENDERSTATE_TEXTUREPERSPECTIVE, TRUE, ExecBufInstPtr);
     }
@@ -7588,9 +7587,6 @@ void UpdateGammaSettings(int g, int forceUpdate)
 }
 #endif
 
-// For extern "C"
-};
-
 #if 0
 void D3D_Polygon_Output(RENDERVERTEX *renderVerticesPtr)
 {
@@ -7725,9 +7721,9 @@ void D3D_Polygon_Output(RENDERVERTEX *renderVerticesPtr)
 
 	CheckTranslucencyModeIsCorrect(RenderPolygon.TranslucencyMode);
 
-    if (D3DTexturePerspective != Yes)
+    if (D3DTexturePerspective != true)
     {
-		D3DTexturePerspective = Yes;
+		D3DTexturePerspective = true;
 		OP_STATE_RENDER(1, ExecBufInstPtr);
 		STATE_DATA(D3DRENDERSTATE_TEXTUREPERSPECTIVE, TRUE, ExecBufInstPtr);
 	}
@@ -8007,8 +8003,6 @@ void D3D_RenderHUDString_Centred(char *stringPtr, int centreX, int y, int colour
     }
 }
 
-extern "C" {
-
 extern void RenderString(char *stringPtr, int x, int y, int colour)
 {
     D3D_RenderHUDString(stringPtr, x, y, colour);
@@ -8062,4 +8056,3 @@ extern void RenderStringVertically(char *stringPtr, int centreX, int bottomY, in
         y -= AAFontWidths[c];
     }
 }
-};

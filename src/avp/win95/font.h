@@ -18,8 +18,8 @@ typedef enum fonts {
     DATABASE_FONT_LITE,
     DATABASE_MESSAGE_FONT,
 
-    IntroFont_Dark,
-    IntroFont_Light,
+    Fonts_IntroFont_Dark,
+    Fonts_IntroFont_Light,
 
     NUM_FONTS,
 
@@ -119,12 +119,12 @@ inline int pffont::bPrintable(const ProjChar ProjCh) const
     const int Offset = GetOffset();
 
     if ((int) ProjCh < Offset) {
-        return No;
+        return false;
     }
     if ((int) ProjCh >= Offset + num_chars_in_font) {
-        return No;
+        return false;
     }
-    return Yes;
+    return true;
 }
 inline int pffont::ProjCharToOffset(const ProjChar ProjCh) const
 {
@@ -150,7 +150,6 @@ inline int pffont::GetMaxChar(void) const
     return (GetOffset() + num_chars_in_font - 1);
 }
 
-extern "C" {
 #endif
 
 // platform independent externs
@@ -171,9 +170,5 @@ extern void FontUnlock(PFFONT const *pFont);
 
 // the array of all the Fonts int the game
 extern PFFONT AvpFonts[];
-
-#ifdef __cplusplus
-};
-#endif
 
 #endif /* _font_h_included */

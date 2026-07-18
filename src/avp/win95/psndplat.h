@@ -5,10 +5,6 @@
 #ifndef PSNDPLAT_H
 #define PSNDPLAT_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include "psndproj.h"
 #include "psnd.h"
 
@@ -210,9 +206,5 @@ extern SOUNDSAMPLEDATA BlankGameSound;
 extern ACTIVESOUNDSAMPLE BlankActiveSound;
 
 void UpdateSoundFrequencies(void);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif

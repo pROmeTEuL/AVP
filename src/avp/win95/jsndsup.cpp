@@ -2,17 +2,15 @@
 #include "inline.h"
 #include "module.h"
 
-#define UseLocalAssert Yes
+#define UseLocalAssert true
 #include "ourasert.h"
 #include "psndplat.h"
 
 #include "list_tem.hpp"
 #include "jsndsup.h"
 
-extern "C" {
 extern int SoundSwitchedOn;
 // Pat sets this up
-};
 
 List<LOADED_SOUND *> loaded_sounds;
 

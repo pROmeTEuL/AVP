@@ -41,8 +41,6 @@
 #include "pldnet.h"
 #include "avp_menus.h"
 
-extern "C" {
-
 /* KJL 11:48:45 28/01/98 - used to scale NormalFrameTime, so the game can be slowed down */
 extern int TimeScale;
 extern int MotionTrackerScale;
@@ -385,5 +383,3 @@ void CreateGameSpecificConsoleVariables(void)
         0,
         1);
 }
-
-}; // extern "C"

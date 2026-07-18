@@ -24,10 +24,6 @@
 #include "font.h"
 #endif
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* Version settings *****************************************************/
 
 /* Constants  ***********************************************************/
@@ -43,9 +39,5 @@ typedef enum fonts FontIndex;
 /* Function prototypes **************************************************/
 
 /* End of the header ****************************************************/
-
-#ifdef __cplusplus
-};
-#endif
 
 #endif

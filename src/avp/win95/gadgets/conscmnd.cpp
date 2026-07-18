@@ -13,7 +13,7 @@
 #include "conscmnd.hpp"
 #include "strutil.h"
 
-#define UseLocalAssert Yes
+#define UseLocalAssert true
 #include "ourasert.h"
 
 /* Version settings ************************************************/
@@ -25,9 +25,6 @@
 /* Imported function prototypes ************************************/
 
 /* Imported data ***************************************************/
-#ifdef __cplusplus
-extern "C" {
-#endif
 #if 0
 		extern OurBool			DaveDebugOn;
 		extern FDIEXTENSIONTAG	FDIET_Dummy;
@@ -39,9 +36,6 @@ extern "C" {
 		extern UncompressedGlobalPlotAtomID UGPAID_StandardNull;
 		extern IFCOLOUR			IFColour_Dummy;
  		extern IFVECTOR			IFVec_Zero;
-#endif
-#ifdef __cplusplus
-};
 #endif
 
 /* Exported globals ************************************************/
@@ -160,7 +154,7 @@ private:
 
     GLOBALASSERT(pProjCh_In);
 
-    OurBool bProcessed = No;
+    OurBool bProcessed = false;
 
     // Parse into words; find the first word.  Iterate through the commands
     // looking for a match:
@@ -196,7 +190,7 @@ private:
                             : STRUTIL_SC_Strequal_Insensitive //case insensitive otherwise
                             (oi()->pSCString_Symbol->pProjCh(), commandPtr)) {
                         // Got match
-                        bProcessed = Yes;
+                        bProcessed = true;
 
                         // Execute the function:
                         {

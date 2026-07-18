@@ -4,7 +4,6 @@
 	so this file will hold all Direct 3D hud code.
 
  */
-extern "C" {
 
 // Mysterious definition required by objbase.h
 // (included via one of the include files below)
@@ -39,7 +38,7 @@ extern "C++" {
 
 #include "d3d_hud.h"
 
-#define UseLocalAssert No
+#define UseLocalAssert false
 #include "ourasert.h"
 
 #include "vision.h"
@@ -869,4 +868,3 @@ void DrawPredatorEnergyBar(void)
         );
     }
 }
-};

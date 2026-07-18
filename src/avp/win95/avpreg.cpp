@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include "avpreg.hpp"
 
-extern "C" {
 char *AvpCDPath = 0;
 extern char const *SecondTex_Directory;
 extern char *SecondSoundDir;
@@ -72,4 +71,3 @@ void GetPathFromRegistry()
         SecondSoundDir = directory;
     }
 }
-};

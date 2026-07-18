@@ -233,7 +233,7 @@ public:
         if (Size()) {
             db_log1(("AW: Object dump complete"));
         }
-#else  // ! _CPPRTTI
+#else   // ! _CPPRTTI
         //#warning "Run-Time Type Identification (RTTI) is not enabled - memory leak checking will not report types"
         unsigned nRefs(0);
         for (Iterator itLeak(*this); !itLeak.Done(); itLeak.Next()) {
@@ -245,7 +245,7 @@ public:
                  Size(),
                  nRefs));
         }
-#endif // ! _CPPRTTI
+#endif  // ! _CPPRTTI
         g_bAllocListActive = false;
     }
 };
@@ -522,10 +522,8 @@ void AwBackupTexture::ChoosePixelFormat(AwTl::CreateTextureParms const &_parmsR)
     }
 }
 
-extern "C" {
 extern int CreateOGLTexture(D3DTexture *, unsigned char *);
 extern int CreateIMGSurface(D3DTexture *, unsigned char *);
-};
 
 AwTl::SurfUnion AwBackupTexture::CreateTexture(AwTl::CreateTextureParms const &_parmsR)
 {

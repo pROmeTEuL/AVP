@@ -17,14 +17,12 @@
 #include "missions.hpp"
 #include "gadget.h"
 
-#define UseLocalAssert Yes
+#define UseLocalAssert true
 #include "ourasert.h"
 
-extern "C" {
 #include "paintball.h"
 extern PAINTBALLMODE PaintBallMode;
 extern void MessageHistory_Add(enum TEXTSTRING_ID stringID);
-};
 
 /* Version settings ************************************************/
 
@@ -35,9 +33,6 @@ extern void MessageHistory_Add(enum TEXTSTRING_ID stringID);
 /* Imported function prototypes ************************************/
 
 /* Imported data ***************************************************/
-#ifdef __cplusplus
-extern "C" {
-#endif
 #if 0
 		extern OurBool			DaveDebugOn;
 		extern FDIEXTENSIONTAG	FDIET_Dummy;
@@ -49,9 +44,6 @@ extern "C" {
 		extern UncompressedGlobalPlotAtomID UGPAID_StandardNull;
 		extern IFCOLOUR			IFColour_Dummy;
  		extern IFVECTOR			IFVec_Zero;
-#endif
-#ifdef __cplusplus
-};
 #endif
 
 /* Exported globals ************************************************/
@@ -112,7 +104,6 @@ MissionEvent :: ~MissionEvent()
 
 // class MissionObjective
 // public:
-extern "C" {
 //function for triggering mission objective that can be called from a c file
 void MissionObjectiveTriggered(void *mission_objective)
 {
@@ -176,7 +167,6 @@ void PrintStringTableEntryInConsole(enum TEXTSTRING_ID string_id)
     // add to message history
     MessageHistory_Add(string_id);
 }
-};
 
 void MissionObjective ::OnTriggering(void)
 {
@@ -383,7 +373,7 @@ void MissionHacks ::TestInit(void)
 	new MissionHint
 	(
 		TEXTSTRING_LEVELMSG_001, // ProjChar* pProjCh_Description,
-		Yes // OurBool bVisible
+		true // OurBool bVisible
 	);
 #endif
 
@@ -491,7 +481,7 @@ void MissionObjective ::TestCompleteNext(void)
 		"SECURITY DOORS RESTRICT ACCESS WITHIN THE COLONY.  FIND THE OPERATIONS ROOM IN THE MAIN BUILDING.  "
 		"INSIDE ARE FIVE SWITCHES.  TRIGGER ALL OF THEM TO OPEN THE SECURITY DOORS REMOTELY.  "
 			, // ProjChar* pProjCh_Description,
-		Yes, // OurBool bHidden
+		true, // OurBool bHidden
 
 		"SECURITY DOOR EMERGENCY OVERRIDE TRIGGERED:  DOORS HAVE BEEN OPENED.  ", // ProjChar* pProjCh_TriggeringFeedback,
 		MissionFX_None // enum MissionEffects MissionFX,
@@ -502,7 +492,7 @@ void MissionObjective ::TestCompleteNext(void)
 		"MAKE YOUR WAY TO MEDLAB.  COLLECT COMPUTER ARCHIVES "
 		"DOCUMENTING THE COLONISTS WORK ON THE FACEHUGGERS.  "
 			,  // ProjChar* pProjCh_Description,
-		Yes, // OurBool bHidden
+		true, // OurBool bHidden
 
 		"PARTIAL MEDLAB ARCHIVE COLLECTED", // ProjChar* pProjCh_TriggeringFeedback,
 		MissionFX_None // enum MissionEffects MissionFX,
@@ -516,7 +506,7 @@ void MissionObjective ::TestCompleteNext(void)
 		"SHE MIGHT BE ALIVE, BUT IT'S PROBABLY JUST HER REMAINS.  "
 		"MAKE YOUR WAY THERE AND TRY TO FIND MORE ARCHIVES.  "
 			,  // ProjChar* pProjCh_Description,
-		Yes, // OurBool bHidden
+		true, // OurBool bHidden
 
 		"MEDLAB ARCHIVE COLLECTED", // ProjChar* pProjCh_TriggeringFeedback,
 		MissionFX_None // enum MissionEffects MissionFX,
@@ -528,7 +518,7 @@ void MissionObjective ::TestCompleteNext(void)
 		"GET BACK TO THE YARD.  THE LANDING BEACON CONTROLS ARE IN A RECESS TO THE LEFT OF THE "
 		"ATMOSPHERE PROCESSOR.  ACTIVATE THE BEACON AND PREPARE FOR EVAC."
 			,  // ProjChar* pProjCh_Description,
-		Yes, // OurBool bHidden
+		true, // OurBool bHidden
 
 		"LANDING BEACON ACTIVATED.  STAND CLEAR AND PREPARE FOR EVAC.  ", // ProjChar* pProjCh_TriggeringFeedback,
 #endif

@@ -26,7 +26,7 @@
 #include "strtab.hpp"
 #endif
 
-#define UseLocalAssert Yes
+#define UseLocalAssert true
 #include "ourasert.h"
 #include "avp_menus.h"
 
@@ -45,15 +45,8 @@
 /* Imported function prototypes ************************************/
 
 /* Imported data ***************************************************/
-#ifdef __cplusplus
-extern "C" {
-#endif
 extern unsigned char KeyboardInput[];
 extern unsigned char DebouncedKeyboardInput[];
-
-#ifdef __cplusplus
-};
-#endif
 
 /* Exported globals ************************************************/
 
@@ -136,7 +129,7 @@ void KeyBinding ::ParseUnbindCommand(ProjChar *pProjCh_ToParse)
     // Scan through the string, trying to find matches against strings for keys
     // We will use the longest match:
     {
-        OurBool bGotMatch = No;
+        OurBool bGotMatch = false;
         unsigned int LongestMatch = 0;
         BindableKey theKey_ToUnbind = (BindableKey) 0;
 
@@ -157,7 +150,7 @@ void KeyBinding ::ParseUnbindCommand(ProjChar *pProjCh_ToParse)
                         LongestMatch = LengthOfTestString;
 
                         theKey_ToUnbind = theKey;
-                        bGotMatch = Yes;
+                        bGotMatch = true;
                     }
                 }
             }
@@ -477,11 +470,11 @@ KeyBinding :: bGetKeyForString
 
 #if 1
 		theKey_Out = pProjCh_In[0];
-		return Yes;
+		return true;
 			// LOCALISEME
 #else
 
-		return No;
+		return false;
 			// for now
 #endif
 	}
@@ -490,7 +483,7 @@ KeyBinding :: bGetKeyForString
 #if KeyBindingUses_KEY_ID
 	{
 		theKey_Out = KEY_NUMPADDEL;
-		return Yes;
+		return true;
 			// for now
 	}
 #endif
@@ -541,54 +534,54 @@ static int GetKeyLabel(int inPhysicalKey, TextID &outTextID)
     // If it fails, output area is untouched
     if (inPhysicalKey >= KEY_LEFT && inPhysicalKey <= KEY_MOUSEWHEELDOWN) {
         outTextID = (enum TEXTSTRING_ID)(TEXTSTRING_KEYS_LEFT + (inPhysicalKey - KEY_LEFT));
-        return Yes;
+        return true;
     } else
-        return No;
+        return false;
 
 #if 0
 	switch (inPhysicalKey)
 	{
-		case KEY_UP: outTextID = TEXTSTRING_KEYS_UP; return Yes;
-		case KEY_DOWN: outTextID = TEXTSTRING_KEYS_DOWN; return Yes;
-		case KEY_LEFT: outTextID = TEXTSTRING_KEYS_LEFT; return Yes;
-		case KEY_RIGHT: outTextID = TEXTSTRING_KEYS_RIGHT; return Yes;
-		case KEY_CR: outTextID = TEXTSTRING_KEYS_RETURN; return Yes;
-		case KEY_TAB: outTextID = TEXTSTRING_KEYS_TAB; return Yes;
-		case KEY_INS: outTextID = TEXTSTRING_KEYS_INSERT; return Yes;
-		case KEY_DEL: outTextID = TEXTSTRING_KEYS_DELETE; return Yes;
-		case KEY_END: outTextID = TEXTSTRING_KEYS_END; return Yes;
-		case KEY_HOME: outTextID = TEXTSTRING_KEYS_HOME; return Yes;
-		case KEY_PAGEUP: outTextID = TEXTSTRING_KEYS_PGUP; return Yes;
-		case KEY_PAGEDOWN: outTextID = TEXTSTRING_KEYS_PGDOWN; return Yes;
-		case KEY_BACKSPACE: outTextID = TEXTSTRING_KEYS_BACKSP; return Yes;
-		case KEY_COMMA: outTextID = TEXTSTRING_KEYS_COMMA; return Yes;
-		case KEY_FSTOP: outTextID = TEXTSTRING_KEYS_PERIOD; return Yes;
-		case KEY_SPACE: outTextID = TEXTSTRING_KEYS_SPACE; return Yes;
-		case KEY_LMOUSE: outTextID = TEXTSTRING_KEYS_LMOUSE; return Yes;
-		case KEY_RMOUSE: outTextID = TEXTSTRING_KEYS_RMOUSE; return Yes;
-		case KEY_LEFTALT: outTextID = TEXTSTRING_KEYS_LALT; return Yes;
-		case KEY_RIGHTALT: outTextID = TEXTSTRING_KEYS_RALT; return Yes;
-		case KEY_LEFTCTRL: outTextID = TEXTSTRING_KEYS_LCTRL; return Yes;
-		case KEY_RIGHTCTRL: outTextID = TEXTSTRING_KEYS_RCTRL; return Yes;
-		case KEY_LEFTSHIFT: outTextID = TEXTSTRING_KEYS_LSHIFT; return Yes;
-		case KEY_RIGHTSHIFT: outTextID = TEXTSTRING_KEYS_RSHIFT; return Yes;
-		case KEY_CAPS: outTextID = TEXTSTRING_KEYS_CAPS; return Yes;
-		case KEY_NUMLOCK: outTextID = TEXTSTRING_KEYS_NUMLOCK; return Yes;
-		case KEY_SCROLLOK: outTextID = TEXTSTRING_KEYS_SCRLOCK; return Yes;
-		case KEY_NUMPAD0: outTextID = TEXTSTRING_KEYS_PAD0; return Yes;
-		case KEY_NUMPAD1: outTextID = TEXTSTRING_KEYS_PAD1; return Yes;
-		case KEY_NUMPAD2: outTextID = TEXTSTRING_KEYS_PAD2; return Yes;
-		case KEY_NUMPAD3: outTextID = TEXTSTRING_KEYS_PAD3; return Yes;
-		case KEY_NUMPAD4: outTextID = TEXTSTRING_KEYS_PAD4; return Yes;
-		case KEY_NUMPAD5: outTextID = TEXTSTRING_KEYS_PAD5; return Yes;
-		case KEY_NUMPAD6: outTextID = TEXTSTRING_KEYS_PAD6; return Yes;
-		case KEY_NUMPAD7: outTextID = TEXTSTRING_KEYS_PAD7; return Yes;
-		case KEY_NUMPAD8: outTextID = TEXTSTRING_KEYS_PAD8; return Yes;
-		case KEY_NUMPAD9: outTextID = TEXTSTRING_KEYS_PAD9; return Yes;
-		case KEY_NUMPADSUB: outTextID = TEXTSTRING_KEYS_PADSUB; return Yes;
-		case KEY_NUMPADADD: outTextID = TEXTSTRING_KEYS_PADADD; return Yes;
-		case KEY_NUMPADDEL: outTextID = TEXTSTRING_KEYS_PADDEL; return Yes;
-		default: return No;
+		case KEY_UP: outTextID = TEXTSTRING_KEYS_UP; return true;
+		case KEY_DOWN: outTextID = TEXTSTRING_KEYS_DOWN; return true;
+		case KEY_LEFT: outTextID = TEXTSTRING_KEYS_LEFT; return true;
+		case KEY_RIGHT: outTextID = TEXTSTRING_KEYS_RIGHT; return true;
+		case KEY_CR: outTextID = TEXTSTRING_KEYS_RETURN; return true;
+		case KEY_TAB: outTextID = TEXTSTRING_KEYS_TAB; return true;
+		case KEY_INS: outTextID = TEXTSTRING_KEYS_INSERT; return true;
+		case KEY_DEL: outTextID = TEXTSTRING_KEYS_DELETE; return true;
+		case KEY_END: outTextID = TEXTSTRING_KEYS_END; return true;
+		case KEY_HOME: outTextID = TEXTSTRING_KEYS_HOME; return true;
+		case KEY_PAGEUP: outTextID = TEXTSTRING_KEYS_PGUP; return true;
+		case KEY_PAGEDOWN: outTextID = TEXTSTRING_KEYS_PGDOWN; return true;
+		case KEY_BACKSPACE: outTextID = TEXTSTRING_KEYS_BACKSP; return true;
+		case KEY_COMMA: outTextID = TEXTSTRING_KEYS_COMMA; return true;
+		case KEY_FSTOP: outTextID = TEXTSTRING_KEYS_PERIOD; return true;
+		case KEY_SPACE: outTextID = TEXTSTRING_KEYS_SPACE; return true;
+		case KEY_LMOUSE: outTextID = TEXTSTRING_KEYS_LMOUSE; return true;
+		case KEY_RMOUSE: outTextID = TEXTSTRING_KEYS_RMOUSE; return true;
+		case KEY_LEFTALT: outTextID = TEXTSTRING_KEYS_LALT; return true;
+		case KEY_RIGHTALT: outTextID = TEXTSTRING_KEYS_RALT; return true;
+		case KEY_LEFTCTRL: outTextID = TEXTSTRING_KEYS_LCTRL; return true;
+		case KEY_RIGHTCTRL: outTextID = TEXTSTRING_KEYS_RCTRL; return true;
+		case KEY_LEFTSHIFT: outTextID = TEXTSTRING_KEYS_LSHIFT; return true;
+		case KEY_RIGHTSHIFT: outTextID = TEXTSTRING_KEYS_RSHIFT; return true;
+		case KEY_CAPS: outTextID = TEXTSTRING_KEYS_CAPS; return true;
+		case KEY_NUMLOCK: outTextID = TEXTSTRING_KEYS_NUMLOCK; return true;
+		case KEY_SCROLLOK: outTextID = TEXTSTRING_KEYS_SCRLOCK; return true;
+		case KEY_NUMPAD0: outTextID = TEXTSTRING_KEYS_PAD0; return true;
+		case KEY_NUMPAD1: outTextID = TEXTSTRING_KEYS_PAD1; return true;
+		case KEY_NUMPAD2: outTextID = TEXTSTRING_KEYS_PAD2; return true;
+		case KEY_NUMPAD3: outTextID = TEXTSTRING_KEYS_PAD3; return true;
+		case KEY_NUMPAD4: outTextID = TEXTSTRING_KEYS_PAD4; return true;
+		case KEY_NUMPAD5: outTextID = TEXTSTRING_KEYS_PAD5; return true;
+		case KEY_NUMPAD6: outTextID = TEXTSTRING_KEYS_PAD6; return true;
+		case KEY_NUMPAD7: outTextID = TEXTSTRING_KEYS_PAD7; return true;
+		case KEY_NUMPAD8: outTextID = TEXTSTRING_KEYS_PAD8; return true;
+		case KEY_NUMPAD9: outTextID = TEXTSTRING_KEYS_PAD9; return true;
+		case KEY_NUMPADSUB: outTextID = TEXTSTRING_KEYS_PADSUB; return true;
+		case KEY_NUMPADADD: outTextID = TEXTSTRING_KEYS_PADADD; return true;
+		case KEY_NUMPADDEL: outTextID = TEXTSTRING_KEYS_PADDEL; return true;
+		default: return false;
 	}
 #endif
 }
@@ -668,7 +661,7 @@ OurBool KeyBinding ::ParseBindCommand(
     // Scan through the string, trying to find matches against strings for keys
     // We will use the longest match:
     {
-        OurBool bGotMatch = No;
+        OurBool bGotMatch = false;
         unsigned int LongestMatch = 0;
 
         for (int i = 0; i < MAX_VALUE_BINDABLE_KEY; i++) {
@@ -690,7 +683,7 @@ OurBool KeyBinding ::ParseBindCommand(
                         theKey_Out = theKey;
                         *ppProjCh_Out = pProjCh_In + LengthOfTestString;
                         // Continue processing after the string
-                        bGotMatch = Yes;
+                        bGotMatch = true;
                     }
                 }
             }
@@ -725,7 +718,7 @@ RefList<SCString> KeyBinding ::PendingList;
 
 // public:
 // static
-int KeyBinding ::bEcho = No;
+int KeyBinding ::bEcho = false;
 
 void CONSBIND_WriteKeyBindingsToConfigFile(void)
 {

@@ -11,12 +11,6 @@
 
 #include "shpanim.h"
 
-#ifdef __cplusplus
-
-extern "C" {
-
-#endif
-
 /*
 
  Macros for Defining Colours
@@ -917,10 +911,5 @@ typedef enum {
 #include "theader.h"
 
 #endif /* StandardShapeLanguage */
-
-#ifdef __cplusplus
-};
-
-#endif
 
 #endif

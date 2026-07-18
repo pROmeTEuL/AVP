@@ -1,4 +1,3 @@
-extern "C" {
 #include "3dc.h"
 #include "ourasert.h"
 #include "psndplat.h"
@@ -8,7 +7,6 @@ extern "C" {
 #include "gamedef.h"
 
 #include "avp_envinfo.h"
-};
 
 #include "list_tem.hpp"
 
@@ -19,8 +17,6 @@ List<int> LevelCDTracks[AVP_ENVIRONMENT_END_OF_LIST];
 List<int> MultiplayerCDTracks[3];
 
 static int LastTrackChosen = -1;
-
-extern "C" {
 
 void EmptyCDTrackList()
 {
@@ -195,4 +191,3 @@ void ResetCDPlayForLevel()
     TrackSelectCounter = 0;
     CDDA_Stop();
 }
-};

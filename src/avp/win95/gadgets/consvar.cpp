@@ -13,7 +13,7 @@
 #include "consvar.hpp"
 #include "strutil.h"
 
-#define UseLocalAssert Yes
+#define UseLocalAssert true
 #include "ourasert.h"
 
 /* Version settings ************************************************/
@@ -25,9 +25,6 @@
 /* Imported function prototypes ************************************/
 
 /* Imported data ***************************************************/
-#ifdef __cplusplus
-extern "C" {
-#endif
 #if 0
 		extern OurBool			DaveDebugOn;
 		extern FDIEXTENSIONTAG	FDIET_Dummy;
@@ -39,9 +36,6 @@ extern "C" {
 		extern UncompressedGlobalPlotAtomID UGPAID_StandardNull;
 		extern IFCOLOUR			IFColour_Dummy;
  		extern IFVECTOR			IFVec_Zero;
-#endif
-#ifdef __cplusplus
-};
 #endif
 
 /* Exported globals ************************************************/
@@ -187,7 +181,7 @@ ConsoleVariable ::~ConsoleVariable()
                     (pProjCh_In, oi()->pSCString_Symbol->pProjCh())
                     : STRUTIL_SC_Strequal_Insensitive(pProjCh_In, oi()->pSCString_Symbol->pProjCh())) {
                 oi()->Display();
-                return Yes;
+                return true;
             }
         }
     }
@@ -209,11 +203,11 @@ ConsoleVariable ::~ConsoleVariable()
         if (*pProjCh_Search == '\0') {
             // then there were no word breaks; stop
 
-            return No;
+            return false;
         }
 
         if (NumChars < 1) {
-            return No;
+            return false;
         }
 
         for (LIF<ConsoleVariable *> oi(&List_pConsoleVar); !oi.done(); oi.next()) {
@@ -225,21 +219,21 @@ ConsoleVariable ::~ConsoleVariable()
 
                     oi()->ProcessSetValue(NewValue);
 
-                    return Yes;
+                    return true;
                 } else {
                     // interpret as int
                     int NewValue = atoi(pProjCh_Search);
 
                     oi()->ProcessSetValue(NewValue);
 
-                    return Yes;
+                    return true;
                 }
             }
         }
     }
 
     // If you get here, no processing has been performed:
-    return No;
+    return false;
 }
 
 /*static*/ void ConsoleVariable ::ListAllVariables(void)

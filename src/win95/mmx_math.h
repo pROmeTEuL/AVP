@@ -3,10 +3,6 @@
 
 #if SUPPORT_MMX
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
-
 /*
 Calling-convention independent
 definitions of inline MMX assembler
@@ -320,10 +316,6 @@ int MMXInline_VectorDot(struct vectorch const *v1, struct vectorch const *v2);
 int MMXInline_VectorDot16(struct vectorch const *v1, struct vectorch const *v2);
 
 #endif
-
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
 
 #endif /* SUPPORT_MMX */
 

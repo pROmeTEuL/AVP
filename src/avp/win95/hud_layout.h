@@ -22,10 +22,4 @@
 #define HUDLayout_Colour_MarineRed ((255 << 24) + (255 << 16))
 #define HUDLayout_Linespacing 16
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 extern char AAFontWidths[];
-#ifdef __cplusplus
-};
-#endif

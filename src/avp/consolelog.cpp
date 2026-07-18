@@ -35,7 +35,6 @@
 static LogFile ConsoleLogFile("ConsoleLog.txt");
 #endif
 
-extern "C" {
 int LogConsoleTextToFile;
 extern void OutputBugReportToConsoleLogfile(char *messagePtr)
 {
@@ -92,4 +91,3 @@ extern void OutputToConsoleLogfile(char *messagePtr)
 	}
 #endif
 }
-};

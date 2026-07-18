@@ -39,18 +39,14 @@
 #include "textexp.hpp"
 #endif
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* Version settings *****************************************************/
-#define LimitedLineLength Yes
+#define LimitedLineLength true
 
-#define SupportHistory Yes
+#define SupportHistory true
 
-#define SupportAutomation Yes
+#define SupportAutomation true
 
-#define SupportCompletion Yes
+#define SupportCompletion true
 
 #if !LimitedLineLength
 
@@ -234,9 +230,5 @@ private:
 /* Function prototypes **************************************************/
 
 /* End of the header ****************************************************/
-
-#ifdef __cplusplus
-};
-#endif
 
 #endif

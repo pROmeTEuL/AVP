@@ -47,9 +47,7 @@ struct Hierarchy_Descriptor
     char *hierarchy_name;
 };
 
-extern "C" {
 struct hierarchy_variant_data;
-};
 
 class Global_Hierarchy_Store
 {
@@ -87,8 +85,6 @@ private:
 
     void delete_section(SECTION *);
 };
-
-extern "C" {
 
 #endif
 
@@ -146,9 +142,5 @@ HIERARCHY_SHAPE_REPLACEMENT *GetHierarchyAlternateShapeSetFromLibrary(
     const char *rif_name, const char *shape_set_name);
 
 extern void save_preplaced_decals();
-
-#ifdef __cplusplus
-};
-#endif
 
 #endif

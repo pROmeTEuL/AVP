@@ -9,13 +9,12 @@
 #include "chnktexi.h"
 #include "hud_layout.h"
 
-#define UseLocalAssert Yes
+#define UseLocalAssert true
 #include "ourasert.h"
 #include "ffstdio.h"
 
 extern void D3D_RenderHUDString(char *stringPtr, int x, int y, int colour);
 
-extern "C" {
 #include "avp_menus.h"
 extern unsigned char *ScreenBuffer;
 extern long BackBufferPitch;
@@ -1747,4 +1746,3 @@ static void CalculateWidthsOfAAFont(void)
 
     surface->Unlock((LPVOID) ddsdimage.lpSurface);
 }
-};

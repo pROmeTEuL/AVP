@@ -12,10 +12,9 @@
 #include "avp_menus.h"
 #include "list_tem.hpp"
 
-#define UseLocalAssert Yes
+#define UseLocalAssert true
 #include "ourasert.h"
 
-extern "C" {
 extern void SetDefaultMultiplayerConfig();
 extern char MP_SessionName[];
 extern char MP_Config_Description[];
@@ -720,4 +719,3 @@ int GetLocalMultiplayerLevelIndex(int index, char *customLevelName, int gameType
 
     return -1;
 }
-};

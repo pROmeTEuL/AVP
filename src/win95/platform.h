@@ -11,10 +11,6 @@
 
 */
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* Types */
 
 typedef struct LONGLONGCH
@@ -682,10 +678,6 @@ void ProjectSpecificItemListPostProcessing();
 
 #if optimiseflip
 void ProcessProjectWhileWaitingToBeFlippable();
-#endif
-
-#ifdef __cplusplus
-};
 #endif
 
 #endif

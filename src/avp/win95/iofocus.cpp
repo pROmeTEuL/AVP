@@ -13,10 +13,9 @@
 #include "iofocus.h"
 #include "gadget.h"
 #include "psnd.h"
-extern "C" {
 #include "avp_menus.h"
 
-#define UseLocalAssert Yes
+#define UseLocalAssert true
 #include "ourasert.h"
 
 /* Version settings ************************************************/
@@ -37,7 +36,7 @@ extern int InGameMenusAreRunning(void);
 /* Internal function prototypes ************************************/
 
 /* Internal globals ************************************************/
-static OurBool iofocus_AcceptTyping = No;
+static OurBool iofocus_AcceptTyping = false;
 
 /* Exported function definitions ***********************************/
 OurBool IOFOCUS_AcceptControls(void)
@@ -68,4 +67,3 @@ void IOFOCUS_Toggle(void)
 }
 
 /* Internal function definitions ***********************************/
-};

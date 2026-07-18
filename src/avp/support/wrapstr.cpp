@@ -13,7 +13,7 @@
 #include "wrapstr.hpp"
 #include "strutil.h"
 
-#define UseLocalAssert Yes
+#define UseLocalAssert true
 #include "ourasert.h"
 
 /* Version settings ************************************************/
@@ -25,9 +25,6 @@
 /* Imported function prototypes ************************************/
 
 /* Imported data ***************************************************/
-#ifdef __cplusplus
-extern "C" {
-#endif
 #if 0
 		extern OurBool			DaveDebugOn;
 		extern FDIEXTENSIONTAG	FDIET_Dummy;
@@ -39,9 +36,6 @@ extern "C" {
 		extern UncompressedGlobalPlotAtomID UGPAID_StandardNull;
 		extern IFCOLOUR			IFColour_Dummy;
  		extern IFVECTOR			IFVec_Zero;
-#endif
-#ifdef __cplusplus
-};
 #endif
 
 /* Exported globals ************************************************/
@@ -235,7 +229,7 @@ int WordWrap ::bWithinWord(ProjChar *pProjCh_Test)
     GLOBALASSERT(pProjCh_Test);
 
     if (bWhitespace(*pProjCh_Test)) {
-        return No;
+        return false;
     }
 
     GLOBALASSERT(!STRUTIL_SC_fIsTerminator(pProjCh_Test));

@@ -1,5 +1,4 @@
 
-extern "C" {
 #include "3dc.h"
 #include "inline.h"
 //#include "smacker.h"
@@ -321,4 +320,3 @@ void Show_AvPLogo(void)
     while (timeRemaining > 0); // && !GotAnyKey);
 #endif
 }
-};

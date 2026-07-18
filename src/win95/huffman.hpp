@@ -1,10 +1,6 @@
 #ifndef _huffman_hpp_included
 #define _huffman_hpp_included 1
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #define MAX_DEPTH 11
 
 typedef struct
@@ -23,8 +19,5 @@ extern HuffmanPackage *HuffmanCompression(unsigned char *sourcePtr, int length);
 extern char *HuffmanDecompress(const HuffmanPackage *inpackage);
 
 #define COMPRESSED_RIF_IDENTIFIER "REBCRIF1"
-#ifdef __cplusplus
-};
-#endif
 
 #endif

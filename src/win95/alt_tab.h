@@ -8,10 +8,6 @@ Deal with lost surfaces and textures - restore them when the application is re-a
 
 #include "aw.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 typedef void (*AT_PFN_RESTORETEXTURE)(D3DTexture *pTexture, void *pUser);
 typedef void (*AT_PFN_RESTORESURFACE)(DDSurface *pSurface, void *pUser);
 
@@ -63,9 +59,5 @@ extern void ATRemoveTexture(D3DTexture *pTexture);
 extern void ATRemoveSurface(DDSurface *pSurface);
 
 extern void ATOnAppReactivate();
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif /* ! _INCLUDED_ALT_TAB_H_ */

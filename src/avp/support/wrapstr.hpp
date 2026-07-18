@@ -36,10 +36,6 @@
 #include "reflist.hpp"
 #endif
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* Version settings *****************************************************/
 
 /* Constants  ***********************************************************/
@@ -86,9 +82,5 @@ int bWithinWord(ProjChar *pProjCh_Test);
 }; // namespace WordWrap
 
 /* End of the header ****************************************************/
-
-#ifdef __cplusplus
-};
-#endif
 
 #endif

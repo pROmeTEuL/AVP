@@ -1,12 +1,6 @@
 #ifndef _ltfx_exp_h
 #define _ltfx_exp_h 1
 
-#ifdef __cplusplus
-
-extern "C" {
-
-#endif
-
 typedef enum {
 
     LFX_RandomFlicker,
@@ -39,10 +33,5 @@ typedef struct
     unsigned long post_fade_down_delay;
 
 } LightFXData;
-
-#ifdef __cplusplus
-};
-
-#endif
 
 #endif

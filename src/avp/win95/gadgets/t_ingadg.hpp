@@ -36,8 +36,8 @@ class AVPTextInputState : public TextInputState
 public:
     AVPTextInputState()
         : TextInputState(
-              Yes, // OurBool bForceUpperCase,
-              ""   // const char* pProjCh_Init
+              true, // OurBool bForceUpperCase,
+              ""    // const char* pProjCh_Init
           )
     {}
 

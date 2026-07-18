@@ -37,15 +37,9 @@
 #if UseProjPlatAssert
 /* New assertions system */
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 int GlobalAssertFired(char *Filename, int LineNum, char *Condition);
 int LocalAssertFired(char *Filename, int LineNum, char *Condition);
 void ExitFired(char *Filename, int LineNum, int ExitCode);
-#ifdef __cplusplus
-};
-#endif
 
 #if ASSERT_SYSTEM_ON
 

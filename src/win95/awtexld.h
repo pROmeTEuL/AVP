@@ -2,7 +2,6 @@
 #define _INCLUDED_AWTEXLD_H_
 
 #ifdef __cplusplus
-extern "C" {
 #define _AWTL_DEFAULTPARM(v) = (v)
 #else /* ! __cplusplus */
 #define _AWTL_DEFAULTPARM(v)
@@ -704,10 +703,5 @@ extern DDSurface * _AWTL_VARARG AwCreateSurface(char const * _argFormatS, ...);
 extern AW_TL_ERC AwDestroyBackupTexture(AW_BACKUPTEXTUREHANDLE _bH);
 
 #endif
-
-/* End Wrappers */
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
 
 #endif /* ! _INCLUDED_AWTEXLD_H_ */

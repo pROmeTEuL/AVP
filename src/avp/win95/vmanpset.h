@@ -36,10 +36,6 @@ typedef enum {
     DSPROPERTY_VMANAGER_STATE_PLAYFAILED
 } VmState;
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 // {62A69BAE-DF9D-11d1-99A6-00C04FC99D46}
 DEFINE_GUID(
     DSPROPSETID_VoiceManager,
@@ -54,9 +50,5 @@ DEFINE_GUID(
     0xc9,
     0x9d,
     0x46);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif

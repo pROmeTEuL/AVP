@@ -11,10 +11,6 @@
 #ifndef __fail_h
 #define __fail_h 1
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #ifdef _MSC_VER
 #define VARARG_DECL __cdecl
 #else
@@ -22,9 +18,5 @@ extern "C" {
 #endif
 
 extern void VARARG_DECL fail(const char *__format, ...);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif /* __fail_h */

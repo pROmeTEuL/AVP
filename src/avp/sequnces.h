@@ -4,12 +4,6 @@
 
 #define _sequnces_h_ 1
 
-#ifdef __cplusplus
-
-extern "C" {
-
-#endif
-
 /* Sequences enums. */
 
 typedef enum HModelSequenceTypes {
@@ -473,10 +467,5 @@ typedef enum XenoborgSubSequences {
     XBSS_RightLegMissingDeath,
     XBSS_end,
 } XENOBORG_SUBSEQUENCES;
-
-#ifdef __cplusplus
-}
-
-#endif
 
 #endif

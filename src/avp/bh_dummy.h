@@ -2,12 +2,6 @@
 #ifndef _bhdummy_h_
 #define _bhdummy_h_ 1
 
-#ifdef __cplusplus
-
-extern "C" {
-
-#endif
-
 #include "bh_ais.h"
 
 typedef struct dummyStatusBlock
@@ -21,10 +15,5 @@ typedef struct dummyStatusBlock
 extern void MakeDummyNear(STRATEGYBLOCK *sbPtr);
 extern void MakeDummyFar(STRATEGYBLOCK *sbPtr);
 extern void DummyBehaviour(STRATEGYBLOCK *sbPtr);
-
-#ifdef __cplusplus
-}
-
-#endif
 
 #endif

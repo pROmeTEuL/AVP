@@ -3,12 +3,6 @@
 
 #include "bh_track.h" //for the special_track_point structure
 
-#ifdef __cplusplus
-
-extern "C" {
-
-#endif
-
 typedef struct placed_hierarchy_sound
 {
     unsigned long inner_range;
@@ -88,10 +82,5 @@ void PlacedHierarchyBehaveFun(STRATEGYBLOCK *sbptr);
 void MakePlacedHierarchyNear(STRATEGYBLOCK *sbptr);
 void DeletePlacedHierarchy(PLACED_HIERARCHY_BEHAV_BLOCK *);
 void SendRequestToPlacedHierarchy(STRATEGYBLOCK *sbptr, BOOL state, int extended_data);
-
-#ifdef __cplusplus
-};
-
-#endif
 
 #endif

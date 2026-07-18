@@ -1,10 +1,6 @@
 #ifndef _included_pcmenus_h_
 #define _included_pcmenus_h_
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #define ENABLE_SHADING_OPTION 0
 #define ENABLE_MIPMAP_OPTION 0
 
@@ -109,9 +105,5 @@ float GetUVScale(IMAGETYPEIDX);
 /* This will change the video mode to 640x480x8 (or rather, the menu video mode) if it is not already in that mode */
 #define AMB_MODELESS 0x00000001 /* do not wait for select or blank screen */
 void AvpMessageBox(char const *text, char const *title, int flags);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif /* ! _included_pcmenus_h_ */

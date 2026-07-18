@@ -15,9 +15,6 @@
 #define DPLAYEXT_H_INCLUDED
 
 /* Permit use in a C++ source file. */
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /* I N C L U D E S ---------------------------------------------------- */
 
@@ -121,9 +118,6 @@ extern HRESULT DpExtRecv(
 /* E N D   W R A P P E R ---------------------------------------------- */
 
 /* Permit use in a C++ source file. */
-#ifdef __cplusplus
-}
-#endif
 
 /* Avoid multiple inclusions of this file in a single source file. */
 #endif

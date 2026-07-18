@@ -147,10 +147,6 @@ inline unsigned int SCString::GetNumChars(void)
     return NumberOfCharacters;
 }
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* Version settings *****************************************************/
 
 /* Macros ***************************************************************/
@@ -162,9 +158,5 @@ extern "C" {
 /* Function prototypes **************************************************/
 
 /* End of the header ****************************************************/
-
-#ifdef __cplusplus
-};
-#endif
 
 #endif

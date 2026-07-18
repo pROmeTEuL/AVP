@@ -21,11 +21,11 @@
 
 #include "ffstdio.h"
 
-#define UseLocalAssert Yes
+#define UseLocalAssert true
 #include "ourasert.h"
 
 /* Version settings ************************************************/
-#define UseSoftwareAlphaRendering Yes
+#define UseSoftwareAlphaRendering true
 // an option which assumes you're in a 16-bit graphic mode...
 
 #if UseSoftwareAlphaRendering
@@ -39,9 +39,6 @@
 /* Imported function prototypes ************************************/
 
 /* Imported data ***************************************************/
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 extern unsigned char *ScreenBuffer;
 extern long BackBufferPitch;
@@ -61,9 +58,6 @@ extern int CloakingPhase;
 		extern UncompressedGlobalPlotAtomID UGPAID_StandardNull;
 		extern IFCOLOUR			IFColour_Dummy;
  		extern IFVECTOR			IFVec_Zero;
-#endif
-#ifdef __cplusplus
-};
 #endif
 
 /* Exported globals ************************************************/
@@ -458,19 +452,19 @@ OurBool IndexedFont_Proportional_Column ::bAnyNonTransparentPixelsInColumn(
 
 #if 1
         if (Pixel > 0) {
-            return Yes;
+            return true;
         }
 #else
         if ((R > 32) || (G > 32) || (B > 32)) {
             // nasty hack to get it working...
-            return Yes;
+            return true;
         }
 #endif
 
         y++;
     }
 
-    return No;
+    return false;
 }
 
 /////////////////////////////////////////////////////////////////
@@ -1123,19 +1117,19 @@ OurBool IndexedFont_Kerned_Column ::bAnyNonTransparentPixelsInColumn(
 
 #if 1
         if (Pixel > 0) {
-            return Yes;
+            return true;
         }
 #else
         if ((R > 32) || (G > 32) || (B > 32)) {
             // nasty hack to get it working...
-            return Yes;
+            return true;
         }
 #endif
 
         y++;
     }
 
-    return No;
+    return false;
 }
 
 int IndexedFont_Kerned_Column ::CalcXInc(
@@ -1206,7 +1200,7 @@ OurBool IndexedFont_Kerned_Column ::OverlapOnRow(
             // ought really to throw an exception
 
             LOGDXERR(hrLock);
-            return Yes;
+            return true;
         }
 
         // Find right-most pixel in row of first character
@@ -1241,7 +1235,7 @@ OurBool IndexedFont_Kerned_Column ::OverlapOnRow(
         }
     }
 #else
-    return Yes;
+    return true;
     // for now
 #endif
 }

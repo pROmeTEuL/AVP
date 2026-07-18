@@ -4,8 +4,6 @@
 
 // Must link to C code in main engine system
 
-extern "C" {
-
 // Mysterious definition required by objbase.h
 // (included via one of the include files below)
 // to start definition of obscure unique in the
@@ -37,7 +35,7 @@ extern "C++" {
 #include "r2base.h"
 }
 
-#define UseLocalAssert No
+#define UseLocalAssert false
 #include "ourasert.h"
 
 // FIXME!!! Structures in d3d structure
@@ -50,19 +48,19 @@ extern "C++" {
 // eventually have to be changed to something that reacts
 // to the caps bit in the driver, once drivers have reached
 // the point where we can safely assume that such bits will be valid.
-#define ForceExecuteBufferIntoSystemMemory Yes
+#define ForceExecuteBufferIntoSystemMemory true
 
 // To define TBLEND mode --- at present
 // it must be on for ramp textures and
 // off for evrything else...
-#define ForceTBlendCopy No
+#define ForceTBlendCopy false
 
 // Set to Yes for debugging, to No for normal
 // operations (i.e. if we need a palettised
 // file for an accelerator, load it from
 // pre-palettised data, using code not yet
 // written as of 27 / 8/ 96)
-#define QuantiseOnLoad Yes
+#define QuantiseOnLoad true
 
 // Set to Yes to make default texture filter bilinear averaging rather
 // than nearest
@@ -153,11 +151,11 @@ HRESULT WINAPI DeviceEnumerator(
     */
 
     if (lpHWDesc->dcmColorModel) {
-        D3DHardwareAvailable = Yes;
-        d3d.Driver[d3d.NumDrivers].Hardware = Yes;
+        D3DHardwareAvailable = true;
+        d3d.Driver[d3d.NumDrivers].Hardware = true;
         memcpy(&d3d.Driver[d3d.NumDrivers].Desc, lpHWDesc, sizeof(D3DDEVICEDESC));
     } else {
-        d3d.Driver[d3d.NumDrivers].Hardware = No;
+        d3d.Driver[d3d.NumDrivers].Hardware = false;
         memcpy(&d3d.Driver[d3d.NumDrivers].Desc, lpHELDesc, sizeof(D3DDEVICEDESC));
     }
 
@@ -220,7 +218,7 @@ BOOL InitialiseDirect3DImmediateMode(void)
     // this here just in case the test from
     // InitialiseSystem failed and things aren't
     // what we thought...
-    D3DHardwareAvailable = No;
+    D3DHardwareAvailable = false;
 
     // Zero d3d structure
     memset(&d3d, 0, sizeof(D3DINFO));
@@ -809,6 +807,3 @@ void FlushZB(void)
     d3dRect.lY2 = 480;
     hRes = d3d.lpD3DViewport->Clear(1, &d3dRect, D3DCLEAR_ZBUFFER);
 }
-
-// For extern "C"
-};

@@ -20,11 +20,11 @@
 #include "dcontext.hpp"
 #endif
 
-#define UseLocalAssert Yes
+#define UseLocalAssert true
 #include "ourasert.h"
 
 /* Version settings ************************************************/
-#define LogStringTables No
+#define LogStringTables false
 
 /* Constants *******************************************************/
 #define MAX_BYTES_IN_NUMERIC_STRING (100)
@@ -102,7 +102,7 @@ SCString ::SCString(const ProjChar *pProjCh_Init)
             } else {
                 R2Size[i] = r2size(0, 0);
 
-                bCanRender[i] = No;
+                bCanRender[i] = false;
             }
         }
 
@@ -164,7 +164,7 @@ SCString ::SCString(signed int Number)
             } else {
                 R2Size[i] = r2size(0, 0);
 
-                bCanRender[i] = No;
+                bCanRender[i] = false;
             }
         }
 
@@ -226,7 +226,7 @@ SCString ::SCString(unsigned int Number)
             } else {
                 R2Size[i] = r2size(0, 0);
 
-                bCanRender[i] = No;
+                bCanRender[i] = false;
             }
         }
 
@@ -285,7 +285,7 @@ SCString ::SCString(float Number)
             } else {
                 R2Size[i] = r2size(0, 0);
 
-                bCanRender[i] = No;
+                bCanRender[i] = false;
             }
         }
 
@@ -355,7 +355,7 @@ SCString ::SCString(ProjChar *pProjCh_Init, unsigned int Length)
             } else {
                 R2Size[i] = r2size(0, 0);
 
-                bCanRender[i] = No;
+                bCanRender[i] = false;
             }
         }
 
@@ -671,7 +671,7 @@ SCString ::SCString(List<ProjChar> List_ProjChar)
             } else {
                 R2Size[i] = r2size(0, 0);
 
-                bCanRender[i] = No;
+                bCanRender[i] = false;
             }
         }
 
@@ -713,7 +713,7 @@ SCString ::SCString(List<ProjChar> List_ProjChar)
             } else {
                 pSCString->R2Size[I_Font_Changed] = r2size(0, 0);
 
-                pSCString->bCanRender[I_Font_Changed] = No;
+                pSCString->bCanRender[I_Font_Changed] = false;
             }
 
             pSCString = pSCString->pNxt;

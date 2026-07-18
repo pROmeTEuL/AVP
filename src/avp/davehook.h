@@ -10,10 +10,6 @@
 #ifndef _davehook
 #define _davehook 1
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* Version settings *****************************************************/
 
 /* Constants  ***********************************************************/
@@ -33,9 +29,5 @@ extern void DAVEHOOK_ScreenModeChange_Setup(void);
 extern void DAVEHOOK_ScreenModeChange_Cleanup(void);
 
 /* End of the header ****************************************************/
-
-#ifdef __cplusplus
-};
-#endif
 
 #endif

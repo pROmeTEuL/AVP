@@ -5,10 +5,6 @@
 #ifndef _bhqueen_h_
 #define _bhqueen_h_ 1
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include "bh_pred.h"
 #include "scream.h"
 
@@ -137,9 +133,5 @@ void QueenIsDamaged(
     SECTION_DATA *Section,
     VECTORCH *incoming,
     VECTORCH *point);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif

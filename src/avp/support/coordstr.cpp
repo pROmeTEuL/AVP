@@ -15,7 +15,7 @@
 #include "scrobj.hpp"
 #endif
 
-#define UseLocalAssert Yes
+#define UseLocalAssert true
 #include "ourasert.h"
 
 #if 0 	
@@ -171,7 +171,7 @@ CyclicPulsingCoordinate ::CyclicPulsingCoordinate(
     int Int_InitialCoord, int Int_SecondCoord, int FixP_Velocity, OurBool fActive)
     : PulsingCoordinate(Int_InitialCoord, Int_SecondCoord, FixP_Velocity, fActive)
 {
-    fGoingForSecondCoord = Yes;
+    fGoingForSecondCoord = true;
 }
 
 CyclicPulsingCoordinate ::~CyclicPulsingCoordinate()

@@ -3,8 +3,6 @@
 
 // Must link to C code in main engine system
 
-extern "C" {
-
 // Note: INITGUID has NOT been defined here,
 // since the definition in d3_func.cpp is amply
 // sufficient.
@@ -67,7 +65,7 @@ static BOOL DIKeyboardOkay;              // Is the keyboard acquired?
 static IDirectInputDevice *g_pJoystick = NULL;
 static IDirectInputDevice2 *g_pJoystickDevice2 = NULL; // needed to poll joystick
 
-static char bGravePressed = No;
+static char bGravePressed = false;
 // added 14/1/98 by DHM as a temporary hack to debounce the GRAVE key
 
 /*
@@ -101,9 +99,7 @@ DIJOYSTATE JoystickState; // DirectInput joystick state
 /*
 	8/4/98 DHM: A new array, analagous to KeyboardInput, except it's debounced
 */
-extern "C" {
 unsigned char DebouncedKeyboardInput[MAX_NUMBER_OF_INPUT_KEYS];
-}
 
 // Implementation of the debounced KeyboardInput
 // There's probably a more efficient way of getting it direct from DirectInput
@@ -156,7 +152,7 @@ void ReleaseDirectInput(void)
 
 // see comments below
 
-#define UseForegroundKeyboard No
+#define UseForegroundKeyboard false
 
 GUID guid = GUID_SysKeyboard;
 BOOL InitialiseDirectKeyboard()
@@ -750,13 +746,13 @@ to make F8 not count in a 'press any key' situation */
 			IOFOCUS_Toggle();
 		}
 
-		bGravePressed = Yes;
+		bGravePressed = true;
 
 		GotAnyKey = TRUE;		
 	}
 	else
 	{
-		bGravePressed = No;
+		bGravePressed = false;
 	}
 #else
     if (DiKeybd[DIK_GRAVE] & DikOn) {
@@ -893,7 +889,7 @@ void DirectReadMouse(void)
     HRESULT hres;
     int OldMouseX, OldMouseY, OldMouseZ;
 
-    GotMouse = No;
+    GotMouse = false;
     MouseVelX = 0;
     MouseVelY = 0;
     MouseVelZ = 0;
@@ -912,7 +908,7 @@ void DirectReadMouse(void)
         return;
 
     // Check for any data being picked up
-    GotMouse = Yes;
+    GotMouse = true;
     if (dwElements == 0)
         return;
 
@@ -1042,14 +1038,14 @@ int ReadJoystick(void)
     MMRESULT joyreturn;
 
     if (!JoystickControlMethods.JoystickEnabled)
-        return No;
+        return false;
 
     joyreturn = joyGetPosEx(JOYSTICKID1, &JoystickData);
 
     if (joyreturn == JOYERR_NOERROR)
-        return Yes;
+        return true;
 
-    return No;
+    return false;
 }
 
 int CheckForJoystick(void)
@@ -1059,9 +1055,9 @@ int CheckForJoystick(void)
     joyreturn = joyGetDevCaps(JOYSTICKID1, &JoystickCaps, sizeof(JOYCAPS));
 
     if (joyreturn == JOYERR_NOERROR)
-        return Yes;
+        return true;
 
-    return No;
+    return false;
 }
 #else
 // Eleventh hour rewrite of joystick code, to support PantherXL trackerball.
@@ -1071,7 +1067,7 @@ BOOL CALLBACK EnumJoysticksCallback(LPCDIDEVICEINSTANCE pInst, LPVOID lpvContext
 void InitJoysticks(void)
 {
     HRESULT hr;
-    GotJoystick = No;
+    GotJoystick = false;
     g_pJoystick = NULL;
 
     hr = lpdi->EnumDevices(DIDEVTYPE_JOYSTICK, EnumJoysticksCallback, NULL, DIEDFL_ATTACHEDONLY);
@@ -1086,12 +1082,12 @@ void InitJoysticks(void)
     if (FAILED(hr))
         return;
 
-    GotJoystick = Yes;
+    GotJoystick = true;
 }
 
 void ReadJoysticks(void)
 {
-    GotJoystick = No;
+    GotJoystick = false;
 
     if (!JoystickControlMethods.JoystickEnabled || g_pJoystick == NULL) {
         return;
@@ -1124,7 +1120,7 @@ void ReadJoysticks(void)
     if (FAILED(hr))
         return;
 
-    GotJoystick = Yes;
+    GotJoystick = true;
     PrintDebuggingText("%d %d\n", JoystickState.rglSlider[0], JoystickState.rglSlider[1]);
 }
 //-----------------------------------------------------------------------------
@@ -1178,6 +1174,3 @@ extern IngameKeyboardInput_ClearBuffer(void)
         IngameKeyboardInput[i] = 0;
     }
 }
-
-// For extern "C"
-};

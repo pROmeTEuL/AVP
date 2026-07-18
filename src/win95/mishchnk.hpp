@@ -6,7 +6,7 @@
 
 #include "chnktype.hpp"
 
-#define UseLocalAssert No
+#define UseLocalAssert false
 #include "ourasert.h"
 #define assert(x) GLOBALASSERT(x)
 

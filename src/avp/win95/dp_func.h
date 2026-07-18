@@ -4,9 +4,6 @@ Header for setting up and handling direct play objects
 -----------------------------------------------------------------------*/
 #ifndef dpfunc_h_included
 #define dpfunc_h_included
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /* globals */
 extern LPDIRECTPLAY4 glpDP;
@@ -47,7 +44,4 @@ HRESULT DPlayRelease(void);
 HRESULT DPlaySend(DPID idFrom, DPID idTo, DWORD dwFlags, LPVOID lpData, DWORD dwDataSize);
 HRESULT DPlaySetPlayerData(DPID pid, LPVOID lpData, DWORD dwSize, DWORD dwFlags);
 
-#ifdef __cplusplus
-}
-#endif
 #endif

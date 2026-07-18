@@ -6,10 +6,6 @@
 #ifndef _pvisible_h_
 #define _pvisible_h_ 1
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* this enum defines the different inanimate object types ... */
 typedef enum inanimateobject_type {
     IOT_Non = -1,
@@ -66,7 +62,7 @@ typedef struct inanimateobjectstatusblock
     TXACTRLBLK *inan_tac; //for objects with anims on them
 
     OBJECT_EVENT_TARGET
-        *event_target; //another strategy can be notified when this object is destroyed or picked up
+    *event_target; //another strategy can be notified when this object is destroyed or picked up
 
     int explosionType;       //non zero for explosive objects
     int explosionTimer;      //slight time delay after destruction for explosion
@@ -133,7 +129,4 @@ extern MODULEMAPBLOCK VisibilityDefaultObjectMap;
 
 STRATEGYBLOCK *CreateMultiplayerWeaponPickup(VECTORCH *location, int type, char *name);
 void MakePlayersWeaponPickupVisible();
-#ifdef __cplusplus
-}
-#endif
 #endif

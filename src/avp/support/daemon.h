@@ -7,19 +7,14 @@
 #ifndef _daemon
 #define _daemon 1
 
-#ifdef __cplusplus
-
 #ifndef _ourbool
 #include "ourbool.h"
 #endif
 
-extern "C" {
-#endif
-
 /* Version settings *****************************************************/
-#define SupportCallbackHooks No
+#define SupportCallbackHooks false
 
-#define IndividualTiming No
+#define IndividualTiming false
 /*
 			Should daemons get individually passed a time to run for,
 			or do they all share the same timing information?
@@ -32,11 +27,11 @@ extern "C" {
 
 #define ACTIVITY_RVAL_CHANGE \
     { \
-        return Yes; \
+        return true; \
     }
 #define ACTIVITY_RVAL_NOCHANGE \
     { \
-        return No; \
+        return false; \
     }
 #define ACTIVITY_RVAL_BOOL(b) \
     { \
@@ -151,9 +146,5 @@ extern void DAEMON_Init(void);
 extern void DAEMON_Maintain(void);
 
 /* End of the header ****************************************************/
-
-#ifdef __cplusplus
-};
-#endif
 
 #endif

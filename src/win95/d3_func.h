@@ -1,10 +1,6 @@
 #ifndef _included_d3_func_h_
 #define _included_d3_func_h_
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* KJL 14:24:45 12/4/97 - render state information */
 enum TRANSLUCENCY_TYPE {
     TRANSLUCENCY_OFF,
@@ -130,10 +126,6 @@ typedef struct
 
 } RENDERSTATES;
 
-#endif
-
-#ifdef __cplusplus
-}
 #endif
 
 #endif /* ! _included_d3_func_h_ */

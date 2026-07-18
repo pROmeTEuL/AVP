@@ -42,12 +42,10 @@
 
 #include "consbind.hpp"
 
-extern "C" {
 #include "weapons.h"
 #include "avp_menus.h"
-};
 
-#define UseLocalAssert Yes
+#define UseLocalAssert true
 #include "ourasert.h"
 
 /* Version settings ************************************************/
@@ -59,9 +57,6 @@ extern "C" {
 /* Imported function prototypes ************************************/
 
 /* Imported data ***************************************************/
-#ifdef __cplusplus
-extern "C" {
-#endif
 extern int DebuggingCommandsActive;
 
 extern int bEnableTextprint;
@@ -79,9 +74,6 @@ extern SCENE Global_Scene;
 		extern UncompressedGlobalPlotAtomID UGPAID_StandardNull;
 		extern IFCOLOUR			IFColour_Dummy;
  		extern IFVECTOR			IFVec_Zero;
-#endif
-#ifdef __cplusplus
-};
 #endif
 
 /* Exported globals ************************************************/

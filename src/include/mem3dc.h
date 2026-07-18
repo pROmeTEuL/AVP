@@ -2,12 +2,6 @@
 #ifndef MEM3DC_H_INCLUDED
 #define MEM3DC_H_INCLUDED
 
-#ifdef __cplusplus
-
-extern "C" {
-
-#endif
-
 #include "fixer.h" // make sure system headers get included first, because windows headers use Yes/No
 #include "system.h"
 #include <stddef.h>
@@ -146,11 +140,6 @@ inline void operator delete[](void *p)
 #else
 #define AllocateMem(x) AllocMem(x)
 #define DeallocateMem(x) DeallocMem(x)
-#endif
-
-#ifdef __cplusplus
-};
-
 #endif
 
 #endif

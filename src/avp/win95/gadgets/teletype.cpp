@@ -15,11 +15,11 @@
 #include "inline.h"
 #include "trepgadg.hpp"
 
-#define UseLocalAssert Yes
+#define UseLocalAssert true
 #include "ourasert.h"
 
 /* Version settings ************************************************/
-#define SupportTeletypeSound Yes
+#define SupportTeletypeSound true
 
 #if UseGadgets
 #include "indexfnt.hpp"
@@ -38,9 +38,6 @@
 /* Imported function prototypes ************************************/
 
 /* Imported data ***************************************************/
-#ifdef __cplusplus
-extern "C" {
-#endif
 #if 0
 		extern OurBool			DaveDebugOn;
 		extern FDIEXTENSIONTAG	FDIET_Dummy;
@@ -52,9 +49,6 @@ extern "C" {
 		extern UncompressedGlobalPlotAtomID UGPAID_StandardNull;
 		extern IFCOLOUR			IFColour_Dummy;
  		extern IFVECTOR			IFVec_Zero;
-#endif
-#ifdef __cplusplus
-};
 #endif
 
 /* Exported globals ************************************************/
@@ -234,7 +228,7 @@ void TeletypeGadget ::DirectRenderCursor(
 // public:
 TeletypeDaemon ::TeletypeDaemon(TeletypeGadget *pTeletypeGadg)
     : Daemon(
-          Yes // OurBool fActive
+          true // OurBool fActive
       )
 {
     GLOBALASSERT(pTeletypeGadg);
@@ -245,7 +239,7 @@ TeletypeDaemon ::TeletypeDaemon(TeletypeGadget *pTeletypeGadg)
 
     pTeletypeGadg_Val = pTeletypeGadg;
 
-    fFinished_Val = No;
+    fFinished_Val = false;
 
     FixP_TotalPixels =
 #if 1
@@ -304,7 +298,7 @@ ACTIVITY_RETURN_TYPE TeletypeDaemon ::Activity(ACTIVITY_INPUT)
         // Teletype has finished:
         FixP_PixelsCovered = FixP_TotalPixels;
 
-        fFinished_Val = Yes;
+        fFinished_Val = true;
 
         Stop();
 
