@@ -319,9 +319,10 @@ ENDFOREACH(sourcefile)
 INCLUDE_DIRECTORIES(${include})
 
 # manually include src/include
-INCLUDE_DIRECTORIES(src/include)
 
 ADD_EXECUTABLE(avp ${source} ${headers})
+TARGET_INCLUDE_DIRECTORIES(avp PRIVATE src/include)
+SET_PROPERTY(TARGET avp PROPERTY CXX_STANDARD 23)
 
 # required dependencies
 IF(SDL_TYPE STREQUAL "SDL")
