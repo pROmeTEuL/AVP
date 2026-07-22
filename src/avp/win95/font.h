@@ -1,3 +1,4 @@
+#include "fixer.h"
 #ifndef _font_h_included
 #define _font_h_included 1
 
