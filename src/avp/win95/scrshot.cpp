@@ -1,7 +1,6 @@
 #include "3dc.h"
 #include "bmp2.h"
 #include "endianio.h"
-#include "string.hpp"
 #include "scrshot.hpp"
 #include "module.h"
 #include "stratdef.h"

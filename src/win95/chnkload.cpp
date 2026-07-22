@@ -3,7 +3,6 @@
 #include <string.h>
 #include <ctype.h>
 
-#include "string.hpp"
 
 #include "list_tem.hpp"
 #include "chnkload.hpp"
@@ -255,13 +254,13 @@ private:
 
     int listpos;
     SHAPEHEADER *shptr;
-    String name;
+    std::string name;
     BOOL in_hash_table;
 
 public:
     inline int Listpos() const { return listpos; }
     inline SHAPEHEADER *Shptr() const { return shptr; }
-    inline char const *Name() const { return name; }
+    inline char const *Name() const { return name.c_str(); }
 
     static ShapeInMSL const *GetByName(char const *);
     static ShapeInMSL const *GetByMSL(int);
@@ -288,7 +287,7 @@ void ShapeInMSL::AddToHashTables()
     if (GLS_NOTINLIST != listpos)
         hash_msl[HashMSLFunc(listpos)].add_entry(this);
     hash_ptr[HashPtrFunc(shptr)].add_entry(this);
-    hash_name[HashNameFunc(name)].add_entry(this);
+    hash_name[HashNameFunc(name.c_str())].add_entry(this);
 
     in_hash_table = TRUE;
 }
@@ -298,7 +297,7 @@ void ShapeInMSL::RemoveFromHashTables()
     if (GLS_NOTINLIST != listpos)
         hash_msl[HashMSLFunc(listpos)].delete_entry(this);
     hash_ptr[HashPtrFunc(shptr)].delete_entry(this);
-    hash_name[HashNameFunc(name)].delete_entry(this);
+    hash_name[HashNameFunc(name.c_str())].delete_entry(this);
 
     in_hash_table = FALSE;
 }
@@ -353,7 +352,7 @@ ShapeInMSL const *ShapeInMSL::GetByPtr(SHAPEHEADER *shp)
 ShapeInMSL const *ShapeInMSL::GetByName(char const *nam)
 {
     for (LIF<ShapeInMSL const *> i(&hash_name[HashNameFunc(nam)]); !i.done(); i.next()) {
-        if (!_stricmp(i()->name, nam))
+        if (!_stricmp(i()->name.c_str(), nam))
             return i();
     }
     return 0;
@@ -594,7 +593,7 @@ int copy_sprite_to_mainshapelist(RIFFHANDLE h, Sprite_Header_Chunk *shc, int /* 
 static void setup_tex_conv_array(
     int &max_indices, int *&conv_array, RIFFHANDLE h, Chunk_With_Children *tmpshp)
 {
-    String rif_name;
+    std::string rif_name;
 
     max_indices = h->max_index;
     conv_array = h->tex_index_nos;
@@ -640,7 +639,7 @@ static void setup_tex_conv_array(
         // JH 17-2-97 -- image loaders have changed to avoid loading the same image twice
         for (bns.restart(); !bns.done(); bns.next()) {
             if (!(bns().flags & ChunkBMPFlag_NotInPC)) {
-                String tex;
+                std::string tex;
                 if (bns().flags & ChunkBMPFlag_IFF) {
                     tex = bns().filename;
                 } else {
@@ -649,7 +648,7 @@ static void setup_tex_conv_array(
                     tex += bns().filename;
                 }
 
-                int imgnum = load_rif_bitmap(tex, bns().flags);
+                int imgnum = load_rif_bitmap(tex.c_str(), bns().flags);
                 if (GEI_NOTLOADED != imgnum)
                     conv_array[bns().index] = imgnum;
             }
@@ -695,7 +694,7 @@ CTM_ReturnType copy_to_mainshapelist(
     int list_pos = GetMSLPos();
     int main_shape_num = list_pos;
     int start_shape_no = list_pos;
-    String rif_name;
+    std::string rif_name;
 
     setup_tex_conv_array(local_max_index, local_tex_index_nos, h, tmpshp);
 
@@ -732,7 +731,7 @@ CTM_ReturnType copy_to_mainshapelist(
     if (pChunk) {
         seflc = (Shape_External_File_Chunk *) pChunk;
         rif_name = seflc->get_shape_name();
-        msl_shapes.add_entry(new ShapeInMSL(mainshapelist[list_pos], rif_name, list_pos));
+        msl_shapes.add_entry(new ShapeInMSL(mainshapelist[list_pos], rif_name.c_str(), list_pos));
     } else {
         List<Object_Chunk *> const &oblist = tmpshp->list_assoc_objs();
         if (oblist.size()) {
@@ -2345,7 +2344,7 @@ BOOL copy_sprite_to_shapeheader(
     int *tptr;
     int *BmpConv = 0;
     int local_max_index;
-    String sprite_name;
+    std::string sprite_name;
 
     Bitmap_List_Store_Chunk *blsc = 0;
 
@@ -2356,7 +2355,7 @@ BOOL copy_sprite_to_shapeheader(
     pChunk = shc->lookup_single_child("RIFFNAME");
     if (pChunk) {
         sprite_name = ((RIF_Name_Chunk *) pChunk)->rif_name;
-        msl_shapes.add_entry(new ShapeInMSL(shphd, sprite_name, listpos));
+        msl_shapes.add_entry(new ShapeInMSL(shphd, sprite_name.c_str(), listpos));
     }
 
     if (blsc) {
@@ -2380,7 +2379,7 @@ BOOL copy_sprite_to_shapeheader(
             if (bns().flags & ChunkBMPFlag_NotInPC)
                 continue;
 
-            String tex;
+            std::string tex;
             if (bns().flags & ChunkBMPFlag_IFF) {
                 tex = bns().filename;
             } else {

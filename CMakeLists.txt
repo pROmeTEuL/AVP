@@ -525,8 +525,6 @@ SET(source
     src/win95/sndchunk.hpp
     src/win95/sprchunk.cpp
     src/win95/sprchunk.hpp
-    src/win95/string.cpp
-    src/win95/string.hpp
     src/win95/texio.cpp
     src/win95/toolchnk.cpp
     src/win95/toolchnk.hpp

@@ -1,6 +1,5 @@
 #include <print>
 #include <cassert>
-#include <fstream>
 #include <cstdio>
 #include <chrono>
 

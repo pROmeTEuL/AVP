@@ -2,7 +2,6 @@
 
 #include "fixer.h"
 
-#include "string.hpp"
 #ifndef DB_LEVEL
 #define DB_LEVEL 4
 #endif
@@ -239,15 +238,15 @@ char *CL_GetImageFileName(
              SecondTex_Directory ? SecondTex_Directory : "<not-specified>"));
 #define _GET_RELATIVE_PATH(pszDirectory, fnDoesExist) \
     if (pszDirectory) { \
-        String str = pszDirectory; \
+        std::string str = pszDirectory; \
         if (str.length()) { \
-            int chLast = str.get_at(str.length() - 1); \
+            int chLast = *str.rbegin(); \
             if (chLast != '\\' && chLast != '/') \
                 str += '\\'; \
             str += pszFileName; \
-            if (fnDoesExist(str)) { \
+            if (fnDoesExist(str.c_str())) { \
                 if (str.length() < nBufSize) { \
-                    strcpy(pszDestBuf, str); \
+                    strcpy(pszDestBuf, str.c_str()); \
                     return pszDestBuf; \
                 } else { \
                     db_log1("CL_LoadImageOnce(): ERROR: buffer not large enough to hold filename"); \
