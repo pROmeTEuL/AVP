@@ -28,22 +28,22 @@ enum class FILEATTR {
 
 inline FILEATTR operator|(FILEATTR left, FILEATTR right)
 {
-    return FILEATTR(left | right);
+    return FILEATTR(int(left) | int(right));
 }
 
-inline FILEATTR operator|=(FILEATTR left, FILEATTR right)
+inline FILEATTR operator|=(FILEATTR &left, FILEATTR right)
 {
-    return left | right;
+    return left = (left | right);
 }
 
 inline FILEATTR operator&(FILEATTR left, FILEATTR right)
 {
-    return FILEATTR(left & right);
+    return FILEATTR(int(left) & int(right));
 }
 
-inline FILEATTR operator&=(FILEATTR left, FILEATTR right)
+inline FILEATTR operator&=(FILEATTR &left, FILEATTR right)
 {
-    return left & right;
+    return left = (left & right);
 }
 
 typedef struct GameDirectoryFile

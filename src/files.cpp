@@ -249,6 +249,9 @@ typedef struct GameDirectory
     std::string pat; /* pattern to match */
 
     GameDirectoryFile tmp; /* Temp space */
+    fs::directory_iterator gdit;
+    fs::directory_iterator ldit;
+
 } GameDirectory;
 
 /*
@@ -279,6 +282,10 @@ void *OpenGameDirectory(const fs::path &dirname, const std::string &pattern, FIL
     gd->globaldir = globaldir;
 
     gd->pat = pattern;
+    if (!gd->globaldir.empty())
+        gd->gdit = fs::directory_iterator{gd->globaldir};
+    if (!gd->localdir.empty())
+        gd->ldit = fs::directory_iterator{gd->localdir};
 
     return gd;
 }
@@ -306,35 +313,26 @@ GameDirectoryFile *ScanGameDirectory(void *dir)
 
     directory = (GameDirectory *) dir;
 
-    if (!directory->globaldir.empty()) {
-        for (auto file : fs::directory_iterator{directory->globaldir}) {
-            if (fnmatch(directory->pat.c_str(), file.path().filename().string().c_str(), FNM_PATHNAME) == 0) {
-                directory->tmp.attr = GetFA(file.path());
-
-                directory->tmp.filename = file.path().filename().string();
-
-                return &directory->tmp;
-            }
+    if (directory->gdit != fs::directory_iterator{}) {
+        const auto file = *directory->gdit++;
+        if (fnmatch(directory->pat.c_str(), file.path().filename().string().c_str(), FNM_PATHNAME) == 0) {
+            directory->tmp.attr = GetFA(file.path());
+            directory->tmp.filename = file.path().filename().string();
+            return &directory->tmp;
         }
-        directory->globaldir.clear();
     }
 
-    if (!directory->localdir.empty()) {
-        for (auto file : fs::directory_iterator{directory->localdir}) {
-            if (fnmatch(directory->pat.c_str(), file.path().filename().string().c_str(), FNM_PATHNAME) == 0) {
-                directory->tmp.attr = GetFA(file.path());
-
-                directory->tmp.timestamp = GetTS(file.path());
-
-                directory->tmp.filename = file.path().filename().string();
-
-                return &directory->tmp;
-            }
+    if (directory->ldit != fs::directory_iterator{}) {
+        const auto file = *directory->ldit++;
+        if (fnmatch(directory->pat.c_str(), file.path().filename().string().c_str(), FNM_PATHNAME) == 0) {
+            directory->tmp.attr = GetFA(file.path());
+            directory->tmp.timestamp = GetTS(file.path());
+            directory->tmp.filename = file.path().filename().string();
+            return &directory->tmp;
         }
-        directory->localdir.clear();
     }
 
-    return NULL;
+    return nullptr;
 }
 
 /*
