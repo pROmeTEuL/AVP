@@ -249,7 +249,7 @@ char *LoadTextFile(char *filename)
     char *bufferPtr;
     long int save_pos, size_of_file;
     FILE *fp;
-    fp = OpenGameFile(filename, FILEMODE_READONLY, FILETYPE_PERM);
+    fp = OpenGameFile(filename, FILEMODE::READONLY, FILETYPE::PERM);
 
     if (!fp)
         goto error;

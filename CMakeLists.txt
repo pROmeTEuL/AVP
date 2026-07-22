@@ -77,45 +77,6 @@ ENDIF(NOT OPENAL_FOUND)
 # old D3D immediate-mode renderer, alt-tab surface tracking, etc.) that
 # predates the OpenGL/SDL port and was never part of the build.
 SET(source
-    src/cdplayer.cpp
-    src/cdplayer.h
-    src/files.cpp
-    src/files.h
-    src/fixer.h
-    src/fmv.cpp
-    src/fmv.h
-    src/frustum.cpp
-    src/frustum.h
-    src/kshape.cpp
-    src/kshape.h
-    src/map.cpp
-    src/mathline.cpp
-    src/maths.cpp
-    src/maths.h
-    src/md5.cpp
-    src/md5.h
-    src/mem3dc.cpp
-    src/mem3dcpp.cpp
-    src/menus.cpp
-    src/module.cpp
-    src/morph.cpp
-    src/net.cpp
-    src/net.h
-    src/object.cpp
-    src/oglfunc.cpp
-    src/oglfunc.h
-    src/openal.cpp
-    src/opengl.cpp
-    src/opengl.h
-    src/shpanim.cpp
-    src/sphere.cpp
-    src/sphere.h
-    src/stubs.cpp
-    src/tables.cpp
-    src/vdb.cpp
-    src/version.cpp
-    src/version.h
-    src/winapi.cpp
     src/avp/ai_sight.cpp
     src/avp/ai_sight.h
     src/avp/avpview.cpp
@@ -282,17 +243,9 @@ SET(source
     src/avp/sequnces.h
     src/avp/sfx.cpp
     src/avp/sfx.h
+    src/avp/shapes/cube.cpp
     src/avp/stratdef.cpp
     src/avp/stratdef.h
-    src/avp/targeting.cpp
-    src/avp/targeting.h
-    src/avp/track.cpp
-    src/avp/track.h
-    src/avp/triggers.cpp
-    src/avp/triggers.h
-    src/avp/weapons.cpp
-    src/avp/weapons.h
-    src/avp/shapes/cube.cpp
     src/avp/support/command.hpp
     src/avp/support/consbind.cpp
     src/avp/support/consbind.hpp
@@ -327,6 +280,14 @@ SET(source
     src/avp/support/trig666.hpp
     src/avp/support/wrapstr.cpp
     src/avp/support/wrapstr.hpp
+    src/avp/targeting.cpp
+    src/avp/targeting.h
+    src/avp/track.cpp
+    src/avp/track.h
+    src/avp/triggers.cpp
+    src/avp/triggers.h
+    src/avp/weapons.cpp
+    src/avp/weapons.h
     src/avp/win95/avpchunk.cpp
     src/avp/win95/avpchunk.hpp
     src/avp/win95/avpreg.hpp
@@ -348,6 +309,43 @@ SET(source
     src/avp/win95/ffstdio.cpp
     src/avp/win95/ffstdio.h
     src/avp/win95/font.h
+    src/avp/win95/frontend/avp_envinfo.cpp
+    src/avp/win95/frontend/avp_envinfo.h
+    src/avp/win95/frontend/avp_intro.cpp
+    src/avp/win95/frontend/avp_intro.h
+    src/avp/win95/frontend/avp_menudata.cpp
+    src/avp/win95/frontend/avp_menudata.h
+    src/avp/win95/frontend/avp_menugfx.hpp
+    src/avp/win95/frontend/avp_menus.cpp
+    src/avp/win95/frontend/avp_menus.h
+    src/avp/win95/frontend/avp_mp_config.cpp
+    src/avp/win95/frontend/avp_mp_config.h
+    src/avp/win95/frontend/avp_userprofile.cpp
+    src/avp/win95/frontend/avp_userprofile.h
+    src/avp/win95/gadgets/ahudgadg.cpp
+    src/avp/win95/gadgets/ahudgadg.hpp
+    src/avp/win95/gadgets/conscmnd.cpp
+    src/avp/win95/gadgets/conscmnd.hpp
+    src/avp/win95/gadgets/conssym.cpp
+    src/avp/win95/gadgets/conssym.hpp
+    src/avp/win95/gadgets/consvar.cpp
+    src/avp/win95/gadgets/consvar.hpp
+    src/avp/win95/gadgets/gadget.cpp
+    src/avp/win95/gadgets/gadget.h
+    src/avp/win95/gadgets/hudgadg.cpp
+    src/avp/win95/gadgets/hudgadg.hpp
+    src/avp/win95/gadgets/rootgadg.cpp
+    src/avp/win95/gadgets/rootgadg.hpp
+    src/avp/win95/gadgets/t_ingadg.cpp
+    src/avp/win95/gadgets/t_ingadg.hpp
+    src/avp/win95/gadgets/teletype.cpp
+    src/avp/win95/gadgets/teletype.hpp
+    src/avp/win95/gadgets/textexp.cpp
+    src/avp/win95/gadgets/textexp.hpp
+    src/avp/win95/gadgets/textin.cpp
+    src/avp/win95/gadgets/textin.hpp
+    src/avp/win95/gadgets/trepgadg.cpp
+    src/avp/win95/gadgets/trepgadg.hpp
     src/avp/win95/gameplat.h
     src/avp/win95/gammacontrol.cpp
     src/avp/win95/gammacontrol.h
@@ -395,48 +393,51 @@ SET(source
     src/avp/win95/vision.cpp
     src/avp/win95/vision.h
     src/avp/win95/vmanpset.h
-    src/avp/win95/frontend/avp_envinfo.cpp
-    src/avp/win95/frontend/avp_envinfo.h
-    src/avp/win95/frontend/avp_intro.cpp
-    src/avp/win95/frontend/avp_intro.h
-    src/avp/win95/frontend/avp_menudata.cpp
-    src/avp/win95/frontend/avp_menudata.h
-    src/avp/win95/frontend/avp_menugfx.hpp
-    src/avp/win95/frontend/avp_menus.cpp
-    src/avp/win95/frontend/avp_menus.h
-    src/avp/win95/frontend/avp_mp_config.cpp
-    src/avp/win95/frontend/avp_mp_config.h
-    src/avp/win95/frontend/avp_userprofile.cpp
-    src/avp/win95/frontend/avp_userprofile.h
-    src/avp/win95/gadgets/ahudgadg.cpp
-    src/avp/win95/gadgets/ahudgadg.hpp
-    src/avp/win95/gadgets/conscmnd.cpp
-    src/avp/win95/gadgets/conscmnd.hpp
-    src/avp/win95/gadgets/conssym.cpp
-    src/avp/win95/gadgets/conssym.hpp
-    src/avp/win95/gadgets/consvar.cpp
-    src/avp/win95/gadgets/consvar.hpp
-    src/avp/win95/gadgets/gadget.cpp
-    src/avp/win95/gadgets/gadget.h
-    src/avp/win95/gadgets/hudgadg.cpp
-    src/avp/win95/gadgets/hudgadg.hpp
-    src/avp/win95/gadgets/rootgadg.cpp
-    src/avp/win95/gadgets/rootgadg.hpp
-    src/avp/win95/gadgets/t_ingadg.cpp
-    src/avp/win95/gadgets/t_ingadg.hpp
-    src/avp/win95/gadgets/teletype.cpp
-    src/avp/win95/gadgets/teletype.hpp
-    src/avp/win95/gadgets/textexp.cpp
-    src/avp/win95/gadgets/textexp.hpp
-    src/avp/win95/gadgets/textin.cpp
-    src/avp/win95/gadgets/textin.hpp
-    src/avp/win95/gadgets/trepgadg.cpp
-    src/avp/win95/gadgets/trepgadg.hpp
+    src/cdplayer.cpp
+    src/cdplayer.h
+    src/files.cpp
+    src/files.h
+    src/fixer.h
+    src/fmv.cpp
+    src/fmv.h
+    src/frustum.cpp
+    src/frustum.h
+    src/globals.cpp
+    src/globals.h
     src/include/3dc.h
     src/include/mem3dc.h
     src/include/module.h
     src/include/prototyp.h
     src/include/shape.h
+    src/kshape.cpp
+    src/kshape.h
+    src/map.cpp
+    src/mathline.cpp
+    src/maths.cpp
+    src/maths.h
+    src/md5.cpp
+    src/md5.h
+    src/mem3dc.cpp
+    src/mem3dcpp.cpp
+    src/menus.cpp
+    src/module.cpp
+    src/morph.cpp
+    src/net.cpp
+    src/net.h
+    src/object.cpp
+    src/oglfunc.cpp
+    src/oglfunc.h
+    src/openal.cpp
+    src/opengl.cpp
+    src/opengl.h
+    src/shpanim.cpp
+    src/sphere.cpp
+    src/sphere.h
+    src/stubs.cpp
+    src/tables.cpp
+    src/vdb.cpp
+    src/version.cpp
+    src/version.h
     src/win95/alt_tab.h
     src/win95/animchnk.cpp
     src/win95/animchnk.hpp
@@ -536,6 +537,7 @@ SET(source
     src/win95/wpchunk.hpp
     src/win95/zsp.cpp
     src/win95/zsp.hpp
+    src/winapi.cpp
 )
 
 IF(SDL_TYPE STREQUAL "SDL")

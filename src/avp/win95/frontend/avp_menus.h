@@ -1,6 +1,11 @@
 #ifndef _included_AvP_Menus_h_
 #define _included_AvP_Menus_h_
 
+#include <string>
+#include <variant>
+#include <vector>
+
+
 #ifndef MARINE_DEMO
 #define MARINE_DEMO 0
 #endif

@@ -176,7 +176,7 @@ Sprite_Header_Chunk::Sprite_Header_Chunk(const char *file_name, Chunk_With_Child
 
     error_code = 0;
 
-    rif_file = OpenGameFile(file_name, FILEMODE_READONLY, FILETYPE_PERM);
+    rif_file = OpenGameFile(file_name, FILEMODE::READONLY, FILETYPE::PERM);
     if (rif_file == NULL) {
         return;
     }

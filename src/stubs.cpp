@@ -1,3 +1,6 @@
+#include <fstream>
+#include <print>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -222,7 +225,7 @@ void dx_str_log(char const *str, int line, char const *file)
 {
     FILE *fp;
 
-    fp = OpenGameFile("dx_error.log", FILEMODE_APPEND, FILETYPE_CONFIG);
+    fp = OpenGameFile("dx_error.log", FILEMODE::APPEND, FILETYPE::CONFIG);
     if (fp == NULL)
         fp = stderr;
 
@@ -237,7 +240,7 @@ void dx_strf_log(char const *fmt, ...)
     va_list ap;
     FILE *fp;
 
-    fp = OpenGameFile("dx_error.log", FILEMODE_APPEND, FILETYPE_CONFIG);
+    fp = OpenGameFile("dx_error.log", FILEMODE::APPEND, FILETYPE::CONFIG);
     if (fp == NULL)
         fp = stderr;
 
@@ -255,7 +258,7 @@ void dx_line_log(int line, char const *file)
 {
     FILE *fp;
 
-    fp = OpenGameFile("dx_error.log", FILEMODE_APPEND, FILETYPE_CONFIG);
+    fp = OpenGameFile("dx_error.log", FILEMODE::APPEND, FILETYPE::CONFIG);
     if (fp == NULL)
         fp = stderr;
 

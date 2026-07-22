@@ -525,7 +525,7 @@ void InitNPCs(RIFFHANDLE h)
         // has this file, so the OpenGameFile is called just to check if it
         // is available.
         FILE *rifFile
-            = OpenGameFile(DIRECTORY_FOR_RIFS "mdisk.rif", FILEMODE_READONLY, FILETYPE_PERM);
+            = OpenGameFile(DIRECTORY_FOR_RIFS "mdisk.rif", FILEMODE::READONLY, FILETYPE::PERM);
         if (rifFile != NULL) {
             CloseGameFile(rifFile);
 

@@ -101,7 +101,7 @@ extern int SaveUserProfile(AVP_USER_PROFILE *profilePtr)
     strcat(filename, profilePtr->Name);
     strcat(filename, USER_PROFILES_SUFFIX);
 
-    FILE *file = OpenGameFile(filename, FILEMODE_WRITEONLY, FILETYPE_CONFIG);
+    FILE *file = OpenGameFile(filename, FILEMODE::WRITEONLY, FILETYPE::CONFIG);
     delete[] filename;
     if (!file)
         return 0;
@@ -172,7 +172,7 @@ static int LoadUserProfiles(void)
     void *gd;
     GameDirectoryFile *gdf;
 
-    gd = OpenGameDirectory(USER_PROFILES_PATH, USER_PROFILES_WILDCARD_NAME, FILETYPE_CONFIG);
+    gd = OpenGameDirectory(USER_PROFILES_PATH, USER_PROFILES_WILDCARD_NAME, FILETYPE::CONFIG);
     if (gd == NULL) {
         CreateGameDirectory(USER_PROFILES_PATH); /* maybe it didn't exist.. */
         return 0;
@@ -181,19 +181,14 @@ static int LoadUserProfiles(void)
     int nPathLen = strlen(USER_PROFILES_PATH);
 
     while ((gdf = ScanGameDirectory(gd)) != NULL) {
-        if ((gdf->attr & FILEATTR_DIRECTORY) != 0)
+        if (int(gdf->attr & FILEATTR::DIRECTORY) != 0)
             continue;
-        if ((gdf->attr & FILEATTR_READABLE) == 0)
+        if (int(gdf->attr & FILEATTR::READABLE) == 0)
             continue;
-
-        char *pszFullPath = new char[nPathLen + strlen(gdf->filename) + 1];
-        strcpy(pszFullPath, USER_PROFILES_PATH);
-        strcat(pszFullPath, gdf->filename);
 
         FILE *rif_file;
-        rif_file = OpenGameFile(pszFullPath, FILEMODE_READONLY, FILETYPE_CONFIG);
+        rif_file = OpenGameFile(USER_PROFILES_PATH + gdf->filename, FILEMODE::READONLY, FILETYPE::CONFIG);
         if (rif_file == NULL) {
-            delete[] pszFullPath;
             continue;
         }
 
@@ -201,7 +196,6 @@ static int LoadUserProfiles(void)
 
         if (fread(profilePtr, 1, sizeof(AVP_USER_PROFILE), rif_file) != sizeof(AVP_USER_PROFILE)) {
             fclose(rif_file);
-            delete[] pszFullPath;
             delete profilePtr;
             continue;
         }
@@ -210,7 +204,6 @@ static int LoadUserProfiles(void)
 
         InsertProfileIntoList(profilePtr);
         fclose(rif_file);
-        delete[] pszFullPath;
     }
 
     CloseGameDirectory(gd);

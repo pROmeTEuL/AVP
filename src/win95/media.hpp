@@ -449,7 +449,7 @@ public:
             m_fError |= MME_OPENFAIL;
             return;
         }
-        m_pFile = OpenGameFile(pszFileName, FILEMODE_READONLY, FILETYPE_PERM);
+        m_pFile = OpenGameFile(pszFileName, FILEMODE::READONLY, FILETYPE::PERM);
         if (!m_pFile)
             m_fError |= MME_OPENFAIL;
     }

@@ -1,19 +1,23 @@
 #ifndef _included_AvP_MP_Config_h_
 #define _included_AvP_MP_Config_h_
 
-BOOL BuildLoadMPConfigMenu();
+#include <string>
+
+bool BuildLoadMPConfigMenu();
 void LoadMultiplayerConfigurationByIndex(int index);
-void LoadMultiplayerConfiguration(const char *name);
-void SaveMultiplayerConfiguration(const char *name);
-const char *GetMultiplayerConfigDescription(int index);
+void LoadMultiplayerConfiguration(const std::string &name);
+void SaveMultiplayerConfiguration(const std::string &name);
+std::string GetMultiplayerConfigDescription(int index);
 void DeleteMultiplayerConfigurationByIndex(int index);
 
-BOOL BuildLoadIPAddressMenu();
-void SaveIPAddress(const char *name, const char *address);
-void LoadIPAddress(const char *name);
+bool BuildLoadIPAddressMenu();
+void SaveIPAddress(const std::string &name, const std::string &address);
+void LoadIPAddress(const std::string &name);
 
 #define LOAD_NEW_MPCONFIG_ENTRIES (1)
 #define SAVE_NEW_MPCONFIG_ENTRIES (1)
+
+//list of all multiplayer level names as they appear in the menus
 
 extern int NumCustomLevels;
 extern int NumMultiplayerLevels;

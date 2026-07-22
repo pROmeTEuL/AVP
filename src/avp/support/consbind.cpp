@@ -296,7 +296,7 @@ void KeyBinding ::WriteToConfigFile(char *Filename)
 
     GLOBALASSERT(Filename);
 
-    FILE *pFile = OpenGameFile(Filename, FILEMODE_WRITEONLY, FILETYPE_CONFIG);
+    FILE *pFile = OpenGameFile(Filename, FILEMODE::WRITEONLY, FILETYPE::CONFIG);
 
     if (!pFile) {
         return;

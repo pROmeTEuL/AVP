@@ -68,7 +68,7 @@ void CharacterSoundEffects::LoadSounds(const char *filename, const char *directo
     char path[100] = ScreamFilePath;
     strcat(path, filename);
 
-    FILE *file = OpenGameFile(path, FILEMODE_READONLY, FILETYPE_PERM);
+    FILE *file = OpenGameFile(path, FILEMODE::READONLY, FILETYPE::PERM);
     if (file == NULL) {
         LOGDXFMT(("Failed to open %s", path));
         return;

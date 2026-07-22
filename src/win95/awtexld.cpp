@@ -1948,7 +1948,7 @@ static bool ParseParams(CreateTextureParms *pParams, char const *_argFormatS, va
 SurfUnion LoadFromParams(CreateTextureParms *pParams)
 {
     if (pParams->fileNameS) {
-        pParams->fileH = OpenGameFile(pParams->fileNameS, FILEMODE_READONLY, FILETYPE_PERM);
+        pParams->fileH = OpenGameFile(pParams->fileNameS, FILEMODE::READONLY, FILETYPE::PERM);
 
         if (NULL == pParams->fileH) {
             awTlLastErr = AW_TLE_CANTOPENFILE;

@@ -147,7 +147,7 @@ static List<FFILE *> openlist;
 
 int ffInit(char const *infofilename, char const *ffpath)
 {
-    FILE *fp = OpenGameFile(infofilename, FILEMODE_READONLY, FILETYPE_PERM);
+    FILE *fp = OpenGameFile(infofilename, FILEMODE::READONLY, FILETYPE::PERM);
     if (!fp)
         return 0;
 
@@ -346,7 +346,7 @@ FFILE *ffopen(char const *filename, char const *mode)
     LOGDXFMT(("%s not in any fastfile", filename));
 
     /* mode is always "rb" */
-    FILE *sfp = OpenGameFile(filename, FILEMODE_READONLY, FILETYPE_PERM);
+    FILE *sfp = OpenGameFile(filename, FILEMODE::READONLY, FILETYPE::PERM);
 
     if (!sfp)
         return 0;

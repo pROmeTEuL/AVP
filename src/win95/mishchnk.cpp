@@ -362,7 +362,7 @@ File_Chunk::File_Chunk(const char *file_name)
 
     strcpy(filename, file_name);
 
-    rif_file = OpenGameFile(file_name, FILEMODE_READONLY, FILETYPE_PERM);
+    rif_file = OpenGameFile(file_name, FILEMODE::READONLY, FILETYPE::PERM);
 
     if (rif_file == NULL) {
         error_code = CHUNK_FAILED_ON_LOAD;
@@ -1609,7 +1609,7 @@ RIF_File_Chunk::RIF_File_Chunk(Chunk_With_Children *parent, const char *file_nam
 
     error_code = 0;
 
-    rif_file = OpenGameFile(file_name, FILEMODE_READONLY, FILETYPE_PERM);
+    rif_file = OpenGameFile(file_name, FILEMODE::READONLY, FILETYPE::PERM);
 
     if (rif_file == NULL) {
         error_code = CHUNK_FAILED_ON_LOAD;

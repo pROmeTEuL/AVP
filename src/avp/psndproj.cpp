@@ -781,12 +781,12 @@ int FindAndLoadWavFile(int soundNum, char *wavFileName)
     {
         {
             //check to see if file exists locally first
-            FILE *wavFile = OpenGameFile(sound_name, FILEMODE_READONLY, FILETYPE_PERM);
+            FILE *wavFile = OpenGameFile(sound_name, FILEMODE::READONLY, FILETYPE::PERM);
             if (!wavFile && SecondSoundDir) {
                 //look for sound over network
                 sprintf(sound_name, "%s%s", SecondSoundDir, wavFileName);
 
-                wavFile = OpenGameFile(sound_name, FILEMODE_READONLY, FILETYPE_PERM);
+                wavFile = OpenGameFile(sound_name, FILEMODE::READONLY, FILETYPE::PERM);
                 if (!wavFile) {
                     LOGDXFMT(("Failed to find %s\n", wavFileName));
                     return 0;
@@ -813,7 +813,7 @@ void *LoadRebSndFile(char *filename)
     void *bufferPtr;
     long int save_pos, size_of_file;
     FILE *fp;
-    fp = OpenGameFile(filename, FILEMODE_READONLY, FILETYPE_PERM);
+    fp = OpenGameFile(filename, FILEMODE::READONLY, FILETYPE::PERM);
 
     if (!fp)
         goto error;

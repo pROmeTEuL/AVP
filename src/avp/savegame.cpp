@@ -436,7 +436,7 @@ void SaveGame()
     SaveGameRequest = SAVELOAD_REQUEST_NONE;
 
     //write the file
-    file = OpenGameFile(filename, FILEMODE_WRITEONLY, FILETYPE_CONFIG);
+    file = OpenGameFile(filename, FILEMODE::WRITEONLY, FILETYPE::CONFIG);
 
     if (file == NULL) {
         GLOBALASSERT("Error saving file" == 0);
@@ -550,7 +550,7 @@ void LoadSavedGame()
     LoadGameRequest = SAVELOAD_REQUEST_NONE;
 
     //load the file
-    file = OpenGameFile(filename, FILEMODE_READONLY, FILETYPE_CONFIG);
+    file = OpenGameFile(filename, FILEMODE::READONLY, FILETYPE::CONFIG);
 
     if (file == NULL) {
         //failed to load

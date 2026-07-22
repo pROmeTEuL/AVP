@@ -366,7 +366,7 @@ void db_log_fired(const char *strP)
         db_log_init();
     {
         /* Open a file for appending, creating one if it doesn't yet exist. */
-        FILE *fP = OpenGameFile(LogFileNameP, FILEMODE_APPEND, FILETYPE_CONFIG);
+        FILE *fP = OpenGameFile(LogFileNameP, FILEMODE::APPEND, FILETYPE::CONFIG);
 
         if (!fP)
             return;
@@ -778,8 +778,8 @@ static fontPtr CleanupFontLoadFail(HANDLE fH, fontPtr fontP)
 static void out_text(
     LPDIRECTDRAWSURFACE surfP, int xc, int yc, const char *text, short x_limit, fontPtr fP)
 {
-    register unsigned long *srcP, *destP;
-    register unsigned int x, y;
+    unsigned long *srcP, *destP;
+    unsigned int x, y;
     unsigned long heightTimesPitch, charOffset;
     unsigned int prop_width;
     int srcIncr, longsPerLine;

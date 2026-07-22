@@ -68,7 +68,7 @@ OurBool BatchFileProcessing ::Run(char *Filename)
     RefList<SCString> PendingList;
 
     {
-        FILE *pFile = OpenGameFile(Filename, FILEMODE_READONLY, FILETYPE_CONFIG);
+        FILE *pFile = OpenGameFile(Filename, FILEMODE::READONLY, FILETYPE::CONFIG);
 
         if (NULL == pFile) {
             return false;

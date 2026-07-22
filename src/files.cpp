@@ -1,40 +1,33 @@
-#define _BSD_SOURCE
+#include <print>
+#include <cassert>
+#include <fstream>
+#include <cstdio>
+#include <chrono>
 
-#include <assert.h>
-#include <unistd.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <time.h>
-#include <ctype.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <dirent.h>
 #include <fnmatch.h>
 
-#include "fixer.h"
 #include "files.h"
+#include "globals.h"
 
-static char *local_dir;
-static char *global_dir;
+namespace fs = std::filesystem;
+using namespace std::string_view_literals;
 
 /*
 Sets the local and global directories used by the other functions.
 Local = ~/.dir, where config and user-installed files are kept.
 Global = installdir, where installed data is stored.
 */
-int SetGameDirectories(const char *local, const char *global)
+int SetGameDirectories(const fs::path &local, const fs::path &global)
 {
-    struct stat buf;
+    auto &globals = Globals::instance();
 
-    local_dir = strdup(local);
-    global_dir = strdup(global);
+    globals.local_dir = local;
+    globals.global_dir = global;
 
-    if (stat(local_dir, &buf) == -1) {
-        printf("Creating local directory %s...\n", local_dir);
+    if (!fs::exists(local)) {
+        std::println("Creating local directory {}...", local.string());
 
-        mkdir(local_dir, S_IRWXU);
+        fs::create_directories(local);
     }
 
     return 0;
@@ -42,134 +35,133 @@ int SetGameDirectories(const char *local, const char *global)
 
 #define DIR_SEPARATOR "/"
 
-static char *FixFilename(const char *filename, const char *prefix, int force)
+static std::string FixFilename(const std::string &filename, const std::string &prefix, int force)
 {
-    char *f, *ptr;
-    int flen;
-    int plen;
-
-    plen = strlen(prefix) + 1;
-    flen = strlen(filename) + plen + 1;
-
-    f = (char *) malloc(flen);
-    strcpy(f, prefix);
-    strcat(f, DIR_SEPARATOR);
-    strcat(f, filename);
-
-    /* only the filename part needs to be modified */
-    ptr = &f[plen + 1];
-
-    while (*ptr) {
-        if ((*ptr == '/') || (*ptr == '\\') || (*ptr == ':')) {
-            *ptr = DIR_SEPARATOR[0];
-        } else if (*ptr == '\r' || *ptr == '\n') {
-            *ptr = 0;
-            break;
-        } else {
-            if (force) {
-                *ptr = tolower(*ptr);
-            }
-        }
-        ptr++;
-    }
-
-    return f;
+    auto res = prefix + "/" + filename;
+    for (auto &c : res)
+        if (c == '\\')
+            c = '/';
+    return res;
 }
 
 /*
 Open a file of type type, with mode mode.
 
 Mode can be:
-#define	FILEMODE_READONLY	0x01
-#define	FILEMODE_WRITEONLY	0x02
-#define	FILEMODE_READWRITE	0x04
-#define FILEMODE_APPEND		0x08
+#define	FILEMODE::READONLY	0x01
+#define	FILEMODE::WRITEONLY	0x02
+#define	FILEMODE::READWRITE	0x04
+#define FILEMODE::APPEND		0x08
 Type is (mode = ReadOnly):
-#define	FILETYPE_PERM		0x08 // try the global dir only 
-#define	FILETYPE_OPTIONAL	0x10 // try the global dir first, then try the local dir
-#define	FILETYPE_CONFIG		0x20 // try the local dir only
+#define	FILETYPE::PERM		0x08 // try the global dir only
+#define	FILETYPE::OPTIONAL	0x10 // try the global dir first, then try the local dir
+#define	FILETYPE::CONFIG		0x20 // try the local dir only
 
 Type is (mode = WriteOnly or ReadWrite):
-FILETYPE_PERM: error
-FILETYPE_OPTIONAL: error
-FILETYPE_CONFIG: try the local dir only
+FILETYPE::PERM: error
+FILETYPE::OPTIONAL: error
+FILETYPE::CONFIG: try the local dir only
 */
-FILE *OpenGameFile(const char *filename, int mode, int type)
+FILE *OpenGameFile(const fs::path &filename, FILEMODE mode, FILETYPE type)
 {
     char *rfilename;
-    char *openmode;
+    std::string openmode;
     FILE *fp;
 
-    if ((type != FILETYPE_CONFIG) && (mode != FILEMODE_READONLY))
+    if ((type != FILETYPE::CONFIG) && (mode != FILEMODE::READONLY))
         return NULL;
 
     switch (mode) {
-    case FILEMODE_READONLY:
+    case FILEMODE::READONLY:
         openmode = "rb";
         break;
-    case FILEMODE_WRITEONLY:
+    case FILEMODE::WRITEONLY:
         openmode = "wb";
         break;
-    case FILEMODE_READWRITE:
+    case FILEMODE::READWRITE:
         openmode = "w+";
         break;
-    case FILEMODE_APPEND:
+    case FILEMODE::APPEND:
         openmode = "ab";
         break;
     default:
         return NULL;
     }
 
-    if (type != FILETYPE_CONFIG) {
-        rfilename = FixFilename(filename, global_dir, 0);
+    if (type != FILETYPE::CONFIG) {
+        // rfilename = FixFilename(filename, global_dir, 0);
 
-        fp = fopen(rfilename, openmode);
-
-        free(rfilename);
+        fp = fopen((Globals::instance().global_dir / filename).string().c_str(), openmode.c_str());
 
         if (fp != NULL) {
             return fp;
         }
 
-        rfilename = FixFilename(filename, global_dir, 1);
+        // rfilename = FixFilename(filename, global_dir, 1);
 
-        fp = fopen(rfilename, openmode);
+        // fp = fopen(rfilename, openmode);
 
-        free(rfilename);
+        // free(rfilename);
 
-        if (fp != NULL) {
-            return fp;
-        }
+        // if (fp != NULL) {
+        //     return fp;
+        // }
     }
 
-    if (type != FILETYPE_PERM) {
-        rfilename = FixFilename(filename, local_dir, 0);
+    if (type != FILETYPE::PERM) {
+        // rfilename = FixFilename(filename, local_dir, 0);
 
-        fp = fopen(rfilename, openmode);
-
-        free(rfilename);
+        fp = fopen((Globals::instance().local_dir / filename).string().c_str(), openmode.c_str());
 
         if (fp != NULL) {
             return fp;
         }
 
-        rfilename = FixFilename(filename, local_dir, 1);
+        // rfilename = FixFilename(filename, local_dir, 1);
 
-        fp = fopen(rfilename, openmode);
+        // fp = fopen(rfilename, openmode);
 
-        free(rfilename);
+        // free(rfilename);
 
-        return fp;
+        // return fp;
     }
 
     return NULL;
+    // char *rfilename;
+    // std::string openmode;
+    // FILE *fp;
+
+    // if ((type != FILETYPE::CONFIG) && (mode != FILEMODE::READONLY))
+    //     return nullptr;
+
+    // switch (mode) {
+    // case FILEMODE::READONLY:
+    //     openmode = "rb";
+    //     break;
+    // case FILEMODE::WRITEONLY:
+    //     openmode = "wb";
+    //     break;
+    // case FILEMODE::READWRITE:
+    //     // openmode = std::ios_base::in | std::ios_base::out | std::ios_base::binary;
+    //     openmode = "rb+";
+    //     break;
+    // case FILEMODE::APPEND:
+    //     openmode = std::ios_base::in | std::ios_base::out | std::ios_base::binary | std::ios_base::ate;
+    //     openmode = ""
+    //     break;
+    // default:
+    //     return {};
+    // }
+
+    // if (type != FILETYPE::CONFIG)
+    //     return {Globals::instance().global_dir / filename, openmode};
+
+    // if (type != FILETYPE::PERM)
+    //     return {Globals::instance().local_dir / filename, openmode};
+
+    // return {};
 }
 
-/*
-Close a fd returned from OpenGameFile
-
-Currently this just uses stdio, so CloseGameFile is redundant.
-*/
 int CloseGameFile(FILE *pfd)
 {
     return fclose(pfd);
@@ -178,167 +170,58 @@ int CloseGameFile(FILE *pfd)
 /*
 Get the filesystem attributes of a file
 
-#define	FILEATTR_DIRECTORY	0x0100
-#define FILEATTR_READABLE	0x0200
-#define FILEATTR_WRITABLE	0x0400
+#define	FILEATTR::DIRECTORY	0x0100
+#define FILEATTR::READABLE	0x0200
+#define FILEATTR::WRITABLE	0x0400
 
 Error or can't access it: return value of 0 (What is the game going to do about it anyway?)
 */
-static int GetFA(const char *filename)
+static FILEATTR GetFA(const fs::path &path)
 {
-    struct stat buf;
-    int attr;
+    FILEATTR attr = FILEATTR::NONE;
+    auto perms = fs::status(path).permissions();
 
-    attr = 0;
-    if (stat(filename, &buf) == 0) {
-        if (S_ISDIR(buf.st_mode)) {
-            attr |= FILEATTR_DIRECTORY;
-        }
+    if (fs::is_directory(path))
+        attr |= FILEATTR::DIRECTORY;
 
-        if (access(filename, R_OK) == 0) {
-            attr |= FILEATTR_READABLE;
-        }
+    if ((perms & fs::perms::owner_read) != fs::perms::none)
+        attr |= FILEATTR::READABLE;
 
-        if (access(filename, W_OK) == 0) {
-            attr |= FILEATTR_WRITABLE;
-        }
-    }
-
+    if ((perms & fs::perms::owner_write) != fs::perms::none)
+        attr |= FILEATTR::WRITABLE;
     return attr;
 }
 
-static time_t GetTS(const char *filename)
+static time_t GetTS(const fs::path &filename)
 {
-    struct stat buf;
-
-    if (stat(filename, &buf) == 0) {
-        return buf.st_mtime;
-    }
-
-    return 0;
+#warning FIX ME: CHANGE TO STD::FILESYSTEM::FILE_TIME_TYPE
+    const auto fTime = fs::last_write_time(filename);
+    const auto chronoTime = std::chrono::clock_cast<std::chrono::system_clock>(fTime);
+    return std::chrono::system_clock::to_time_t(chronoTime);
 }
 
-int GetGameFileAttributes(const char *filename, int type)
+FILEATTR GetGameFileAttributes(const fs::path &filename, FILETYPE type)
 {
-    struct stat buf;
-    char *rfilename;
-    int attr;
+    if (type != FILETYPE::CONFIG)
+        return GetFA(Globals::instance().global_dir / filename);
 
-    attr = 0;
-    if (type != FILETYPE_CONFIG) {
-        rfilename = FixFilename(filename, global_dir, 0);
+    if (type != FILETYPE::PERM)
+        return GetFA(Globals::instance().local_dir / filename);
 
-        if (stat(rfilename, &buf) == 0) {
-            if (S_ISDIR(buf.st_mode)) {
-                attr |= FILEATTR_DIRECTORY;
-            }
-
-            if (access(rfilename, R_OK) == 0) {
-                attr |= FILEATTR_READABLE;
-            }
-
-            if (access(rfilename, W_OK) == 0) {
-                attr |= FILEATTR_WRITABLE;
-            }
-
-            free(rfilename);
-
-            return attr;
-        }
-
-        free(rfilename);
-
-        rfilename = FixFilename(filename, global_dir, 1);
-
-        if (stat(rfilename, &buf) == 0) {
-            if (S_ISDIR(buf.st_mode)) {
-                attr |= FILEATTR_DIRECTORY;
-            }
-
-            if (access(rfilename, R_OK) == 0) {
-                attr |= FILEATTR_READABLE;
-            }
-
-            if (access(rfilename, W_OK) == 0) {
-                attr |= FILEATTR_WRITABLE;
-            }
-
-            free(rfilename);
-
-            return attr;
-        }
-
-        free(rfilename);
-    }
-
-    if (type != FILETYPE_PERM) {
-        rfilename = FixFilename(filename, local_dir, 0);
-
-        if (stat(rfilename, &buf) == 0) {
-            if (S_ISDIR(buf.st_mode)) {
-                attr |= FILEATTR_DIRECTORY;
-            }
-
-            if (access(rfilename, R_OK) == 0) {
-                attr |= FILEATTR_READABLE;
-            }
-
-            if (access(rfilename, W_OK) == 0) {
-                attr |= FILEATTR_WRITABLE;
-            }
-
-            free(rfilename);
-
-            return attr;
-        }
-
-        free(rfilename);
-
-        rfilename = FixFilename(filename, local_dir, 1);
-
-        if (stat(rfilename, &buf) == 0) {
-            if (S_ISDIR(buf.st_mode)) {
-                attr |= FILEATTR_DIRECTORY;
-            }
-
-            if (access(rfilename, R_OK) == 0) {
-                attr |= FILEATTR_READABLE;
-            }
-
-            if (access(rfilename, W_OK) == 0) {
-                attr |= FILEATTR_WRITABLE;
-            }
-
-            free(rfilename);
-
-            return attr;
-        }
-
-        free(rfilename);
-    }
-
-    return 0;
+    return FILEATTR::NONE;
 }
 
 /*
 Delete a file: local dir only
 */
-int DeleteGameFile(const char *filename)
+bool DeleteGameFile(const fs::path &filename)
 {
-    char *rfilename;
-    int ret;
-
-    rfilename = FixFilename(filename, local_dir, 0);
-    ret = unlink(rfilename);
-    free(rfilename);
-
-    if (ret == -1) {
-        rfilename = FixFilename(filename, local_dir, 1);
-        ret = unlink(rfilename);
-        free(rfilename);
+    try {
+        fs::remove(Globals::instance().local_dir / filename);
+    } catch(...) {
+        return false;
     }
-
-    return ret;
+    return true;
 }
 
 /*
@@ -346,34 +229,24 @@ Create a directory: local dir only
 
 TODO: maybe also mkdir parent directories, if they do not exist?
 */
-int CreateGameDirectory(const char *dirname)
+bool CreateGameDirectory(const fs::path &dirname)
 {
-    char *rfilename;
-    int ret;
-
-    rfilename = FixFilename(dirname, local_dir, 0);
-    ret = mkdir(rfilename, S_IRWXU);
-    free(rfilename);
-
-    if (ret == -1) {
-        rfilename = FixFilename(dirname, local_dir, 1);
-        ret = mkdir(rfilename, S_IRWXU);
-        free(rfilename);
+    try {
+        fs::create_directories(Globals::instance().local_dir / dirname);
+    } catch (...) {
+        return false;
     }
-
-    return ret;
+    return true;
 }
 
 /* This struct is private. */
 typedef struct GameDirectory
 {
-    DIR *localdir; /* directory opened with opendir */
-    DIR *globaldir;
 
-    char *localdirname;
-    char *globaldirname;
+    fs::path localdir;
+    fs::path globaldir;
 
-    char *pat; /* pattern to match */
+    std::string pat; /* pattern to match */
 
     GameDirectoryFile tmp; /* Temp space */
 } GameDirectory;
@@ -384,62 +257,28 @@ Returns a pointer to a directory datatype
 
 Pattern is the pattern to match
 */
-void *OpenGameDirectory(const char *dirname, const char *pattern, int type)
+void *OpenGameDirectory(const fs::path &dirname, const std::string &pattern, FILETYPE type)
 {
-    char *localdirname, *globaldirname;
-    DIR *localdir, *globaldir;
     GameDirectory *gd;
 
-    globaldir = NULL;
-    globaldirname = NULL;
-    if (type != FILETYPE_CONFIG) {
-        globaldirname = FixFilename(dirname, global_dir, 0);
+    fs::path globaldir;
+    fs::path localdir;
 
-        globaldir = opendir(globaldirname);
+    if (type != FILETYPE::CONFIG)
+        globaldir = Globals::instance().global_dir / dirname;
 
-        if (globaldir == NULL) {
-            free(globaldirname);
+    if (type != FILETYPE::PERM)
+        localdir = Globals::instance().local_dir / dirname;
 
-            globaldirname = FixFilename(dirname, global_dir, 1);
+    if (localdir.empty() && globaldir.empty())
+        return nullptr;
 
-            globaldir = opendir(globaldirname);
-
-            if (globaldir == NULL)
-                free(globaldirname);
-        }
-    }
-
-    localdir = NULL;
-    localdirname = NULL;
-    if (type != FILETYPE_PERM) {
-        localdirname = FixFilename(dirname, local_dir, 0);
-
-        localdir = opendir(localdirname);
-
-        if (localdir == NULL) {
-            free(localdirname);
-
-            localdirname = FixFilename(dirname, local_dir, 1);
-
-            localdir = opendir(localdirname);
-
-            if (localdir == NULL)
-                free(localdirname);
-        }
-    }
-
-    if (localdir == NULL && globaldir == NULL)
-        return NULL;
-
-    gd = (GameDirectory *) malloc(sizeof(GameDirectory));
+    gd = new GameDirectory;
 
     gd->localdir = localdir;
     gd->globaldir = globaldir;
 
-    gd->localdirname = localdirname;
-    gd->globaldirname = globaldirname;
-
-    gd->pat = strdup(pattern);
+    gd->pat = pattern;
 
     return gd;
 }
@@ -461,49 +300,38 @@ f is the current file
 */
 GameDirectoryFile *ScanGameDirectory(void *dir)
 {
-    char *ptr;
-    struct dirent *file;
+    // char *ptr;
+    // struct dirent *file;
     GameDirectory *directory;
 
     directory = (GameDirectory *) dir;
 
-    if (directory->globaldir) {
-        while ((file = readdir(directory->globaldir)) != NULL) {
-            if (fnmatch(directory->pat, file->d_name, FNM_PATHNAME) == 0) {
-                ptr = FixFilename(file->d_name, directory->globaldirname, 0);
-                directory->tmp.attr = GetFA(ptr);
-                free(ptr);
+    if (!directory->globaldir.empty()) {
+        for (auto file : fs::directory_iterator{directory->globaldir}) {
+            if (fnmatch(directory->pat.c_str(), file.path().filename().string().c_str(), FNM_PATHNAME) == 0) {
+                directory->tmp.attr = GetFA(file.path());
 
-                directory->tmp.filename = file->d_name;
+                directory->tmp.filename = file.path().filename().string();
 
                 return &directory->tmp;
             }
         }
-        closedir(directory->globaldir);
-        free(directory->globaldirname);
-
-        directory->globaldir = NULL;
-        directory->globaldirname = NULL;
+        directory->globaldir.clear();
     }
 
-    if (directory->localdir) {
-        while ((file = readdir(directory->localdir)) != NULL) {
-            if (fnmatch(directory->pat, file->d_name, FNM_PATHNAME) == 0) {
-                ptr = FixFilename(file->d_name, directory->localdirname, 0);
-                directory->tmp.attr = GetFA(ptr);
-                directory->tmp.timestamp = GetTS(ptr);
-                free(ptr);
+    if (!directory->localdir.empty()) {
+        for (auto file : fs::directory_iterator{directory->localdir}) {
+            if (fnmatch(directory->pat.c_str(), file.path().filename().string().c_str(), FNM_PATHNAME) == 0) {
+                directory->tmp.attr = GetFA(file.path());
 
-                directory->tmp.filename = file->d_name;
+                directory->tmp.timestamp = GetTS(file.path());
+
+                directory->tmp.filename = file.path().filename().string();
 
                 return &directory->tmp;
             }
         }
-        closedir(directory->localdir);
-        free(directory->localdirname);
-
-        directory->localdir = NULL;
-        directory->localdirname = NULL;
+        directory->localdir.clear();
     }
 
     return NULL;
@@ -515,99 +343,58 @@ Close directory
 int CloseGameDirectory(void *dir)
 {
     GameDirectory *directory = (GameDirectory *) dir;
-
-    if (directory) {
-        free(directory->pat);
-
-        if (directory->localdirname)
-            free(directory->localdirname);
-        if (directory->globaldirname)
-            free(directory->globaldirname);
-        if (directory->localdir)
-            closedir(directory->localdir);
-        if (directory->globaldir)
-            closedir(directory->globaldir);
-
-        return 0;
-    }
-    return -1;
+    delete directory;
+    return directory ? 0 : -1;
 }
 
 /*
   Game-specific helper function.
  */
-static int try_game_directory(char *dir, char *file)
+static bool check_game_directory(const fs::path &dir)
 {
-    char tmppath[PATH_MAX];
+    if (dir.empty())
+        return false;
 
-    strncpy(tmppath, dir, PATH_MAX - 32);
-    tmppath[PATH_MAX - 32] = 0;
-    strcat(tmppath, file);
+    if (!fs::exists(dir / "avp_huds"sv))
+        return false;
 
-    return access(tmppath, R_OK) == 0;
-}
+    if (!fs::exists(dir / "avp_huds/alien.rif"sv))
+        return false;
 
-/*
-  Game-specific helper function.
- */
-static int check_game_directory(char *dir)
-{
-    if (!dir || !*dir) {
-        return 0;
-    }
+    if (!fs::exists(dir / "avp_rifs"sv))
+        return false;
 
-    if (!try_game_directory(dir, "/avp_huds")) {
-        return 0;
-    }
+    if (!fs::exists(dir / "avp_rifs/temple.rif"sv))
+        return false;
 
-    if (!try_game_directory(dir, "/avp_huds/alien.rif")) {
-        return 0;
-    }
+    if (!fs::exists(dir / "fastfile"sv))
+        return false;
 
-    if (!try_game_directory(dir, "/avp_rifs")) {
-        return 0;
-    }
+    if (!fs::exists(dir / "fastfile/ffinfo.txt"sv))
+        return false;
 
-    if (!try_game_directory(dir, "/avp_rifs/temple.rif")) {
-        return 0;
-    }
-
-    if (!try_game_directory(dir, "/fastfile")) {
-        return 0;
-    }
-
-    if (!try_game_directory(dir, "/fastfile/ffinfo.txt")) {
-        return 0;
-    }
-
-    return 1;
+    return true;
 }
 
 /*
   Game-specific initialization
  */
-void InitGameDirectories(char *argv0)
+void InitGameDirectories(const std::string_view argv0)
 {
+#warning FIX ME: MOVE THIS CRAP TO GLOBALS
     extern char *SecondTex_Directory;
     extern char *SecondSoundDir;
-
-    char tmppath[PATH_MAX];
-    char *homedir, *gamedir, *localdir, *tmp;
-    char *path;
-    size_t len, copylen;
 
     SecondTex_Directory = "graphics/";
     SecondSoundDir = "sound/";
 
-    homedir = getenv("HOME");
-    if (homedir == NULL)
-        homedir = ".";
-    localdir = (char *) malloc(strlen(homedir) + 10);
-    strcpy(localdir, homedir);
-    strcat(localdir, "/");
-    strcat(localdir, ".avp");
+    const auto safeenv = [](std::string_view name) -> std::string_view {
+        const auto env = getenv(name.data());
+        return env ? env : ""sv;
+    };
+    const fs::path homedir{safeenv("HOME")};
+    auto localdir = homedir / ".avp"sv;
 
-    tmp = NULL;
 
     /*
 	1. $AVP_DATA overrides all
@@ -618,89 +405,84 @@ void InitGameDirectories(char *argv0)
 	*/
 
     /* 1. $AVP_DATA */
-    gamedir = getenv("AVP_DATA");
+    fs::path gamedir{safeenv("AVP_DATA")};
 
     /* $AVP_DATA overrides all, so no check */
 
-    if (gamedir == NULL) {
+    if (gamedir.empty()) {
         /* 2. executable path from argv[0] */
-        tmp = strdup(argv0);
+        fs::path exePath{argv0};
 
-        if (tmp == NULL) {
+        if (exePath.empty()) {
             /* ... */
-            fprintf(stderr, "InitGameDirectories failure\n");
-            exit(EXIT_FAILURE);
+            std::println(stderr, "InitGameDirectories failure");
+            std::abort();
         }
 
-        gamedir = strrchr(tmp, '/');
+        gamedir = exePath.parent_path();
 
-        if (gamedir) {
-            *gamedir = 0;
-            gamedir = tmp;
+        if (!gamedir.empty()) {
+            // gamedir = tmp;
 
             if (!check_game_directory(gamedir)) {
-                gamedir = NULL;
+                gamedir.clear();
             }
         }
     }
 
-    if (gamedir == NULL) {
+    if (gamedir.empty()) {
         /* 3. realpath of executable path from argv[0] */
 
-        assert(tmp != NULL);
-
-        gamedir = realpath(tmp, tmppath);
+        try {
+            gamedir = fs::read_symlink(argv0).parent_path();
+        } catch (const std::filesystem::filesystem_error  &err) {
+            std::println(stderr, "Error {}", err.what());
+        }
 
         if (!check_game_directory(gamedir)) {
-            gamedir = NULL;
+            gamedir.clear();
         }
     }
 
-    if (gamedir == NULL) {
-        /* 4. $PATH */
-        path = getenv("PATH");
-        if (path) {
-            while (*path) {
-                len = strcspn(path, ":");
+    // if (gamedir.empty()) {
+    //     /* 4. $PATH */
+    //     std::abort();
+    //     // path = getenv("PATH");
+    //     // if (path) {
+    //     //     while (*path) {
+    //     //         len = strcspn(path, ":");
 
-                copylen = min(len, (size_t) (PATH_MAX - 1));
+    //     //         copylen = min(len, (size_t) (PATH_MAX - 1));
 
-                strncpy(tmppath, path, copylen);
-                tmppath[copylen] = 0;
+    //     //         strncpy(tmppath, path, copylen);
+    //     //         tmppath[copylen] = 0;
 
-                if (check_game_directory(tmppath)) {
-                    gamedir = tmppath;
-                    break;
-                }
+    //     //         if (check_game_directory(tmppath)) {
+    //     //             gamedir = tmppath;
+    //     //             break;
+    //     //         }
 
-                path += len;
-                path += strspn(path, ":");
-            }
-        }
-    }
+    //     //         path += len;
+    //     //         path += strspn(path, ":");
+    //     //     }
+    //     // }
+    // }
 
-    if (gamedir == NULL) {
+    if (gamedir.empty()) {
         /* 5. current directory */
-        gamedir = ".";
+        gamedir = fs::current_path();
     }
-
-    assert(gamedir != NULL);
 
     /* last chance sanity check */
     if (!check_game_directory(gamedir)) {
-        fprintf(stderr, "Unable to find the AvP gamedata.\n");
-        fprintf(stderr, "The directory last examined was: %s\n", gamedir);
-        fprintf(stderr, "Has the game been installed and\n");
-        fprintf(stderr, "are all game files lowercase?\n");
-        exit(EXIT_FAILURE);
+        std::println(stderr, "Unable to find the AvP gamedata.");
+        std::println(stderr, "The directory last examined was: {}", gamedir.string());
+        std::println(stderr, "Has the game been installed and");
+        std::println(stderr, "are all game files lowercase?");
+        std::abort();
     }
 
     SetGameDirectories(localdir, gamedir);
-
-    free(localdir);
-    if (tmp) {
-        free(tmp);
-    }
 
     /* delete some log files */
     DeleteGameFile("dx_error.log");
@@ -715,7 +497,7 @@ int main(int argc, char *argv[])
 
     SetGameDirectories("tmp1", "tmp2");
 
-    fp = OpenGameFile("tester", FILEMODE_WRITEONLY, FILETYPE_CONFIG);
+    fp = OpenGameFile("tester", FILEMODE::WRITEONLY, FILETYPE::CONFIG);
 
     fputs("test\n", fp);
 
@@ -725,15 +507,15 @@ int main(int argc, char *argv[])
     CreateGameDirectory("tester2");
     CreateGameDirectory("tester2/blah");
 
-    fp = OpenGameFile("tester", FILEMODE_READONLY, FILETYPE_OPTIONAL);
+    fp = OpenGameFile("tester", FILEMODE::READONLY, FILETYPE::OPTIONAL);
     printf("Read: %s", fgets(buf, 60, fp));
     CloseGameFile(fp);
 
-    fp = OpenGameFile("tester", FILEMODE_READONLY, FILETYPE_CONFIG);
+    fp = OpenGameFile("tester", FILEMODE::READONLY, FILETYPE::CONFIG);
     printf("Read: %s", fgets(buf, 60, fp));
     CloseGameFile(fp);
 
-    dir = OpenGameDirectory(".", "*", FILETYPE_OPTIONAL);
+    dir = OpenGameDirectory(".", "*", FILETYPE::OPTIONAL);
     if (dir != NULL) {
         GameDirectoryFile *gd;
 

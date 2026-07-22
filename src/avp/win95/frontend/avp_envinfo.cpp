@@ -12133,7 +12133,7 @@ static BOOL DoesNamedLevelExist(const char *level_name)
 
     sprintf(filename, "avp_rifs/%s.rif", level_name);
 
-    file_handle = OpenGameFile(filename, FILEMODE_READONLY, FILETYPE_PERM);
+    file_handle = OpenGameFile(filename, FILEMODE::READONLY, FILETYPE::PERM);
     if (file_handle == NULL)
         return FALSE;
     fclose(file_handle);

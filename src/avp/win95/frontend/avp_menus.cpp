@@ -1754,8 +1754,8 @@ static void RenderHelpString()
 
 static void RenderConfigurationDescriptionString()
 {
-    const char *text = GetMultiplayerConfigDescription(AvPMenus.CurrentlySelectedElement);
-    if (text) {
+    const auto text = GetMultiplayerConfigDescription(AvPMenus.CurrentlySelectedElement);
+    if (!text.empty()) {
         RECT area;
         //draw the text at the bottom of the screen
         //now at the top.
@@ -1765,7 +1765,7 @@ static void RenderConfigurationDescriptionString()
         area.top = 0;
         area.bottom = 60;
 
-        RenderSmallFontString_Wrapped(text, &area, BRIGHTNESS_OF_HIGHLIGHTED_ELEMENT, 0, 0);
+        RenderSmallFontString_Wrapped(text.c_str(), &area, BRIGHTNESS_OF_HIGHLIGHTED_ELEMENT, 0, 0);
     }
 }
 
@@ -3909,7 +3909,7 @@ void DisplayVideoModeUnavailableScreen(void)
 void CheckForCredits(void)
 {
 #if 0
-	FILE *fp = OpenGameFile("credits.txt", FILEMODE_READONLY, FILETYPE_PERM);
+	FILE *fp = OpenGameFile("credits.txt", FILEMODE::READONLY, FILETYPE::PERM);
 	
 	if (!fp)
 	{
@@ -4847,13 +4847,11 @@ static void GetHeaderInfoForSaveSlot(SAVE_SLOT_HEADER *save_slot, const GameDire
 {
     LEVEL_SAVE_BLOCK block;
     unsigned int file_size;
-    unsigned char filename[100];
     FILE *file;
 
     save_slot->SlotUsed = 0;
 
-    sprintf(filename, "%s%s", USER_PROFILES_PATH, gdf->filename);
-    file = OpenGameFile(filename, FILEMODE_READONLY, FILETYPE_CONFIG);
+    file = OpenGameFile(USER_PROFILES_PATH + gdf->filename, FILEMODE::READONLY, FILETYPE::CONFIG);
 
     if (file == NULL) {
         //failed to load (probably doesn't exist)
@@ -4899,23 +4897,23 @@ static void GetHeaderInfoForSaveSlot(SAVE_SLOT_HEADER *save_slot, const GameDire
 
 void ScanSaveSlots(void)
 {
-    unsigned char pattern[100], *ptr;
+    char pattern[100], *ptr;
     int i;
     void *gd;
     GameDirectoryFile *gdf;
 
     sprintf(pattern, "%s_?.sav", UserProfilePtr->Name);
-    gd = OpenGameDirectory(USER_PROFILES_PATH, pattern, FILETYPE_CONFIG);
+    gd = OpenGameDirectory(USER_PROFILES_PATH, (const char*)pattern, FILETYPE::CONFIG);
     if (gd == NULL)
         return;
 
     while ((gdf = ScanGameDirectory(gd)) != NULL) {
-        if ((gdf->attr & FILEATTR_DIRECTORY) != 0)
+        if (int(gdf->attr & FILEATTR::DIRECTORY) != 0)
             continue;
-        if ((gdf->attr & FILEATTR_READABLE) == 0)
+        if (int(gdf->attr & FILEATTR::READABLE) == 0)
             continue;
 
-        ptr = strrchr(gdf->filename, '.');
+        ptr = strrchr(gdf->filename.data(), '.');
         if (ptr == NULL)
             continue;
         ptr--;

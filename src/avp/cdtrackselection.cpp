@@ -93,7 +93,7 @@ void LoadCDTrackList()
     //clear out the old list first
     EmptyCDTrackList();
 
-    FILE *file = OpenGameFile(CDTrackFileName, FILEMODE_READONLY, FILETYPE_OPTIONAL);
+    FILE *file = OpenGameFile(CDTrackFileName, FILEMODE::READONLY, FILETYPE::OPTIONAL);
 
     if (file == NULL) {
         LOGDXFMT(("Failed to open %s", CDTrackFileName));

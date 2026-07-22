@@ -1,3 +1,5 @@
+#include <fstream>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -1264,7 +1266,7 @@ int LoadWavFile(int soundNum, char *wavFileName)
     ALushort freq, format;
     ALvoid *data, *bufferPtr;
     int len, seclen;
-    FILE *fp;
+    // FILE *fp;
     const char *wavname;
 
 #ifdef OPENAL_DEBUG
@@ -1276,7 +1278,7 @@ int LoadWavFile(int soundNum, char *wavFileName)
     }
 
     /* TODO: Perm for now, until custom rifs can be loaded in ~/.avp */
-    fp = OpenGameFile(wavFileName, FILEMODE_READONLY, FILETYPE_PERM);
+    auto fp = OpenGameFile(wavFileName, FILEMODE::READONLY, FILETYPE::PERM);
     if (fp == NULL) {
         return 0;
     }

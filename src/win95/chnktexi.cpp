@@ -110,11 +110,11 @@ static inline bool IsFileInFastFile(char const *pszFileName)
 
 static bool DoesFileExist(char const *pszFileName)
 {
-    unsigned int attr = GetGameFileAttributes(pszFileName, FILETYPE_PERM);
+    const auto attr = GetGameFileAttributes(pszFileName, FILETYPE::PERM);
 
-    if ((attr & FILEATTR_DIRECTORY) != 0)
+    if (int(attr & FILEATTR::DIRECTORY) != 0)
         return false;
-    if ((attr & FILEATTR_READABLE) == 0)
+    if (int(attr & FILEATTR::READABLE) == 0)
         return false;
     return true;
 }

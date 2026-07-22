@@ -2750,7 +2750,7 @@ void avp_undo_rif_load(RIFFHANDLE h)
 RIFFHANDLE avp_load_rif(const char *fname)
 {
     //see if there is a local copy of the rif file
-    FILE *rifFile = OpenGameFile(fname, FILEMODE_READONLY, FILETYPE_PERM);
+    FILE *rifFile = OpenGameFile(fname, FILEMODE::READONLY, FILETYPE::PERM);
 
     /* TODO: Let's find a better method */
     if (!rifFile && AvpCDPath) {
@@ -2767,7 +2767,7 @@ RIFFHANDLE avp_load_rif(const char *fname)
 RIFFHANDLE avp_load_rif_non_env(const char *fname)
 {
     //see if there is a local copy of the rif file
-    FILE *rifFile = OpenGameFile(fname, FILEMODE_READONLY, FILETYPE_PERM);
+    FILE *rifFile = OpenGameFile(fname, FILEMODE::READONLY, FILETYPE::PERM);
 
     /* TODO: Let's find a better method */
     if (!rifFile && AvpCDPath) {

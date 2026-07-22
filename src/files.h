@@ -1,38 +1,65 @@
-#ifndef FILES_H
-#define FILES_H
+#pragma once
+
+#include <filesystem>
+#include <string_view>
 
 #include <stdio.h>
 #include <time.h>
 
-#define FILEMODE_READONLY 0x01
-#define FILEMODE_WRITEONLY 0x02
-#define FILEMODE_READWRITE 0x04
-#define FILEMODE_APPEND 0x08
+enum class FILEMODE {
+    READONLY = 0x01,
+    WRITEONLY = 0x02,
+    READWRITE = 0x04,
+    APPEND = 0x08
+};
 
-#define FILETYPE_PERM 0x10
-#define FILETYPE_OPTIONAL 0x20
-#define FILETYPE_CONFIG 0x40
+enum class FILETYPE {
+    PERM = 0x10,
+    OPTIONAL = 0x20,
+    CONFIG = 0x40
+};
 
-#define FILEATTR_DIRECTORY 0x0100
-#define FILEATTR_READABLE 0x0200
-#define FILEATTR_WRITABLE 0x0400
+enum class FILEATTR {
+    NONE = 0x0,
+    DIRECTORY = 0x0100,
+    READABLE = 0x0200,
+    WRITABLE = 0x0400
+};
+
+inline FILEATTR operator|(FILEATTR left, FILEATTR right)
+{
+    return FILEATTR(left | right);
+}
+
+inline FILEATTR operator|=(FILEATTR left, FILEATTR right)
+{
+    return left | right;
+}
+
+inline FILEATTR operator&(FILEATTR left, FILEATTR right)
+{
+    return FILEATTR(left & right);
+}
+
+inline FILEATTR operator&=(FILEATTR left, FILEATTR right)
+{
+    return left & right;
+}
 
 typedef struct GameDirectoryFile
 {
-    char *filename;
-    int attr;
+    std::string filename;
+    FILEATTR attr;
     time_t timestamp;
 } GameDirectoryFile;
 
-int SetGameDirectories(const char *local, const char *global);
-FILE *OpenGameFile(const char *filename, int mode, int type);
+int SetGameDirectories(const std::filesystem::path &local, const std::filesystem::path &global);
+FILE *OpenGameFile(const std::filesystem::path &filename, FILEMODE mode, FILETYPE type);
 int CloseGameFile(FILE *pfd);
-int GetGameFileAttributes(const char *filename, int type);
-int DeleteGameFile(const char *filename);
-int CreateGameDirectory(const char *dirname);
-void *OpenGameDirectory(const char *dirname, const char *pattern, int type);
+FILEATTR GetGameFileAttributes(const std::filesystem::path &filename, FILETYPE type);
+bool DeleteGameFile(const std::filesystem::path &filename);
+bool CreateGameDirectory(const std::filesystem::path &dirname);
+void *OpenGameDirectory(const std::filesystem::path &dirname, const std::string &pattern, FILETYPE type);
 GameDirectoryFile *ScanGameDirectory(void *dir);
 int CloseGameDirectory(void *dir);
-void InitGameDirectories(char *argv0);
-
-#endif
+void InitGameDirectories(const std::string_view argv0);

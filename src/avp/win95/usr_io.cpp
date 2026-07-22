@@ -1513,7 +1513,7 @@ void SaveAKeyConfiguration(char *Filename)
 
 void SaveDefaultPrimaryConfigs(void)
 {
-    FILE *file = OpenGameFile("default.cfg", FILEMODE_WRITEONLY, FILETYPE_CONFIG);
+    FILE *file = OpenGameFile("default.cfg", FILEMODE::WRITEONLY, FILETYPE::CONFIG);
     if (!file)
         return;
 
@@ -1525,7 +1525,7 @@ void SaveDefaultPrimaryConfigs(void)
 }
 void LoadDefaultPrimaryConfigs(void)
 {
-    FILE *file = OpenGameFile("default.cfg", FILEMODE_READONLY, FILETYPE_CONFIG);
+    FILE *file = OpenGameFile("default.cfg", FILEMODE::READONLY, FILETYPE::CONFIG);
     if (!file)
         return;
 

@@ -274,7 +274,7 @@ FFError FFHeaderI::Read(char const *_filename)
         strcpy(filename, _filename);
     }
 
-    FILE *h = OpenGameFile(filename, FILEMODE_READONLY, FILETYPE_PERM);
+    FILE *h = OpenGameFile(filename, FILEMODE::READONLY, FILETYPE::PERM);
 
     if (h == NULL) {
         ReportError(filename);

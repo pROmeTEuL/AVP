@@ -111,7 +111,7 @@ void ScreenShot()
     for (i = 0; i < 100; i++) {
         Name[length] = i / 10 + '0';
         Name[length + 1] = (i % 10) + '0';
-        FILE *tempfp = OpenGameFile(Name, FILEMODE_READONLY, FILETYPE_CONFIG);
+        FILE *tempfp = OpenGameFile(Name, FILEMODE::READONLY, FILETYPE::CONFIG);
         if (!tempfp)
             break;
         else {
@@ -121,7 +121,7 @@ void ScreenShot()
     if (i == 100)
         return;
 
-    FILE *fp = OpenGameFile(Name, FILEMODE_WRITEONLY, FILETYPE_CONFIG);
+    FILE *fp = OpenGameFile(Name, FILEMODE::WRITEONLY, FILETYPE::CONFIG);
     if (!fp) {
         return;
     }
