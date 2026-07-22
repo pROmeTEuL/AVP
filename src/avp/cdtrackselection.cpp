@@ -10,30 +10,28 @@
 
 #include "list_tem.hpp"
 
+#include <vector>
+
 //lists of tracks for each level
-List<int> LevelCDTracks[AVP_ENVIRONMENT_END_OF_LIST];
+std::vector<int> LevelCDTracks[AVP_ENVIRONMENT_END_OF_LIST];
 
 //lists of tracks for each species in multiplayer games
-List<int> MultiplayerCDTracks[3];
+std::vector<int> MultiplayerCDTracks[3];
 
 static int LastTrackChosen = -1;
 
 void EmptyCDTrackList()
 {
-    for (int i = 0; i < AVP_ENVIRONMENT_END_OF_LIST; i++) {
-        while (LevelCDTracks[i].size())
-            LevelCDTracks[i].delete_first_entry();
-    }
+    for (int i = 0; i < AVP_ENVIRONMENT_END_OF_LIST; i++)
+        LevelCDTracks[i].clear();
 
-    for (int i = 0; i < 3; i++) {
-        while (MultiplayerCDTracks[i].size())
-            MultiplayerCDTracks[i].delete_first_entry();
-    }
+    for (int i = 0; i < 3; i++)
+        MultiplayerCDTracks[i].clear();
 }
 
 #define CDTrackFileName "cd tracks.txt"
 
-static void ExtractTracksForLevel(char *&buffer, List<int> &track_list)
+static void ExtractTracksForLevel(char *&buffer, std::vector<int> &track_list)
 {
     //search for a line starting with a #
     while (*buffer) {
@@ -65,7 +63,7 @@ static void ExtractTracksForLevel(char *&buffer, List<int> &track_list)
             sscanf(buffer, "%d", &track);
 
             if (track >= 0) {
-                track_list.add_entry(track);
+                track_list.push_back(track);
             }
 
             //skip to the next non numerical character
@@ -129,10 +127,10 @@ void LoadCDTrackList()
 
 static unsigned int TrackSelectCounter = 0;
 
-static BOOL PickCDTrack(List<int> &track_list)
+static bool PickCDTrack(std::vector<int> &track_list)
 {
     //make sure we have some tracks in the list
-    if (!track_list.size())
+    if (track_list.empty())
         return FALSE;
 
     //pick the next track in the list
@@ -162,7 +160,9 @@ void CheckCDAndChooseTrackIfNeeded()
             return;
 
         //have changed character type , is the current track in the list for this character type
-        if (MultiplayerCDTracks[AvP.PlayerType].contains(LastTrackChosen))
+        if (std::find(MultiplayerCDTracks[AvP.PlayerType].begin(),
+                      MultiplayerCDTracks[AvP.PlayerType].end(),
+                      LastTrackChosen) != MultiplayerCDTracks[AvP.PlayerType].end())
             return;
 
         //Lets choose a new track then

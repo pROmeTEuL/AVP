@@ -2,6 +2,7 @@
 #define _included_ffstdio_h_
 
 #include <stdio.h>
+#include <memory>
 
 #define FFF_EOF 0x0001
 #define FFF_ERR 0x0002
@@ -24,7 +25,7 @@ extern void ffKill(void); /* only need to call this to prevent misreported memor
 
 /* only mode supported is "rb" */
 extern int ffclearerr(FFILE *fp);
-extern int ffclose(FFILE *fp);
+extern int ffclose(FFILE* fp);
 extern int ffcloseall(void);
 extern int ffclose_almost_all(void);
 extern int ffeof(FFILE *fp);

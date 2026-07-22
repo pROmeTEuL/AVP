@@ -15,6 +15,9 @@
 #pragma once
 #endif
 
+#include <memory>
+#include <vector>
+
 #ifdef __cplusplus
 #ifndef _scstring
 #include "scstring.hpp"
@@ -106,10 +109,12 @@ public:
 public:
     static int bEcho;
 
+#warning it was private originally but now it's public
+    ~KeyBinding();
+
 private:
     // Private ctor/dtor; to be called only by static fns of the class:
     KeyBinding(BindableKey theKey_ToUse, SCString *pSCString_ToBind);
-    ~KeyBinding();
 
 #if 0
 		static OurBool bGetKeyForString
@@ -142,7 +147,7 @@ private:
     SCString *pSCString_ToOutput;
 
     // Maintain a static list of all of objects of the class:
-    static List<KeyBinding *> List_pKeyBindings;
+    static std::vector<std::unique_ptr<KeyBinding>> List_pKeyBindings;
 
     // A list that ought to be local to Process_WM_KEYDOWN()
     // and the Maintain() functions

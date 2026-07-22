@@ -6,6 +6,8 @@
 #include "dxlog.h"
 #include "system.h"
 
+#include <vector>
+
 class FFileDesc
 {
 private:
@@ -137,13 +139,13 @@ int FFileDesc::operator==(FFileDesc const &ffd) const
     return !_stricmp(file_name ? file_name : "", ffd.file_name ? ffd.file_name : "");
 }
 
-static List<FFileDesc> fdesclist;
+static std::vector<FFileDesc> fdesclist;
 
-static List<FFileDesc> floadeddesclist;
+static std::vector<FFileDesc> floadeddesclist;
 
-static List<FFHeaderI *> fflist;
+static std::vector<std::unique_ptr<FFHeaderI>> fflist;
 
-static List<FFILE *> openlist;
+static std::vector<std::unique_ptr<FFILE>> openlist;
 
 int ffInit(char const *infofilename, char const *ffpath)
 {
@@ -151,8 +153,7 @@ int ffInit(char const *infofilename, char const *ffpath)
     if (!fp)
         return 0;
 
-    while (fdesclist.size())
-        fdesclist.delete_first_entry();
+    fdesclist.clear();
 
     // read data
     char buf[512];
@@ -164,7 +165,7 @@ int ffInit(char const *infofilename, char const *ffpath)
         //mainly so as to avoid using blank lines
 
         if ((buf[0] >= 'a' && buf[0] <= 'z') || (buf[0] >= 'A' && buf[0] <= 'Z')) {
-            fdesclist.add_entry(FFileDesc(buf, ffpath));
+            fdesclist.push_back(FFileDesc(buf, ffpath));
         }
     } while (fgets(buf, sizeof buf, fp));
 
@@ -175,6 +176,7 @@ int ffInit(char const *infofilename, char const *ffpath)
 
 void ffKill(void)
 {
+#if 0
 #define EMPTY_LIST(list) \
     while ((list).size()) \
         (list).delete_first_entry();
@@ -183,33 +185,30 @@ void ffKill(void)
         delete (list).first_entry(); \
         (list).delete_first_entry(); \
     }
-
-    EMPTY_LIST(fdesclist)
-    EMPTY_LIST(floadeddesclist)
-    EMPTY_POINTER_LIST(fflist)
-    EMPTY_POINTER_LIST(openlist)
+#endif
+    // auto emptyPointerVector = [](auto &vec) {
+    //     while (!vec.empty()) {
+    //         delete *vec.begin();
+    //         vec.erase(vec.begin());
+    //     }
+    // };
+    fdesclist.clear();
+    floadeddesclist.clear();
+    fflist.clear();
+    openlist.clear();
 }
 
 int ffcloseall(void)
 {
     int cnt = openlist.size();
     LOGDXFMT(("Unloading all fastfiles: %d subfile(s) still open", cnt));
-    for (LIF<FFILE *> i_open(&openlist); !i_open.done();) {
-        FFILE *fp = i_open();
-        if (fp->flag & FFF_ALOC)
-            free((void *) fp->data_start);
-        fp->data_start = 0;
-        fp->data_ptr = 0;
-        delete fp;
-        i_open.delete_current();
+    for (auto &i_open : openlist) {
+        if (i_open->flag & FFF_ALOC)
+            free((void *) i_open->data_start);
     }
-    while (fflist.size()) {
-        delete fflist.first_entry();
-        fflist.delete_first_entry();
-    }
-    while (floadeddesclist.size()) {
-        floadeddesclist.delete_first_entry();
-    }
+    openlist.clear();
+    fflist.clear();
+    floadeddesclist.clear();
     return cnt;
 }
 
@@ -218,30 +217,24 @@ int ffclose_almost_all(void)
     //unload all fastfiles except for the common ones
     int cnt = openlist.size();
     LOGDXFMT(("Unloading almost all fastfiles: %d subfile(s) still open", cnt));
-    for (LIF<FFILE *> i_open(&openlist); !i_open.done();) {
-        FFILE *fp = i_open();
-        if (fp->flag & FFF_ALOC)
-            free((void *) fp->data_start);
-        fp->data_start = 0;
-        fp->data_ptr = 0;
-        delete fp;
-        i_open.delete_current();
+    for (auto &i_open : openlist) {
+        if (i_open->flag & FFF_ALOC)
+            free((void *) i_open->data_start);
+    }
+    openlist.clear();
+
+    for (auto fflif = fflist.begin(); fflif != fflist.end();) {
+        if ((*fflif)->ShouldBeKept())
+            ++fflif;
+        else
+            fflif = fflist.erase(fflif);
     }
 
-    for (LIF<FFHeaderI *> fflif(&fflist); !fflif.done();) {
-        if (fflif()->ShouldBeKept()) {
-            fflif.next();
+    for (auto desc_lif = floadeddesclist.begin(); desc_lif != floadeddesclist.end();) {
+        if ((*desc_lif).ShouldBeKept()) {
+            ++desc_lif;
         } else {
-            delete fflif();
-            fflif.delete_current();
-        }
-    }
-
-    for (LIF<FFileDesc> desc_lif(&floadeddesclist); !desc_lif.done();) {
-        if (desc_lif().ShouldBeKept()) {
-            desc_lif.next();
-        } else {
-            desc_lif.delete_current();
+            desc_lif = floadeddesclist.erase(desc_lif);
         }
     }
 
@@ -249,14 +242,15 @@ int ffclose_almost_all(void)
     return cnt;
 }
 
-int ffclose(FFILE *fp)
+int ffclose(FFILE* fp)
 {
+// #error verify me!
     if (fp->flag & FFF_ALOC)
         free((void *) fp->data_start);
-    fp->data_start = 0;
-    fp->data_ptr = 0;
-    openlist.delete_entry(fp);
-    delete fp;
+    auto it = std::ranges::find_if(openlist, [&](const std::unique_ptr<FFILE> &f){
+        return f.get() == fp;
+    });
+    openlist.erase(it);
     return 0;
 }
 
@@ -296,19 +290,24 @@ void const *ffreadbuf(char const *filename, size_t *p_len)
 {
     void const *data;
 
-    for (LIF<FFHeaderI *> i_ff(&fflist); !i_ff.done(); i_ff.next()) {
-        data = i_ff()->FindFile(filename, p_len);
+    for (auto &i_ff : fflist) {
+        data = i_ff->FindFile(filename, p_len);
         if (data)
             return data;
     }
 
     // try loading another big catfile
 
-    for (LIF<FFileDesc> i_fdesc(&fdesclist); !i_fdesc.done(); i_fdesc.next()) {
-        if (i_fdesc().CouldInclude(filename) && !floadeddesclist.contains(i_fdesc())) {
-            floadeddesclist.add_entry(i_fdesc());
-            FFHeaderI *newffh = i_fdesc().Load();
-            fflist.add_entry(newffh);
+    for (auto &i_fdesc : fdesclist) {
+        if (i_fdesc.CouldInclude(filename) && std::find(floadeddesclist.begin()
+                                                        , floadeddesclist.end()
+                                                        , i_fdesc) == floadeddesclist.end()) {
+            floadeddesclist.push_back(i_fdesc);
+// #error verify me!
+            // FFHeaderI *newffh = i_fdesc.Load();
+            // fflist.push_back(newffh);
+            auto newffh = i_fdesc.Load();
+            fflist.push_back(std::move(std::unique_ptr<FFHeaderI>(newffh)));
 
             data = newffh->FindFile(filename, p_len);
             if (data) {
@@ -329,6 +328,7 @@ FFILE *ffopen(char const *filename, char const *mode)
     void const *data = ffreadbuf(filename, &length);
 
     if (data) {
+// #error verify me!
         FFILE *fp = new FFILE;
         fp->data_start = data;
         fp->data_ptr = (unsigned char const *) data;
@@ -336,7 +336,7 @@ FFILE *ffopen(char const *filename, char const *mode)
         fp->pos = 0;
         fp->remaining = length;
         fp->flag = 0;
-        openlist.add_entry(fp);
+        openlist.emplace_back(fp);
         return fp;
     }
 
