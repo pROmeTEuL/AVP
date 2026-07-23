@@ -961,10 +961,11 @@ ConsoleSymbol *TextInputState ::GetNxtMatchingCompletion(void) const
 
         while (1) {
             // Advance to next entry (in a circular fashion)
-            if (pConsoleSym_I == ConsoleSymbol ::List_pConsoleSym.last_entry()) {
-                pConsoleSym_I = ConsoleSymbol ::List_pConsoleSym.first_entry();
+            if (pConsoleSym_I == ConsoleSymbol::List_pConsoleSym.back()) {
+                pConsoleSym_I = ConsoleSymbol::List_pConsoleSym.front();
             } else {
-                pConsoleSym_I = ConsoleSymbol ::List_pConsoleSym.next_entry(pConsoleSym_I);
+                auto it = std::ranges::find(ConsoleSymbol::List_pConsoleSym, pConsoleSym_I);
+                pConsoleSym_I = *(++it);
             }
 
             // Break if you've wrapped around:
@@ -983,19 +984,11 @@ ConsoleSymbol *TextInputState ::GetNxtMatchingCompletion(void) const
 
     } else {
         // Find first matching one:
-        CLIF<ConsoleSymbol *> oi(&ConsoleSymbol ::List_pConsoleSym);
-
-        while (1) {
-            if (oi.done()) {
+        for(const auto oi : ConsoleSymbol ::List_pConsoleSym) {
+            if (oi->ThisIsACheat ? bManualMatch(oi->GetpSCString()->pProjCh())
+                                   : bManualMatchInsensitive(oi->GetpSCString()->pProjCh())) {
+                pConsoleSym_Return = oi;
                 break;
-            }
-
-            if (oi()->ThisIsACheat ? bManualMatch(oi()->GetpSCString()->pProjCh())
-                                   : bManualMatchInsensitive(oi()->GetpSCString()->pProjCh())) {
-                pConsoleSym_Return = oi();
-                break;
-            } else {
-                oi.next();
             }
         }
     }

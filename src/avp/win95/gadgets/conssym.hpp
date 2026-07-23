@@ -15,6 +15,8 @@
 #pragma once
 #endif
 
+#include <vector>
+
 #ifndef _scstring
 #include "scstring.hpp"
 #endif
@@ -51,7 +53,7 @@ public:
     SCString *GetpSCString(void) const { return pSCString_Symbol; }
 
 private:
-    static List<ConsoleSymbol *> List_pConsoleSym;
+    static std::vector<ConsoleSymbol *> List_pConsoleSym;
 
 public:
     virtual ~ConsoleSymbol();

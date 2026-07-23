@@ -38,7 +38,7 @@
 #endif
 
 /* Exported globals ************************************************/
-/*static*/ List<ConsoleSymbol *> ConsoleSymbol ::List_pConsoleSym;
+/*static*/ std::vector<ConsoleSymbol *> ConsoleSymbol ::List_pConsoleSym;
 
 /* Internal type definitions ***************************************/
 
@@ -56,7 +56,7 @@ ConsoleSymbol ::ConsoleSymbol(ProjChar *pProjCh_ToUse)
                        // constructor for the SCString adds the required reference
       )
 {
-    List_pConsoleSym.add_entry(this);
+    List_pConsoleSym.push_back(this);
 }
 
 ConsoleSymbol ::~ConsoleSymbol()
@@ -64,7 +64,9 @@ ConsoleSymbol ::~ConsoleSymbol()
     pSCString_Symbol->R_Release();
 
     // remove from the list
-    List_pConsoleSym.delete_entry(this);
+    auto it = std::ranges::find(List_pConsoleSym, this);
+    if (it != List_pConsoleSym.end())
+        List_pConsoleSym.erase(it);
 }
 
 /* Internal function definitions ***********************************/
