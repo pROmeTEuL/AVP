@@ -13,6 +13,8 @@
 #include "scstring.hpp"
 #endif
 
+#include <vector>
+
 /* Version settings *****************************************************/
 
 /* Constants  ***********************************************************/
@@ -57,7 +59,7 @@ private:
     SCString *pSCString_Description_Val;
     // a string of the form: "<shortform>" -> "<longform>"
 
-    static List<TextExpansion *> List_pTextExp;
+    static std::vector<TextExpansion *> List_pTextExp;
 
 public:
     ~TextExpansion();

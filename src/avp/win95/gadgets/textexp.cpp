@@ -41,7 +41,7 @@
 #endif
 
 /* Exported globals ************************************************/
-/*static*/ List<TextExpansion *> TextExpansion ::List_pTextExp;
+/*static*/ std::vector<TextExpansion *> TextExpansion ::List_pTextExp;
 /*static*/ int TextExpansion ::bVerbose = false;
 
 /* Internal type definitions ***************************************/
@@ -60,7 +60,9 @@ TextExpansion ::~TextExpansion()
 
     pSCString_Description_Val->R_Release();
 
-    List_pTextExp.delete_entry(this);
+    auto it = std::ranges::find(List_pTextExp, this);
+    if (it != List_pTextExp.end())
+        List_pTextExp.erase(it);
 }
 
 void TextExpansion ::Display(void)
@@ -178,11 +180,11 @@ void TextExpansion ::Display(void)
 
             TextExpansion *pTextExp_Found = NULL;
 
-            for (LIF<TextExpansion *> oi(&List_pTextExp); (!(oi.done() || pTextExp_Found));
-                 oi.next()) {
+            for (auto oi : List_pTextExp) {
                 if (STRUTIL_SC_Strequal(
-                        oi()->pSCString_Short_Val->pProjCh(), pSCString_Compare->pProjCh())) {
-                    pTextExp_Found = oi();
+                        oi->pSCString_Short_Val->pProjCh(), pSCString_Compare->pProjCh())) {
+                    pTextExp_Found = oi;
+                    break;
                 }
             }
 
@@ -238,8 +240,8 @@ void TextExpansion ::Display(void)
 
 /*static*/ void TextExpansion ::ListAll(void)
 {
-    for (LIF<TextExpansion *> oi(&List_pTextExp); !oi.done(); oi.next()) {
-        oi()->Display();
+    for (auto oi : List_pTextExp) {
+        oi->Display();
     }
 }
 
@@ -268,7 +270,7 @@ TextExpansion ::TextExpansion(SCString *pSCString_Short, SCString *pSCString_Exp
         pSCString_Temp1->R_Release();
     }
 
-    List_pTextExp.add_entry(this);
+    List_pTextExp.push_back(this);
 }
 
 /*static*/ void TextExpansion ::TryToRemoveExpansion(SCString *pSCString_Word)
@@ -286,15 +288,15 @@ TextExpansion ::TextExpansion(SCString *pSCString_Short, SCString *pSCString_Exp
 
         // Find the one to be removed; removed later to avoid confusing the
         // list iteration code
-        for (LIF<TextExpansion *> oi(&List_pTextExp); (!(oi.done() || pTextExp_ToKill)); oi.next()) {
-            if (STRUTIL_SC_Strequal(oi()->pSCString_Short_Val->pProjCh(), pSCString_Word->pProjCh())) {
-                pTextExp_ToKill = oi();
-                continue;
+        for (auto oi : List_pTextExp) {
+            if (STRUTIL_SC_Strequal(oi->pSCString_Short_Val->pProjCh(), pSCString_Word->pProjCh())) {
+                pTextExp_ToKill = oi;
+                break;
             }
             if (STRUTIL_SC_Strequal(
-                    oi()->pSCString_Expansion_Val->pProjCh(), pSCString_Word->pProjCh())) {
-                pTextExp_ToKill = oi();
-                continue;
+                    oi->pSCString_Expansion_Val->pProjCh(), pSCString_Word->pProjCh())) {
+                pTextExp_ToKill = oi;
+                break;
             }
         }
 
