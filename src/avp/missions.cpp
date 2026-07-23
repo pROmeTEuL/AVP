@@ -47,8 +47,8 @@ extern void MessageHistory_Add(enum TEXTSTRING_ID stringID);
 #endif
 
 /* Exported globals ************************************************/
-/*static*/ List<MissionHint *> MissionHint ::List_pMissionHint;
-/*static*/ List<MissionObjective *> MissionObjective ::List_pMissionObjective;
+/*static*/ std::vector<MissionHint*> MissionHint ::List_pMissionHint;
+/*static*/ std::vector<MissionObjective*> MissionObjective ::List_pMissionObjective;
 
 /* Internal type definitions ***************************************/
 
@@ -65,12 +65,14 @@ MissionHint ::MissionHint(enum TEXTSTRING_ID I_TextString_Description, OurBool b
     : I_TextString_Description_Val(I_TextString_Description)
     , bVisible_Val(bVisible_New)
 {
-    List_pMissionHint.add_entry(this);
+    List_pMissionHint.emplace_back(this);
 }
 
 MissionHint ::~MissionHint()
 {
-    List_pMissionHint.delete_entry(this);
+    auto it = std::ranges::find(List_pMissionHint, this);
+    if (it != List_pMissionHint.end())
+        List_pMissionHint.erase(it);
 }
 
 // Protected methods:
@@ -201,10 +203,11 @@ void MissionObjective ::OnTriggering(void)
             case MissionFX_UncoversNext:
                 // Reveal next objective in list...
                 {
-                    MissionObjective *pNext = (List_pMissionObjective.next_entry(this));
+                    auto pNext = std::ranges::find(List_pMissionObjective, this);
+                    ++pNext;
 
-                    if (pNext) {
-                        pNext->MakeVisible();
+                    if (*pNext) {
+                        (*pNext)->MakeVisible();
                     }
                 }
                 break;
@@ -227,13 +230,12 @@ void MissionObjective ::OnTriggering(void)
             }
         }
         //go through the list of mission alterations
-        for (LIF<MissionAlteration *> ma_lif(&List_pMissionAlteration); !ma_lif.done();
-             ma_lif.next()) {
-            if (ma_lif()->alteration_to_mission & MissionAlteration_MakeVisible) {
-                ma_lif()->mission_objective->MakeVisible();
+        for (auto &ma_lif : List_pMissionAlteration) {
+            if (ma_lif->alteration_to_mission & MissionAlteration_MakeVisible) {
+                ma_lif->mission_objective->MakeVisible();
             }
-            if (ma_lif()->alteration_to_mission & MissionAlteration_MakePossible) {
-                ma_lif()->mission_objective->MakePossible();
+            if (ma_lif->alteration_to_mission & MissionAlteration_MakePossible) {
+                ma_lif->mission_objective->MakePossible();
             }
         }
     }
@@ -325,17 +327,14 @@ MissionObjective ::MissionObjective(
     , MOS_Val(MOS_New)
     , initial_MOS_Val(MOS_New)
 {
-    List_pMissionObjective.add_entry(this);
+    List_pMissionObjective.emplace_back(this);
 }
 
 MissionObjective ::~MissionObjective()
 {
-    List_pMissionObjective.delete_entry(this);
-
-    while (List_pMissionAlteration.size()) {
-        delete List_pMissionAlteration.first_entry();
-        List_pMissionAlteration.delete_first_entry();
-    }
+    auto it = std::ranges::find(List_pMissionObjective, this);
+    if (it != List_pMissionObjective.end())
+        List_pMissionObjective.erase(it);
 }
 
 // private:
@@ -357,7 +356,7 @@ void MissionObjective::AddMissionAlteration(
     MissionAlteration *ma = new MissionAlteration;
     ma->mission_objective = mission_objective;
     ma->alteration_to_mission = alteration_to_mission;
-    List_pMissionAlteration.add_entry(ma);
+    List_pMissionAlteration.emplace_back(ma);
 }
 
 void MissionObjective::ResetMission()
@@ -428,11 +427,11 @@ void MissionObjective ::TestCompleteNext(void)
 {
     // Do it:
     {
-        MissionObjective *pMissionObjective = NULL;
+        MissionObjective *pMissionObjective = nullptr;
 
-        for (LIF<MissionObjective *> oi(&List_pMissionObjective); !oi.done(); oi.next()) {
-            if (!oi()->bAchieved()) {
-                pMissionObjective = oi();
+        for (auto oi : List_pMissionObjective) {
+            if (!oi->bAchieved()) {
+                pMissionObjective = oi;
                 break;
             }
         }

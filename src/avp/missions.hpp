@@ -11,6 +11,9 @@
 #pragma once
 #endif
 
+#include <memory>
+#include <vector>
+
 #ifndef _scstring
 #include "scstring.hpp"
 #endif
@@ -76,7 +79,7 @@ public:
 
     void SetVisibility(OurBool bVisible_New);
 
-    static const List<MissionHint *> &GetAll(void);
+    static const std::vector<MissionHint*> &GetAll(void);
 
     // Protected methods:
 protected:
@@ -87,7 +90,7 @@ private:
     enum TEXTSTRING_ID I_TextString_Description_Val;
     OurBool bVisible_Val;
 
-    static List<MissionHint *> List_pMissionHint;
+    static std::vector<MissionHint*> List_pMissionHint;
 
 public:
     virtual ~MissionHint();
@@ -105,7 +108,7 @@ inline void MissionHint::SetVisibility(OurBool bVisible_New)
 {
     bVisible_Val = bVisible_New;
 }
-inline /*static*/ const List<MissionHint *> &MissionHint::GetAll(void)
+inline /*static*/ const std::vector<MissionHint*> &MissionHint::GetAll(void)
 {
     return List_pMissionHint;
 }
@@ -187,9 +190,9 @@ private:
     enum MissionObjectiveState MOS_Val;
     enum MissionObjectiveState initial_MOS_Val;
 
-    static List<MissionObjective *> List_pMissionObjective;
+    static std::vector<MissionObjective*> List_pMissionObjective;
 
-    List<MissionAlteration *> List_pMissionAlteration;
+    std::vector<std::unique_ptr<MissionAlteration>> List_pMissionAlteration;
 
 public:
     int bAchievable(void) const
