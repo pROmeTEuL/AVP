@@ -18,6 +18,8 @@
 #include "pldnet.h"
 #include <time.h>
 
+#include <vector>
+
 static int LoadUserProfiles(void);
 
 static void EmptyUserProfilesList(void);
@@ -33,11 +35,11 @@ extern int IntroOutroMoviesAreActive;
 extern char MP_PlayerName[];
 extern int AutoWeaponChangeOn;
 
-List<AVP_USER_PROFILE *> UserProfilesList;
+std::vector<AVP_USER_PROFILE *> UserProfilesList;
 static AVP_USER_PROFILE DefaultUserProfile = {
     "",
 };
-static AVP_USER_PROFILE *CurrentUserProfilePtr;
+static auto CurrentUserProfilePtr = UserProfilesList.end();
 
 extern void ExamineSavedUserProfiles(void)
 {
@@ -71,25 +73,25 @@ extern int NumberOfUserProfiles(void)
 
 extern AVP_USER_PROFILE *GetFirstUserProfile(void)
 {
-    CurrentUserProfilePtr = UserProfilesList.first_entry();
-    return CurrentUserProfilePtr;
+    CurrentUserProfilePtr = UserProfilesList.begin();
+    return *CurrentUserProfilePtr;
 }
 
 extern AVP_USER_PROFILE *GetNextUserProfile(void)
 {
-    if (CurrentUserProfilePtr == UserProfilesList.last_entry()) {
-        CurrentUserProfilePtr = UserProfilesList.first_entry();
+    if (CurrentUserProfilePtr == UserProfilesList.end()) {
+        CurrentUserProfilePtr = UserProfilesList.begin();
     } else {
-        CurrentUserProfilePtr = UserProfilesList.next_entry(CurrentUserProfilePtr);
+        ++CurrentUserProfilePtr;
     }
-    return CurrentUserProfilePtr;
+    return *CurrentUserProfilePtr;
 }
 
 static void EmptyUserProfilesList(void)
 {
     while (UserProfilesList.size()) {
-        delete UserProfilesList.first_entry();
-        UserProfilesList.delete_first_entry();
+        delete UserProfilesList.front();
+        UserProfilesList.erase(UserProfilesList.begin());
     }
 }
 
@@ -149,12 +151,13 @@ static void InsertProfileIntoList(AVP_USER_PROFILE *profilePtr)
 
         for (int i = 0; i < UserProfilesList.size(); i++, profileInListPtr = GetNextUserProfile()) {
             if (ProfileIsMoreRecent(profilePtr, profileInListPtr)) {
-                UserProfilesList.add_entry_before(profilePtr, profileInListPtr);
+                auto pos = std::ranges::find(UserProfilesList, profileInListPtr);
+                UserProfilesList.insert(pos, profilePtr);
                 return;
             }
         }
     }
-    UserProfilesList.add_entry(profilePtr);
+    UserProfilesList.push_back(profilePtr);
 }
 
 static int ProfileIsMoreRecent(
