@@ -182,11 +182,9 @@ void TextReportGadget ::Render(
 
         // Iterate through the teletype gadgets:
         {
-            for (List_Iterator_Forward<TeletypeGadget *> oi(&(List_pTeletypeGadg_Displaying));
-                 !oi.done();
-                 oi.next()) {
+            for (auto oi : List_pTeletypeGadg_Displaying) {
 #if 1
-                oi()->Render(
+                oi->Render(
                     R2Pos_Teletype,     // const struct r2pos& R2Pos,
                     R2Rect_ClipForText, // const struct r2rect& R2Rect_Clip,
                     FixP_Alpha          // int FixP_Alpha
@@ -200,7 +198,7 @@ void TextReportGadget ::Render(
 
         // If the last one has finished; add a cheesy flashing cursor:
         if (List_pTeletypeGadg_Displaying.size() > 0) {
-            TeletypeGadget *pLast = List_pTeletypeGadg_Displaying.last_entry();
+            TeletypeGadget *pLast = List_pTeletypeGadg_Displaying.back();
 
             GLOBALASSERT(pLast);
 
@@ -290,11 +288,9 @@ TextReportGadget ::~TextReportGadget()
     {
 #if 1
         {
-            for (List_Iterator_Forward<TeletypeGadget *> oi(&(List_pTeletypeGadg_Displaying));
-                 !oi.done();
-                 oi.next()) {
+            for (auto oi : List_pTeletypeGadg_Displaying) {
                 // Delete the teletype objects:
-                delete (oi());
+                delete oi;
             }
         }
 #else
@@ -423,7 +419,7 @@ void TextReportGadget ::TeletypeCompletionHook(void)
     }
 
     //add a timer for this line of text
-    LineTimes.add_entry(FIXP_SECONDS_UNTIL_TEXT_REPORTS_DISAPPEAR);
+    LineTimes.push_back(FIXP_SECONDS_UNTIL_TEXT_REPORTS_DISAPPEAR);
 }
 
 int TextReportGadget ::GetFullyOnScreenScrollCoord(void)
@@ -452,8 +448,7 @@ void TextReportGadget ::Disappear(void)
     // to be called only by TextReportDaemon_Disappear
     //clear the list of timers for when individual lines should disappear
     NumberOfLinesToDisplay = 0;
-    while (LineTimes.size())
-        LineTimes.delete_first_entry();
+    LineTimes.clear();
 
     p666_Scroll->SetTarget_Int(
         GetOffScreenScrollCoord()
@@ -491,7 +486,7 @@ void TextReportGadget ::AddTeletypeLine(SCString *pSCString_ToAdd)
         // If finished displaying last message; immediately display this one, otherwise
         // add to list.  The message display daemon should process the queue:
         if (List_pTeletypeGadg_Displaying.size() > 0) {
-            if (!List_pTeletypeGadg_Displaying.last_entry()->HasFinishedPrinting()) {
+            if (!List_pTeletypeGadg_Displaying.back()->HasFinishedPrinting()) {
                 // Can't add a new teletype object yet; there's an existing one which
                 // hasn't finished yet; add to queue:
 
@@ -559,10 +554,10 @@ void TextReportGadget ::DirectAddTeletypeLine(SCString *pSCString_ToAdd)
 		}
 #else
         {
-            List_pTeletypeGadg_Displaying.add_entry_end(new TeletypeGadget(
+            List_pTeletypeGadg_Displaying.push_back(new TeletypeGadget{
                 this,           // TextReportGadget* pTextReportGadg,
                 pSCString_ToAdd // SCString* pSCString
-                ));
+            });
         }
 #endif
 
@@ -573,13 +568,13 @@ void TextReportGadget ::DirectAddTeletypeLine(SCString *pSCString_ToAdd)
 void TextReportGadget ::PostprocessForAddingTeletypeLine(void)
 {
     if (List_pTeletypeGadg_Displaying.size() > MAX_MESSAGES_TO_DISPLAY) {
-        TeletypeGadget *pTeletypeGadg = List_pTeletypeGadg_Displaying.first_entry();
+        TeletypeGadget *pTeletypeGadg = List_pTeletypeGadg_Displaying.front();
 
         GLOBALASSERT(pTeletypeGadg);
 
         delete pTeletypeGadg;
 
-        List_pTeletypeGadg_Displaying.delete_first_entry();
+        List_pTeletypeGadg_Displaying.erase(List_pTeletypeGadg_Displaying.begin());
     }
 
     // Make it visible, either fully or partially, depending on input focus:
@@ -612,18 +607,17 @@ void TextReportGadget ::UpdateLineTimes()
 
     //if we are currently displaying to many lines ,g et rifd of the earliest ones
     while (NumberOfLinesToDisplay > MAX_MESSAGES_TO_DISPLAY) {
-        if (LineTimes.size())
-            LineTimes.delete_first_entry();
+        LineTimes.clear();
         NumberOfLinesToDisplay--;
     }
 
     //go through our list of timers for each line , updating them
-    for (LIF<int> timelif(&LineTimes); !timelif.done();) {
-        time = timelif() - RealFrameTime;
+    for (auto timelif = LineTimes.begin(); timelif != LineTimes.end();) {
+        time = *timelif - RealFrameTime;
         if (time <= 0) {
             //this timer has expired , so reduce the number of lines displayed by one
             //also delete this timer from the list
-            timelif.delete_current();
+            LineTimes.erase(timelif);
             NumberOfLinesToDisplay--;
             if (NumberOfLinesToDisplay < 0) {
                 NumberOfLinesToDisplay = 0;
@@ -638,8 +632,8 @@ void TextReportGadget ::UpdateLineTimes()
 
         } else {
             //update this timer
-            timelif.change_current(time);
-            timelif.next();
+            *timelif = time;
+            ++timelif;
         }
     }
 }

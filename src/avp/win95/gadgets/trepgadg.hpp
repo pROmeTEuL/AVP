@@ -25,7 +25,10 @@
 #include "reflist.hpp"
 #endif
 
+
 #endif
+
+#include <vector>
 
 /* Version settings *****************************************************/
 
@@ -101,10 +104,10 @@ private:
     RefList<SCString> RefList_SCString_ToAppear;
 
     // Queue of messages that are being displayed:
-    List<TeletypeGadget *> List_pTeletypeGadg_Displaying;
+    std::vector<TeletypeGadget *> List_pTeletypeGadg_Displaying;
 
     //time left to display each teletype line thingy
-    List<int> LineTimes;
+    std::vector<int> LineTimes;
 
     CheesyDaemon_Flash *p666_CheeseFlash;
     CheesyDaemon_Lifetime *p666_CheeseLifetime;
