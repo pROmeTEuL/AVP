@@ -39,7 +39,7 @@
 #endif
 
 /* Exported globals ************************************************/
-/*static*/ List<ConsoleCommand *> ConsoleCommand ::List_pConsoleCommand;
+/*static*/ std::vector<ConsoleCommand *> ConsoleCommand ::List_pConsoleCommand;
 
 /* Internal type definitions ***************************************/
 
@@ -177,24 +177,24 @@ private:
         if (*commandPtr) {
             // Iterate through the console commands; looking for a match
             {
-                for (LIF<ConsoleCommand *> oi(&List_pConsoleCommand); !oi.done(); oi.next()) {
-                    GLOBALASSERT(oi());
-                    GLOBALASSERT(oi()->pSCString_Symbol);
+                for (auto oi : List_pConsoleCommand) {
+                    GLOBALASSERT(oi);
+                    GLOBALASSERT(oi->pSCString_Symbol);
 
-                    if (oi()->ThisIsACheat
+                    if (oi->ThisIsACheat
                             ?
 
                             STRUTIL_SC_Strequal //case sensitive comparisons for cheats
-                            (oi()->pSCString_Symbol->pProjCh(),
+                            (oi->pSCString_Symbol->pProjCh(),
                              commandPtr)
                             : STRUTIL_SC_Strequal_Insensitive //case insensitive otherwise
-                            (oi()->pSCString_Symbol->pProjCh(), commandPtr)) {
+                            (oi->pSCString_Symbol->pProjCh(), commandPtr)) {
                         // Got match
                         bProcessed = true;
 
                         // Execute the function:
                         {
-                            oi()->Execute(argumentPtr);
+                            oi->Execute(argumentPtr);
                         }
                     }
                 }
@@ -216,8 +216,8 @@ private:
 
     pSCString_Temp->R_Release();
 
-    for (LIF<ConsoleCommand *> oi(&List_pConsoleCommand); !oi.done(); oi.next()) {
-        oi()->Display();
+    for (auto &oi : List_pConsoleCommand) {
+        oi->Display();
     }
 }
 
@@ -225,7 +225,9 @@ private:
 {
     pSCString_Description->R_Release();
 
-    List_pConsoleCommand.delete_entry(this);
+    auto it = std::ranges::find(List_pConsoleCommand, this);
+    if (it != List_pConsoleCommand.end())
+        List_pConsoleCommand.erase(it);
 }
 
 void ConsoleCommand ::Display(void) const
@@ -251,7 +253,7 @@ ConsoleCommand ::ConsoleCommand(
     , pSCString_Description(new SCString(pProjCh_Description_ToUse))
 {
     ThisIsACheat = Cheat;
-    List_pConsoleCommand.add_entry(this);
+    List_pConsoleCommand.emplace_back(this);
 }
 
 void ConsoleCommand ::EchoResult(int Result)

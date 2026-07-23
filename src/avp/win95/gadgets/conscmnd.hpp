@@ -11,6 +11,9 @@
 #pragma once
 #endif
 
+#include <memory>
+#include <vector>
+
 #ifndef _conssym_hpp
 #include "conssym.hpp"
 #endif
@@ -74,7 +77,7 @@ protected:
 private:
     SCString *pSCString_Description;
 
-    static List<ConsoleCommand *> List_pConsoleCommand;
+    static std::vector<ConsoleCommand *> List_pConsoleCommand;
 
 public:
     virtual ~ConsoleCommand();
