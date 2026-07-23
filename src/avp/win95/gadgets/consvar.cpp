@@ -39,7 +39,7 @@
 #endif
 
 /* Exported globals ************************************************/
-/*static*/ List<ConsoleVariable *> ConsoleVariable ::List_pConsoleVar;
+/*static*/ std::vector<ConsoleVariable *> ConsoleVariable ::List_pConsoleVar;
 
 /* Internal type definitions ***************************************/
 class ConsoleVariable_Simple_Int : public ConsoleVariable
@@ -162,7 +162,9 @@ ConsoleVariable ::~ConsoleVariable()
     pSCString_Description->R_Release();
 
     // remove from the list
-    List_pConsoleVar.delete_entry(this);
+    auto it = std::ranges::find(List_pConsoleVar, this);
+    if (it != List_pConsoleVar.end())
+        List_pConsoleVar.erase(it);
 }
 
 /*static*/ OurBool ConsoleVariable ::Process(ProjChar *pProjCh_In)
@@ -175,12 +177,12 @@ ConsoleVariable ::~ConsoleVariable()
     // Check to see if there's a match between the entire
     // input string and each console command
     {
-        for (LIF<ConsoleVariable *> oi(&List_pConsoleVar); !oi.done(); oi.next()) {
-            if (oi()->ThisIsACheat
+        for (auto oi : List_pConsoleVar) {
+            if (oi->ThisIsACheat
                     ? STRUTIL_SC_Strequal //case sensitive comparisons for cheats
-                    (pProjCh_In, oi()->pSCString_Symbol->pProjCh())
-                    : STRUTIL_SC_Strequal_Insensitive(pProjCh_In, oi()->pSCString_Symbol->pProjCh())) {
-                oi()->Display();
+                    (pProjCh_In, oi->pSCString_Symbol->pProjCh())
+                    : STRUTIL_SC_Strequal_Insensitive(pProjCh_In, oi->pSCString_Symbol->pProjCh())) {
+                oi->Display();
                 return true;
             }
         }
@@ -210,21 +212,21 @@ ConsoleVariable ::~ConsoleVariable()
             return false;
         }
 
-        for (LIF<ConsoleVariable *> oi(&List_pConsoleVar); !oi.done(); oi.next()) {
+        for (auto oi : List_pConsoleVar) {
             // LOCALISEME():
-            if (0 == strncmp(pProjCh_In, oi()->pSCString_Symbol->pProjCh(), NumChars)) {
+            if (0 == strncmp(pProjCh_In, oi->pSCString_Symbol->pProjCh(), NumChars)) {
                 if (strchr(pProjCh_Search, '.')) {
                     // interpret as fraction
                     float NewValue = atof(pProjCh_Search);
 
-                    oi()->ProcessSetValue(NewValue);
+                    oi->ProcessSetValue(NewValue);
 
                     return true;
                 } else {
                     // interpret as int
                     int NewValue = atoi(pProjCh_Search);
 
-                    oi()->ProcessSetValue(NewValue);
+                    oi->ProcessSetValue(NewValue);
 
                     return true;
                 }
@@ -244,8 +246,8 @@ ConsoleVariable ::~ConsoleVariable()
 
     pSCString_Temp->R_Release();
 
-    for (LIF<ConsoleVariable *> oi(&List_pConsoleVar); !oi.done(); oi.next()) {
-        oi()->Display();
+    for (auto oi : List_pConsoleVar) {
+        oi->Display();
     }
 }
 // protected:
@@ -273,7 +275,7 @@ ConsoleVariable ::ConsoleVariable(
         ThisIsACheat = Cheat;
 
         // add to list of all console variables
-        List_pConsoleVar.add_entry(this);
+        List_pConsoleVar.push_back(this);
     }
 }
 

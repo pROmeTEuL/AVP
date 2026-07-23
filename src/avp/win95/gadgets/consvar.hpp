@@ -100,7 +100,7 @@ protected:
 private:
     SCString *pSCString_Description;
 
-    static List<ConsoleVariable *> List_pConsoleVar;
+    static std::vector<ConsoleVariable *> List_pConsoleVar;
 
 public:
     ~ConsoleVariable();
