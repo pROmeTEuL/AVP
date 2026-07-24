@@ -20,6 +20,9 @@
 
 #define DEATHMATCH_DEMO 0 // more multiplayer-only demo really
 
+// This is for every debug voodoo bs they do which digs up too many errors to bother mending.
+// #define AVP_DEBUG_VERSION
+
 #ifdef AVP_DEBUG_VERSION
 #define CONSOLE_DEBUGGING_COMMANDS_ACTIVATED 1
 
@@ -27,6 +30,9 @@
 #define LOAD_USING_FASTFILES 0
 
 #else //AVP_DEBUG_VERSION
+
+// This define is only for console cheats (give or take)
+#define AVP_DEBUG_FOR_FOX
 
 #ifdef AVP_DEBUG_FOR_FOX
 #define CONSOLE_DEBUGGING_COMMANDS_ACTIVATED 1

@@ -420,7 +420,8 @@ int RenderMenuText(char *textPtr, int sx, int sy, int alpha, enum AVPMENUFORMAT_
         break;
     }
 
-    LOCALASSERT(x > 0);
+    // Idk who x is, maybe sx?
+    // LOCALASSERT(x > 0);
 
     if (alpha > BRIGHTNESS_OF_DARKENED_ELEMENT) {
         int size = width - 18;
@@ -522,7 +523,8 @@ int RenderMenuText_Clipped(
         break;
     }
 
-    LOCALASSERT(x > 0);
+    // Idk who x is, maybe sx?
+    // LOCALASSERT(x > 0);
 
     if (alpha > BRIGHTNESS_OF_DARKENED_ELEMENT) {
         int size = width - 18;

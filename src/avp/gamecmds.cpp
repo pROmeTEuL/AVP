@@ -394,11 +394,12 @@ void CreateGameSpecificConsoleCommands(void)
 
     ConsoleCommand::Make("BUG", "ADD A BUG REPORT TO CONSOLELOG.TXT", OutputBugReportToConsoleLogfile);
     ConsoleCommand::Make("REMOVEDECALS", "DELETES ALL PRE-DECALS", RemoveAllFixedDecals);
-
+    //Both PlatDontUse3DSoundHW and PlatUse3DSoundHW don't exist or are commented out
+#if 0
     ConsoleCommand::Make(
         "TURN3DSOUNDHARDWAREOFF", "DEACTIVATES 3D SOUND IN HARDWARE", PlatDontUse3DSoundHW);
     ConsoleCommand::Make("TURN3DSOUNDHARDWAREON", "ACTIVATES 3D SOUND IN HARDWARE", PlatUse3DSoundHW);
-
+#endif
     ConsoleCommand::Make(
         "NETGAME_INDIVIDUAL", "CHANGE NETWORK GAME TYPE", ChangeNetGameType_Individual);
     ConsoleCommand::Make("NETGAME_COOP", "CHANGE NETWORK GAME TYPE", ChangeNetGameType_Coop);
@@ -407,7 +408,8 @@ void CreateGameSpecificConsoleCommands(void)
     ConsoleCommand::Make(
         "NETGAME_PREDATORTAG", "CHANGE NETWORK GAME TYPE", ChangeNetGameType_PredatorTag);
 
-    ConsoleCommand::Make("TRIGGER_PLOT_FMV", "", StartTriggerPlotFMV);
+    // FMVs unavailable :(
+    // ConsoleCommand::Make("TRIGGER_PLOT_FMV", "", StartTriggerPlotFMV);
 
     ConsoleCommand::Make(
         "SPECIALISTMARINE_GENERAL",
