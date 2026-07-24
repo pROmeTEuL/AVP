@@ -205,65 +205,6 @@ public:
     AwCreateGraphicRegion *rectA;
 };
 
-/****************************************/
-/* Reference Count Object Debug Support */
-/****************************************/
-
-#ifndef NDEBUG
-
-static bool g_bAllocListActive = false;
-
-class AllocList : public ::HashTable<RefCntObj *>
-{
-public:
-    AllocList() { g_bAllocListActive = true; }
-    ~AllocList()
-    {
-        if (Size()) {
-            db_log1(("AW: Potential Memory Leaks Detected!!!"));
-        }
-#ifdef _CPPRTTI
-        //#warning "Run-Time Type Identification (RTTI) is enabled"
-        for (Iterator itLeak(*this); !itLeak.Done(); itLeak.Next()) {
-            db_logf1(
-                ("\tAW Object not deallocated: Type: %s RefCnt: %u",
-                 typeid(*itLeak.Get()).name(),
-                 itLeak.Get()->m_nRefCnt));
-        }
-        if (Size()) {
-            db_log1(("AW: Object dump complete"));
-        }
-#else   // ! _CPPRTTI
-        //#warning "Run-Time Type Identification (RTTI) is not enabled - memory leak checking will not report types"
-        unsigned nRefs(0);
-        for (Iterator itLeak(*this); !itLeak.Done(); itLeak.Next()) {
-            nRefs += itLeak.Get()->m_nRefCnt;
-        }
-        if (Size()) {
-            db_logf1(
-                ("AW: Objects not deallocated: Number of Objects: %u Number of References: %u",
-                 Size(),
-                 nRefs));
-        }
-#endif  // ! _CPPRTTI
-        g_bAllocListActive = false;
-    }
-};
-
-static AllocList g_listAllocated;
-
-void DbRemember(RefCntObj *pObj)
-{
-    g_listAllocated.AddAsserted(pObj);
-}
-
-void DbForget(RefCntObj *pObj)
-{
-    if (g_bAllocListActive)
-        g_listAllocated.RemoveAsserted(pObj);
-}
-
-#endif // ! NDEBUG
 
 /********************************************/
 /* structure to contain loading information */

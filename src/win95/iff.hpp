@@ -98,33 +98,18 @@ public:
 protected:
     virtual ~Unknown()
     {
-#ifndef NDEBUG
-        DbForget(this);
-#endif
     }
     Unknown()
         : m_nRefCnt(1)
     {
-#ifndef NDEBUG
-        DbRemember(this);
-#endif
     }
     Unknown(Unknown const &)
         : m_nRefCnt(1)
     {
-#ifndef NDEBUG
-        DbRemember(this);
-#endif
     }
 
 private:
     unsigned m_nRefCnt;
-
-#ifndef NDEBUG
-    friend void DbRemember(Unknown *pObj);
-    friend void DbForget(Unknown *pObj);
-    friend class AllocList;
-#endif
 };
 
 /*******************************/

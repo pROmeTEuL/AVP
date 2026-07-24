@@ -320,34 +320,19 @@ public:
 protected:
     virtual ~RefCntObj()
     {
-#ifndef NDEBUG
-        DbForget(this);
-#endif
     }
     RefCntObj()
         : m_nRefCnt(1)
     {
-#ifndef NDEBUG
-        DbRemember(this);
-#endif
     }
     RefCntObj(RefCntObj const &)
         : m_nRefCnt(1)
     {
-#ifndef NDEBUG
-        DbRemember(this);
-#endif
     }
     RefCntObj &operator=(RefCntObj const &) { return *this; }
 
 private:
     unsigned m_nRefCnt;
-
-#ifndef NDEBUG
-    friend void DbRemember(RefCntObj *pObj);
-    friend void DbForget(RefCntObj *pObj);
-    friend class AllocList;
-#endif
 };
 
 SurfUnion LoadFromParams(CreateTextureParms *);

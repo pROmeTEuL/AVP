@@ -11,6 +11,7 @@
 char *users_name = "Player";
 
 #include "hash_tem.hpp"
+#include <unordered_set>
 Chunk *Parent_File;
 
 // Non class functions ( only one as yet )
@@ -447,6 +448,10 @@ void Chunk_With_Children::post_input_processing()
 class RifRegEntry
 {
 public:
+    RifRegEntry() = default;
+    RifRegEntry(const RifRegEntry &) = default;
+    RifRegEntry & operator=(const RifRegEntry&) = default;
+
     int chunk_id_1;
     int chunk_id_2;
     int parent_id_1;
@@ -473,25 +478,31 @@ public:
     inline bool operator!=(RifRegEntry const &rEntry) const { return !operator==(rEntry); }
 };
 
-inline unsigned HashFunction(RifRegEntry const &rEntry)
+struct Hash
 {
-    return HashFunction(rEntry.chunk_id_1 + rEntry.chunk_id_2);
-}
+    size_t operator() (const RifRegEntry &entry) const {
+        return HashFunction(entry.chunk_id_1 + entry.chunk_id_2);
+    }
+private:
+    static inline unsigned HashFunction(unsigned const _i)
+    {
+        return _i ^ _i >> 4 ^ _i >> 9 ^ _i >> 15 ^ _i >> 22;
+    }
+};
 
-static HashTable<RifRegEntry> *g_pRifRegister = NULL;
+static std::unordered_set<RifRegEntry, Hash> *g_pRifRegister = NULL;
 
 void Chunk::Register(
     const char *idChunk,
     const char *idParent,
     Chunk *(*pfnCreate)(Chunk_With_Children *parent, const char *data))
 {
-    static HashTable<RifRegEntry> reg;
+    static std::unordered_set<RifRegEntry, Hash> reg;
     char temp_id[8];
 
     g_pRifRegister = &reg;
 
     RifRegEntry entry;
-
     strncpy(temp_id, idChunk, 8);
     entry.chunk_id_1 = *(int *) &temp_id[0];
     entry.chunk_id_2 = *(int *) &temp_id[4];
@@ -506,7 +517,7 @@ void Chunk::Register(
         entry.parent_id_2 = 0;
     }
 
-    reg.AddAsserted(entry);
+    reg.insert(entry);
 }
 
 Chunk *Chunk_With_Children::DynCreate(const char *data)
@@ -523,10 +534,9 @@ Chunk *Chunk_With_Children::DynCreate(const char *data)
         test.parent_id_2 = *(int *) &identifier[4];
         test.m_pfnCreate = NULL;
 
-        RifRegEntry const *pEntry = g_pRifRegister->Contains(test);
-        if (pEntry) {
-            return pEntry->m_pfnCreate(this, data);
-        }
+        auto it = g_pRifRegister->find(test);
+        if (it != g_pRifRegister->end())
+            return (*it).m_pfnCreate(this, data);
     }
     return new Miscellaneous_Chunk(this, data, (data + 12), (*(int *) (data + 8)) - 12);
 }

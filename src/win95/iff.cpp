@@ -1,6 +1,7 @@
 #include "iff.hpp"
 
 #include <stdio.h>
+#include <unordered_set>
 
 #if defined(_CPPRTTI) && !defined(NDEBUG)
 #include <typeinfo>
@@ -13,66 +14,6 @@
 #include "hash_tem.hpp"
 
 namespace IFF {
-/*****************************/
-/* Original File: iffObj.cpp */
-/*****************************/
-
-#ifndef NDEBUG
-
-static bool g_bAllocListActive = false;
-
-class AllocList : public ::HashTable<Unknown *>
-{
-public:
-    AllocList() { g_bAllocListActive = true; }
-    ~AllocList()
-    {
-#ifdef _CPPRTTI // this works in MSVC 5.0 - ie. the macro is defined if RTTI is turned on
-// but there appears to be no preprocessor way of determining if RTTI is turned on under Watcom
-// No, I think it works in Watcom too, actually...
-#pragma message("Run-Time Type Identification (RTTI) is enabled")
-        for (Iterator itLeak(*this); !itLeak.Done(); itLeak.Next()) {
-            TCHAR buf[256];
-            ::wsprintf(
-                buf,
-                TEXT("Object not deallocated:\nType: %s\nRefCnt: %u"),
-                typeid(*itLeak.Get()).name(),
-                itLeak.Get()->m_nRefCnt);
-            DisplayMessage(TEXT("Memory Leak!"), buf);
-        }
-#else  // ! _CPPRTTI
-        unsigned nRefs(0);
-        for (Iterator itLeak(*this); !itLeak.Done(); itLeak.Next()) {
-            nRefs += itLeak.Get()->m_nRefCnt;
-        }
-        if (Size()) {
-            char buf[256];
-            ::sprintf(
-                buf,
-                "Objects not deallocated:\nNumber of Objects: %u\nNumber of References: %u",
-                Size(),
-                nRefs);
-            DisplayMessage("Memory Leaks!", buf);
-        }
-#endif // ! _CPPRTTI
-        g_bAllocListActive = false;
-    }
-};
-
-static AllocList g_listAllocated;
-
-void DbRemember(Unknown *pObj)
-{
-    g_listAllocated.AddAsserted(pObj);
-}
-
-void DbForget(Unknown *pObj)
-{
-    if (g_bAllocListActive)
-        g_listAllocated.RemoveAsserted(pObj);
-}
-
-#endif // ! NDEBUG
 
 /******************************/
 /* Original File: iffFile.cpp */
@@ -200,6 +141,10 @@ File::~File()
 class RegEntry
 {
 public:
+    RegEntry() = default;
+    RegEntry(const RegEntry&) = default;
+    RegEntry & operator=(const RegEntry&) = default;
+
     ID m_idParent;
     ID m_idChunk;
     Chunk *(*m_pfnCreate)();
@@ -214,16 +159,28 @@ public:
 
 namespace IFF {
 
-inline unsigned HashFunction(IFF::RegEntry const &rEntry)
-{
-    return ::HashFunction(rEntry.m_idChunk.m_nID);
-}
+// inline unsigned HashFunction(IFF::RegEntry const &rEntry)
+// {
+//     return ::HashFunction(rEntry.m_idChunk.m_nID);
+// }
 
-static ::HashTable<RegEntry> *g_pRegister = NULL;
+struct Hash
+{
+    size_t operator() (const RegEntry &entry) const {
+        return ::HashFunction(entry.m_idChunk.m_nID);
+    }
+private:
+    static inline unsigned HashFunction(unsigned const _i)
+    {
+        return _i ^ _i >> 4 ^ _i >> 9 ^ _i >> 15 ^ _i >> 22;
+    }
+};
+
+static std::unordered_set<RegEntry, Hash> *g_pRegister = NULL;
 
 void Chunk::Register(ID idParent, ID idChunk, Chunk *(*pfnCreate)())
 {
-    static ::HashTable<RegEntry> reg;
+    static std::unordered_set<RegEntry, Hash> reg;
 
     g_pRegister = &reg;
 
@@ -232,7 +189,7 @@ void Chunk::Register(ID idParent, ID idChunk, Chunk *(*pfnCreate)())
     entry.m_idChunk = idChunk;
     entry.m_pfnCreate = pfnCreate;
 
-    reg.AddAsserted(entry);
+    reg.insert(entry);
 }
 
 Chunk *Chunk::DynCreate(ID idParent, ID idChunk)
@@ -243,10 +200,9 @@ Chunk *Chunk::DynCreate(ID idParent, ID idChunk)
         test.m_idChunk = idChunk;
         test.m_pfnCreate = NULL;
 
-        RegEntry const *pEntry = g_pRegister->Contains(test);
-        if (pEntry) {
-            return pEntry->m_pfnCreate();
-        }
+        auto it = g_pRegister->find(test);
+        if (it != g_pRegister->end())
+            return (*it).m_pfnCreate();
     }
     return new MiscChunk(idChunk);
 }
