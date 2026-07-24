@@ -61,9 +61,9 @@ TextInputState ::~TextInputState()
 {
 #if SupportHistory
     while (List_pSCString_History.size() > 0) {
-        List_pSCString_History.first_entry()->R_Release();
+        List_pSCString_History.front()->R_Release();
 
-        List_pSCString_History.delete_first_entry();
+        List_pSCString_History.erase(List_pSCString_History.begin());
     }
 #endif
 }
@@ -89,11 +89,16 @@ void TextInputState ::CharTyped(
 
     // LOCALISEME();
 
+    // Workaround in t_ingadg.hpp targeting ProcessCarriageReturn() function directly.
+    // Keeping this out the project until I find out what to do with it.
+#warning Bypassing this section in t_ingadg.hpp. Don't forget about me.
+#if 0
     if (Ch == '\r') {
         ProcessCarriageReturn();
         // Special processing for carriage return:
         return;
     }
+#endif
 
 // Reject certain characters using <CTYPE.H>:
 #if 0
@@ -720,11 +725,11 @@ void TextInputState ::AddToHistory(SCString &SCString_ToAdd)
 
     SCString *StringCopy = new SCString(SCString_ToAdd.pProjCh());
 
-    List_pSCString_History.add_entry_end(StringCopy);
+    List_pSCString_History.push_back(StringCopy);
 
     if (List_pSCString_History.size() > MAX_LINES_HISTORY) {
-        List_pSCString_History.first_entry()->R_Release();
-        List_pSCString_History.delete_first_entry();
+        List_pSCString_History.front()->R_Release();
+        List_pSCString_History.erase(List_pSCString_History.begin());
     }
 
     pSCString_CurrentHistory = NULL;
@@ -858,10 +863,11 @@ SCString *TextInputState ::GetNxtMatchingHistory(void) const
 
         while (1) {
             // Advance to next entry (in a circular fashion)
-            if (pSCString_I == List_pSCString_History.last_entry()) {
-                pSCString_I = List_pSCString_History.first_entry();
+            if (pSCString_I == List_pSCString_History.back()) {
+                pSCString_I = List_pSCString_History.front();
             } else {
-                pSCString_I = List_pSCString_History.next_entry(pSCString_I);
+                auto it = std::ranges::find(List_pSCString_History, pSCString_I);
+                pSCString_I = *(++it);
             }
 
             // Break if you've wrapped around:
@@ -878,18 +884,10 @@ SCString *TextInputState ::GetNxtMatchingHistory(void) const
 
     } else {
         // Find first matching one:
-        CLIF<SCString *> oi(&List_pSCString_History);
-
-        while (1) {
-            if (oi.done()) {
+        for (auto oi : List_pSCString_History) {
+            if (bManualMatchInsensitive(oi->pProjCh())) {
+                pSCString_Return = oi;
                 break;
-            }
-
-            if (bManualMatchInsensitive(oi()->pProjCh())) {
-                pSCString_Return = oi();
-                break;
-            } else {
-                oi.next();
             }
         }
     }
@@ -907,10 +905,11 @@ SCString *TextInputState ::GetPrvMatchingHistory(void) const
 
         while (1) {
             // Back to prev entry (in a circular fashion)
-            if (pSCString_I == List_pSCString_History.first_entry()) {
-                pSCString_I = List_pSCString_History.last_entry();
+            if (pSCString_I == List_pSCString_History.front()) {
+                pSCString_I = List_pSCString_History.back();
             } else {
-                pSCString_I = List_pSCString_History.prev_entry(pSCString_I);
+                auto it = std::ranges::find(List_pSCString_History, pSCString_I);
+                pSCString_I = *(--it);
             }
 
             // Break if you've wrapped around:
@@ -927,18 +926,10 @@ SCString *TextInputState ::GetPrvMatchingHistory(void) const
 
     } else {
         // Find final matching one:
-        CLIB<SCString *> oi(&List_pSCString_History);
-
-        while (1) {
-            if (oi.done()) {
+        for (auto oi : List_pSCString_History) {
+            if (bManualMatchInsensitive(oi->pProjCh())) {
+                pSCString_Return = oi;
                 break;
-            }
-
-            if (bManualMatchInsensitive(oi()->pProjCh())) {
-                pSCString_Return = oi();
-                break;
-            } else {
-                oi.next();
             }
         }
     }

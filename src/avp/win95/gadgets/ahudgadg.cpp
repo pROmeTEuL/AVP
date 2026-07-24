@@ -223,6 +223,12 @@ void AlienHUDGadget ::Key_Tab(void)
     pTextEntryGadg->Key_Tab();
 }
 
+void AlienHUDGadget ::Key_Return(void)
+{
+    GLOBALASSERT(pTextEntryGadg);
+    pTextEntryGadg->Key_Return();
+}
+
 void AlienHUDGadget ::Jitter(int FixP_Magnitude)
 {
     // empty for now

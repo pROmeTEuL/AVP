@@ -81,6 +81,7 @@ public:
     virtual void Key_Down(void) = 0;
     virtual void Key_Delete(void) = 0;
     virtual void Key_Tab(void) = 0;
+    virtual void Key_Return(void) = 0;
 
     virtual void Jitter(int FixP_Magnitude) = 0;
 

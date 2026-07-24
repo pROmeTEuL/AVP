@@ -90,6 +90,10 @@ public:
     void Key_Down(void) { theState.Key_Down(); }
     void Key_Delete(void) { theState.Key_Delete(); }
     void Key_Tab(void) { theState.Key_Tab(); }
+// Gadget Return Key Function
+// This is a workaround in orderto test the console's functionality.
+// Probably going to change it in the future.
+    void Key_Return(void) { theState.ProcessCarriageReturn(); };
 
     void SetString(SCString &SCString_ToUse) { theState.SetString(SCString_ToUse); }
 };

@@ -968,6 +968,9 @@ static void handle_keypress(int key, int unicode, int press)
         case KEY_TAB:
             RE_ENTRANT_QUEUE_WinProc_AddMessage_WM_KEYDOWN(VK_TAB);
             break;
+            // Handling Return Key Pressed in Console
+        case KEY_CR:
+            RE_ENTRANT_QUEUE_WinProc_AddMessage_WM_KEYDOWN(VK_RETURN);
         default:
             break;
         }

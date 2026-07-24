@@ -165,6 +165,9 @@ void RE_ENTRANT_QUEUE_WinMain_FlushMessages(void)
                         case VK_TAB:
                             HUDGadget ::GetHUD()->Key_Tab();
                             break;
+                            // Handling Console Return Key
+                        case VK_RETURN:
+                            HUDGadget ::GetHUD()->Key_Return();
                         }
 
                     } else {

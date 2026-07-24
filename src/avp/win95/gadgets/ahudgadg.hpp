@@ -48,15 +48,16 @@ public:
         char Ch
         // note that this _is _ a char
     );
-    void Key_Backspace(void);
-    void Key_End(void);
-    void Key_Home(void);
-    void Key_Left(void);
-    void Key_Up(void);
-    void Key_Right(void);
-    void Key_Down(void);
-    void Key_Delete(void);
-    void Key_Tab(void);
+    void Key_Backspace(void) override;
+    void Key_End(void) override;
+    void Key_Home(void) override;
+    void Key_Left(void) override;
+    void Key_Up(void) override;
+    void Key_Right(void) override;
+    void Key_Down(void) override;
+    void Key_Delete(void) override;
+    void Key_Tab(void) override;
+    void Key_Return(void) override;
 
     void SetString(const char *text);
 

@@ -39,6 +39,8 @@
 #include "textexp.hpp"
 #endif
 
+#include <vector>
+
 /* Version settings *****************************************************/
 #define LimitedLineLength true
 
@@ -99,7 +101,7 @@ private:
 #endif
 
 #if SupportHistory
-    List<SCString *> List_pSCString_History;
+    std::vector<SCString *> List_pSCString_History;
     SCString *pSCString_CurrentHistory;
     // Can be NULL; indicates no cycling through the history has yet occurred.
     // This does NOT own a reference to the string.

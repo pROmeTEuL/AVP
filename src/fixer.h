@@ -128,6 +128,8 @@ typedef unsigned __int64 uint64_t;
 #define VK_INSERT 8
 #define VK_DELETE 9
 #define VK_TAB 10
+// Custom return key value
+#define VK_RETURN 11
 
 #define INVALID_HANDLE_VALUE -1
 #define GENERIC_WRITE 0x0001
