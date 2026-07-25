@@ -1,3 +1,36 @@
+#pragma once
+
+#include <cctype>
+#include <cstdint>
+
+// v1,0 Default Hash Functions defined:
+// HashFunction(unsigned), HashFunction(void const *), HashFunction(char const *)
+// you can disable the default hash functions by defining HT_NODEFAULTFNS
+
+#ifndef HT_NODEFAULTFNS
+// a hash function for integral (unsigned) values
+inline unsigned HashFunction(unsigned const _i)
+{
+    return _i ^ _i >> 4 ^ _i >> 9 ^ _i >> 15 ^ _i >> 22;
+}
+
+// a hash function for pointers
+inline unsigned HashFunction(void const *const _vP)
+{
+    // treat as integer
+    return HashFunction(reinterpret_cast<uintptr_t>(_vP));
+}
+
+// a hash function for strings
+inline unsigned HashFunction(char const *_sP)
+{
+    unsigned rv = 0;
+    while (*_sP)
+        rv += toupper(*_sP++);
+    return rv;
+}
+#endif
+
 /********************************************************/
 /* Hash Table template class - v1.2						*/
 /*														*/
@@ -221,40 +254,11 @@
 /*															*/
 /*******************************************************Alex*/
 
-#ifndef HASH_TEMPLATE_VERSION
-#define HASH_TEMPLATE_VERSION 12 // v1.2
 
-#include <stddef.h>
-#include <ctype.h> // for toupper
+// #ifndef HASH_TEMPLATE_VERSION
+// #define HASH_TEMPLATE_VERSION 12 // v1.2
 
-// v1,0 Default Hash Functions defined:
-// HashFunction(unsigned), HashFunction(void const *), HashFunction(char const *)
-// you can disable the default hash functions by defining HT_NODEFAULTFNS
-
-#ifndef HT_NODEFAULTFNS
-// a hash function for integral (unsigned) values
-inline unsigned HashFunction(unsigned const _i)
-{
-    return _i ^ _i >> 4 ^ _i >> 9 ^ _i >> 15 ^ _i >> 22;
-}
-
-// a hash function for pointers
-inline unsigned HashFunction(void const *const _vP)
-{
-    // treat as integer
-    return HashFunction(reinterpret_cast<uintptr_t>(_vP));
-}
-
-// a hash function for strings
-inline unsigned HashFunction(char const *_sP)
-{
-    unsigned rv = 0;
-    while (*_sP)
-        rv += toupper(*_sP++);
-    return rv;
-}
-#endif
-
+#if 0
 // v1,0 Default (initial) table size (log2 of)
 // Define this to another value if you like,
 // or just override in the constructor.
@@ -834,5 +838,5 @@ class HashTable HT_DEFINITION(TYPE, TYPE const &, TYPE const &)
 //template <class TYPE *> class HashTable : public _base_HashTable<TYPE *,TYPE *,TYPE const *> {};
 
 #undef HT_DEFINITION
-
-#endif // ! HASH_TEMPLATE_VERSION
+//#endif // HASH_TEMPLATE_VERSION
+#endif // if
