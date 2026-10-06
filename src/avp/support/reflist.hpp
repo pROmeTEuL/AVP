@@ -41,6 +41,8 @@
 #include "refobj.hpp"
 #endif
 
+#include <vector>
+
 extern char const *reflist_fail_destructor;
 
 /* Type definitions *****************************************************/
@@ -50,7 +52,7 @@ template<class RC>
 class RefList
 {
 private:
-    List<RC *> List_pRC;
+    std::vector<RC *> List_pRC;
 
 public:
     // {{{ Constructors:
@@ -72,13 +74,13 @@ public:
     {
         theRC.R_AddRef();
 
-        List_pRC.add_entry_start(&theRC);
+        List_pRC.emplace(List_pRC.begin(), &theRC);
     }
     void AddToEnd(RC &theRC)
     {
         theRC.R_AddRef();
 
-        List_pRC.add_entry_end(&theRC);
+        List_pRC.emplace_back(&theRC);
     }
     // }}}
 
@@ -86,25 +88,25 @@ public:
     RC *ReadFirst(void) const
     {
         if (List_pRC.size() > 0) {
-            return List_pRC.first_entry();
+            return List_pRC.front();
         } else {
-            return NULL;
+            return nullptr;
         }
     }
     RC *ReadFinal(void) const
     {
         if (List_pRC.size() > 0) {
-            return List_pRC.last_entry();
+            return List_pRC.back();
         } else {
-            return NULL;
+            return nullptr;
         }
     }
     RC *GetYourFirst(void)
     {
         if (List_pRC.size() > 0) {
-            RC *pReturn = List_pRC.first_entry();
+            RC *pReturn = List_pRC.front();
 
-            List_pRC.delete_first_entry();
+            List_pRC.erase(List_pRC.begin());
             // note that a reference is still owned; ownership is transferred to the caller
 
             return pReturn;
@@ -129,9 +131,9 @@ public:
     {
         // Destroys the list, releasing all refs
         while (List_pRC.size() > 0) {
-            RC *pRC = List_pRC.first_entry();
+            RC *pRC = List_pRC.front();
 
-            List_pRC.delete_first_entry();
+            List_pRC.erase(List_pRC.begin());
 
 #ifndef NDEBUG
             if (!pRC) {
