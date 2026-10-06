@@ -10,6 +10,8 @@
 #define rsp_oc_z0 0x00000010
 #define rsp_oc_z1 0x00000020
 
+#include <vector>
+
 // this file should be included from chunk.hpp
 
 struct ChunkShape;
@@ -43,7 +45,7 @@ public:
 
     int num_x_cubes, num_y_cubes, num_z_cubes;
 
-    List<ZSP_zone> zone_array;
+    std::vector<ZSP_zone> zone_array;
 };
 
 /////////////////////////////////////////

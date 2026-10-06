@@ -7,7 +7,7 @@
 ZSP_Data::~ZSP_Data()
 {
     while (zone_array.size()) {
-        zone_array.delete_first_entry();
+        zone_array.erase(zone_array.end());
     }
 }
 
@@ -59,7 +59,7 @@ ZSP_Data::ZSP_Data(const char *zdata, size_t /*zsize*/)
             ptr += 4;
         }
 
-        zone_array.add_entry(tmpzone);
+        zone_array.push_back(tmpzone);
     }
 }
 
@@ -168,8 +168,8 @@ size_t Shape_ZSP_Data_Chunk::size_chunk()
 
     ZSP_Data *zdata = (ZSP_Data *) (&zspdata);
 
-    for (LIF<ZSP_zone> znl(&zdata->zone_array); !znl.done(); znl.next()) {
-        sz += 8 + (znl().num_z_polys * 4) + (znl().num_z_verts * 4);
+    for (const auto &znl : zdata->zone_array) {
+        sz += 8 + (znl.num_z_polys * 4) + (znl.num_z_verts * 4);
     }
 
     return (chunk_size = sz);
@@ -202,21 +202,21 @@ void Shape_ZSP_Data_Chunk::fill_data_block(char *data_start)
 
     ZSP_Data *zdata = (ZSP_Data *) (&zspdata);
 
-    for (LIF<ZSP_zone> znl(&zdata->zone_array); !znl.done(); znl.next()) {
-        *((int *) data_start) = znl().num_z_polys;
+    for (const auto &znl : zdata->zone_array) {
+        *((int *) data_start) = znl.num_z_polys;
         data_start += 4;
 
-        *((int *) data_start) = znl().num_z_verts;
+        *((int *) data_start) = znl.num_z_verts;
         data_start += 4;
 
         int i;
-        for (i = 0; i < znl().num_z_polys; i++) {
-            *((int *) data_start) = znl().z_poly_list[i];
+        for (i = 0; i < znl.num_z_polys; i++) {
+            *((int *) data_start) = znl.z_poly_list[i];
             data_start += 4;
         }
 
-        for (i = 0; i < znl().num_z_verts; i++) {
-            *((int *) data_start) = znl().z_vert_list[i];
+        for (i = 0; i < znl.num_z_verts; i++) {
+            *((int *) data_start) = znl.z_vert_list[i];
             data_start += 4;
         }
     }
