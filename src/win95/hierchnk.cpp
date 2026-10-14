@@ -23,14 +23,14 @@ children for Object_Hierarchy_Chunk:
 
 */
 
-List<Object_Hierarchy_Chunk *> Object_Hierarchy_Chunk::list_h_children()
+std::vector<Object_Hierarchy_Chunk *> Object_Hierarchy_Chunk::list_h_children()
 {
     List<Chunk *> cl;
     lookup_child("OBJCHIER", cl);
-    List<Object_Hierarchy_Chunk *> h_l;
+    std::vector<Object_Hierarchy_Chunk *> h_l;
 
     for (LIF<Chunk *> cli(&cl); !cli.done(); cli.next()) {
-        h_l.add_entry((Object_Hierarchy_Chunk *) cli());
+        h_l.push_back((Object_Hierarchy_Chunk *) cli());
     }
     return (h_l);
 }
@@ -285,7 +285,7 @@ Object_Hierarchy_Alternate_Shape_Set_Chunk::Object_Hierarchy_Alternate_Shape_Set
         strcpy(rsd->new_object_name, data);
         data += (name_length + 3) & ~3;
 
-        Replaced_Shape_List.add_entry(rsd);
+        Replaced_Shape_List.push_back(rsd);
     }
 
     flags = *(int *) data;
@@ -302,9 +302,8 @@ Object_Hierarchy_Alternate_Shape_Set_Chunk::~Object_Hierarchy_Alternate_Shape_Se
     if (Shape_Set_Name)
         delete[] Shape_Set_Name;
 
-    while (Replaced_Shape_List.size()) {
-        delete Replaced_Shape_List.first_entry();
-        Replaced_Shape_List.delete_first_entry();
+    for (Replaced_Shape_Details *replaced_shape : Replaced_Shape_List) {
+        delete replaced_shape;
     }
 }
 
@@ -327,12 +326,12 @@ void Object_Hierarchy_Alternate_Shape_Set_Chunk::fill_data_block(char *data_star
     *(int *) data_start = Replaced_Shape_List.size();
     data_start += 4;
 
-    for (LIF<Replaced_Shape_Details *> rlif(&Replaced_Shape_List); !rlif.done(); rlif.next()) {
-        strcpy(data_start, rlif()->old_object_name);
-        data_start += (strlen(rlif()->old_object_name) + 4) & ~3;
+    for (const Replaced_Shape_Details *replaced_shape : Replaced_Shape_List) {
+        strcpy(data_start, replaced_shape->old_object_name);
+        data_start += (strlen(replaced_shape->old_object_name) + 4) & ~3;
 
-        strcpy(data_start, rlif()->new_object_name);
-        data_start += (strlen(rlif()->new_object_name) + 4) & ~3;
+        strcpy(data_start, replaced_shape->new_object_name);
+        data_start += (strlen(replaced_shape->new_object_name) + 4) & ~3;
     }
 
     *(int *) data_start = flags;
@@ -348,9 +347,9 @@ size_t Object_Hierarchy_Alternate_Shape_Set_Chunk::size_chunk()
 {
     chunk_size = 36;
     chunk_size += (strlen(Shape_Set_Name) + 4) & ~3;
-    for (LIF<Replaced_Shape_Details *> rlif(&Replaced_Shape_List); !rlif.done(); rlif.next()) {
-        chunk_size += (strlen(rlif()->old_object_name) + 4) & ~3;
-        chunk_size += (strlen(rlif()->new_object_name) + 4) & ~3;
+    for (const Replaced_Shape_Details *replaced_shape : Replaced_Shape_List) {
+        chunk_size += (strlen(replaced_shape->old_object_name) + 4) & ~3;
+        chunk_size += (strlen(replaced_shape->new_object_name) + 4) & ~3;
     }
     return chunk_size;
 }
@@ -384,7 +383,7 @@ Hierarchy_Shape_Set_Collection_Chunk::Hierarchy_Shape_Set_Collection_Chunk(
     data += 4;
 
     for (int i = 0; i < list_length; i++) {
-        Index_List.add_entry(*(int *) data);
+        Index_List.push_back(*(int *) data);
         data += 4;
     }
 
@@ -419,8 +418,8 @@ void Hierarchy_Shape_Set_Collection_Chunk::fill_data_block(char *data_start)
     *(int *) data_start = Index_List.size();
     data_start += 4;
 
-    for (LIF<int> slif(&Index_List); !slif.done(); slif.next()) {
-        *(int *) data_start = slif();
+    for (int index : Index_List) {
+        *(int *) data_start = index;
         data_start += 4;
     }
 

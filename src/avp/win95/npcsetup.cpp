@@ -1,6 +1,5 @@
 #include "npcsetup.h"
 #include "ourasert.h"
-#include "list_tem.hpp"
 #include "chunkpal.hpp"
 #include "chnkload.hpp"
 #include "projload.hpp"
@@ -11,6 +10,9 @@
 #include "progress_bar.h"
 #include "scream.h"
 #include "avp_menus.h"
+
+#include <algorithm>
+#include <vector>
 
 #if ALIEN_DEMO
 #define DIRECTORY_FOR_RIFS "alienavp_huds/"
@@ -97,10 +99,10 @@ private:
     int img_group;
 
     RIFFHANDLE npc_rif;
-    static List<int> image_groups;
+    static std::vector<int> image_groups;
 };
 
-List<LoadedNPC> loaded_npcs;
+std::vector<LoadedNPC> loaded_npcs;
 
 LoadedNPC::LoadedNPC(RIF_Child_Chunk const *rcc)
     : rifname(0)
@@ -215,10 +217,12 @@ void LoadedNPC::Load(int progress_start, int progress_interval)
         npc_rif = avp_load_rif_non_env(filename);
         if (INVALID_RIFFHANDLE != npc_rif) {
 #if MaxImageGroups > 1
-            for (img_group = FIRST_FREE_IMAGE_GROUP; image_groups.contains(img_group); ++img_group)
+            for (img_group = FIRST_FREE_IMAGE_GROUP;
+                 std::find(image_groups.begin(), image_groups.end(), img_group) != image_groups.end();
+                 ++img_group)
                 ;
             GLOBALASSERT(img_group < MaxImageGroups);
-            image_groups.add_entry(img_group);
+            image_groups.push_back(img_group);
             SetCurrentImageGroup(img_group); // PROBLEM AT PRESENT, copy_rif_data changes this
 #endif
             Set_Progress_Bar_Position(progress_start + progress_interval / 2);
@@ -236,7 +240,7 @@ void LoadedNPC::Unload()
 {
     if (INVALID_RIFFHANDLE != npc_rif) {
 #if MaxImageGroups > 1
-        image_groups.delete_entry(img_group);
+        image_groups.erase(std::find(image_groups.begin(), image_groups.end(), img_group));
         SetCurrentImageGroup(img_group);
         DeallocateCurrentImages();
 #endif
@@ -262,7 +266,7 @@ static BOOL MarineIsNomcombatant(AVP_Generator_Chunk *agc)
     return FALSE;
 }
 
-List<int> LoadedNPC::image_groups;
+std::vector<int> LoadedNPC::image_groups;
 
 extern BOOL Current_Level_Requires_Mirror_Image();
 extern int AllowGoldWeapons;
@@ -498,13 +502,13 @@ void InitNPCs(RIFFHANDLE h)
         }
     }
 
-    List<LoadedNPC> newnpcs;
+    std::vector<LoadedNPC> newnpcs;
 
     for (int i = 0; i < HNPC_Last; i++) {
         if (Load_HNPC[i]) {
             LoadedNPC tempnpc(HNPC_FileNames[i]);
             if (tempnpc.IsValid()) {
-                newnpcs.add_entry(tempnpc);
+                newnpcs.push_back(tempnpc);
             }
         }
     }
@@ -515,7 +519,7 @@ void InitNPCs(RIFFHANDLE h)
         //need to load the disk hierarchy
         LoadedNPC tempnpc("disk.rif");
         if (tempnpc.IsValid()) {
-            newnpcs.add_entry(tempnpc);
+            newnpcs.push_back(tempnpc);
         }
     }
 #endif
@@ -533,20 +537,21 @@ void InitNPCs(RIFFHANDLE h)
             LoadedNPC tempnpc("mdisk.rif");
             if (tempnpc.IsValid()) {
                 AllowGoldWeapons = 1;
-                newnpcs.add_entry(tempnpc);
+                newnpcs.push_back(tempnpc);
             }
         }
     }
 
     // see what we already have, unloading what we don't need, and ensuring we don't load a npc twice
-    for (LIF<LoadedNPC> i_loaded_npc(&loaded_npcs); !i_loaded_npc.done();) {
-        if (newnpcs.contains(i_loaded_npc())) {
-            newnpcs.delete_entry(i_loaded_npc());
-            i_loaded_npc.next();
+    for (auto i_loaded_npc = loaded_npcs.begin(); i_loaded_npc != loaded_npcs.end();) {
+        auto new_npc = std::find(newnpcs.begin(), newnpcs.end(), *i_loaded_npc);
+        if (new_npc != newnpcs.end()) {
+            newnpcs.erase(new_npc);
+            ++i_loaded_npc;
         } else {
-            LoadedNPC tounload(i_loaded_npc());
+            LoadedNPC tounload(*i_loaded_npc);
             tounload.Unload();
-            i_loaded_npc.delete_current();
+            i_loaded_npc = loaded_npcs.erase(i_loaded_npc);
         }
     }
 
@@ -576,12 +581,12 @@ void InitNPCs(RIFFHANDLE h)
         LoadQueenScreamSounds();
     }
 
-    for (LIF<LoadedNPC> i_newnpc(&newnpcs); !i_newnpc.done(); i_newnpc.next()) {
-        LoadedNPC toload(i_newnpc());
+    for (const LoadedNPC &new_npc : newnpcs) {
+        LoadedNPC toload(new_npc);
         toload.Load(
             PBAR_NPC_START + (PBAR_NPC_INTERVAL * NumLoaded) / NumToLoad,
             PBAR_NPC_INTERVAL / NumToLoad);
-        loaded_npcs.add_entry(toload);
+        loaded_npcs.push_back(toload);
         NumLoaded++;
     }
     Set_Progress_Bar_Position(PBAR_NPC_START + PBAR_NPC_INTERVAL);
@@ -598,11 +603,11 @@ void InitNPCs(RIFFHANDLE h)
 
 void EndNPCs()
 {
-    while (loaded_npcs.size()) {
-        LoadedNPC tounload(loaded_npcs.first_entry());
+    for (const LoadedNPC &npc : loaded_npcs) {
+        LoadedNPC tounload(npc);
         tounload.Unload();
-        loaded_npcs.delete_first_entry();
     }
+    loaded_npcs.clear();
     EmptyHierarchyLibrary();
     UnloadScreamSounds();
 }

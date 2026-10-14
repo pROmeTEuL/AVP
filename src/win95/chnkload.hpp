@@ -11,6 +11,8 @@
 #include "bmpnames.hpp"
 #include "projload.hpp"
 
+#include <vector>
+
 class Sprite_Header_Chunk;
 
 #if 0
@@ -90,7 +92,7 @@ struct _RifHandle : Project_RifHandle
     File_Chunk *fc;
     Environment_Data_Chunk *envd;
     Chunk_With_Children *palparent;
-    List<int> shape_nums;
+    std::vector<int> shape_nums;
     int max_index;
     int *tex_index_nos;
 

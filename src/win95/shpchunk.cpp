@@ -371,12 +371,12 @@ BOOL Shape_Chunk::assoc_with_object_list(File_Chunk *fc)
     List<Chunk *> chlst;
     fc->lookup_child("RBOBJECT", chlst);
 
-    for (LIF<char *> n(&(hdptr->object_names_store)); !n.done(); n.next()) {
+    for (char *object_name : hdptr->object_names_store) {
         LIF<Chunk *> l(&chlst);
 
         for (; !l.done(); l.next()) {
             ob = (Object_Chunk *) l();
-            if (!strcmp(ob->object_data.o_name, n()))
+            if (!strcmp(ob->object_data.o_name, object_name))
                 break;
         }
         if (!l.done())
@@ -1259,23 +1259,23 @@ Shape_Header_Chunk::Shape_Header_Chunk(Shape_Chunk *parent, const char *hdata, s
     for (int i = 0; i < num_as_obj; i++) {
         obj_store = new char[strlen(hdata) + 1];
         strcpy(obj_store, (hdata));
-        object_names_store.add_entry(obj_store);
+        object_names_store.push_back(obj_store);
         hdata += (strlen(hdata) + 1);
     }
 }
 
 Shape_Header_Chunk::~Shape_Header_Chunk()
 {
-    for (LIF<char *> aon(&object_names_store); !aon.done(); aon.next())
-        delete[] aon();
+    for (char *object_name : object_names_store)
+        delete[] object_name;
 }
 
 size_t Shape_Header_Chunk::size_chunk()
 {
     int length = 80;
 
-    for (LIF<char *> aon(&object_names_store); !aon.done(); aon.next())
-        length += (strlen(aon()) + 1);
+    for (char *object_name : object_names_store)
+        length += strlen(object_name) + 1;
 
     length += (4 - length % 4) % 4;
 
@@ -1346,9 +1346,9 @@ void Shape_Header_Chunk::fill_data_block(char *data_start)
     *((int *) data_start) = object_names_store.size();
     data_start += 4;
 
-    for (LIF<char *> ons(&object_names_store); !ons.done(); ons.next()) {
-        strcpy(data_start, ons());
-        data_start += (strlen(ons()) + 1);
+    for (char *object_name : object_names_store) {
+        strcpy(data_start, object_name);
+        data_start += strlen(object_name) + 1;
     }
 }
 
@@ -1362,10 +1362,9 @@ void Shape_Header_Chunk::prepare_for_output()
     if (file_id_num == -1)
         file_id_num = ++(Shape_Chunk::max_id);
 
-    while (object_names_store.size()) {
-        delete[] object_names_store.first_entry();
-        object_names_store.delete_first_entry();
-    }
+    for (char *object_name : object_names_store)
+        delete[] object_name;
+    object_names_store.clear();
 
     for (LIF<Object_Chunk *> aosl(&associated_objects_store); !aosl.done(); aosl.next()) {
         if (aosl()->get_header())
@@ -1373,7 +1372,7 @@ void Shape_Header_Chunk::prepare_for_output()
 
         str = new char[strlen(aosl()->object_data.o_name) + 1];
         strcpy(str, aosl()->object_data.o_name);
-        object_names_store.add_entry(str);
+        object_names_store.push_back(str);
     }
 
     Shape_Chunk::max_id = max(Shape_Chunk::max_id, file_id_num);
@@ -1751,10 +1750,8 @@ Shape_Morphing_Frame_Data_Chunk::~Shape_Morphing_Frame_Data_Chunk()
 {
     if (frame_store)
         delete[] frame_store;
-    while (anim_frames.size()) {
-        delete anim_frames.first_entry();
-        anim_frames.delete_first_entry();
-    }
+    for (a_frame *anim_frame : anim_frames)
+        delete anim_frame;
 }
 
 void Shape_Morphing_Frame_Data_Chunk::prepare_for_output()
@@ -1776,20 +1773,20 @@ void Shape_Morphing_Frame_Data_Chunk::prepare_for_output()
 
     int num_f = 0;
 
-    for (LIF<a_frame *> afi(&anim_frames); !afi.done(); afi.next()) {
+    for (a_frame *anim_frame : anim_frames) {
         int s1no, s2no;
-        if (afi()->shape1a)
-            s1no = afi()->shape1a->get_header()->file_id_num;
+        if (anim_frame->shape1a)
+            s1no = anim_frame->shape1a->get_header()->file_id_num;
         else
             s1no = -1;
-        if (afi()->shape2a)
-            s2no = afi()->shape2a->get_header()->file_id_num;
+        if (anim_frame->shape2a)
+            s2no = anim_frame->shape2a->get_header()->file_id_num;
         else
             s2no = -1;
 
         frame_store[num_f] = s1no;
         frame_store[num_f + 1] = s2no;
-        frame_store[num_f + 2] = afi()->spare;
+        frame_store[num_f + 2] = anim_frame->spare;
         num_f++;
     }
     num_frames = num_f;
@@ -1854,7 +1851,7 @@ void Shape_Morphing_Frame_Data_Chunk::post_input_processing()
                 fr->shape2b = sh2b;
 
             fr->spare = frame_store[i + 2];
-            anim_frames.add_entry(fr);
+            anim_frames.push_back(fr);
         }
     }
 }
@@ -2568,7 +2565,7 @@ int Anim_Shape_Sequence_Chunk::ConstructSequenceDataFromChildren()
 }
 void Anim_Shape_Sequence_Chunk::post_input_processing()
 {
-    List<int> *poly_not_in_bb = 0;
+    std::vector<int> *poly_not_in_bb = 0;
     List<Chunk *> chlist;
     parent->lookup_child("PNOTINBB", chlist);
     if (chlist.size())
@@ -2872,7 +2869,7 @@ Poly_Not_In_Bounding_Box_Chunk::Poly_Not_In_Bounding_Box_Chunk(
     : Chunk(parent, "PNOTINBB")
 {
     for (int i = 0; i < (((signed) datasize) / 4) - 2; i++) {
-        poly_no.add_entry(*(int *) data);
+        poly_no.push_back(*(int *) data);
         data += 4;
     }
     pad1 = *(int *) data;
@@ -2898,8 +2895,8 @@ void Poly_Not_In_Bounding_Box_Chunk::fill_data_block(char *data_start)
     *((int *) data_start) = chunk_size;
     data_start += 4;
 
-    for (LIF<int> plif(&poly_no); !plif.done(); plif.next()) {
-        *(int *) data_start = plif();
+    for (int polygon_number : poly_no) {
+        *(int *) data_start = polygon_number;
         data_start += 4;
     }
     *(int *) data_start = pad1;

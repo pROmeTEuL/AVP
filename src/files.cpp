@@ -1,4 +1,3 @@
-#include <print>
 #include <cassert>
 #include <cstdio>
 #include <chrono>
@@ -24,7 +23,7 @@ int SetGameDirectories(const fs::path &local, const fs::path &global)
     globals.global_dir = global;
 
     if (!fs::exists(local)) {
-        std::println("Creating local directory {}...", local.string());
+        std::printf("Creating local directory %s...\n", local.string().c_str());
 
         fs::create_directories(local);
     }
@@ -412,7 +411,7 @@ void InitGameDirectories(const std::string_view argv0)
 
         if (exePath.empty()) {
             /* ... */
-            std::println(stderr, "InitGameDirectories failure");
+            std::fprintf(stderr, "InitGameDirectories failure\n");
             std::abort();
         }
 
@@ -433,7 +432,7 @@ void InitGameDirectories(const std::string_view argv0)
         try {
             gamedir = fs::read_symlink(argv0).parent_path();
         } catch (const std::filesystem::filesystem_error  &err) {
-            std::println(stderr, "Error {}", err.what());
+            std::fprintf(stderr, "Error %s\n", err.what());
         }
 
         if (!check_game_directory(gamedir)) {
@@ -472,10 +471,10 @@ void InitGameDirectories(const std::string_view argv0)
 
     /* last chance sanity check */
     if (!check_game_directory(gamedir)) {
-        std::println(stderr, "Unable to find the AvP gamedata.");
-        std::println(stderr, "The directory last examined was: {}", gamedir.string());
-        std::println(stderr, "Has the game been installed and");
-        std::println(stderr, "are all game files lowercase?");
+        std::fprintf(stderr, "Unable to find the AvP gamedata.\n");
+        std::fprintf(stderr, "The directory last examined was: %s\n", gamedir.string().c_str());
+        std::fprintf(stderr, "Has the game been installed and\n");
+        std::fprintf(stderr, "are all game files lowercase?\n");
         std::abort();
     }
 

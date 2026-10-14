@@ -6,6 +6,8 @@
 #include "chnktype.hpp"
 #include "mishchnk.hpp"
 
+#include <vector>
+
 // shape flags
 
 #define SHAPE_FLAG_PALETTISED 0x0000100
@@ -327,7 +329,7 @@ public:
 
     virtual void fill_data_block(char *data_start);
 
-    List<int> poly_no;
+    std::vector<int> poly_no;
     int pad1, pad2;
 };
 ///////////////////////////////////////////////
@@ -575,7 +577,7 @@ public:
 
     char lock_user[17];
 
-    List<char *> object_names_store;
+    std::vector<char *> object_names_store;
 
     int flags;
 
@@ -845,7 +847,7 @@ public:
     int a_flags;
     int a_speed;
 
-    List<a_frame *> anim_frames;
+    std::vector<a_frame *> anim_frames;
 
     virtual void fill_data_block(char *);
     virtual size_t size_chunk() { return (chunk_size = 12 + 12 + num_frames * 12); }

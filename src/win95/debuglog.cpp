@@ -78,12 +78,11 @@ LogFile::LogFile(LogFile const &l)
 
 void LogFile::FlushOut(FILE *fp)
 {
-    while (unwritten.size()) {
-        char *str = unwritten.first_entry();
-        unwritten.delete_first_entry();
+    for (char *str : unwritten) {
         fputs(str, fp);
         delete[] str;
     }
+    unwritten.clear();
 }
 
 int vlfprintf(LOGFILE *lfp, char const *format, va_list args)

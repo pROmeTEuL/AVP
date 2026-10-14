@@ -349,9 +349,8 @@ char *CL_GetImageFileName(
                     bShapeInGm = true;
                 }
 
-                for (LIF<BMP_Flags> itBmpFlags(&pRifChildChunk->bmps); !itBmpFlags.done();
-                     itBmpFlags.next()) {
-                    BMP_Flags bmpfTemp(itBmpFlags());
+                for (const BMP_Flags &bmpFlags : pRifChildChunk->bmps) {
+                    BMP_Flags bmpfTemp(bmpFlags);
                     StripFileExtension(bmpfTemp.filename);
 
                     if (pszFileName ? !_stricmp(pszName, StripPath(bmpfTemp.filename))
@@ -364,7 +363,7 @@ char *CL_GetImageFileName(
                                                     : IDSCF_0)
                                                | IDSCF_INCLUDED)
                                 : IDSCF_0,
-                            itBmpFlags().filename,
+                            bmpFlags.filename,
                             *pRifChildChunk->filename ? pRifChildChunk->rifname : 0);
                         ImageDescriptor const *pIdsc = &idsc;
 
@@ -400,9 +399,8 @@ char *CL_GetImageFileName(
                     if (_stricmp(pszSubName, pShapeBmpsChunk->shapename) && *pszSubName)
                         continue;
 
-                for (LIF<BMP_Name> itBmpNames(&pShapeBmpsChunk->bmps); !itBmpNames.done();
-                     itBmpNames.next()) {
-                    BMP_Name bmpnTemp(itBmpNames());
+                for (const BMP_Name &bmpName : pShapeBmpsChunk->bmps) {
+                    BMP_Name bmpnTemp(bmpName);
                     StripFileExtension(bmpnTemp.filename);
 
                     if (pszFileName ? !_stricmp(pszName, StripPath(bmpnTemp.filename))
@@ -416,7 +414,7 @@ char *CL_GetImageFileName(
                                                 ? IDSCF_SPRITE
                                                 : IDSCF_SUBSHAPE)
                                          | IDSCF_INCLUDED),
-                            itBmpNames().filename,
+                            bmpName.filename,
                             pShapeBmpsChunk->shapename,
                             bmpnTemp.flags & ChunkBMPFlag_FixedPalette ? pShapeBmpsChunk->rifname
                                                                        : 0);
@@ -523,9 +521,8 @@ char *CL_GetImageFileName(
                     = dynamic_cast<Bitmap_List_Store_Chunk *>(pBmpLstStChunk);
                 db_assert1(pBmpListStoreChunk);
 
-                for (LIF<BMP_Name> itBmpName(&pBmpListStoreChunk->bmps); !itBmpName.done();
-                     itBmpName.next()) {
-                    BMP_Name bmpnTemp(itBmpName());
+                for (const BMP_Name &bmpName : pBmpListStoreChunk->bmps) {
+                    BMP_Name bmpnTemp(bmpName);
                     StripFileExtension(bmpnTemp.filename);
 
                     if (pszFileName ? !_stricmp(pszName, StripPath(bmpnTemp.filename))
@@ -540,7 +537,7 @@ char *CL_GetImageFileName(
                                                 ? IDSCF_SPRITE
                                                 : IDSCF_SUBSHAPE)
                                          | IDSCF_INCLUDED),
-                            itBmpName().filename,
+                            bmpName.filename,
                             pszSubRifName,
                             bmpnTemp.flags & ChunkBMPFlag_FixedPalette ? pszRifName : 0);
                         ImageDescriptor const *pIdsc = &idsc;
@@ -599,8 +596,8 @@ char *CL_GetImageFileName(
                 Global_BMP_Name_Chunk *pGbnc = dynamic_cast<Global_BMP_Name_Chunk *>(pBmpNames);
                 db_assert1(pGbnc);
 
-                for (LIF<BMP_Name> itBmpName(&pGbnc->bmps); !itBmpName.done(); itBmpName.next()) {
-                    BMP_Name bmpnTemp(itBmpName());
+                for (const BMP_Name &bmpName : pGbnc->bmps) {
+                    BMP_Name bmpnTemp(bmpName);
                     StripFileExtension(bmpnTemp.filename);
 
                     if (pszFileName ? !_stricmp(pszName, StripPath(bmpnTemp.filename))
@@ -609,7 +606,7 @@ char *CL_GetImageFileName(
                         ImageDescriptor const idsc(
                             bmpnTemp.flags & ChunkBMPFlag_FixedPalette ? IDSCF_FIXEDPALETTE
                                                                        : IDSCF_0,
-                            itBmpName().filename);
+                            bmpName.filename);
                         ImageDescriptor const *pIdsc = &idsc;
 
                         if (bmpnTemp.flags & ChunkBMPFlag_FixedPalette) {

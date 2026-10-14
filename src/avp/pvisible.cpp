@@ -1588,11 +1588,11 @@ void InanimateObjectIsDamaged(STRATEGYBLOCK *sbPtr, DAMAGE_PROFILE *damage, int 
                     STRATEGYBLOCK *evil_switch_SBPtr;
                     char Evil_Switch_SBname[] = {
                         0x46,
-                        0xb9,
+                        static_cast<char>(0xb9),
                         0x01,
-                        0xf0,
+                        static_cast<char>(0xf0),
                         0x63,
-                        0xe4,
+                        static_cast<char>(0xe4),
                         0x56,
                         0x0,
                     };

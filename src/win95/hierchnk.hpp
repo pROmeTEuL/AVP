@@ -5,6 +5,8 @@
 #include "list_tem.hpp"
 #include "chnktype.hpp"
 
+#include <vector>
+
 class Object_Chunk;
 class Object_Hierarchy_Data_Chunk;
 class Object_Hierarchy_Name_Chunk;
@@ -24,7 +26,7 @@ public:
     // constructor from buffer
     Object_Hierarchy_Chunk(Chunk_With_Children *const parent, const char *, size_t const);
 
-    List<Object_Hierarchy_Chunk *> list_h_children();
+    std::vector<Object_Hierarchy_Chunk *> list_h_children();
 
     Object_Hierarchy_Data_Chunk *get_data();
     Object_Hierarchy_Name_Chunk *get_name();
@@ -119,7 +121,7 @@ public:
     char *Shape_Set_Name;
     int Shape_Set_Num;
 
-    List<Replaced_Shape_Details *> Replaced_Shape_List;
+    std::vector<Replaced_Shape_Details *> Replaced_Shape_List;
 
     int flags;
     int spare[3];
@@ -147,7 +149,7 @@ public:
     char *Set_Collection_Name;
     int Set_Collection_Num;
 
-    List<int> Index_List;
+    std::vector<int> Index_List;
 
     int TypeIndex;
     int flags;

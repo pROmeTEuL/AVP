@@ -3,6 +3,9 @@
 #include <string.h>
 #include <ctype.h>
 
+#include <algorithm>
+#include <vector>
+
 
 #include "list_tem.hpp"
 #include "chnkload.hpp"
@@ -147,19 +150,19 @@ void Shape_Fragment_Type::Setup_sh_frags(Fragment_Type_Chunk *ftc)
     }
 }
 
-static List<Shape_Fragment_Type *> FragList;
+static std::vector<Shape_Fragment_Type *> FragList;
 
 void ApplyFragTypeToShape(SHAPEHEADER *shp, const char *name)
 {
-    for (LIF<Shape_Fragment_Type *> flif(&FragList); !flif.done(); flif.next()) {
-        if (!_stricmp(flif()->name, name)) {
-            flif()->AddShape(shp);
+    for (Shape_Fragment_Type *fragment_type : FragList) {
+        if (!_stricmp(fragment_type->name, name)) {
+            fragment_type->AddShape(shp);
             return;
         }
     }
     Shape_Fragment_Type *sft = new Shape_Fragment_Type(name);
     sft->AddShape(shp);
-    FragList.add_entry(sft);
+    FragList.push_back(sft);
 }
 
 void SetupFragmentType(Fragment_Type_Chunk *ftc)
@@ -169,9 +172,9 @@ void SetupFragmentType(Fragment_Type_Chunk *ftc)
         return;
 
     Shape_Fragment_Type *sft = 0;
-    for (LIF<Shape_Fragment_Type *> flif(&FragList); !flif.done(); flif.next()) {
-        if (!_stricmp(flif()->name, name)) {
-            sft = flif();
+    for (Shape_Fragment_Type *fragment_type : FragList) {
+        if (!_stricmp(fragment_type->name, name)) {
+            sft = fragment_type;
             break;
         }
     }
@@ -184,13 +187,13 @@ void SetupFragmentType(Fragment_Type_Chunk *ftc)
 
 void DeallocateFragments(SHAPEHEADER *shp, SHAPEFRAGMENTDESC *sh_fragdesc)
 {
-    for (LIF<Shape_Fragment_Type *> flif(&FragList); !flif.done(); flif.next()) {
-        if (flif()->sh_fragdesc == sh_fragdesc) {
-            flif()->shapelist.delete_entry(shp);
-            if (!flif()->shapelist.size()) {
+    for (auto fragment_type = FragList.begin(); fragment_type != FragList.end(); ++fragment_type) {
+        if ((*fragment_type)->sh_fragdesc == sh_fragdesc) {
+            (*fragment_type)->shapelist.delete_entry(shp);
+            if (!(*fragment_type)->shapelist.size()) {
                 //no more shapes use this fragment type - so deallocate it
-                delete flif();
-                flif.delete_current();
+                delete *fragment_type;
+                FragList.erase(fragment_type);
             }
             return;
         }
@@ -215,17 +218,15 @@ void DeallocateFragments(SHAPEHEADER *shp, SHAPEFRAGMENTDESC *sh_fragdesc)
 
 void DeallocateAllFragments()
 {
-    while (FragList.size()) {
-        Shape_Fragment_Type *frag_type = FragList.first_entry();
-
+    for (Shape_Fragment_Type *frag_type : FragList) {
         while (frag_type->shapelist.size()) {
             frag_type->shapelist.delete_first_entry();
         }
         frag_type->sh_fragdesc = 0;
         delete frag_type;
 
-        FragList.delete_first_entry();
     }
+    FragList.clear();
 }
 
 /////////////////////////////////////////
@@ -523,13 +524,13 @@ void deallocate_loaded_shapes(RIFFHANDLE h)
 
     LIF<ShapeInMSL *> msl_shape_lif(&msl_shapes);
 
-    while (h->shape_nums.size()) {
+    while (!h->shape_nums.empty()) {
 #if !StandardShapeLanguage
 #error Must have standard shape language
 #endif
 
-        int list_pos = h->shape_nums.first_entry();
-        h->shape_nums.delete_first_entry();
+        int list_pos = h->shape_nums.front();
+        h->shape_nums.erase(h->shape_nums.begin());
 
         DeallocateLoadedShapeheader(mainshapelist[list_pos]);
 
@@ -585,7 +586,7 @@ int copy_sprite_to_mainshapelist(RIFFHANDLE h, Sprite_Header_Chunk *shc, int /* 
 
     post_process_shape(mainshapelist[list_pos]);
 
-    h->shape_nums.add_entry(list_pos);
+    h->shape_nums.push_back(list_pos);
 
     return list_pos;
 }
@@ -623,10 +624,8 @@ static void setup_tex_conv_array(
         // load in the textures from the shape
 
         max_indices = 0;
-        LIF<BMP_Name> bns(&blsc->bmps);
-
-        for (; !bns.done(); bns.next()) {
-            max_indices = max(bns().index, max_indices);
+        for (const BMP_Name &bmpName : blsc->bmps) {
+            max_indices = max(bmpName.index, max_indices);
         }
 
         conv_array = new int[max_indices + 1];
@@ -637,20 +636,20 @@ static void setup_tex_conv_array(
         if (Env_Chunk == 0)
             Env_Chunk = h->fc;
         // JH 17-2-97 -- image loaders have changed to avoid loading the same image twice
-        for (bns.restart(); !bns.done(); bns.next()) {
-            if (!(bns().flags & ChunkBMPFlag_NotInPC)) {
+        for (const BMP_Name &bmpName : blsc->bmps) {
+            if (!(bmpName.flags & ChunkBMPFlag_NotInPC)) {
                 std::string tex;
-                if (bns().flags & ChunkBMPFlag_IFF) {
-                    tex = bns().filename;
+                if (bmpName.flags & ChunkBMPFlag_IFF) {
+                    tex = bmpName.filename;
                 } else {
                     tex = rif_name;
                     tex += "\\";
-                    tex += bns().filename;
+                    tex += bmpName.filename;
                 }
 
-                int imgnum = load_rif_bitmap(tex.c_str(), bns().flags);
+                int imgnum = load_rif_bitmap(tex.c_str(), bmpName.flags);
                 if (GEI_NOTLOADED != imgnum)
-                    conv_array[bns().index] = imgnum;
+                    conv_array[bmpName.index] = imgnum;
             }
         }
     }
@@ -745,7 +744,7 @@ CTM_ReturnType copy_to_mainshapelist(
 
     post_process_shape(mainshapelist[list_pos]);
 
-    h->shape_nums.add_entry(list_pos);
+    h->shape_nums.push_back(list_pos);
 
     if (tmpshp->count_children("ANIMSEQU")) {
         //look for alternate texture mappings
@@ -772,7 +771,7 @@ CTM_ReturnType copy_to_mainshapelist(
                 const char *shpname = sssc->get_shape_name();
                 GLOBALASSERT(shpname);
                 msl_shapes.add_entry(new ShapeInMSL(mainshapelist[list_pos], shpname, list_pos));
-                h->shape_nums.add_entry(list_pos);
+                h->shape_nums.push_back(list_pos);
 
                 post_process_shape(mainshapelist[list_pos]);
             }
@@ -820,7 +819,7 @@ CTM_ReturnType copy_to_mainshapelist(
                         list_pos,
                         object);
                     post_process_shape(mainshapelist[list_pos]);
-                    h->shape_nums.add_entry(list_pos);
+                    h->shape_nums.push_back(list_pos);
 
                     int num_frags = 1;
 
@@ -918,20 +917,20 @@ CTM_ReturnType copy_to_mainshapelist(
 
                     int frame_no = 0;
 
-                    for (LIF<a_frame *> afi(&smfdc->anim_frames); !afi.done(); afi.next()) {
-                        if (afi()->shape1a) {
-                            if (afi()->shape1a->list_pos_number == -1) {
+                    for (a_frame *anim_frame : smfdc->anim_frames) {
+                        if (anim_frame->shape1a) {
+                            if (anim_frame->shape1a->list_pos_number == -1) {
                                 list_pos = GetMSLPos();
 
                                 Shape_Preprocessed_Data_Chunk *spdc
-                                    = (Shape_Preprocessed_Data_Chunk *) afi()
-                                          ->shape1a->lookup_single_child("SHPPRPRO");
+                                    = (Shape_Preprocessed_Data_Chunk *) anim_frame->shape1a
+                                          ->lookup_single_child("SHPPRPRO");
                                 if (spdc) {
                                     copy_preprocessed_to_shapeheader(
                                         h,
                                         spdc,
                                         mainshapelist[list_pos],
-                                        afi()->shape1a,
+                                        anim_frame->shape1a,
                                         flags,
                                         local_max_index,
                                         local_tex_index_nos,
@@ -940,9 +939,9 @@ CTM_ReturnType copy_to_mainshapelist(
                                 } else {
                                     copy_to_shapeheader(
                                         h,
-                                        afi()->shape1a->shape_data,
+                                        anim_frame->shape1a->shape_data,
                                         mainshapelist[list_pos],
-                                        afi()->shape1a,
+                                        anim_frame->shape1a,
                                         flags,
                                         local_max_index,
                                         local_tex_index_nos,
@@ -951,8 +950,8 @@ CTM_ReturnType copy_to_mainshapelist(
                                 }
 
                                 post_process_shape(mainshapelist[list_pos]);
-                                afi()->shape1a->list_pos_number = list_pos;
-                                h->shape_nums.add_entry(list_pos);
+                                anim_frame->shape1a->list_pos_number = list_pos;
+                                h->shape_nums.push_back(list_pos);
                                 /*
 								Copy the item data for this door shape from the main shape. This is largely done to cope
 								with the problem of the polygons being merged differently in different morph shapes.
@@ -972,24 +971,25 @@ CTM_ReturnType copy_to_mainshapelist(
                                 this_shape->sh_instruction[4].sh_numitems = main_shape->numitems;
                                 this_shape->sh_instruction[4].sh_instr_data = main_shape->items;
                             }
-                            mh->mph_frames[frame_no].mf_shape1 = afi()->shape1a->list_pos_number;
+                            mh->mph_frames[frame_no].mf_shape1
+                                = anim_frame->shape1a->list_pos_number;
                         } else {
                             mh->mph_frames[frame_no].mf_shape1 = main_shape_num;
                         }
 
-                        if (afi()->shape2a) {
-                            if (afi()->shape2a->list_pos_number == -1) {
+                        if (anim_frame->shape2a) {
+                            if (anim_frame->shape2a->list_pos_number == -1) {
                                 list_pos = GetMSLPos();
 
                                 Shape_Preprocessed_Data_Chunk *spdc
-                                    = (Shape_Preprocessed_Data_Chunk *) afi()
-                                          ->shape2a->lookup_single_child("SHPPRPRO");
+                                    = (Shape_Preprocessed_Data_Chunk *) anim_frame->shape2a
+                                          ->lookup_single_child("SHPPRPRO");
                                 if (spdc) {
                                     copy_preprocessed_to_shapeheader(
                                         h,
                                         spdc,
                                         mainshapelist[list_pos],
-                                        afi()->shape1a,
+                                        anim_frame->shape1a,
                                         flags,
                                         local_max_index,
                                         local_tex_index_nos,
@@ -998,9 +998,9 @@ CTM_ReturnType copy_to_mainshapelist(
                                 } else {
                                     copy_to_shapeheader(
                                         h,
-                                        afi()->shape2a->shape_data,
+                                        anim_frame->shape2a->shape_data,
                                         mainshapelist[list_pos],
-                                        afi()->shape2a,
+                                        anim_frame->shape2a,
                                         0,
                                         local_max_index,
                                         local_tex_index_nos,
@@ -1008,8 +1008,8 @@ CTM_ReturnType copy_to_mainshapelist(
                                         object);
                                 }
                                 post_process_shape(mainshapelist[list_pos]);
-                                afi()->shape2a->list_pos_number = list_pos;
-                                h->shape_nums.add_entry(list_pos);
+                                anim_frame->shape2a->list_pos_number = list_pos;
+                                h->shape_nums.push_back(list_pos);
 
                                 /*
 								Copy the item data for this door shape from the main shape. This is largely done to cope
@@ -1030,7 +1030,8 @@ CTM_ReturnType copy_to_mainshapelist(
                                 this_shape->sh_instruction[4].sh_numitems = main_shape->numitems;
                                 this_shape->sh_instruction[4].sh_instr_data = main_shape->items;
                             }
-                            mh->mph_frames[frame_no].mf_shape2 = afi()->shape2a->list_pos_number;
+                            mh->mph_frames[frame_no].mf_shape2
+                                = anim_frame->shape2a->list_pos_number;
                         } else {
                             mh->mph_frames[frame_no].mf_shape2 = main_shape_num;
                         }
@@ -1074,10 +1075,8 @@ BOOL load_rif_bitmaps(RIFFHANDLE h, int /* flags*/)
     h->max_index = 0;
 
     if (gbnc) {
-        LIF<BMP_Name> bns(&gbnc->bmps);
-
-        for (; !bns.done(); bns.next()) {
-            h->max_index = max(bns().index, h->max_index);
+        for (const BMP_Name &bmpName : gbnc->bmps) {
+            h->max_index = max(bmpName.index, h->max_index);
         }
 
         if (h->tex_index_nos)
@@ -1089,12 +1088,12 @@ BOOL load_rif_bitmaps(RIFFHANDLE h, int /* flags*/)
 
         if (Env_Chunk == 0)
             Env_Chunk = h->fc;
-        for (bns.restart(); !bns.done(); bns.next()) {
-            if (!(bns().flags & ChunkBMPFlag_NotInPC)) {
+        for (const BMP_Name &bmpName : gbnc->bmps) {
+            if (!(bmpName.flags & ChunkBMPFlag_NotInPC)) {
                 // JH 17-2-97 -- image loaders have changed to avoid loading the same image twice
-                int imgnum = load_rif_bitmap(bns().filename, bns().flags);
+                int imgnum = load_rif_bitmap(bmpName.filename, bmpName.flags);
                 if (GEI_NOTLOADED != imgnum)
-                    h->tex_index_nos[bns().index] = imgnum;
+                    h->tex_index_nos[bmpName.index] = imgnum;
             }
         }
 
@@ -1293,7 +1292,7 @@ int CopyNamedShapeMSL(RIFFHANDLE h, char const *shapename)
     int listpos = GetMSLPos();
     SHAPEHEADER *shp = CreateShapeFromRif(h, shapename, listpos);
     if (shp) {
-        h->shape_nums.add_entry(listpos);
+        h->shape_nums.push_back(listpos);
         mainshapelist[listpos] = shp;
         return listpos;
     } else {
@@ -1392,7 +1391,7 @@ void DeallocateLoadedShapePtr(SHAPEHEADER *shp)
 // delete a shape by the shape list number
 void DeallocateLoadedShapeMSL(RIFFHANDLE h, int list_pos)
 {
-    h->shape_nums.delete_entry(list_pos);
+    h->shape_nums.erase(std::find(h->shape_nums.begin(), h->shape_nums.end(), list_pos));
 
     DeallocateLoadedShapeheader(mainshapelist[list_pos]);
 
@@ -2362,9 +2361,8 @@ BOOL copy_sprite_to_shapeheader(
         // load in the textures from the shape
 
         local_max_index = 0;
-        LIF<BMP_Name> bns(&blsc->bmps);
-        for (; !bns.done(); bns.next()) {
-            local_max_index = max(bns().index, local_max_index);
+        for (const BMP_Name &bmpName : blsc->bmps) {
+            local_max_index = max(bmpName.index, local_max_index);
         }
 
         BmpConv = new int[local_max_index + 1];
@@ -2375,22 +2373,22 @@ BOOL copy_sprite_to_shapeheader(
         if (Env_Chunk == 0)
             Env_Chunk = h->fc;
         // JH 17-2-97 -- image loaders have changed to avoid loading the same image twice
-        for (bns.restart(); !bns.done(); bns.next()) {
-            if (bns().flags & ChunkBMPFlag_NotInPC)
+        for (const BMP_Name &bmpName : blsc->bmps) {
+            if (bmpName.flags & ChunkBMPFlag_NotInPC)
                 continue;
 
             std::string tex;
-            if (bns().flags & ChunkBMPFlag_IFF) {
-                tex = bns().filename;
+            if (bmpName.flags & ChunkBMPFlag_IFF) {
+                tex = bmpName.filename;
             } else {
                 tex = sprite_name;
                 tex += "\\";
-                tex += bns().filename;
+                tex += bmpName.filename;
             }
 
-            int imgnum = load_rif_bitmap(bns().filename, bns().flags);
+            int imgnum = load_rif_bitmap(bmpName.filename, bmpName.flags);
             if (GEI_NOTLOADED != imgnum)
-                BmpConv[bns().index] = imgnum;
+                BmpConv[bmpName.index] = imgnum;
         }
     }
     // header data (note shapeheader is calloced)

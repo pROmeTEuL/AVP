@@ -119,7 +119,7 @@ BMP_Enums_Chunk::BMP_Enums_Chunk(
     for (unsigned int i = enlistsize; i; --i) {
         Enum_Constant current(sdata);
         sdata += current.size_chunk();
-        enums.add_entry(current);
+        enums.push_back(current);
     }
 }
 
@@ -127,8 +127,8 @@ size_t BMP_Enums_Chunk::size_chunk()
 {
     chunk_size = 12 + 8 + (ctype ? strlen(ctype) + 1 : 1) + 4 + 3 & ~3;
 
-    for (LIF<Enum_Constant> li(&enums); !li.done(); li.next()) {
-        chunk_size += li().size_chunk();
+    for (const Enum_Constant &enumeration : enums) {
+        chunk_size += enumeration.size_chunk();
     }
     return chunk_size;
 }
@@ -151,8 +151,8 @@ void BMP_Enums_Chunk::fill_data_block(char *data_start)
     *(int *) data_start = enums.size();
     data_start += 4;
 
-    for (LIF<Enum_Constant> li(&enums); !li.done(); li.next()) {
-        Enum_Constant current(li());
+    for (const Enum_Constant &enumeration : enums) {
+        Enum_Constant current(enumeration);
 
         current.fill_data_block(data_start);
         data_start += current.size_chunk();

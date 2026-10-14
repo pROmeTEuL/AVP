@@ -143,7 +143,7 @@ Chunk_With_BMPs::Chunk_With_BMPs(
 
         max_index = max(bn.index, max_index);
 
-        bmps.add_entry(bn);
+        bmps.push_back(bn);
     }
 
     if (ver_num) {
@@ -155,8 +155,8 @@ size_t Chunk_With_BMPs::size_chunk()
 {
     int sz = 12 + 4;
 
-    for (LIF<BMP_Name> bl(&bmps); !bl.done(); bl.next()) {
-        sz += (4 - strlen(bl().filename) % 4) + strlen(bl().filename) + 20;
+    for (const BMP_Name &bmp : bmps) {
+        sz += (4 - strlen(bmp.filename) % 4) + strlen(bmp.filename) + 20;
     }
 
     chunk_size = sz;
@@ -178,21 +178,21 @@ void Chunk_With_BMPs::fill_data_block(char *data_start)
 
     data_start += 4;
 
-    for (LIF<BMP_Name> bl(&bmps); !bl.done(); bl.next()) {
-        *((int *) data_start) = bl().flags;
+    for (const BMP_Name &bmp : bmps) {
+        *((int *) data_start) = bmp.flags;
         data_start += 4;
-        *((int *) data_start) = bl().index;
+        *((int *) data_start) = bmp.index;
         data_start += 4;
-        *((int *) data_start) = bl().version_num & BMPNAME_VERSION_NUM_MASK
-                                | bl().enum_id << BMPNAME_ENUMID_SHIFT;
+        *((int *) data_start) = bmp.version_num & BMPNAME_VERSION_NUM_MASK
+                                | bmp.enum_id << BMPNAME_ENUMID_SHIFT;
         data_start += 4;
-        *((int *) data_start) = bl().priority;
+        *((int *) data_start) = bmp.priority;
         data_start += 4;
-        *((int *) data_start) = bl().transparency_colour_union;
+        *((int *) data_start) = bmp.transparency_colour_union;
         data_start += 4;
 
-        strcpy(data_start, bl().filename);
-        data_start += (4 - strlen(bl().filename) % 4) + strlen(bl().filename);
+        strcpy(data_start, bmp.filename);
+        data_start += (4 - strlen(bmp.filename) % 4) + strlen(bmp.filename);
     }
 }
 
@@ -778,8 +778,8 @@ Matching_Images_Chunk::Matching_Images_Chunk(
     datablock += 16;
 
     for (; listsize; --listsize) {
-        mlist.add_entry_end(datablock);
-        datablock += mlist.last_entry().Size();
+        mlist.push_back(MatchingImages(datablock));
+        datablock += mlist.back().Size();
     }
 
     assert(datastart + size == datablock);
@@ -789,8 +789,8 @@ size_t Matching_Images_Chunk::size_chunk()
 {
     chunk_size = 28; // 2dw spares, 1dw flags, 1dw list size, 12b header
 
-    for (LIF<MatchingImages> mlit(&mlist); !mlit.done(); mlit.next()) {
-        chunk_size += mlit().Size();
+    for (const MatchingImages &matchingImage : mlist) {
+        chunk_size += matchingImage.Size();
     }
 
     return chunk_size;
@@ -811,17 +811,17 @@ void Matching_Images_Chunk::fill_data_block(char *data_start)
 
     data_start += 16;
 
-    for (LIF<MatchingImages> mlit(&mlist); !mlit.done(); mlit.next()) {
-        mlit().WriteData(data_start);
-        data_start += mlit().Size();
+    for (const MatchingImages &matchingImage : mlist) {
+        matchingImage.WriteData(data_start);
+        data_start += matchingImage.Size();
     }
 }
 
 ImageDescriptor const &Matching_Images_Chunk::GetLoadImage(ImageDescriptor const &_insteadof)
 {
-    for (LIF<MatchingImages> mlit(&mlist); !mlit.done(); mlit.next()) {
-        if (_insteadof == mlit().insteadof)
-            return mlit().load;
+    for (const MatchingImages &matchingImage : mlist) {
+        if (_insteadof == matchingImage.insteadof)
+            return matchingImage.load;
     }
     return _insteadof;
 }

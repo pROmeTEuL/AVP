@@ -5,6 +5,8 @@
 #include "chnktype.hpp"
 #include "mishchnk.hpp"
 
+#include <vector>
+
 class Environment_Data_Header_Chunk;
 
 class Environment_Data_Chunk : public Lockable_Chunk_With_Children
@@ -162,7 +164,7 @@ public:
     size_t size_chunk();
 
     char *name;
-    List<int> random_types;
+    std::vector<int> random_types;
 
     int spare1, spare2;
 };

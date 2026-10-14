@@ -2,7 +2,8 @@
 #define _chnktype_hpp 1
 
 #include "3dc.h"
-#include "list_tem.hpp"
+
+#include <vector>
 
 struct ChunkVectorInt;
 struct ChunkVectorFloat;
@@ -319,7 +320,7 @@ struct ChunkAnimSequence
     void DeleteInterpolatedFrames();
     void GenerateInterpolatedFrames(ChunkShape const *cs);
 
-    void UpdateNormalsAndExtents(ChunkShape const *cs, List<int> *poly_not_in_bb = 0);
+    void UpdateNormalsAndExtents(ChunkShape const *cs, std::vector<int> *poly_not_in_bb = 0);
 
     int SequenceNum;
     char *name;

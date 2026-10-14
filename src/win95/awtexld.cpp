@@ -12,11 +12,10 @@
 
 #include "iff.hpp"
 
-#include "list_tem.hpp"
-
 #include <stdlib.h>
 #include <stdarg.h>
 #include <limits.h>
+#include <vector>
 
 #include "media.hpp"
 #include "awtexld.h"
@@ -254,12 +253,9 @@ struct AdditionalPixelFormat : PixelFormat
     bool canDoTranspB;
     unsigned maxColours;
 
-    // for List
-    bool operator==(AdditionalPixelFormat const &) const { return false; }
-    bool operator!=(AdditionalPixelFormat const &) const { return true; }
 };
 
-static List<AdditionalPixelFormat> listTextureFormats;
+static std::vector<AdditionalPixelFormat> listTextureFormats;
 
 } // namespace AwTl
 
@@ -392,9 +388,9 @@ void AwBackupTexture::ChoosePixelFormat(AwTl::CreateTextureParms const &_parmsR)
 		
 		PixelFormat * pFormat = &pfTextureFormat;
 		
-		for (LIF<AdditionalPixelFormat> itFormat(&listTextureFormats); !itFormat.done(); itFormat.next())
+		for (auto &itFormat : listTextureFormats)
 		{
-			AdditionalPixelFormat * pThisFormat = &itFormat();
+			AdditionalPixelFormat * pThisFormat = &itFormat;
 			// is this format suitable?
 			// ignoring alpha for now
 			if
@@ -2004,8 +2000,7 @@ AW_TL_ERC AwSetTextureFormat2(void *_ddpfP)
 
     using namespace AwTl;
 
-    while (listTextureFormats.size())
-        listTextureFormats.delete_first_entry();
+    listTextureFormats.clear();
 
     return AwSetPixelFormat(&pfTextureFormat, _ddpfP);
 }
@@ -2030,7 +2025,7 @@ AW_TL_ERC AwSetAdditionalTextureFormat2(
         pf.canDoTranspB = _canDoTransp ? true : false;
         pf.maxColours = _maxColours;
 
-        listTextureFormats.add_entry_end(pf);
+        listTextureFormats.push_back(pf);
     }
 
     return erc;

@@ -1,6 +1,7 @@
 #define DB_LEVEL 1
 
 #include <stdlib.h>
+#include <vector>
 
 #include "list_tem.hpp"
 #include "chnkload.hpp"
@@ -91,8 +92,8 @@ struct LocationGroupDieRoll
     int roll;
 };
 
-static List<BehaviourBlockData *> Behav_List;
-static List<LocationGroupDieRoll *> DieRoll_List;
+static std::vector<BehaviourBlockData *> Behav_List;
+static std::vector<LocationGroupDieRoll *> DieRoll_List;
 
 const char *light_set_name = "NORMALLT";
 
@@ -294,27 +295,26 @@ TRACK_CONTROLLER *setup_track_controller(Object_Chunk *oc)
 static int get_location_group_die_roll(int group)
 {
     //see if a vaule has already been rolled for this group
-    for (LIF<LocationGroupDieRoll *> dlif(&DieRoll_List); !dlif.done(); dlif.next()) {
-        if (dlif()->group == group) {
+    for (LocationGroupDieRoll *die_roll : DieRoll_List) {
+        if (die_roll->group == group) {
             //found the group , so return its roll
-            return dlif()->roll;
+            return die_roll->roll;
         }
     }
     //need to roll a new value for this group
     LocationGroupDieRoll *loc_group = new LocationGroupDieRoll;
     loc_group->group = group;
     loc_group->roll = FastRandom() & 0xffff;
-    DieRoll_List.add_entry(loc_group);
+    DieRoll_List.push_back(loc_group);
 
     return loc_group->roll;
 }
 
 static void clear_location_group_die_roll_list()
 {
-    while (DieRoll_List.size()) {
-        delete DieRoll_List.first_entry();
-        DieRoll_List.delete_first_entry();
-    }
+    for (LocationGroupDieRoll *die_roll : DieRoll_List)
+        delete die_roll;
+    DieRoll_List.clear();
 }
 
 static void select_alternate_location(BehaviourBlockData *bbd)
@@ -432,8 +432,7 @@ static void select_alternate_location(BehaviourBlockData *bbd)
 
 void create_strategies_from_list()
 {
-    for (LIF<BehaviourBlockData *> blif(&Behav_List); !blif.done(); blif.next()) {
-        BehaviourBlockData *bbd = blif();
+    for (BehaviourBlockData *bbd : Behav_List) {
 
         //is the strategy required by the current difficulty level?
         switch (AvP.Difficulty) {
@@ -547,13 +546,12 @@ void AddToBehaviourList(
         bbd->diff_hard = (flags & OBJECT_FLAG_NOTDIFFICULTY3) == 0;
     }
 
-    Behav_List.add_entry(bbd);
+    Behav_List.push_back(bbd);
 }
 
 void deallocate_behaviour_list()
 {
-    while (Behav_List.size()) {
-        BehaviourBlockData *bbd = Behav_List.first_entry();
+    for (BehaviourBlockData *bbd : Behav_List) {
 
         switch (bbd->sb_type) {
         case I_BehaviourMissionComplete: {
@@ -702,8 +700,8 @@ void deallocate_behaviour_list()
         DeallocateMem(bbd->bhdata);
         DeallocateMem(bbd);
 #endif
-        Behav_List.delete_first_entry();
     }
+    Behav_List.clear();
 }
 
 static void add_simple_animation(Object_Chunk *ob, int list_pos, MODULE *mod)
@@ -3047,7 +3045,7 @@ typedef struct mission_setup
     MissionObjective *mission;
 } MISSION_SETUP;
 
-static List<MISSION_SETUP *> mos_list;
+static std::vector<MISSION_SETUP *> mos_list;
 
 static void add_mission_to_list(AVP_Strategy_Chunk *asc, ObjectID id)
 {
@@ -3060,21 +3058,16 @@ static void add_mission_to_list(AVP_Strategy_Chunk *asc, ObjectID id)
     MissionObjectiveStrategy *mos = (MissionObjectiveStrategy *) asc->Strategy;
     ms->order_number = mos->mission_number;
 
-    for (LIF<MISSION_SETUP *> mlif(&mos_list); !mlif.done(); mlif.next()) {
-        if (mlif()->order_number > ms->order_number) {
-            mos_list.add_entry_before(ms, mlif());
-            return;
-        }
-    }
-    mos_list.add_entry(ms);
+    auto insertion = mos_list.begin();
+    while (insertion != mos_list.end() && (*insertion)->order_number <= ms->order_number)
+        ++insertion;
+    mos_list.insert(insertion, ms);
 }
 
 void SetupMissionObjectives()
 {
-    LIF<MISSION_SETUP *> mlif(&mos_list);
-
-    for (; !mlif.done(); mlif.next()) {
-        MissionObjectiveStrategy *mos = (MissionObjectiveStrategy *) mlif()->asc->Strategy;
+    for (MISSION_SETUP *mission_setup : mos_list) {
+        MissionObjectiveStrategy *mos = (MissionObjectiveStrategy *) mission_setup->asc->Strategy;
         assert(mos->mission_description_string >= 0 && mos->mission_description_string < 450);
         assert(mos->mission_complete_string >= 0 && mos->mission_complete_string < 450);
 
@@ -3118,36 +3111,35 @@ void SetupMissionObjectives()
             break;
         }
 
-        mlif()->mission = mission;
+        mission_setup->mission = mission;
 
         MISSION_COMPLETE_TOOLS_TEMPLATE *mctt = (MISSION_COMPLETE_TOOLS_TEMPLATE *) PoolAllocateMem(
             sizeof(MISSION_COMPLETE_TOOLS_TEMPLATE));
         mctt->mission_objective_ptr = mission;
-        *(ObjectID *) &mctt->nameID[0] = mlif()->ID;
+        *(ObjectID *) &mctt->nameID[0] = mission_setup->ID;
 
-        AddToBehaviourList(0, mlif()->ID, I_BehaviourMissionComplete, (void *) mctt, -1);
+        AddToBehaviourList(0, mission_setup->ID, I_BehaviourMissionComplete, (void *) mctt, -1);
     }
 
     //now set up the mission alterations
-    for (mlif.restart(); !mlif.done(); mlif.next()) {
-        MissionObjectiveStrategy *mos = (MissionObjectiveStrategy *) mlif()->asc->Strategy;
+    for (MISSION_SETUP *mission_setup : mos_list) {
+        MissionObjectiveStrategy *mos = (MissionObjectiveStrategy *) mission_setup->asc->Strategy;
 
         for (int i = 0; i < mos->num_mission_targets; i++) {
             //find the mission referred to
-            for (LIF<MISSION_SETUP *> mlif2(&mos_list); !mlif2.done(); mlif2.next()) {
-                if (mlif2()->ID == mos->mission_targets->target_mission) {
-                    mlif()->mission->AddMissionAlteration(
-                        mlif2()->mission, mos->mission_targets->effect_on_target);
+            for (MISSION_SETUP *target_mission : mos_list) {
+                if (target_mission->ID == mos->mission_targets->target_mission) {
+                    mission_setup->mission->AddMissionAlteration(
+                        target_mission->mission, mos->mission_targets->effect_on_target);
                     break;
                 }
             }
         }
     }
 
-    while (mos_list.size()) {
-        delete mos_list.first_entry();
-        mos_list.delete_first_entry();
-    }
+    for (MISSION_SETUP *mission_setup : mos_list)
+        delete mission_setup;
+    mos_list.clear();
 }
 
 void setup_light_data(LIGHTBLOCK *lPtr, Light_Chunk *lc)
@@ -3263,7 +3255,7 @@ void SetUpRunTimeLights()
     MODULE **m_arrayPtr = MainScene.sm_marray;
 
     while (*m_arrayPtr) {
-        List<Light_Chunk *> lights_for_this_module;
+        std::vector<Light_Chunk *> lights_for_this_module;
 
         MODULE *this_mod = *m_arrayPtr++;
 
@@ -3305,7 +3297,7 @@ void SetUpRunTimeLights()
 
             lc->light_added_to_module = TRUE;
 
-            lights_for_this_module.add_entry(lc);
+            lights_for_this_module.push_back(lc);
         }
 
         this_mod->m_numlights = lights_for_this_module.size();
@@ -3322,8 +3314,8 @@ void SetUpRunTimeLights()
 
             LIGHTBLOCK *lPtr = this_mod->m_lightarray;
 
-            for (LIF<Light_Chunk *> lci(&lights_for_this_module); !lci.done(); lci.next(), lPtr++) {
-                setup_light_data(lPtr, lci());
+            for (Light_Chunk *light : lights_for_this_module) {
+                setup_light_data(lPtr++, light);
             }
         } else {
             this_mod->m_lightarray = 0;

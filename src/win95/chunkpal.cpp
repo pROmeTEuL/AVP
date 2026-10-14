@@ -31,13 +31,9 @@ void FixedPalette_Outdated(Chunk_With_Children *parent)
         List<Chunk *> plist;
         parent->lookup_child("PRSETPAL", plist);
         for (LIF<Chunk *> plit(&plist); !plit.done(); plit.next()) {
-            for (LIF<Preset_Palette> findconst(&((Preset_Palette_Chunk *) plit())->pplist);
-                 !findconst.done();
-                 findconst.next()) {
-                Preset_Palette temp = findconst();
-                if (temp.flags & PrePalFlag_Reserved) {
-                    temp.flags &= ~PrePalFlag_UpToDate;
-                    findconst.change_current(temp);
+            for (Preset_Palette &presetPalette : ((Preset_Palette_Chunk *) plit())->pplist) {
+                if (presetPalette.flags & PrePalFlag_Reserved) {
+                    presetPalette.flags &= ~PrePalFlag_UpToDate;
                 }
             }
         }
@@ -52,20 +48,16 @@ BOOL IsFixedPalette(Chunk_With_Children *parent)
 
         LIF<Chunk *> plit(&plist);
         for (; !plit.done(); plit.next()) {
-            for (LIF<Preset_Palette> findconst(&((Preset_Palette_Chunk *) plit())->pplist);
-                 !findconst.done();
-                 findconst.next()) {
-                if (findconst().flags & PrePalFlag_Reserved) {
+            for (const Preset_Palette &presetPalette : ((Preset_Palette_Chunk *) plit())->pplist) {
+                if (presetPalette.flags & PrePalFlag_Reserved) {
                     return TRUE;
                 }
             }
         }
         parent->lookup_child("SETPALST", plist);
         for (plit = LIF<Chunk *>(&plist); !plit.done(); plit.next()) {
-            for (LIF<Preset_Palette> findconst(&((Preset_Palette_Store_Chunk *) plit())->pplist);
-                 !findconst.done();
-                 findconst.next()) {
-                if (findconst().flags & PrePalFlag_Reserved) {
+            for (const Preset_Palette &presetPalette : ((Preset_Palette_Store_Chunk *) plit())->pplist) {
+                if (presetPalette.flags & PrePalFlag_Reserved) {
                     return TRUE;
                 }
             }
@@ -205,7 +197,7 @@ Preset_Palette_Chunk::Preset_Palette_Chunk(
     for (int i = pplistsize; i; --i) {
         Preset_Palette current(sdata);
         sdata += current.size_chunk();
-        pplist.add_entry(current);
+        pplist.push_back(current);
     }
 }
 
@@ -213,8 +205,8 @@ size_t Preset_Palette_Chunk::size_chunk()
 {
     chunk_size = 12 + 24;
 
-    for (LIF<Preset_Palette> li(&pplist); !li.done(); li.next()) {
-        chunk_size += li().size_chunk();
+    for (const Preset_Palette &presetPalette : pplist) {
+        chunk_size += presetPalette.size_chunk();
     }
 
     return chunk_size;
@@ -239,8 +231,8 @@ void Preset_Palette_Chunk::fill_data_block(char *data_start)
 
     data_start += 24;
 
-    for (LIF<Preset_Palette> li(&pplist); !li.done(); li.next()) {
-        Preset_Palette current(li());
+    for (const Preset_Palette &presetPalette : pplist) {
+        Preset_Palette current(presetPalette);
 
         current.fill_data_block(data_start);
         data_start += current.size_chunk();
@@ -387,7 +379,7 @@ TLT_Config_Chunk::TLT_Config_Chunk(Chunk_With_Children *parent, const char *sdat
     while (listsize) {
         TLTConfigBlock block(sdata);
         sdata += block.Size();
-        blocks.add_entry_end(block);
+        blocks.push_back(block);
         listsize--;
     }
 
@@ -401,8 +393,8 @@ TLT_Config_Chunk::TLT_Config_Chunk(Chunk_With_Children *parent, const char *sdat
 size_t TLT_Config_Chunk::size_chunk()
 {
     chunk_size = 44 + (srcrifname ? strlen(srcrifname) : 0) + 4 & ~3;
-    for (LIF<TLTConfigBlock> tbli(&blocks); !tbli.done(); tbli.next()) {
-        chunk_size += tbli().Size();
+    for (const TLTConfigBlock &block : blocks) {
+        chunk_size += block.Size();
     }
     return chunk_size;
 }
@@ -437,9 +429,9 @@ void TLT_Config_Chunk::fill_data_block(char *data_start)
     *(int *) data_start = blocks.size();
     data_start += 4;
 
-    for (LIF<TLTConfigBlock> tbli(&blocks); !tbli.done(); tbli.next()) {
-        tbli().WriteData(data_start);
-        data_start += tbli().Size();
+    for (const TLTConfigBlock &block : blocks) {
+        block.WriteData(data_start);
+        data_start += block.Size();
     }
 }
 
@@ -539,7 +531,7 @@ Environment_Game_Mode_Header_Chunk::Environment_Game_Mode_Header_Chunk(
 
         char *riffn = new char[len];
         strcpy(riffn, pdata);
-        rif_files.add_entry(riffn);
+        rif_files.push_back(riffn);
 
         pdata += len;
     }
@@ -552,9 +544,8 @@ Environment_Game_Mode_Header_Chunk::~Environment_Game_Mode_Header_Chunk()
     if (mode_identifier)
         delete[] mode_identifier;
 
-    while (rif_files.size()) {
-        delete[] rif_files.first_entry();
-        rif_files.delete_first_entry();
+    for (char *rifFile : rif_files) {
+        delete[] rifFile;
     }
 }
 
@@ -581,10 +572,10 @@ void Environment_Game_Mode_Header_Chunk::fill_data_block(char *data_start)
 
     data_start += strlen(mode_identifier) + 1;
 
-    for (LIF<char *> li(&rif_files); !li.done(); li.next()) {
-        strcpy(data_start, li());
+    for (const char *rifFile : rif_files) {
+        strcpy(data_start, rifFile);
 
-        data_start += strlen(li()) + 1;
+        data_start += strlen(rifFile) + 1;
     }
 
     *data_start = 0; // double 0-byte terminator
@@ -594,8 +585,8 @@ size_t Environment_Game_Mode_Header_Chunk::size_chunk()
 {
     chunk_size = 12 + 20 + (strlen(mode_identifier) + 1);
 
-    for (LIF<char *> li(&rif_files); !li.done(); li.next()) {
-        chunk_size += strlen(li()) + 1;
+    for (const char *rifFile : rif_files) {
+        chunk_size += strlen(rifFile) + 1;
     }
 
     chunk_size += 4; // 1 byte terminator, 3(max) to pad
@@ -620,8 +611,8 @@ size_t RIF_Child_Chunk::size_chunk()
 {
     chunk_size = 12 + 12 + (strlen(rifname) + 1 + 3 & ~3) + 4 + (strlen(filename) + 1 + 3 & ~3) + 4;
 
-    for (LIF<BMP_Flags> li(&bmps); !li.done(); li.next()) {
-        chunk_size += 8 + strlen(li().filename) + 1 + 3 & ~3;
+    for (const BMP_Flags &bmp : bmps) {
+        chunk_size += 8 + strlen(bmp.filename) + 1 + 3 & ~3;
     }
 
     return chunk_size;
@@ -657,15 +648,15 @@ void RIF_Child_Chunk::fill_data_block(char *data_start)
     *((int *) data_start) = bmps.size();
     data_start += 4;
 
-    for (LIF<BMP_Flags> li(&bmps); !li.done(); li.next()) {
-        *((int *) data_start) = li().flags;
+    for (const BMP_Flags &bmp : bmps) {
+        *((int *) data_start) = bmp.flags;
         data_start += 4;
-        *((int *) data_start) = li().version_num & BMPFLAGS_VERSION_NUM_MASK
-                                | li().enum_id << BMPFLAGS_ENUMID_SHIFT;
+        *((int *) data_start) = bmp.version_num & BMPFLAGS_VERSION_NUM_MASK
+                                | bmp.enum_id << BMPFLAGS_ENUMID_SHIFT;
         data_start += 4;
 
-        strcpy(data_start, li().filename);
-        data_start += strlen(li().filename) + 1 + 3 & ~3;
+        strcpy(data_start, bmp.filename);
+        data_start += strlen(bmp.filename) + 1 + 3 & ~3;
     }
 }
 
@@ -764,7 +755,7 @@ RIF_Child_Chunk::RIF_Child_Chunk(
         strcpy(temp.filename, sdata);
         sdata += len + 3 & ~3;
 
-        bmps.add_entry(temp);
+        bmps.push_back(temp);
     }
 }
 
@@ -797,7 +788,7 @@ Preset_Palette_Store_Chunk::Preset_Palette_Store_Chunk(
     for (int i = pplistsize; i; --i) {
         Preset_Palette current(sdata);
         sdata += current.size_chunk();
-        pplist.add_entry(current);
+        pplist.push_back(current);
     }
 }
 
@@ -805,8 +796,8 @@ size_t Preset_Palette_Store_Chunk::size_chunk()
 {
     chunk_size = 12 + 24 + strlen(rifname) + 1 + 3 & ~3;
 
-    for (LIF<Preset_Palette> li(&pplist); !li.done(); li.next()) {
-        chunk_size += li().size_chunk();
+    for (const Preset_Palette &presetPalette : pplist) {
+        chunk_size += presetPalette.size_chunk();
     }
 
     return chunk_size;
@@ -835,8 +826,8 @@ void Preset_Palette_Store_Chunk::fill_data_block(char *data_start)
     *(int *) (data_start) = pplist.size();
     data_start += 4;
 
-    for (LIF<Preset_Palette> li(&pplist); !li.done(); li.next()) {
-        Preset_Palette current(li());
+    for (const Preset_Palette &presetPalette : pplist) {
+        Preset_Palette current(presetPalette);
 
         current.fill_data_block(data_start);
         data_start += current.size_chunk();

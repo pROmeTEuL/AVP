@@ -1,5 +1,7 @@
 #include "wpchunk.hpp"
 
+#include <algorithm>
+
 //macro for helping to force inclusion of chunks when using libraries
 FORCE_CHUNK_INCLUDE_IMPLEMENT(wpchunk)
 
@@ -335,7 +337,7 @@ AI_Module_Slave_Chunk *AddModuleSlaveChunk(Object_Chunk *oc, Object_Chunk *maste
 
 void AI_Module_Master_Chunk::AddModule(Object_Chunk *oc)
 {
-    if (ModuleList.contains(oc))
+    if (std::find(ModuleList.begin(), ModuleList.end(), oc) != ModuleList.end())
         return;
     if (oc == get_my_object_chunk())
         return;
@@ -349,11 +351,12 @@ void AI_Module_Master_Chunk::AddModule(Object_Chunk *oc)
         if (chlist.size()) {
             //if the module being added is a master , add all its slaves as well
             AI_Module_Master_Chunk *ammc = (AI_Module_Master_Chunk *) chlist.first_entry();
-            for (LIF<Object_Chunk *> oblif(&ammc->ModuleList); !oblif.done(); oblif.next()) {
-                if (!ModuleList.contains(oblif()) && oblif() != get_my_object_chunk()) {
-                    ModuleList.add_entry(oblif());
+            for (Object_Chunk *module : ammc->ModuleList) {
+                if (std::find(ModuleList.begin(), ModuleList.end(), module) == ModuleList.end()
+                    && module != get_my_object_chunk()) {
+                    ModuleList.push_back(module);
                     //create new slave chunks for the modules being added
-                    AddModuleSlaveChunk(oblif(), get_my_object_chunk());
+                    AddModuleSlaveChunk(module, get_my_object_chunk());
                 }
             }
             delete ammc;
@@ -361,7 +364,7 @@ void AI_Module_Master_Chunk::AddModule(Object_Chunk *oc)
     }
 
     //add this module
-    ModuleList.add_entry(oc);
+    ModuleList.push_back(oc);
     AddModuleSlaveChunk(oc, get_my_object_chunk());
 
     //see if there are any waypoints to copy
@@ -441,7 +444,7 @@ void AI_Module_Slave_Chunk::post_input_processing()
                 return;
             }
             AI_Module_Master_Chunk *ammc = (AI_Module_Master_Chunk *) chlist.first_entry();
-            ammc->ModuleList.add_entry(get_my_object_chunk());
+            ammc->ModuleList.push_back(get_my_object_chunk());
             MasterModule = oc;
             return;
         }

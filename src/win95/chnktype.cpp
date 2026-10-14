@@ -1,4 +1,5 @@
 #include <math.h>
+#include <algorithm>
 #include "chnktype.hpp"
 
 #include "chunk.hpp"
@@ -922,7 +923,8 @@ ChunkAnimSequence &ChunkAnimSequence::operator=(const ChunkAnimSequence &seq)
     return *this;
 }
 
-void ChunkAnimSequence::UpdateNormalsAndExtents(ChunkShape const *cs, List<int> *poly_not_in_bb)
+void ChunkAnimSequence::UpdateNormalsAndExtents(
+    ChunkShape const *cs, std::vector<int> *poly_not_in_bb)
 {
     int i;
 
@@ -973,7 +975,8 @@ void ChunkAnimSequence::UpdateNormalsAndExtents(ChunkShape const *cs, List<int> 
             vert_in_bb[i] = 0;
         }
         for (i = 0; i < cs->num_polys; i++) {
-            if (poly_not_in_bb->contains(i))
+            if (std::find(poly_not_in_bb->begin(), poly_not_in_bb->end(), i)
+                != poly_not_in_bb->end())
                 continue;
             const ChunkPoly *cp = &cs->poly_list[i];
             for (int j = 0; j < cp->num_verts; j++) {

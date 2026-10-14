@@ -5,6 +5,8 @@
 #include "chnktype.hpp"
 #include "obchunk.hpp"
 
+#include <vector>
+
 struct WaypointLink
 {
     int index;
@@ -77,7 +79,7 @@ public:
     void AddModule(Object_Chunk *);
     Object_Chunk *get_my_object_chunk();
 
-    List<Object_Chunk *> ModuleList;
+    std::vector<Object_Chunk *> ModuleList;
 };
 
 class AI_Module_Slave_Chunk : public Chunk

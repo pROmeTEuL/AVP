@@ -21,6 +21,9 @@
 #include "avpchunk.hpp"
 #include "pathchnk.hpp"
 
+#include <algorithm>
+#include <vector>
+
 #include "objsetup.hpp"
 #include "npcsetup.h"
 #include "sprchunk.hpp"
@@ -544,13 +547,13 @@ Global_Hierarchy_Store::~Global_Hierarchy_Store()
 void Global_Hierarchy_Store::add_hierarchy(
     List<Object_ShapeNum_Pair *> &osnp_lst, Object_Hierarchy_Chunk *ohc)
 {
-    List<Object_Hierarchy_Chunk *> ohcl = ohc->list_h_children();
+    std::vector<Object_Hierarchy_Chunk *> ohcl = ohc->list_h_children();
 
     GLOBALASSERT(ohcl.size() == 1);
 
     //check to see if this hierarchy has any sequences
     {
-        Object_Hierarchy_Chunk *ohc = (Object_Hierarchy_Chunk *) ohcl.first_entry();
+        Object_Hierarchy_Chunk *ohc = ohcl.front();
         if (!Get_Object_Animation_All_Sequence_Chunk(ohc)) {
             List<Object_Animation_Sequence_Chunk *> seql;
             Chunk *pChunk = ohc->lookup_single_child("OBANSEQS");
@@ -574,8 +577,8 @@ void Global_Hierarchy_Store::add_hierarchy(
         strcpy(hd->hierarchy_name, "Template");
     }
 
-    build_time_list(ohcl.first_entry());
-    hd->hierarchy_root = build_hierarchy(ohcl.first_entry(), hd->hierarchy_name);
+    build_time_list(ohcl.front());
+    hd->hierarchy_root = build_hierarchy(ohcl.front(), hd->hierarchy_name);
     while (time_list.size()) {
         delete time_list.first_entry();
         time_list.delete_first_entry();
@@ -588,8 +591,8 @@ void Global_Hierarchy_Store::add_hierarchy(
     Preprocess_HModel(hd->hierarchy_root, riffname);
 }
 
-static List<int> random_marine_texturings;
-static List<int> random_civilian_texturings;
+static std::vector<int> random_marine_texturings;
+static std::vector<int> random_civilian_texturings;
 
 void Global_Hierarchy_Store::setup_alternate_shape_sets(
     List<Object_ShapeNum_Pair *> &osnp_lst, File_Chunk *fc)
@@ -616,11 +619,10 @@ void Global_Hierarchy_Store::setup_alternate_shape_sets(
             sizeof(HIERARCHY_SHAPE_REPLACEMENT) * (ohassc->Replaced_Shape_List.size() + 1));
 
         HIERARCHY_SHAPE_REPLACEMENT *hsr = hass->replaced_shapes;
-        for (LIF<Replaced_Shape_Details *> rlif(&ohassc->Replaced_Shape_List); !rlif.done();
-             rlif.next(), hsr++) {
+        for (const Replaced_Shape_Details *replaced_shape : ohassc->Replaced_Shape_List) {
             hsr->replaced_section_name = (char *) PoolAllocateMem(
-                strlen(rlif()->old_object_name) + 1);
-            strcpy(hsr->replaced_section_name, rlif()->old_object_name);
+                strlen(replaced_shape->old_object_name) + 1);
+            strcpy(hsr->replaced_section_name, replaced_shape->old_object_name);
 
             hsr->replacement_id = 0;
 
@@ -628,7 +630,7 @@ void Global_Hierarchy_Store::setup_alternate_shape_sets(
             LIF<Object_ShapeNum_Pair *> olif(&osnp_lst);
 
             for (; !olif.done(); olif.next()) {
-                if (!strcmp(olif()->ob->object_data.o_name, rlif()->new_object_name)) {
+                if (!strcmp(olif()->ob->object_data.o_name, replaced_shape->new_object_name)) {
                     hsr->replacement_shape = mainshapelist[olif()->sh_num];
                     hsr->replacement_shape_index = olif()->sh_num;
                     break;
@@ -639,6 +641,7 @@ void Global_Hierarchy_Store::setup_alternate_shape_sets(
                 hsr->replacement_shape = 0;
                 hsr->replacement_shape_index = 0;
             }
+            hsr++;
         }
         hsr->replaced_section_name = 0;
         hsr->replacement_shape = 0;
@@ -673,7 +676,7 @@ void Global_Hierarchy_Store::setup_alternate_shape_sets(
         shape_collections[i].female = 0;
     }
     //find the collections that can be randomly generated
-    List<int> *ran_list = 0;
+    std::vector<int> *ran_list = 0;
     if (!_stricmp(riffname, "hnpcmarine")) {
         if (random_marine_texturings.size())
             ran_list = &random_marine_texturings;
@@ -682,7 +685,7 @@ void Global_Hierarchy_Store::setup_alternate_shape_sets(
             ran_list = &random_civilian_texturings;
     }
 
-    if (!ran_list || ran_list->contains(1))
+    if (!ran_list || std::find(ran_list->begin(), ran_list->end(), 1) != ran_list->end())
         random_shape_colls.add_entry(1);
 
     //now go through the list of shape set collections again
@@ -699,9 +702,9 @@ void Global_Hierarchy_Store::setup_alternate_shape_sets(
         num_shapes_to_replace = 0;
         int combined_flags = 0;
 
-        for (LIF<int> ind_lif(&coll->Index_List); !ind_lif.done(); ind_lif.next()) {
+        for (int index : coll->Index_List) {
             for (alt_lif.restart(); !alt_lif.done(); alt_lif.next()) {
-                if (ind_lif() == alt_lif()->index) {
+                if (index == alt_lif()->index) {
                     found_sets[num_found_sets] = alt_lif();
                     num_found_sets++;
                     num_shapes_to_replace += alt_lif()->num_replaced_shapes;
@@ -737,7 +740,9 @@ void Global_Hierarchy_Store::setup_alternate_shape_sets(
         }
 
         //see if this collection can appear randomly
-        if (!ran_list || ran_list->contains(coll->Set_Collection_Num)) {
+        if (!ran_list
+            || std::find(ran_list->begin(), ran_list->end(), coll->Set_Collection_Num)
+                   != ran_list->end()) {
             random_shape_colls.add_entry(coll->Set_Collection_Num);
         }
     }
@@ -1143,7 +1148,7 @@ SECTION *Global_Hierarchy_Store::build_hierarchy(Object_Hierarchy_Chunk *ohc, ch
 
     currsection->Children = 0;
 
-    List<Object_Hierarchy_Chunk *> h_children = ohc->list_h_children();
+    std::vector<Object_Hierarchy_Chunk *> h_children = ohc->list_h_children();
 
     if (h_children.size()) {
         currsection->Children = (SECTION **) PoolAllocateMem(
@@ -1151,8 +1156,8 @@ SECTION *Global_Hierarchy_Store::build_hierarchy(Object_Hierarchy_Chunk *ohc, ch
 
         int i = 0;
 
-        for (LIF<Object_Hierarchy_Chunk *> hci(&h_children); !hci.done(); hci.next()) {
-            if ((currsection->Children[i++] = build_hierarchy(hci(), hierarchy_name)) == 0)
+        for (Object_Hierarchy_Chunk *h_child : h_children) {
+            if ((currsection->Children[i++] = build_hierarchy(h_child, hierarchy_name)) == 0)
                 return 0;
         }
         currsection->Children[i] = 0;
@@ -1936,9 +1941,9 @@ BOOL copy_rif_data(RIFFHANDLE h, int flags, int progress_start, int progress_int
                 aimodule_indeces[i] = ai_mod_pos;
 
                 int pos = 1;
-                for (LIF<Object_Chunk *> modlif(&ammc->ModuleList); !modlif.done(); modlif.next()) {
+                for (Object_Chunk *module : ammc->ModuleList) {
                     for (int obj = 0; obj < mod_pos; obj++) {
-                        if (o_chunk_array[obj] == modlif()) {
+                        if (o_chunk_array[obj] == module) {
                             aim->m_module_ptrs[pos++] = &MainScene.sm_module[obj];
                             MainScene.sm_module[obj].m_aimodule = aim;
                             aimodule_indeces[obj] = ai_mod_pos;
@@ -2183,9 +2188,9 @@ BOOL copy_rif_data(RIFFHANDLE h, int flags, int progress_start, int progress_int
             }
 
             if (ammc) {
-                for (LIF<Object_Chunk *> oblif(&ammc->ModuleList); !oblif.done(); oblif.next()) {
+                for (Object_Chunk *module : ammc->ModuleList) {
                     Object_Module_Data_Chunk *omdc2
-                        = (Object_Module_Data_Chunk *) oblif()->lookup_single_child("MODULEDT");
+                        = (Object_Module_Data_Chunk *) module->lookup_single_child("MODULEDT");
                     if (!omdc2)
                         continue;
                     amc = (Adjacent_Module_Entry_Points_Chunk *) omdc2->lookup_single_child(
@@ -2484,10 +2489,8 @@ BOOL copy_rif_data(RIFFHANDLE h, int flags, int progress_start, int progress_int
         InitNPCs(h);
         local_scale = env_scale;
 
-        while (random_marine_texturings.size())
-            random_marine_texturings.delete_first_entry();
-        while (random_civilian_texturings.size())
-            random_civilian_texturings.delete_first_entry();
+        random_marine_texturings.clear();
+        random_civilian_texturings.clear();
     }
 
     //reset sound diretory pointer

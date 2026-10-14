@@ -2,8 +2,8 @@
 #define _included_debuglog_hpp_
 
 #include <stdio.h>
+#include <vector>
 #include "debuglog.h"
-#include "list_tem.hpp"
 
 /*	Changed 27/1/98 by DHM:
 	-----------------------
@@ -32,7 +32,7 @@ struct LogFile : public R_DumpContext
 {
 private:
     char *fname;
-    List<char *> unwritten;
+    std::vector<char *> unwritten;
     int ever_written;
     void FlushOut(FILE *fp);
 
@@ -53,7 +53,7 @@ public:
                 return EOF;
             char *newtxt = new char[strlen(buf) + 1];
             strcpy(newtxt, buf);
-            unwritten.add_entry_end(newtxt);
+            unwritten.push_back(newtxt);
             return 0;
         }
         if (unwritten.size())
@@ -84,7 +84,7 @@ public:
             rv = vsprintf(buf, format, ap);
             char *newtxt = new char[strlen(buf) + 1];
             strcpy(newtxt, buf);
-            unwritten.add_entry_end(newtxt);
+            unwritten.push_back(newtxt);
         }
         va_end(ap);
         if (fp)
@@ -112,7 +112,7 @@ public:
             rv = vsprintf(buf, format, ap);
             char *newtxt = new char[strlen(buf) + 1];
             strcpy(newtxt, buf);
-            unwritten.add_entry_end(newtxt);
+            unwritten.push_back(newtxt);
         }
         return rv;
     }
@@ -141,7 +141,7 @@ public:
             rv = vsprintf(buf, format, ap);
             char *newtxt = new char[strlen(buf) + 1];
             strcpy(newtxt, buf);
-            unwritten.add_entry_end(newtxt);
+            unwritten.push_back(newtxt);
         }
         va_end(ap);
         if (fp)
@@ -169,7 +169,7 @@ public:
             rv = vsprintf(buf, format, ap);
             char *newtxt = new char[strlen(buf) + 1];
             strcpy(newtxt, buf);
-            unwritten.add_entry_end(newtxt);
+            unwritten.push_back(newtxt);
         }
         return rv;
     }

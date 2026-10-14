@@ -3,6 +3,8 @@
 
 #include "chunk.hpp"
 
+#include <vector>
+
 class Enum_Constant
 {
 public:
@@ -45,7 +47,7 @@ private:
 class Enum_Const_List
 {
 public:
-    List<Enum_Constant> enums;
+    std::vector<Enum_Constant> enums;
 
     virtual ~Enum_Const_List() {}
 };
@@ -68,7 +70,6 @@ public:
     char *ctype;
     int reserved1;
     int reserved2;
-    // List<Enum_Constant> enums;
 
 private:
     friend class Enum_Chunk;

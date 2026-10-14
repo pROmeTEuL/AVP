@@ -13,9 +13,8 @@
 #include "iff.hpp"
 #include "iff_ilbm.hpp"
 
-#include "list_tem.hpp"
-
 #include <limits.h>
+#include <vector>
 
 // conversion functors for IFF loader
 class AwIffConvNull
@@ -191,7 +190,7 @@ protected:
 private:
     static bool Enumerator(IFF::Chunk *pChunk, void *pData);
     // list of chunks found by enumerator
-    List<IFF::IlbmBodyChunk *> m_listBodyChunks;
+    std::vector<IFF::IlbmBodyChunk *> m_listBodyChunks;
 
     // smallest and largest palette sizes of versions of this image
     unsigned m_nMaxPaletteSize;
@@ -221,8 +220,7 @@ void AwIffLoader::LoadHeaderInfo(MediaMedium *pMedium)
 {
     db_log4("\tLoading an IFF file");
 
-    while (m_listBodyChunks.size())
-        m_listBodyChunks.delete_first_entry();
+    m_listBodyChunks.clear();
 
     if (!m_ifData.Load(pMedium) || !m_ifData.GetContents()) {
         //		if (NO_ERROR == (awTlLastWinErr = GetLastError()))
@@ -272,7 +270,7 @@ bool AwIffLoader::Enumerator(IFF::Chunk *pChunk, void *pData)
              nThisPaletteSize,
              static_cast<IFF::IlbmBmhdChunk *>(pHdr)->eCompression ? "" : "un"));
 
-        pThis->m_listBodyChunks.add_entry(static_cast<IFF::IlbmBodyChunk *>(pChunk));
+        pThis->m_listBodyChunks.push_back(static_cast<IFF::IlbmBodyChunk *>(pChunk));
 
         if (nThisPaletteSize < pThis->m_nMinPaletteSize)
             pThis->m_nMinPaletteSize = nThisPaletteSize;
@@ -301,15 +299,14 @@ void AwIffLoader::OnBeginRestoring(unsigned nMaxPaletteSize)
         m_pBody = NULL;
         unsigned nBestPaletteSize = 0;
 
-        for (LIF<IFF::IlbmBodyChunk *> itChunks(&m_listBodyChunks); !itChunks.done();
-             itChunks.next()) {
+        for (IFF::IlbmBodyChunk *bodyChunk : m_listBodyChunks) {
             IFF::IlbmCmapChunk *pCmap = static_cast<IFF::IlbmCmapChunk *>(
-                itChunks()->GetProperty("CMAP"));
+                bodyChunk->GetProperty("CMAP"));
             db_assert1(pCmap);
 
             if ((!nMaxPaletteSize || pCmap->nEntries <= nMaxPaletteSize)
                 && pCmap->nEntries > nBestPaletteSize) {
-                m_pBody = itChunks();
+                m_pBody = bodyChunk;
                 m_pCmap = pCmap;
                 nBestPaletteSize = pCmap->nEntries;
             }
@@ -389,7 +386,7 @@ bool AwIffLoader::HasTransparentMask(bool bDefault)
 {
     if (m_listBodyChunks.size()) {
         IFF::IlbmBmhdChunk *pHdr = static_cast<IFF::IlbmBmhdChunk *>(
-            m_listBodyChunks.first_entry()->GetProperty("BMHD"));
+            m_listBodyChunks.front()->GetProperty("BMHD"));
         db_assert1(pHdr);
         return (IFF::IlbmBmhdChunk::MASK_TRANSPARENTCOL == pHdr->eMasking);
     } else

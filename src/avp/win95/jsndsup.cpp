@@ -6,26 +6,29 @@
 #include "ourasert.h"
 #include "psndplat.h"
 
-#include "list_tem.hpp"
 #include "jsndsup.h"
+
+#include <algorithm>
+#include <vector>
 
 extern int SoundSwitchedOn;
 // Pat sets this up
 
-List<LOADED_SOUND *> loaded_sounds;
+std::vector<LOADED_SOUND *> loaded_sounds;
 
 void LoseSound(LOADED_SOUND const *ls)
 {
     LOADED_SOUND **ucls_p = (LOADED_SOUND **) &ls;
     LOADED_SOUND *ucls = *ucls_p;
 
-    if (loaded_sounds.contains(ucls)) {
-        LOADED_SOUND *ls_in_list = loaded_sounds.similar_entry(ucls);
+    auto sound = std::find(loaded_sounds.begin(), loaded_sounds.end(), ucls);
+    if (sound != loaded_sounds.end()) {
+        LOADED_SOUND *ls_in_list = *sound;
         ls_in_list->num_attached--;
 
         if (ls_in_list->permanent == 1) {
             if (ls_in_list->num_attached <= 0) {
-                loaded_sounds.delete_entry(ls_in_list);
+                loaded_sounds.erase(sound);
                 DeallocateMem(ls_in_list->wavname);
                 DeallocateMem(ls_in_list);
             }
@@ -35,7 +38,7 @@ void LoseSound(LOADED_SOUND const *ls)
 
         if (ls_in_list->num_attached <= 0) {
             PlatEndGameSound((SOUNDINDEX) ls_in_list->sound_num);
-            loaded_sounds.delete_entry(ls_in_list);
+            loaded_sounds.erase(sound);
             DeallocateMem(ls_in_list->wavname);
             DeallocateMem(ls_in_list);
         }
@@ -46,10 +49,7 @@ void LoseSound(LOADED_SOUND const *ls)
 
 void LoseAllNonCommonSounds()
 {
-    LOADED_SOUND *ls;
-    while (loaded_sounds.size()) {
-        ls = loaded_sounds.first_entry();
-        loaded_sounds.delete_first_entry();
+    for (LOADED_SOUND *ls : loaded_sounds) {
 
         if (!ls->permanent) {
             PlatEndGameSound((SOUNDINDEX) ls->sound_num);
@@ -58,6 +58,7 @@ void LoseAllNonCommonSounds()
         DeallocateMem(ls->wavname);
         DeallocateMem(ls);
     }
+    loaded_sounds.clear();
 }
 
 static int find_empty_game_sound()
@@ -103,10 +104,10 @@ LOADED_SOUND const *GetSound(char const *fname)
 
     // check if wavname already loaded
 
-    for (LIF<LOADED_SOUND *> lsi(&loaded_sounds); !lsi.done(); lsi.next()) {
-        if (!_stricmp(lsi()->wavname, wavname)) {
-            lsi()->num_attached++;
-            return (lsi());
+    for (LOADED_SOUND *loaded_sound : loaded_sounds) {
+        if (!_stricmp(loaded_sound->wavname, wavname)) {
+            loaded_sound->num_attached++;
+            return loaded_sound;
         }
     }
 
@@ -122,7 +123,7 @@ LOADED_SOUND const *GetSound(char const *fname)
         strcpy(ls->wavname, wavname);
         ls->num_attached = 1;
         ls->permanent = 1;
-        loaded_sounds.add_entry(ls);
+        loaded_sounds.push_back(ls);
         return (ls);
     }
 
@@ -151,7 +152,7 @@ LOADED_SOUND const *GetSound(char const *fname)
         strcpy(ls->wavname, wavname);
         ls->num_attached = 1;
         ls->permanent = 0;
-        loaded_sounds.add_entry(ls);
+        loaded_sounds.push_back(ls);
     }
 
     return (ls);

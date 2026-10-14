@@ -258,7 +258,7 @@ Random_Texture_ID_Chunk::Random_Texture_ID_Chunk(
     CHUNK_EXTRACT(num_types, int);
     for (int i = 0; i < num_types; i++) {
         CHUNK_EXTRACT(type, int);
-        random_types.add_entry(type);
+        random_types.push_back(type);
     }
     CHUNK_EXTRACT(spare1, int);
     CHUNK_EXTRACT(spare2, int);
@@ -276,8 +276,8 @@ void Random_Texture_ID_Chunk::fill_data_block(char *data)
     CHUNK_FILL_STRING(name)
 
     CHUNK_FILL(random_types.size(), int);
-    for (LIF<int> rlif(&random_types); !rlif.done(); rlif.next()) {
-        CHUNK_FILL(rlif(), int)
+    for (int random_type : random_types) {
+        CHUNK_FILL(random_type, int)
     }
 
     CHUNK_FILL(spare1, int)

@@ -2,6 +2,8 @@
 #define _included_chunkpal_hpp_
 
 #include "chunk.hpp"
+
+#include <vector>
 #include "bmpnames.hpp"
 
 class Environment_Data_Chunk;
@@ -140,7 +142,7 @@ public:
     const int reserved2;
     const int reserved3;
 
-    List<Preset_Palette> pplist;
+    std::vector<Preset_Palette> pplist;
 
 private:
     friend class Environment_Data_Chunk;
@@ -279,7 +281,7 @@ public:
 
     unsigned int table_size;
 
-    List<TLTConfigBlock> blocks;
+    std::vector<TLTConfigBlock> blocks;
 
     unsigned int palette_size; // for version 2 palettes and big tlt
 
@@ -549,7 +551,7 @@ public:
     {
         char *n = new char[strlen(f) + 1];
         strcpy(n, f);
-        rif_files.add_entry(n);
+        rif_files.push_back(n);
     }
     inline const char *get_safe_source(void)
     {
@@ -557,7 +559,7 @@ public:
             return "this.rif";
         if (!rif_files.size())
             return "unknown.rif";
-        return rif_files.first_entry();
+        return rif_files.front();
     }
 
 private:
@@ -567,7 +569,7 @@ private:
     friend class GameModeDlg;
     friend class GameModeRifDlg;
 
-    List<char *> rif_files; // where the game mode goes to or comes from
+    std::vector<char *> rif_files; // where the game mode goes to or comes from
 
 #define ChunkGMod_NumReserved 3
     int reserved[ChunkGMod_NumReserved];
@@ -720,7 +722,7 @@ public:
     inline BOOL operator==(RIF_Child_Chunk const &c) const { return !strcmp(rifname, c.rifname); }
     inline BOOL operator!=(RIF_Child_Chunk const &c) const { return strcmp(rifname, c.rifname); }
 
-    List<BMP_Flags> bmps;
+    std::vector<BMP_Flags> bmps;
 
     RCC_Flags flags;
 
@@ -765,7 +767,7 @@ public:
         return strcmp(rifname, c.rifname);
     }
 
-    List<Preset_Palette> pplist;
+    std::vector<Preset_Palette> pplist;
 
 private:
     friend class Environment_Game_Mode_Chunk;

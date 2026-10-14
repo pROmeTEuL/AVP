@@ -3,6 +3,8 @@
 
 #include "chunk.hpp"
 
+#include <vector>
+
 // for assert
 #define UseLocalAssert false
 #include "ourasert.h"
@@ -315,7 +317,7 @@ class Chunk_With_BMPs : public Chunk
 public:
     int max_index;
 
-    List<BMP_Name> bmps;
+    std::vector<BMP_Name> bmps;
 
     virtual int get_version_num(void);
     virtual void set_version_num(int);
@@ -627,7 +629,7 @@ public:
     // I/O
     Matching_Images_Chunk(Chunk_With_Children *parent, char const *datablock, size_t);
     // members
-    List<MatchingImages> mlist;
+    std::vector<MatchingImages> mlist;
 
     MICFlags flags;
 

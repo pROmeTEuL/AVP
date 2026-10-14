@@ -263,7 +263,7 @@ void LoadDeviceAndVideoModePreferences()
     FILE *fp;
     int mode;
 
-    fp = OpenGameFile("AvP_TempVideo.cfg", FILEMODE_READONLY, FILETYPE_CONFIG);
+    fp = OpenGameFile("AvP_TempVideo.cfg", FILEMODE::READONLY, FILETYPE::CONFIG);
 
     if (fp != NULL) {
         if (fscanf(fp, "%d", &mode) == 1) {
@@ -299,7 +299,7 @@ void SaveDeviceAndVideoModePreferences()
 {
     FILE *fp;
 
-    fp = OpenGameFile("AvP_TempVideo.cfg", FILEMODE_WRITEONLY, FILETYPE_CONFIG);
+    fp = OpenGameFile("AvP_TempVideo.cfg", FILEMODE::WRITEONLY, FILETYPE::CONFIG);
     if (fp != NULL) {
         fprintf(fp, "%d\n", CurrentVideoMode);
         fclose(fp);
@@ -458,7 +458,7 @@ static void load_opengl_library(const char *lib)
     while (lib != NULL && *lib) {
         len = strcspn(lib, ":");
 
-        copylen = min(len, PATH_MAX - 1);
+        copylen = std::min(len, static_cast<size_t>(PATH_MAX - 1));
 
         strncpy(tmppath, lib, copylen);
         tmppath[copylen] = 0;
