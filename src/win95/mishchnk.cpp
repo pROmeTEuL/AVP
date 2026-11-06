@@ -215,22 +215,24 @@ BOOL Lockable_Chunk_With_Children::update_chunk_in_file(HANDLE &rif_file)
 
     //twprintf("\nLooking for chunks in file\n");
 
-    List<int> shpfptrs;
+    std::vector<int> shpfptrs;
     list_chunks_in_file(&shpfptrs, rif_file, identifier);
 
     // look through chunks for the save of our current chunk
 
     //twprintf("Checking each chunk\n");
 
-    LIF<int> sfpl(&shpfptrs);
+    // LIF<int> sfpl(&shpfptrs);
+
+    auto it = shpfptrs.begin();
 
     if (shpfptrs.size()) {
-        for (; !sfpl.done(); sfpl.next()) {
-            SetFilePointer(rif_file, sfpl() + 8, 0, FILE_BEGIN);
+        for (; it != shpfptrs.end(); ++it) {
+            SetFilePointer(rif_file, *it + 8, 0, FILE_BEGIN);
 
             ReadFile(rif_file, (long *) &(length), 4, &bytes_read, 0);
 
-            SetFilePointer(rif_file, sfpl(), 0, FILE_BEGIN);
+            SetFilePointer(rif_file, *it, 0, FILE_BEGIN);
             if (file_equals(rif_file))
                 break;
         }
@@ -242,18 +244,18 @@ BOOL Lockable_Chunk_With_Children::update_chunk_in_file(HANDLE &rif_file)
 
     //twprintf("Updating file\n");
 
-    if (!sfpl.done()) {
+    if (it != shpfptrs.end()) {
         int file_length = GetFileSize(rif_file, 0);
 
-        if (file_length > (sfpl() + length)) {
-            SetFilePointer(rif_file, sfpl() + length, 0, FILE_BEGIN);
+        if (file_length > (*it + length)) {
+            SetFilePointer(rif_file, *it + length, 0, FILE_BEGIN);
 
             char *tempbuffer;
-            tempbuffer = new char[file_length - (sfpl() + length)];
+            tempbuffer = new char[file_length - (*it + length)];
 
-            ReadFile(rif_file, (long *) tempbuffer, (file_length - (sfpl() + length)), &bytes_read, 0);
+            ReadFile(rif_file, (long *) tempbuffer, (file_length - (*it + length)), &bytes_read, 0);
 
-            SetFilePointer(rif_file, sfpl(), 0, FILE_BEGIN);
+            SetFilePointer(rif_file, *it, 0, FILE_BEGIN);
 
             if (!deleted) {
                 size_chunk();
@@ -261,13 +263,13 @@ BOOL Lockable_Chunk_With_Children::update_chunk_in_file(HANDLE &rif_file)
             }
 
             WriteFile(
-                rif_file, (long *) tempbuffer, (file_length - (sfpl() + length)), &bytes_read, 0);
+                rif_file, (long *) tempbuffer, (file_length - (*it + length)), &bytes_read, 0);
 
             delete[] tempbuffer;
 
             SetEndOfFile(rif_file);
         } else {
-            SetFilePointer(rif_file, sfpl(), 0, FILE_BEGIN);
+            SetFilePointer(rif_file, *it, 0, FILE_BEGIN);
             if (!deleted) {
                 size_chunk();
                 output_chunk(rif_file);
@@ -586,37 +588,41 @@ BOOL File_Chunk::write_file(const char *fname)
 
 void File_Chunk::post_input_processing()
 {
-    List<Shape_Chunk *> shplist;
-    List<Object_Chunk *> objlist;
+    std::vector<Shape_Chunk *> shplist;
+    std::vector<Object_Chunk *> objlist;
 
-    List<Chunk *> child_lists;
+    std::vector<Chunk *> child_lists;
 
     lookup_child("REBSHAPE", child_lists);
 
     while (child_lists.size()) {
-        shplist.add_entry((Shape_Chunk *) child_lists.first_entry());
-        child_lists.delete_first_entry();
+        shplist.push_back((Shape_Chunk *) child_lists.front());
+        child_lists.erase(child_lists.begin());
     }
 
     lookup_child("RBOBJECT", child_lists);
 
     while (child_lists.size()) {
-        objlist.add_entry((Object_Chunk *) child_lists.first_entry());
-        child_lists.delete_first_entry();
+        objlist.push_back((Object_Chunk *) child_lists.front());
+        child_lists.erase(child_lists.begin());
     }
 
-    LIF<Shape_Chunk *> sli(&shplist);
-    for (; !sli.done(); sli.next()) {
-        Shape_Chunk::max_id = max(Shape_Chunk::max_id, sli()->get_header()->file_id_num);
+
+
+    // LIF<Shape_Chunk *> sli(&shplist);
+    auto it = shplist.begin();
+
+    for (const auto &sli : shplist) {
+        Shape_Chunk::max_id = max(Shape_Chunk::max_id, sli->get_header()->file_id_num);
     }
     Shape_Chunk **shape_array = new Shape_Chunk *[Shape_Chunk::max_id + 1];
 
-    for (sli.restart(); !sli.done(); sli.next()) {
-        shape_array[sli()->get_header()->file_id_num] = sli();
+    for (const auto &sli : shplist) {
+        shape_array[sli->get_header()->file_id_num] = sli;
     }
 
-    for (LIF<Object_Chunk *> ol(&objlist); !ol.done(); ol.next()) {
-        ol()->assoc_with_shape(shape_array[ol()->get_header()->shape_id_no]);
+    for (const auto &ol : objlist) {
+        ol->assoc_with_shape(shape_array[ol->get_header()->shape_id_no]);
     }
 
     delete[] shape_array;
@@ -977,23 +983,24 @@ BOOL File_Chunk::update_file()
     char tempname[256];
     strcpy(tempname, filename);
 
-    List<Shape_Chunk *> slist;
+    std::vector<Shape_Chunk *> slist;
     list_shapes(&slist);
-    List<Object_Chunk *> olist;
+    std::vector<Object_Chunk *> olist;
     list_objects(&olist);
 
-    for (LIF<Shape_Chunk *> sli(&slist); !sli.done(); sli.next()) {
-        if (sli()->deleted) {
-            delete sli();
+#warning if chunks fail, it's my fault
+    for (auto &sli : slist) {
+        if (sli->deleted) {
+            delete sli;
         }
     }
 
-    for (LIF<Object_Chunk *> oli(&olist); !oli.done(); oli.next()) {
-        if (oli()->deleted) {
-            delete oli();
+    for (auto &oli : olist) {
+        if (oli->deleted) {
+            delete oli;
         }
     }
-
+// #warning if chunks fail, it's my fault
     return (write_file(tempname));
 
 #else
@@ -1184,22 +1191,22 @@ BOOL File_Chunk::update_chunks_from_file()
 
     SetFilePointer(rif_file, 0, 0, FILE_BEGIN);
 
-    List<int> verinf;
+    std::vector<int> verinf;
     list_chunks_in_file(&verinf, rif_file, "RIFVERIN");
 
     if (verinf.size()) {
         int f_version_num;
-        SetFilePointer(rif_file, verinf.first_entry() + 12, 0, FILE_BEGIN);
+        SetFilePointer(rif_file, verinf.front() + 12, 0, FILE_BEGIN);
         ReadFile(rif_file, (long *) &f_version_num, 4, &bytes_read, 0);
 
-        SetFilePointer(rif_file, verinf.first_entry() + 12, 0, FILE_BEGIN);
+        SetFilePointer(rif_file, verinf.front() + 12, 0, FILE_BEGIN);
 
-        List<Chunk *> lverinf;
+        std::vector<Chunk *> lverinf;
         lookup_child("RIFVERIN", lverinf);
 
         if (lverinf.size())
             if (f_version_num
-                == ((RIF_Version_Num_Chunk *) (lverinf.first_entry()))->file_version_no) {
+                == ((RIF_Version_Num_Chunk *) (lverinf.front()))->file_version_no) {
                 CloseHandle(rif_file);
                 return TRUE;
             }
@@ -1207,36 +1214,37 @@ BOOL File_Chunk::update_chunks_from_file()
 
     //	go through the list of object chunks looking for chunks to input
 
-    List<Chunk *> oblst;
+    std::vector<Chunk *> oblst;
     lookup_child("RBOBJECT", oblst);
 
     if (oblst.size())
-        for (LIF<Chunk *> oli(&oblst); !oli.done(); oli.next()) {
-            Object_Chunk *tmpobptr = ((Object_Chunk *) oli());
+        for (const auto &oli : oblst) {
+            Object_Chunk *tmpobptr = ((Object_Chunk *) oli);
 
             if (tmpobptr->updated_outside) {
                 // find the chunk, then input it to a buffer and create a new object
                 // from the buffer
                 SetFilePointer(rif_file, 0, 0, FILE_BEGIN);
 
-                List<int> obfptrs;
+                std::vector<int> obfptrs;
                 list_chunks_in_file(&obfptrs, rif_file, "RBOBJECT");
 
                 char name[50];
 
-                LIF<int> ofpl(&obfptrs);
+                // LIF<int> ofpl(&obfptrs);
+                auto ofpl = obfptrs.begin();
 
                 if (obfptrs.size()) {
-                    for (; !ofpl.done(); ofpl.next()) {
-                        SetFilePointer(rif_file, ofpl(), 0, FILE_BEGIN);
+                    for (; ofpl != obfptrs.end(); ++ofpl) {
+                        SetFilePointer(rif_file, *ofpl, 0, FILE_BEGIN);
                         // get header list
-                        List<int> obhead;
+                        std::vector<int> obhead;
                         list_chunks_in_file(&obhead, rif_file, "OBJHEAD1");
 
                         assert(obhead.size() == 1);
 
                         // get object identifier
-                        SetFilePointer(rif_file, obhead.first_entry() + 96, 0, FILE_BEGIN);
+                        SetFilePointer(rif_file, obhead.front() + 96, 0, FILE_BEGIN);
                         int i = 0;
                         do
                             ReadFile(rif_file, (long *) (name + i), 1, &bytes_read, 0);
@@ -1247,10 +1255,10 @@ BOOL File_Chunk::update_chunks_from_file()
                     }
                 }
 
-                if (!ofpl.done()) {
+                if (ofpl != obfptrs.end()) {
                     char *buffer;
 
-                    SetFilePointer(rif_file, ofpl() + 8, 0, FILE_BEGIN);
+                    SetFilePointer(rif_file, *ofpl + 8, 0, FILE_BEGIN);
                     int length;
                     ReadFile(rif_file, (long *) &length, 4, &bytes_read, 0);
                     buffer = new char[length];
@@ -1267,12 +1275,12 @@ BOOL File_Chunk::update_chunks_from_file()
 
     //	go through the list of shape chunks looking for shape chunks to input
 
-    List<Chunk *> shplst;
+    std::vector<Chunk *> shplst;
     lookup_child("REBSHAPE", shplst);
 
     if (shplst.size())
-        for (LIF<Chunk *> sli(&shplst); !sli.done(); sli.next()) {
-            Shape_Chunk *tmpshpptr = ((Shape_Chunk *) sli());
+        for (const auto &sli : shplst) {
+            Shape_Chunk *tmpshpptr = ((Shape_Chunk *) sli);
 
             Shape_Header_Chunk *shhead = tmpshpptr->get_header();
 
@@ -1284,22 +1292,23 @@ BOOL File_Chunk::update_chunks_from_file()
                 // from the buffer
                 SetFilePointer(rif_file, 0, 0, FILE_BEGIN);
 
-                List<int> shfptrs;
+                std::vector<int> shfptrs;
                 list_chunks_in_file(&shfptrs, rif_file, "REBSHAPE");
 
-                LIF<int> sfpl(&shfptrs);
+                // LIF<int> sfpl(&shfptrs);
+                auto sfpl = shfptrs.begin();
 
                 if (shfptrs.size()) {
-                    for (sfpl.restart(); !sfpl.done(); sfpl.next()) {
-                        SetFilePointer(rif_file, sfpl(), 0, FILE_BEGIN);
+                    for (; sfpl != shfptrs.end(); ++sfpl) {
+                        SetFilePointer(rif_file, *sfpl, 0, FILE_BEGIN);
                         // get header list
-                        List<int> shphead;
+                        std::vector<int> shphead;
                         list_chunks_in_file(&shphead, rif_file, "SHPHEAD1");
 
                         assert(shphead.size() == 1);
 
                         // get object identifier
-                        SetFilePointer(rif_file, shphead.first_entry() + 32, 0, FILE_BEGIN);
+                        SetFilePointer(rif_file, shphead.front() + 32, 0, FILE_BEGIN);
                         int sh_number;
                         ReadFile(rif_file, (long *) &sh_number, 4, &bytes_read, 0);
 
@@ -1308,10 +1317,10 @@ BOOL File_Chunk::update_chunks_from_file()
                     }
                 }
 
-                if (!sfpl.done()) {
+                if (sfpl != shfptrs.end()) {
                     char *buffer;
 
-                    SetFilePointer(rif_file, sfpl() + 8, 0, FILE_BEGIN);
+                    SetFilePointer(rif_file, *sfpl + 8, 0, FILE_BEGIN);
                     int length;
                     ReadFile(rif_file, (long *) &length, 4, &bytes_read, 0);
                     buffer = new char[length];
@@ -1320,10 +1329,8 @@ BOOL File_Chunk::update_chunks_from_file()
                     delete[] buffer;
                     // Associate with the new objects
                     if ((shhead->associated_objects_store).size()) {
-                        for (LIF<Object_Chunk *> aol(&(shhead->associated_objects_store));
-                             !aol.done();
-                             aol.next()) {
-                            tmpshpptr->deassoc_with_object(aol());
+                        for (const auto &aol : shhead->associated_objects_store) {
+                            tmpshpptr->deassoc_with_object(aol);
                         }
                     }
                     delete tmpshpptr;
@@ -1338,52 +1345,56 @@ BOOL File_Chunk::update_chunks_from_file()
     return TRUE;
 }
 
-void File_Chunk::list_objects(List<Object_Chunk *> *pList)
+void File_Chunk::list_objects(std::vector<Object_Chunk *> *pList)
 {
     Chunk *child_ptr = children;
 
     while (pList->size())
-        pList->delete_first_entry();
+        pList->erase(pList->begin());
 
     if (children)
         while (child_ptr != NULL) {
             if (strncmp("RBOBJECT", child_ptr->identifier, 8) == 0) {
-                assert(!child_ptr->r_u_miscellaneous());
-                pList->add_entry((Object_Chunk *) child_ptr);
+                assert(!child_ptr->r    for (LIF<Shape_Chunk *> sli(&slist); !sli.done(); sli.next()) {
+                    if (sli()->deleted) {
+                        delete sli();
+                    }
+                }_u_miscellaneous());
+                pList->push_back((Object_Chunk *) child_ptr);
             }
             child_ptr = child_ptr->next;
         }
 }
 
-void File_Chunk::list_shapes(List<Shape_Chunk *> *pList)
+void File_Chunk::list_shapes(std::vector<Shape_Chunk *> *pList)
 {
     Chunk *child_ptr = children;
 
     while (pList->size())
-        pList->delete_first_entry();
+        pList->erase(pList->begin());
 
     if (children)
         while (child_ptr != NULL) {
             if (strncmp("REBSHAPE", child_ptr->identifier, 8) == 0) {
                 assert(!child_ptr->r_u_miscellaneous());
-                pList->add_entry((Shape_Chunk *) child_ptr);
+                pList->push_back((Shape_Chunk *) child_ptr);
             }
             child_ptr = child_ptr->next;
         }
 }
 
-void File_Chunk::list_dummy_objects(List<Dummy_Object_Chunk *> *pList)
+void File_Chunk::list_dummy_objects(std::vector<Dummy_Object_Chunk *> *pList)
 {
     Chunk *child_ptr = children;
 
     while (pList->size())
-        pList->delete_first_entry();
+        pList->erase(pList->begin());
 
     if (children)
         while (child_ptr != NULL) {
             if (strncmp("DUMMYOBJ", child_ptr->identifier, 8) == 0) {
                 assert(!child_ptr->r_u_miscellaneous());
-                pList->add_entry((Dummy_Object_Chunk *) child_ptr);
+                pList->push_back((Dummy_Object_Chunk *) child_ptr);
             }
             child_ptr = child_ptr->next;
         }
@@ -1391,14 +1402,14 @@ void File_Chunk::list_dummy_objects(List<Dummy_Object_Chunk *> *pList)
 
 Environment_Data_Chunk *File_Chunk::get_env_data()
 {
-    List<Environment_Data_Chunk *> e_list;
+    std::vector<Environment_Data_Chunk *> e_list;
     Chunk *child_ptr = children;
 
     if (children)
         while (child_ptr != NULL) {
             if (strncmp("REBENVDT", child_ptr->identifier, 8) == 0) {
                 assert(!child_ptr->r_u_miscellaneous());
-                e_list.add_entry((Environment_Data_Chunk *) child_ptr);
+                e_list.push_back((Environment_Data_Chunk *) child_ptr);
             }
             child_ptr = child_ptr->next;
         }
@@ -1407,13 +1418,13 @@ Environment_Data_Chunk *File_Chunk::get_env_data()
     assert(e_list.size() < 2);
 
     if (e_list.size())
-        return e_list.first_entry();
+        return e_list.front();
     return 0;
 }
 
 void File_Chunk::build_object_array()
 {
-    List<Object_Chunk *> oblist;
+    std::vector<Object_Chunk *> oblist;
     list_objects(&oblist);
 
     if (object_array) {
@@ -1422,11 +1433,11 @@ void File_Chunk::build_object_array()
     }
     object_array_size = 0;
 
-    LIF<Object_Chunk *> oblif(&oblist);
+    // LIF<Object_Chunk *> oblif(&oblist);
 
     //find the highest object index
-    for (oblif.restart(); !oblif.done(); oblif.next()) {
-        object_array_size = max(object_array_size, oblif()->object_data.index_num + 1);
+    for (const auto &oblif : oblist) {
+        object_array_size = max(object_array_size, oblif->object_data.index_num + 1);
     }
 
     if (object_array_size <= 0)
@@ -1439,10 +1450,10 @@ void File_Chunk::build_object_array()
 
     //now fill in object array
 
-    for (oblif.restart(); !oblif.done(); oblif.next()) {
-        int index = oblif()->object_data.index_num;
+    for (const auto &oblif : oblist) {
+        int index = oblif->object_data.index_num;
         if (index >= 0) {
-            object_array[index] = oblif();
+            object_array[index] = oblif;
         }
     }
 }
@@ -1718,73 +1729,73 @@ RIF_File_Chunk::RIF_File_Chunk(Chunk_With_Children *parent, const char *file_nam
 
 void RIF_File_Chunk::post_input_processing()
 {
-    List<Shape_Chunk *> shplist;
-    List<Object_Chunk *> objlist;
+    std::vector<Shape_Chunk *> shplist;
+    std::vector<Object_Chunk *> objlist;
 
-    List<Chunk *> child_lists;
+    std::vector<Chunk *> child_lists;
 
     lookup_child("REBSHAPE", child_lists);
 
     while (child_lists.size()) {
-        shplist.add_entry((Shape_Chunk *) child_lists.first_entry());
-        child_lists.delete_first_entry();
+        shplist.push_back((Shape_Chunk *) child_lists.front());
+        child_lists.erase(child_lists.begin());
     }
 
     lookup_child("RBOBJECT", child_lists);
 
     while (child_lists.size()) {
-        objlist.add_entry((Object_Chunk *) child_lists.first_entry());
-        child_lists.delete_first_entry();
+        objlist.push_back((Object_Chunk *) child_lists.front());
+        child_lists.erase(child_lists.begin());
     }
 
-    for (LIF<Object_Chunk *> ol(&objlist); !ol.done(); ol.next()) {
-        if (ol()->get_header()) {
-            for (LIF<Shape_Chunk *> sl(&shplist); !sl.done(); sl.next()) {
-                if (sl()->get_header())
-                    if (sl()->get_header()->file_id_num == ol()->get_header()->shape_id_no) {
-                        ol()->assoc_with_shape(sl());
+    for (auto &ol : objlist) {
+        if (ol->get_header()) {
+            for (const auto &sl : shplist) {
+                if (sl->get_header())
+                    if (sl->get_header()->file_id_num == ol->get_header()->shape_id_no) {
+                        ol->assoc_with_shape(sl);
                         break;
                     }
             }
         }
     }
 
-    for (LIF<Shape_Chunk *> sli(&shplist); !sli.done(); sli.next()) {
-        Shape_Chunk::max_id = max(Shape_Chunk::max_id, sli()->get_header()->file_id_num);
+    for (const auto &sli : shplist) {
+        Shape_Chunk::max_id = max(Shape_Chunk::max_id, sli->get_header()->file_id_num);
     }
 
     Chunk_With_Children::post_input_processing();
 }
 
-void RIF_File_Chunk::list_objects(List<Object_Chunk *> *pList)
+void RIF_File_Chunk::list_objects(std::vector<Object_Chunk *> *pList)
 {
     Chunk *child_ptr = children;
 
     while (pList->size())
-        pList->delete_first_entry();
+        pList->erase(pList->begin());
 
     if (children)
         while (child_ptr != NULL) {
             if (strncmp("RBOBJECT", child_ptr->identifier, 8) == 0) {
                 assert(!child_ptr->r_u_miscellaneous());
-                pList->add_entry((Object_Chunk *) child_ptr);
+                pList->push_back((Object_Chunk *) child_ptr);
             }
             child_ptr = child_ptr->next;
         }
 }
 
-void RIF_File_Chunk::list_shapes(List<Shape_Chunk *> *pList)
+void RIF_File_Chunk::list_shapes(std::vector<Shape_Chunk *> *pList)
 {
     Chunk *child_ptr = children;
 
     while (pList->size())
-        pList->delete_first_entry();
+        pList->erase(pList->begin());
 
     if (children)
         while (child_ptr != NULL) {
             if (strncmp("REBSHAPE", child_ptr->identifier, 8) == 0) {
                 assert(!child_ptr->r_u_miscellaneous());
-                pList->add_entry((Shape_Chunk *) child_ptr);
+                pList->push_back((Shape_Chunk *) child_ptr);
             }
             child_ptr = child_ptr->next;
         }
@@ -1792,14 +1803,14 @@ void RIF_File_Chunk::list_shapes(List<Shape_Chunk *> *pList)
 
 Environment_Data_Chunk *RIF_File_Chunk::get_env_data()
 {
-    List<Environment_Data_Chunk *> e_list;
+    std::vector<Environment_Data_Chunk *> e_list;
     Chunk *child_ptr = children;
 
     if (children)
         while (child_ptr != NULL) {
             if (strncmp("REBENVDT", child_ptr->identifier, 8) == 0) {
                 assert(!child_ptr->r_u_miscellaneous());
-                e_list.add_entry((Environment_Data_Chunk *) child_ptr);
+                e_list.push_back((Environment_Data_Chunk *) child_ptr);
             }
             child_ptr = child_ptr->next;
         }
@@ -1808,6 +1819,6 @@ Environment_Data_Chunk *RIF_File_Chunk::get_env_data()
     assert(e_list.size() < 2);
 
     if (e_list.size())
-        return e_list.first_entry();
+        return e_list.front();
     return 0;
 }

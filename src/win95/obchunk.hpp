@@ -6,6 +6,8 @@
 #include "chnktype.hpp"
 #include "mishchnk.hpp"
 
+#include <vector>
+
 // object flags
 
 #define OBJECT_FLAG_BASE_OBJECT 0x0000100
@@ -262,12 +264,13 @@ private:
 class Adjacent_Module_Entry_Points_Chunk : public Chunk
 {
 public:
-    Adjacent_Module_Entry_Points_Chunk(Object_Module_Data_Chunk *parent, List<Adjacent_Module> aml)
+    Adjacent_Module_Entry_Points_Chunk(
+        Object_Module_Data_Chunk *parent, std::vector<Adjacent_Module> aml)
         : Chunk(parent, "ADJMDLEP")
         , adjacent_modules_list(aml)
     {}
     Adjacent_Module_Entry_Points_Chunk(Chunk_With_Children *parent, const char *data, size_t size);
-    List<Adjacent_Module> adjacent_modules_list;
+    std::vector<Adjacent_Module> adjacent_modules_list;
 
     virtual void fill_data_block(char *);
     virtual size_t size_chunk();

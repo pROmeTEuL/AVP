@@ -16,7 +16,7 @@ Chunk *Parent_File;
 
 // Non class functions ( only one as yet )
 
-void list_chunks_in_file(List<int> *pList, HANDLE hand, char const *chunk_id)
+void list_chunks_in_file(std::vector<int> *pList, HANDLE hand, char const *chunk_id)
 {
     unsigned long bytes_read;
 
@@ -24,7 +24,7 @@ void list_chunks_in_file(List<int> *pList, HANDLE hand, char const *chunk_id)
     BOOL ok = TRUE;
 
     while (pList->size())
-        pList->delete_first_entry();
+        pList->erase(pList->begin());
 
     // assuming we start at the front of a parent chunk,
     // containing the child chunk specified
@@ -47,7 +47,7 @@ void list_chunks_in_file(List<int> *pList, HANDLE hand, char const *chunk_id)
            && ok) {
         ok = ReadFile(hand, (long *) buffer, 8, &bytes_read, 0);
         if (strncmp(buffer, chunk_id, 8) == 0)
-            pList->add_entry(file_pos);
+            pList->push_back(file_pos);
 
         ok = ReadFile(hand, (long *) &sub_chunk_ln, 4, &bytes_read, 0);
 
@@ -56,9 +56,9 @@ void list_chunks_in_file(List<int> *pList, HANDLE hand, char const *chunk_id)
 }
 
 #ifndef RIFF_OPTIMIZE
-List<int> list_chunks_in_file(HANDLE &hand, const char *chunk_id)
+std::vector<int> list_chunks_in_file(HANDLE &hand, const char *chunk_id)
 {
-    List<int> chunk_list;
+    std::vector<int> chunk_list;
 
     list_chunks_in_file(&chunk_list, hand, chunk_id);
 
@@ -344,9 +344,9 @@ void Chunk_With_Children::fill_data_block(char *data_start)
 }
 
 #ifndef RIFF_OPTIMIZE
-List<Chunk *> Chunk_With_Children::lookup_child(const char *class_ident) const
+std::vector<Chunk *> Chunk_With_Children::lookup_child(const char *class_ident) const
 {
-    List<Chunk *> child_list;
+    std::vector<Chunk *> child_list;
 
     lookup_child(class_ident, child_list);
 
@@ -354,11 +354,11 @@ List<Chunk *> Chunk_With_Children::lookup_child(const char *class_ident) const
 }
 #endif
 
-void Chunk_With_Children::lookup_child(const char *class_ident, List<Chunk *> &child_list) const
+void Chunk_With_Children::lookup_child(const char *class_ident, std::vector<Chunk *> &child_list) const
 {
     //make sure the list is empty first
     while (child_list.size()) {
-        child_list.delete_first_entry();
+        child_list.erase(child_list.begin());
     }
 
     Chunk *child_ptr = children;
@@ -367,7 +367,7 @@ void Chunk_With_Children::lookup_child(const char *class_ident, List<Chunk *> &c
         while (child_ptr != NULL) {
             if (strncmp(class_ident, child_ptr->identifier, 8) == 0) {
                 assert(!child_ptr->r_u_miscellaneous());
-                child_list.add_entry(child_ptr);
+                child_list.emplace_back(child_ptr);
             }
             child_ptr = child_ptr->next;
         }

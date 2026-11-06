@@ -16,7 +16,8 @@
 
 #endif
 
-#include "list_tem.hpp"
+// #include "list_tem.hpp"
+#include <vector>
 
 #define CHUNK_FAILED_ON_LOAD -1
 #define CHUNK_FAILED_ON_LOAD_NOT_RECOGNISED -2
@@ -36,12 +37,14 @@
 // we start at the header of the chunk we are in
 // so that we can stop at the end of the chunk
 
-#include "list_tem.hpp"
+// #include "list_tem.hpp"
+
+#warning list_chunks_in_file!!!
 
 #ifndef RIFF_OPTIMIZE // define this to get compiler errors where you are calling the old slow functions
-extern List<int> list_chunks_in_file(HANDLE &, const char *chunk_id);
+extern std::vector<int> list_chunks_in_file(HANDLE &, const char *chunk_id);
 #endif
-extern void list_chunks_in_file(List<int> *pList, HANDLE, const char *chunk_id);
+extern void list_chunks_in_file(std::vector<int> *pList, HANDLE, const char *chunk_id);
 
 // Structures for interfacing with the outside application
 // these are going to be basically very C-ee so that C
@@ -285,9 +288,9 @@ public:
 
 // look for child chunk(s)
 #ifndef RIFF_OPTIMIZE // define this to get compiler errors where you are calling the old slow functions
-    List<Chunk *> lookup_child(const char *) const;
+    std::vector<Chunk *> lookup_child(const char *) const;
 #endif
-    void lookup_child(const char *, List<Chunk *> &) const;
+    void lookup_child(const char *, std::vector<Chunk *> &) const;
     Chunk *lookup_single_child(const char *) const;
     unsigned count_children(char const *) const;
 

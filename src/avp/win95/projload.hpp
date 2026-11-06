@@ -8,6 +8,8 @@
 
 #include "hierchnk.hpp"
 
+#include <vector>
+
 class File_Chunk;
 
 // project specifc structure contained in rif handle
@@ -60,13 +62,13 @@ public:
     void add_hierarchy(List<Object_ShapeNum_Pair *> &osnp_lst, Object_Hierarchy_Chunk *ohc);
     void setup_alternate_shape_sets(List<Object_ShapeNum_Pair *> &osnp_lst, File_Chunk *fc);
 
-    List<Hierarchy_Descriptor *> hierarchy_list;
+    std::vector<Hierarchy_Descriptor *> hierarchy_list;
 
-    List<Hierarchy_Alternate_Shape_Set *> alternate_shape_set_list;
+    std::vector<Hierarchy_Alternate_Shape_Set *> alternate_shape_set_list;
 
     int num_shape_collections;
     struct hierarchy_variant_data *shape_collections;
-    List<int> random_shape_colls;
+    std::vector<int> random_shape_colls;
 
     RIFFHANDLE rif_hand;
 
@@ -76,7 +78,7 @@ private:
     int num_sounds;
     HIERARCHY_SOUND *sound_array;
 
-    static List<Hierarchy_ID_Time_Pair *> time_list;
+    static std::vector<Hierarchy_ID_Time_Pair *> time_list;
 
     int get_time_from_sequence_id(int id);
     void build_time_list(Object_Hierarchy_Chunk *ohc);

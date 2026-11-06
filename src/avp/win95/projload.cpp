@@ -404,8 +404,8 @@ void unload_placed_hierarchies()
 extern int GetSequenceID(int sequence_type, int sub_sequence);
 extern void MulQuat(QUAT *q1, QUAT *q2, QUAT *output);
 
-List<Global_Hierarchy_Store *> Global_Hierarchy_Library;
-List<Hierarchy_ID_Time_Pair *> Global_Hierarchy_Store::time_list;
+std::vector<Global_Hierarchy_Store *> Global_Hierarchy_Library;
+std::vector<Hierarchy_ID_Time_Pair *> Global_Hierarchy_Store::time_list;
 
 Global_Hierarchy_Store::Global_Hierarchy_Store(RIFFHANDLE h)
 {
@@ -485,8 +485,7 @@ Global_Hierarchy_Store::~Global_Hierarchy_Store()
         DeallocateMem(riffname);
     }
 
-    while (hierarchy_list.size()) {
-        Hierarchy_Descriptor *hd = hierarchy_list.first_entry();
+    for (Hierarchy_Descriptor *hd : hierarchy_list) {
 
         if (hd->hierarchy_name)
             DeallocateMem(hd->hierarchy_name);
@@ -496,11 +495,10 @@ Global_Hierarchy_Store::~Global_Hierarchy_Store()
 
         DeallocateMem(hd);
 
-        hierarchy_list.delete_first_entry();
     }
+    hierarchy_list.clear();
 
-    while (alternate_shape_set_list.size()) {
-        Hierarchy_Alternate_Shape_Set *hass = alternate_shape_set_list.first_entry();
+    for (Hierarchy_Alternate_Shape_Set *hass : alternate_shape_set_list) {
         HIERARCHY_SHAPE_REPLACEMENT *hsr = hass->replaced_shapes;
 
         while (hsr->replaced_section_name) {
@@ -511,8 +509,8 @@ Global_Hierarchy_Store::~Global_Hierarchy_Store()
         DeallocateMem(hass->replaced_shapes);
         DeallocateMem(hass->shape_set_name);
         DeallocateMem(hass);
-        alternate_shape_set_list.delete_first_entry();
     }
+    alternate_shape_set_list.clear();
 
     if (shape_collections) {
         for (int i = 0; i < num_shape_collections; i++) {
@@ -521,12 +519,8 @@ Global_Hierarchy_Store::~Global_Hierarchy_Store()
         DeallocateMem(shape_collections);
     }
 #else
-    while (hierarchy_list.size()) {
-        hierarchy_list.delete_first_entry();
-    }
-    while (alternate_shape_set_list.size()) {
-        alternate_shape_set_list.delete_first_entry();
-    }
+    hierarchy_list.clear();
+    alternate_shape_set_list.clear();
 #endif
 
 //get rid of any loaded sounds
@@ -579,14 +573,13 @@ void Global_Hierarchy_Store::add_hierarchy(
 
     build_time_list(ohcl.front());
     hd->hierarchy_root = build_hierarchy(ohcl.front(), hd->hierarchy_name);
-    while (time_list.size()) {
-        delete time_list.first_entry();
-        time_list.delete_first_entry();
-    }
+    for (Hierarchy_ID_Time_Pair *id_time : time_list)
+        delete id_time;
+    time_list.clear();
 
     hd->hierarchy_root->flags |= section_is_master_root;
 
-    hierarchy_list.add_entry(hd);
+    hierarchy_list.push_back(hd);
 
     Preprocess_HModel(hd->hierarchy_root, riffname);
 }
@@ -646,7 +639,7 @@ void Global_Hierarchy_Store::setup_alternate_shape_sets(
         hsr->replaced_section_name = 0;
         hsr->replacement_shape = 0;
 
-        alternate_shape_set_list.add_entry(hass);
+        alternate_shape_set_list.push_back(hass);
     }
 
     num_shape_collections = 0;
@@ -686,13 +679,12 @@ void Global_Hierarchy_Store::setup_alternate_shape_sets(
     }
 
     if (!ran_list || std::find(ran_list->begin(), ran_list->end(), 1) != ran_list->end())
-        random_shape_colls.add_entry(1);
+        random_shape_colls.push_back(1);
 
     //now go through the list of shape set collections again
     Hierarchy_Alternate_Shape_Set *found_sets[20];
     int num_found_sets;
     int num_shapes_to_replace;
-    LIF<Hierarchy_Alternate_Shape_Set *> alt_lif(&alternate_shape_set_list);
     for (chlif.restart(); !chlif.done(); chlif.next()) {
         Hierarchy_Shape_Set_Collection_Chunk *coll
             = (Hierarchy_Shape_Set_Collection_Chunk *) chlif();
@@ -703,12 +695,12 @@ void Global_Hierarchy_Store::setup_alternate_shape_sets(
         int combined_flags = 0;
 
         for (int index : coll->Index_List) {
-            for (alt_lif.restart(); !alt_lif.done(); alt_lif.next()) {
-                if (index == alt_lif()->index) {
-                    found_sets[num_found_sets] = alt_lif();
+            for (Hierarchy_Alternate_Shape_Set *alternate_shape_set : alternate_shape_set_list) {
+                if (index == alternate_shape_set->index) {
+                    found_sets[num_found_sets] = alternate_shape_set;
                     num_found_sets++;
-                    num_shapes_to_replace += alt_lif()->num_replaced_shapes;
-                    combined_flags |= alt_lif()->flags;
+                    num_shapes_to_replace += alternate_shape_set->num_replaced_shapes;
+                    combined_flags |= alternate_shape_set->flags;
                     break;
                 }
             }
@@ -743,7 +735,7 @@ void Global_Hierarchy_Store::setup_alternate_shape_sets(
         if (!ran_list
             || std::find(ran_list->begin(), ran_list->end(), coll->Set_Collection_Num)
                    != ran_list->end()) {
-            random_shape_colls.add_entry(coll->Set_Collection_Num);
+            random_shape_colls.push_back(coll->Set_Collection_Num);
         }
     }
 }
@@ -1184,16 +1176,16 @@ void Global_Hierarchy_Store::build_time_list(Object_Hierarchy_Chunk *ohc)
             Hierarchy_ID_Time_Pair *id_time = new Hierarchy_ID_Time_Pair;
             id_time->id = id;
             id_time->time = time;
-            time_list.add_entry(id_time);
+            time_list.push_back(id_time);
         }
     }
 }
 
 int Global_Hierarchy_Store::get_time_from_sequence_id(int id)
 {
-    for (LIF<Hierarchy_ID_Time_Pair *> tlif(&time_list); !tlif.done(); tlif.next()) {
-        if (tlif()->id == id) {
-            return tlif()->time;
+    for (Hierarchy_ID_Time_Pair *id_time : time_list) {
+        if (id_time->id == id) {
+            return id_time->time;
         }
     }
     return 0;
@@ -1430,7 +1422,7 @@ static BOOL copy_rif_data_as_hierarchy(
         osnp_list.delete_first_entry();
     }
 
-    Global_Hierarchy_Library.add_entry(ghs);
+    Global_Hierarchy_Library.push_back(ghs);
 
     Set_Progress_Bar_Position((int) (progress_start + progress_interval * .9));
 
@@ -1452,11 +1444,11 @@ SECTION *GetHierarchyFromLibrary(const char *rif_name)
 
 SECTION *GetNamedHierarchyFromLibrary(const char *rif_name, const char *hier_name)
 {
-    for (LIF<Global_Hierarchy_Store *> ghli(&Global_Hierarchy_Library); !ghli.done(); ghli.next()) {
-        if (!_stricmp(ghli()->riffname, rif_name)) {
-            for (LIF<Hierarchy_Descriptor *> hdi(&ghli()->hierarchy_list); !hdi.done(); hdi.next()) {
-                if (!strcmp(hdi()->hierarchy_name, hier_name)) {
-                    return (hdi()->hierarchy_root);
+    for (Global_Hierarchy_Store *hierarchy_store : Global_Hierarchy_Library) {
+        if (!_stricmp(hierarchy_store->riffname, rif_name)) {
+            for (Hierarchy_Descriptor *hierarchy : hierarchy_store->hierarchy_list) {
+                if (!strcmp(hierarchy->hierarchy_name, hier_name)) {
+                    return hierarchy->hierarchy_root;
                 }
             }
         }
@@ -1467,13 +1459,12 @@ SECTION *GetNamedHierarchyFromLibrary(const char *rif_name, const char *hier_nam
 HIERARCHY_SHAPE_REPLACEMENT *GetHierarchyAlternateShapeSetFromLibrary(
     const char *rif_name, const char *shape_set_name)
 {
-    for (LIF<Global_Hierarchy_Store *> ghli(&Global_Hierarchy_Library); !ghli.done(); ghli.next()) {
-        if (!_stricmp(ghli()->riffname, rif_name)) {
-            for (LIF<Hierarchy_Alternate_Shape_Set *> hlif(&ghli()->alternate_shape_set_list);
-                 !hlif.done();
-                 hlif.next()) {
-                if (!_stricmp(hlif()->shape_set_name, shape_set_name)) {
-                    return hlif()->replaced_shapes;
+    for (Global_Hierarchy_Store *hierarchy_store : Global_Hierarchy_Library) {
+        if (!_stricmp(hierarchy_store->riffname, rif_name)) {
+            for (Hierarchy_Alternate_Shape_Set *alternate_shape_set
+                 : hierarchy_store->alternate_shape_set_list) {
+                if (!_stricmp(alternate_shape_set->shape_set_name, shape_set_name)) {
+                    return alternate_shape_set->replaced_shapes;
                 }
             }
             return 0;
@@ -1484,10 +1475,10 @@ HIERARCHY_SHAPE_REPLACEMENT *GetHierarchyAlternateShapeSetFromLibrary(
 HIERARCHY_VARIANT_DATA *GetHierarchyAlternateShapeSetCollectionFromLibrary(
     const char *rif_name, int collection_index)
 {
-    for (LIF<Global_Hierarchy_Store *> ghli(&Global_Hierarchy_Library); !ghli.done(); ghli.next()) {
-        if (!_stricmp(ghli()->riffname, rif_name)) {
+    for (Global_Hierarchy_Store *hierarchy_store : Global_Hierarchy_Library) {
+        if (!_stricmp(hierarchy_store->riffname, rif_name)) {
             //found the appropriate hierarchy library
-            Global_Hierarchy_Store *hier = ghli();
+            Global_Hierarchy_Store *hier = hierarchy_store;
 
             if (hier->num_shape_collections == 0)
                 return 0;
@@ -1516,10 +1507,10 @@ HIERARCHY_SHAPE_REPLACEMENT *GetHierarchyAlternateShapeFromId(
     if (collection_index == 0)
         return NULL;
 
-    for (LIF<Global_Hierarchy_Store *> ghli(&Global_Hierarchy_Library); !ghli.done(); ghli.next()) {
-        if (!_stricmp(ghli()->riffname, rif_name)) {
+    for (Global_Hierarchy_Store *hierarchy_store : Global_Hierarchy_Library) {
+        if (!_stricmp(hierarchy_store->riffname, rif_name)) {
             //found the appropriate hierarchy library
-            Global_Hierarchy_Store *hier = ghli();
+            Global_Hierarchy_Store *hier = hierarchy_store;
 
             if (collection_index < 0 || collection_index >= hier->num_shape_collections)
                 return NULL;
@@ -1550,18 +1541,18 @@ HIERARCHY_SHAPE_REPLACEMENT *GetHierarchyAlternateShapeFromId(
 
 void EmptyHierarchyLibrary()
 {
-    while (Global_Hierarchy_Library.size()) {
-        delete Global_Hierarchy_Library.first_entry();
-        Global_Hierarchy_Library.delete_first_entry();
-    }
+    for (Global_Hierarchy_Store *hierarchy_store : Global_Hierarchy_Library)
+        delete hierarchy_store;
+    Global_Hierarchy_Library.clear();
 }
 
 void DeleteHierarchyLibraryEntry(RIFFHANDLE h)
 {
-    for (LIF<Global_Hierarchy_Store *> ghli(&Global_Hierarchy_Library); !ghli.done(); ghli.next()) {
-        if (ghli()->rif_hand == h) {
-            delete ghli();
-            ghli.delete_current();
+    for (auto hierarchy_store = Global_Hierarchy_Library.begin();
+         hierarchy_store != Global_Hierarchy_Library.end(); ++hierarchy_store) {
+        if ((*hierarchy_store)->rif_hand == h) {
+            delete *hierarchy_store;
+            Global_Hierarchy_Library.erase(hierarchy_store);
             break;
         }
     }
@@ -2150,37 +2141,37 @@ BOOL copy_rif_data(RIFFHANDLE h, int flags, int progress_start, int progress_int
             AIMODULE *aim = &AIModuleArray[this_ai_module_index];
 
             //build list of adjacent ai_modules
-            List<int> adjacent_aimodule_list;
+            std::vector<int> adjacent_aimodule_list;
 
             if (amc) {
-                for (LIF<Adjacent_Module> ami(&amc->adjacent_modules_list); !ami.done();
-                     ami.next()) {
-                    Object_Chunk *adjacent_module = h->fc->get_object_by_index(ami().object_index);
+                for (const Adjacent_Module &adjacent_module_data : amc->adjacent_modules_list) {
+                    Object_Chunk *adjacent_module
+                        = h->fc->get_object_by_index(adjacent_module_data.object_index);
 
                     if (adjacent_module && adjacent_module->program_object_index != -1) {
                         int adj_ai_module = aimodule_indeces[adjacent_module->program_object_index];
                         if (adj_ai_module != this_ai_module_index) {
                             //make sure not already in list
-                            LIF<int> adjlif(&adjacent_aimodule_list);
-                            for (; !adjlif.done(); adjlif.next()) {
-                                if (adjlif() == adj_ai_module)
-                                    break;
-                            }
-                            if (adjlif.done()) {
-                                if (ami().flags & AdjacentModuleFlag_InsideAdjacentModule) {
+                            if (std::find(
+                                    adjacent_aimodule_list.begin(), adjacent_aimodule_list.end(),
+                                    adj_ai_module)
+                                == adjacent_aimodule_list.end()) {
+                                if (adjacent_module_data.flags
+                                    & AdjacentModuleFlag_InsideAdjacentModule) {
                                     continue;
                                 }
-                                if (ami().flags & AdjacentModuleFlag_AdjacentModuleInsideMe) {
+                                if (adjacent_module_data.flags
+                                    & AdjacentModuleFlag_AdjacentModuleInsideMe) {
                                     continue;
                                 }
                                 Adjacent_AIModule_EP *ad_aim = new Adjacent_AIModule_EP;
-                                ad_aim->entry_point = ami().entry_point * local_scale;
+                                ad_aim->entry_point = adjacent_module_data.entry_point * local_scale;
                                 ad_aim->aimodule_index = this_ai_module_index;
-                                ad_aim->alien_only = (ami().flags & AdjacentModuleFlag_Vertical)
-                                                     != 0;
+                                ad_aim->alien_only
+                                    = (adjacent_module_data.flags & AdjacentModuleFlag_Vertical) != 0;
 
                                 entry_points[adj_ai_module].add_entry(ad_aim);
-                                adjacent_aimodule_list.add_entry(adj_ai_module);
+                                adjacent_aimodule_list.push_back(adj_ai_module);
                             }
                         }
                     }
@@ -2196,39 +2187,38 @@ BOOL copy_rif_data(RIFFHANDLE h, int flags, int progress_start, int progress_int
                     amc = (Adjacent_Module_Entry_Points_Chunk *) omdc2->lookup_single_child(
                         "ADJMDLEP");
                     if (amc) {
-                        for (LIF<Adjacent_Module> ami(&amc->adjacent_modules_list); !ami.done();
-                             ami.next()) {
+                        for (const Adjacent_Module &adjacent_module_data : amc->adjacent_modules_list) {
                             Object_Chunk *adjacent_module = h->fc->get_object_by_index(
-                                ami().object_index);
+                                adjacent_module_data.object_index);
 
                             if (adjacent_module && adjacent_module->program_object_index != -1) {
                                 int adj_ai_module
                                     = aimodule_indeces[adjacent_module->program_object_index];
                                 if (adj_ai_module != this_ai_module_index) {
                                     //make sure not already in list
-                                    LIF<int> adjlif(&adjacent_aimodule_list);
-                                    for (; !adjlif.done(); adjlif.next()) {
-                                        if (adjlif() == adj_ai_module)
-                                            break;
-                                    }
-                                    if (adjlif.done()) {
-                                        if (ami().flags & AdjacentModuleFlag_InsideAdjacentModule) {
+                                    if (std::find(
+                                            adjacent_aimodule_list.begin(),
+                                            adjacent_aimodule_list.end(), adj_ai_module)
+                                        == adjacent_aimodule_list.end()) {
+                                        if (adjacent_module_data.flags
+                                            & AdjacentModuleFlag_InsideAdjacentModule) {
                                             continue;
                                         }
-                                        if (ami().flags
+                                        if (adjacent_module_data.flags
                                             & AdjacentModuleFlag_AdjacentModuleInsideMe) {
                                             continue;
                                         }
 
                                         Adjacent_AIModule_EP *ad_aim = new Adjacent_AIModule_EP;
-                                        ad_aim->entry_point = (ami().entry_point) * local_scale;
+                                        ad_aim->entry_point
+                                            = adjacent_module_data.entry_point * local_scale;
                                         ad_aim->aimodule_index = this_ai_module_index;
-                                        ad_aim->alien_only = (ami().flags
+                                        ad_aim->alien_only = (adjacent_module_data.flags
                                                               & AdjacentModuleFlag_Vertical)
                                                              != 0;
 
                                         entry_points[adj_ai_module].add_entry(ad_aim);
-                                        adjacent_aimodule_list.add_entry(adj_ai_module);
+                                        adjacent_aimodule_list.push_back(adj_ai_module);
                                     }
                                 }
                             }
@@ -2242,10 +2232,8 @@ BOOL copy_rif_data(RIFFHANDLE h, int flags, int progress_start, int progress_int
             aim->m_link_ptrs = (AIMODULE **) PoolAllocateMem(
                 sizeof(AIMODULE *) * (1 + adjacent_aimodule_list.size()));
             if (adjacent_aimodule_list.size()) {
-                while (adjacent_aimodule_list.size()) {
-                    aim->m_link_ptrs[adj_pos] = &AIModuleArray[adjacent_aimodule_list.first_entry()];
-                    adj_pos++;
-                    adjacent_aimodule_list.delete_first_entry();
+                for (int adjacent_aimodule : adjacent_aimodule_list) {
+                    aim->m_link_ptrs[adj_pos++] = &AIModuleArray[adjacent_aimodule];
                 }
             }
             aim->m_link_ptrs[adj_pos] = 0;

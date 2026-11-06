@@ -318,11 +318,12 @@ void Object_Chunk::destroy(File_Chunk *fc)
                 = (Adjacent_Module_Entry_Points_Chunk *) omdc->lookup_single_child("ADJMDLEP");
 
             if (amepc) {
-                for (LIF<Adjacent_Module> ad_lif(&amepc->adjacent_modules_list); !ad_lif.done();) {
-                    if (ad_lif().object_index == object_data.index_num)
-                        ad_lif.delete_current();
+                for (auto adjacent_module = amepc->adjacent_modules_list.begin();
+                     adjacent_module != amepc->adjacent_modules_list.end();) {
+                    if (adjacent_module->object_index == object_data.index_num)
+                        adjacent_module = amepc->adjacent_modules_list.erase(adjacent_module);
                     else
-                        ad_lif.next();
+                        ++adjacent_module;
                 }
             }
         }
@@ -795,14 +796,14 @@ void Adjacent_Module_Entry_Points_Chunk::fill_data_block(char *data_start)
 
     data_start += 4;
 
-    for (LIF<Adjacent_Module> ami(&adjacent_modules_list); !ami.done(); ami.next()) {
-        *((int *) data_start) = ami().object_index;
+    for (const Adjacent_Module &adjacent_module : adjacent_modules_list) {
+        *((int *) data_start) = adjacent_module.object_index;
         data_start += 4;
 
-        *((int *) data_start) = ami().flags;
+        *((int *) data_start) = adjacent_module.flags;
         data_start += 4;
 
-        *((ChunkVectorInt *) data_start) = ami().entry_point;
+        *((ChunkVectorInt *) data_start) = adjacent_module.entry_point;
         data_start += sizeof(ChunkVectorInt);
     }
 }
@@ -833,7 +834,7 @@ Adjacent_Module_Entry_Points_Chunk::Adjacent_Module_Entry_Points_Chunk(
         am.entry_point = *((ChunkVectorInt *) data);
         data += sizeof(ChunkVectorInt);
 
-        adjacent_modules_list.add_entry(am);
+        adjacent_modules_list.push_back(am);
     }
 }
 

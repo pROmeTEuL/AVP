@@ -97,13 +97,13 @@ ObjectID AVP_Generator_Chunk::CalculateID()
     //get the environment_data_chunk
     Chunk_With_Children *cwc = ((Special_Objects_Chunk *) parent)->parent;
 
-    List<Chunk *> chlist;
+    std::vector<Chunk *> chlist;
     cwc->lookup_child("RIFFNAME", chlist);
     if (!chlist.size())
         return retval;
     char Name[100];
 
-    strcpy(Name, ((RIF_Name_Chunk *) chlist.first_entry())->rif_name);
+    strcpy(Name, ((RIF_Name_Chunk *) chlist.front())->rif_name);
 
     strcat(Name, name);
     char buffer[16];
@@ -115,17 +115,17 @@ ObjectID AVP_Generator_Chunk::CalculateID()
 
 AVP_Generator_Extra_Data_Chunk *AVP_Generator_Chunk::get_extra_data_chunk()
 {
-    List<Chunk *> chlist;
+    std::vector<Chunk *> chlist;
     parent->lookup_child("AVPGENEX", chlist);
     if (!chlist.size())
         return 0;
 
-    for (LIF<Chunk *> chlif(&chlist); !chlif.done(); chlif.next()) {
-        AVP_Generator_Extra_Data_Chunk *agedc = (AVP_Generator_Extra_Data_Chunk *) chlif();
-        List<Chunk *> chlist2;
+    for (const auto &chlif : chlist) {
+        AVP_Generator_Extra_Data_Chunk *agedc = (AVP_Generator_Extra_Data_Chunk *) chlif;
+        std::vector<Chunk *> chlist2;
         agedc->lookup_child("AVPGENNM", chlist2);
         if (chlist2.size()) {
-            const char *ename = ((AVP_Generator_Extra_Name_Chunk *) chlist2.first_entry())->name;
+            const char *ename = ((AVP_Generator_Extra_Name_Chunk *) chlist2.front())->name;
             if (!strcmp(name, ename)) {
                 return agedc;
             }
@@ -200,15 +200,15 @@ AVP_Generator_Extra_Data_Chunk::AVP_Generator_Extra_Data_Chunk(
 
 AVP_Generator_Chunk *AVP_Generator_Extra_Data_Chunk::get_generator_chunk()
 {
-    List<Chunk *> chlist;
+    std::vector<Chunk *> chlist;
     lookup_child("AVPGENNM", chlist);
     if (!chlist.size())
         return 0;
-    const char *name = ((AVP_Generator_Extra_Name_Chunk *) chlist.first_entry())->name;
+    const char *name = ((AVP_Generator_Extra_Name_Chunk *) chlist.front())->name;
 
     parent->lookup_child("AVPGENER", chlist);
-    for (LIF<Chunk *> chlif(&chlist); !chlif.done(); chlif.next()) {
-        AVP_Generator_Chunk *agc = (AVP_Generator_Chunk *) chlif();
+    for (const auto &chlif : chlist) {
+        AVP_Generator_Chunk *agc = (AVP_Generator_Chunk *) chlif;
         if (!strcmp(agc->name, name)) {
             return agc;
         }

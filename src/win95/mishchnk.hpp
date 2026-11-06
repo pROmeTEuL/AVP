@@ -109,9 +109,9 @@ public:
 
     // some easy access functions
 
-    void list_objects(List<Object_Chunk *> *pList);
-    void list_shapes(List<Shape_Chunk *> *pList);
-    void list_dummy_objects(List<Dummy_Object_Chunk *> *pList);
+    void list_objects(std::vector<Object_Chunk *> *pList);
+    void list_shapes(std::vector<Shape_Chunk *> *pList);
+    void list_dummy_objects(std::vector<Dummy_Object_Chunk *> *pList);
 
     Environment_Data_Chunk *get_env_data();
 
@@ -180,8 +180,8 @@ public:
     BOOL output_chunk(HANDLE & /*h*/) { return TRUE; };
     void fill_data_block(char * /*c*/) {};
 
-    void list_objects(List<Object_Chunk *> *pList);
-    void list_shapes(List<Shape_Chunk *> *pList);
+    void list_objects(std::vector<Object_Chunk *> *pList);
+    void list_shapes(std::vector<Shape_Chunk *> *pList);
     Environment_Data_Chunk *get_env_data();
 };
 

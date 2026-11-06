@@ -152,10 +152,10 @@ void setup_track_sound(
 
     db_logf3(("Setting up track sound"));
 
-    List<Chunk *> chlist;
+    std::vector<Chunk *> chlist;
     oc->lookup_child("TRAKSOUN", chlist);
-    for (LIF<Chunk *> chlif(&chlist); !chlif.done(); chlif.next()) {
-        Object_Track_Sound_Chunk *otsc = (Object_Track_Sound_Chunk *) chlif();
+    for (const auto &chlif : chlist) {
+        Object_Track_Sound_Chunk *otsc = (Object_Track_Sound_Chunk *) chlif;
         TRACK_SOUND **sound_ptr;
 
         switch (otsc->index) {
@@ -852,14 +852,15 @@ void add_placed_hierarchy(Placed_Hierarchy_Chunk *phc, const char *fname, const 
     //first setup the sounds
     phtt->sounds = 0;
 
-    List<Chunk *> chlist;
+    std::vector<Chunk *> chlist;
     phc->lookup_child("INDSOUND", chlist);
     phtt->num_sounds = 0;
 
     //find the highest index
-    LIF<Chunk *> chlif(&chlist);
-    for (; !chlif.done(); chlif.next()) {
-        Indexed_Sound_Chunk *isc = (Indexed_Sound_Chunk *) chlif();
+    // LIF<Chunk *> chlif(&chlist);
+
+    for (const auto &chlif : chlist) {
+        Indexed_Sound_Chunk *isc = (Indexed_Sound_Chunk *) chlif;
         phtt->num_sounds = max(phtt->num_sounds, isc->index + 1);
     }
 
@@ -871,8 +872,8 @@ void add_placed_hierarchy(Placed_Hierarchy_Chunk *phc, const char *fname, const 
             phtt->sounds[i].activ_no = SOUND_NOACTIVEINDEX;
         }
 
-        for (chlif.restart(); !chlif.done(); chlif.next()) {
-            Indexed_Sound_Chunk *isc = (Indexed_Sound_Chunk *) chlif();
+        for (const auto &chlif : chlist) {
+            Indexed_Sound_Chunk *isc = (Indexed_Sound_Chunk *) chlif;
             PLACED_HIERARCHY_SOUND *phs = &phtt->sounds[isc->index];
 
             phs->inner_range = (unsigned) (isc->inner_range * local_scale);
@@ -889,8 +890,8 @@ void add_placed_hierarchy(Placed_Hierarchy_Chunk *phc, const char *fname, const 
     phc->lookup_child("PLHISEQU", chlist);
     phtt->num_sequences = 0;
     //find the highest sequence index
-    for (chlif.restart(); !chlif.done(); chlif.next()) {
-        Placed_Hierarchy_Sequence_Chunk *phsc = (Placed_Hierarchy_Sequence_Chunk *) chlif();
+    for (const auto &chlif : chlist) {
+        Placed_Hierarchy_Sequence_Chunk *phsc = (Placed_Hierarchy_Sequence_Chunk *) chlif;
         phtt->num_sequences = max(phtt->num_sequences, phsc->index + 1);
     }
 
@@ -904,8 +905,8 @@ void add_placed_hierarchy(Placed_Hierarchy_Chunk *phc, const char *fname, const 
     phtt->first_sequence = &phtt->sequences[0];
     phtt->playing = 0;
 
-    for (chlif.restart(); !chlif.done(); chlif.next()) {
-        Placed_Hierarchy_Sequence_Chunk *phsc = (Placed_Hierarchy_Sequence_Chunk *) chlif();
+    for (const auto &chlif : chlist) {
+        Placed_Hierarchy_Sequence_Chunk *phsc = (Placed_Hierarchy_Sequence_Chunk *) chlif;
         PLACED_HIERARCHY_SEQUENCE *ph_seq = &phtt->sequences[phsc->index];
 
         ph_seq->sequence_no = phsc->sequence;
@@ -2791,10 +2792,10 @@ void setup_generators(Environment_Data_Chunk *envd)
 
     if (soc) {
         {
-            List<Chunk *> cl;
+            std::vector<Chunk *> cl;
             soc->lookup_child("AVPGENER", cl);
-            for (LIF<Chunk *> cli(&cl); !cli.done(); cli.next()) {
-                AVP_Generator_Chunk *agc = (AVP_Generator_Chunk *) cli();
+            for (const auto &cli : cl) {
+                AVP_Generator_Chunk *agc = (AVP_Generator_Chunk *) cli;
 
                 if (agc->type) {
 #if 0
@@ -2971,12 +2972,13 @@ void setup_generators(Environment_Data_Chunk *envd)
             predatorStartPositions = 0;
 
             //go through the list to find the number of each type of start location
-            List<Chunk *> cl;
+            std::vector<Chunk *> cl;
             soc->lookup_child("AVPGENER", cl);
 
-            LIF<Chunk *> cli(&cl);
-            for (; !cli.done(); cli.next()) {
-                AVP_Generator_Chunk *agc = (AVP_Generator_Chunk *) cli();
+            // LIF<Chunk *> cli(&cl);
+
+            for (const auto &cli : cl) {
+                AVP_Generator_Chunk *agc = (AVP_Generator_Chunk *) cli;
                 if (agc->type)
                     continue;
                 if (!(agc->flags & AVPGENFLAG_MULTIPLAYERSTART)) {
@@ -3009,8 +3011,8 @@ void setup_generators(Environment_Data_Chunk *envd)
             int ppos = 0;
 
             //go through the list a second time setting up the positions
-            for (cli.restart(); !cli.done(); cli.next()) {
-                AVP_Generator_Chunk *agc = (AVP_Generator_Chunk *) cli();
+            for (const auto &cli : cl) {
+                AVP_Generator_Chunk *agc = (AVP_Generator_Chunk *) cli;
                 if (agc->type)
                     continue;
                 if (!(agc->flags & AVPGENFLAG_MULTIPLAYERSTART)) {
@@ -3213,11 +3215,11 @@ void SetUpRunTimeLights()
     if (pChunk) {
         edc = (Environment_Data_Chunk *) pChunk;
 
-        List<Chunk *> cl;
+        std::vector<Chunk *> cl;
         edc->lookup_child("LIGHTSET", cl);
 
         while (cl.size()) {
-            Light_Set_Chunk *ls = (Light_Set_Chunk *) cl.first_entry();
+            Light_Set_Chunk *ls = (Light_Set_Chunk *) cl.front();
 
             Chunk *pChunk2 = ls->lookup_single_child("LTSETHDR");
             if (pChunk2) {
@@ -3227,7 +3229,7 @@ void SetUpRunTimeLights()
                 }
             }
 
-            cl.delete_first_entry();
+            cl.erase(cl.begin());
         }
     }
 
@@ -3248,9 +3250,9 @@ void SetUpRunTimeLights()
         }
     }
 
-    List<Chunk *> cl;
+    std::vector<Chunk *> cl;
     lsc->lookup_child("STDLIGHT", cl);
-    LIF<Chunk *> cli(&cl);
+    // LIF<Chunk *> cli(&cl);
 
     MODULE **m_arrayPtr = MainScene.sm_marray;
 
@@ -3263,8 +3265,8 @@ void SetUpRunTimeLights()
             continue;
         }
 
-        for (cli.restart(); !cli.done(); cli.next()) {
-            Light_Chunk *lc = (Light_Chunk *) cli();
+        for (const auto &cli : cl) {
+            Light_Chunk *lc = (Light_Chunk *) cli;
 
             // try to throw away light
             if (!(lc->light.local_light_flags & LOFlag_Runtime)) {
@@ -3388,10 +3390,10 @@ void DealWithExternalObjectStategies(Environment_Data_Chunk *envd)
 
     Chunk *pChunk = envd->lookup_single_child("SPECLOBJ");
     if (pChunk) {
-        List<Chunk *> chlist;
+        std::vector<Chunk *> chlist;
         ((Chunk_With_Children *) pChunk)->lookup_child("VIOBJECT", chlist);
-        for (LIF<Chunk *> chlif(&chlist); !chlif.done(); chlif.next()) {
-            Virtual_Object_Chunk *voc = (Virtual_Object_Chunk *) chlif();
+        for (const auto &chlif : chlist) {
+            Virtual_Object_Chunk *voc = (Virtual_Object_Chunk *) chlif;
             Chunk *pChunk2 = voc->lookup_single_child("AVPSTRAT");
             if (!pChunk2)
                 continue;
@@ -3447,10 +3449,10 @@ void setup_sounds(Environment_Data_Chunk *envd)
     }
 
     if (soc) {
-        List<Chunk *> cl;
+        std::vector<Chunk *> cl;
         soc->lookup_child("SOUNDOB2", cl);
-        for (LIF<Chunk *> cli(&cl); !cli.done(); cli.next()) {
-            Sound_Object_Chunk *snd = (Sound_Object_Chunk *) cli();
+        for (const auto &cli : cl) {
+            Sound_Object_Chunk *snd = (Sound_Object_Chunk *) cli;
             SOUND_TOOLS_TEMPLATE *stt = (SOUND_TOOLS_TEMPLATE *) PoolAllocateMem(
                 sizeof(SOUND_TOOLS_TEMPLATE));
 
@@ -3493,11 +3495,11 @@ void setup_cables(Environment_Data_Chunk *envd)
     Special_Objects_Chunk *soc = (Special_Objects_Chunk *) envd->lookup_single_child("SPECLOBJ");
     if (!soc)
         return;
-    List<Chunk *> chlist;
+    std::vector<Chunk *> chlist;
     soc->lookup_child("AVPCABLE", chlist);
 
-    for (LIF<Chunk *> chlif(&chlist); !chlif.done(); chlif.next()) {
-        AVP_Power_Cable_Chunk *appc = (AVP_Power_Cable_Chunk *) chlif();
+    for (const auto &chlif : chlist) {
+        AVP_Power_Cable_Chunk *appc = (AVP_Power_Cable_Chunk *) chlif;
 
         POWER_CABLE_TOOLS_TEMPLATE *tdpc = (POWER_CABLE_TOOLS_TEMPLATE *) PoolAllocateMem(
             sizeof(POWER_CABLE_TOOLS_TEMPLATE));
@@ -3529,11 +3531,11 @@ void setup_particle_generators(Environment_Data_Chunk *envd)
     if (!soc)
         return;
 
-    List<Chunk *> chlist;
+    std::vector<Chunk *> chlist;
     soc->lookup_child("PARGENER", chlist);
 
-    for (LIF<Chunk *> chlif(&chlist); !chlif.done(); chlif.next()) {
-        AVP_Particle_Generator_Chunk *part_chunk = (AVP_Particle_Generator_Chunk *) chlif();
+    for (const auto &chlif : chlist) {
+        AVP_Particle_Generator_Chunk *part_chunk = (AVP_Particle_Generator_Chunk *) chlif;
         AVP_Particle_Generator_Data_Chunk *data_chunk
             = (AVP_Particle_Generator_Data_Chunk *) part_chunk->get_data_chunk();
         GLOBALASSERT(data_chunk);

@@ -55,7 +55,7 @@ struct Shape_Fragment_Type
     void Setup_sh_frags(Fragment_Type_Chunk *);
 
     char *name;
-    List<SHAPEHEADER *> shapelist;
+    std::vector<SHAPEHEADER *> shapelist;
     SHAPEFRAGMENTDESC *sh_fragdesc;
 };
 
@@ -68,9 +68,9 @@ Shape_Fragment_Type::Shape_Fragment_Type(const char *_name)
 
 Shape_Fragment_Type::~Shape_Fragment_Type()
 {
-    while (shapelist.size()) {
-        shapelist.first_entry()->sh_fragdesc = 0;
-        delete shapelist.first_entry();
+    for (SHAPEHEADER *shape : shapelist) {
+        shape->sh_fragdesc = 0;
+        delete shape;
     }
     if (sh_fragdesc) {
 #if USE_LEVEL_MEMORY_POOL
@@ -95,7 +95,7 @@ Shape_Fragment_Type::~Shape_Fragment_Type()
 
 void Shape_Fragment_Type::AddShape(SHAPEHEADER *shp)
 {
-    shapelist.add_entry(shp);
+    shapelist.push_back(shp);
     if (sh_fragdesc)
         shp->sh_fragdesc = sh_fragdesc;
 }
@@ -108,8 +108,8 @@ void Shape_Fragment_Type::Setup_sh_frags(Fragment_Type_Chunk *ftc)
     ftc->lookup_child("FRGTYPSC", chlist);
 
     sh_fragdesc = (SHAPEFRAGMENTDESC *) PoolAllocateMem(sizeof(SHAPEFRAGMENTDESC));
-    for (LIF<SHAPEHEADER *> slif(&shapelist); !slif.done(); slif.next()) {
-        slif()->sh_fragdesc = sh_fragdesc;
+    for (SHAPEHEADER *shape : shapelist) {
+        shape->sh_fragdesc = sh_fragdesc;
     }
 
     sh_fragdesc->sh_frags = (SHAPEFRAGMENT *) PoolAllocateMem(
@@ -189,8 +189,10 @@ void DeallocateFragments(SHAPEHEADER *shp, SHAPEFRAGMENTDESC *sh_fragdesc)
 {
     for (auto fragment_type = FragList.begin(); fragment_type != FragList.end(); ++fragment_type) {
         if ((*fragment_type)->sh_fragdesc == sh_fragdesc) {
-            (*fragment_type)->shapelist.delete_entry(shp);
-            if (!(*fragment_type)->shapelist.size()) {
+            auto shape = std::find(
+                (*fragment_type)->shapelist.begin(), (*fragment_type)->shapelist.end(), shp);
+            (*fragment_type)->shapelist.erase(shape);
+            if ((*fragment_type)->shapelist.empty()) {
                 //no more shapes use this fragment type - so deallocate it
                 delete *fragment_type;
                 FragList.erase(fragment_type);
@@ -219,9 +221,7 @@ void DeallocateFragments(SHAPEHEADER *shp, SHAPEFRAGMENTDESC *sh_fragdesc)
 void DeallocateAllFragments()
 {
     for (Shape_Fragment_Type *frag_type : FragList) {
-        while (frag_type->shapelist.size()) {
-            frag_type->shapelist.delete_first_entry();
-        }
+        frag_type->shapelist.clear();
         frag_type->sh_fragdesc = 0;
         delete frag_type;
 
@@ -410,7 +410,7 @@ ShapeInMSL::~ShapeInMSL()
         RemoveFromHashTables();
 }
 
-static List<ShapeInMSL *> msl_shapes;
+static std::vector<ShapeInMSL *> msl_shapes;
 
 void ShapeInMSL::PurgeMSLShapeList()
 {
@@ -423,12 +423,11 @@ void ShapeInMSL::PurgeMSLShapeList()
             hash_name[i].delete_first_entry();
     }
 
-    while (msl_shapes.size()) {
-        ShapeInMSL *shp_msl = msl_shapes.first_entry();
+    for (ShapeInMSL *shp_msl : msl_shapes) {
         shp_msl->in_hash_table = FALSE;
         delete shp_msl;
-        msl_shapes.delete_first_entry();
     }
+    msl_shapes.clear();
 }
 void PurgeMSLShapeList()
 {
@@ -522,8 +521,6 @@ void deallocate_loaded_shapes(RIFFHANDLE h)
     // because the SHAPEHEADER is calloced, we can
     // just delete the arrays we want
 
-    LIF<ShapeInMSL *> msl_shape_lif(&msl_shapes);
-
     while (!h->shape_nums.empty()) {
 #if !StandardShapeLanguage
 #error Must have standard shape language
@@ -536,10 +533,10 @@ void deallocate_loaded_shapes(RIFFHANDLE h)
 
         FreeMSLPos(list_pos);
 
-        for (msl_shape_lif.restart(); !msl_shape_lif.done(); msl_shape_lif.next()) {
-            if (list_pos == msl_shape_lif()->Listpos()) {
-                delete msl_shape_lif();
-                msl_shape_lif.delete_current();
+        for (auto msl_shape = msl_shapes.begin(); msl_shape != msl_shapes.end(); ++msl_shape) {
+            if (list_pos == (*msl_shape)->Listpos()) {
+                delete *msl_shape;
+                msl_shapes.erase(msl_shape);
                 break;
             }
         }
@@ -730,13 +727,13 @@ CTM_ReturnType copy_to_mainshapelist(
     if (pChunk) {
         seflc = (Shape_External_File_Chunk *) pChunk;
         rif_name = seflc->get_shape_name();
-        msl_shapes.add_entry(new ShapeInMSL(mainshapelist[list_pos], rif_name.c_str(), list_pos));
+        msl_shapes.push_back(new ShapeInMSL(mainshapelist[list_pos], rif_name.c_str(), list_pos));
     } else {
         List<Object_Chunk *> const &oblist = tmpshp->list_assoc_objs();
         if (oblist.size()) {
             Object_Chunk *oc = oblist.first_entry();
             if (oc->get_header()->flags & OBJECT_FLAG_PLACED_OBJECT) {
-                msl_shapes.add_entry(
+                msl_shapes.push_back(
                     new ShapeInMSL(mainshapelist[list_pos], oc->object_data.o_name, list_pos));
             }
         }
@@ -770,7 +767,7 @@ CTM_ReturnType copy_to_mainshapelist(
 
                 const char *shpname = sssc->get_shape_name();
                 GLOBALASSERT(shpname);
-                msl_shapes.add_entry(new ShapeInMSL(mainshapelist[list_pos], shpname, list_pos));
+                msl_shapes.push_back(new ShapeInMSL(mainshapelist[list_pos], shpname, list_pos));
                 h->shape_nums.push_back(list_pos);
 
                 post_process_shape(mainshapelist[list_pos]);
@@ -1365,10 +1362,10 @@ char const *GetPtrLoadedShapeName(SHAPEHEADER *shptr)
 // free a reference to a named shape if it exists - not necessary since these are all tidied up
 void FreeShapeNameReference(SHAPEHEADER *shptr)
 {
-    for (LIF<ShapeInMSL *> search(&msl_shapes); !search.done(); search.next()) {
-        if (search()->Shptr() == shptr) {
-            delete search();
-            search.delete_current();
+    for (auto search = msl_shapes.begin(); search != msl_shapes.end(); ++search) {
+        if ((*search)->Shptr() == shptr) {
+            delete *search;
+            msl_shapes.erase(search);
             break;
         }
     }
@@ -1397,10 +1394,10 @@ void DeallocateLoadedShapeMSL(RIFFHANDLE h, int list_pos)
 
     FreeMSLPos(list_pos);
 
-    for (LIF<ShapeInMSL *> msl_shape_lif(&msl_shapes); !msl_shape_lif.done(); msl_shape_lif.next()) {
-        if (list_pos == msl_shape_lif()->Listpos()) {
-            delete msl_shape_lif();
-            msl_shape_lif.delete_current();
+    for (auto msl_shape = msl_shapes.begin(); msl_shape != msl_shapes.end(); ++msl_shape) {
+        if (list_pos == (*msl_shape)->Listpos()) {
+            delete *msl_shape;
+            msl_shapes.erase(msl_shape);
             break;
         }
     }
@@ -2354,7 +2351,7 @@ BOOL copy_sprite_to_shapeheader(
     pChunk = shc->lookup_single_child("RIFFNAME");
     if (pChunk) {
         sprite_name = ((RIF_Name_Chunk *) pChunk)->rif_name;
-        msl_shapes.add_entry(new ShapeInMSL(shphd, sprite_name.c_str(), listpos));
+        msl_shapes.push_back(new ShapeInMSL(shphd, sprite_name.c_str(), listpos));
     }
 
     if (blsc) {
