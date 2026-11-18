@@ -142,10 +142,11 @@ Shape_Header_Chunk *Shape_Chunk::get_header()
     return (Shape_Header_Chunk *) this->lookup_single_child("SHPHEAD1");
 }
 
-List<Object_Chunk *> const &Shape_Chunk::list_assoc_objs()
+std::vector<Object_Chunk *> const &Shape_Chunk::list_assoc_objs()
 {
     if (!get_header()) {
-        static List<Object_Chunk *> empty_list;
+#warning not sure about this
+        static std::vector<Object_Chunk *> empty_list{};
         return empty_list;
     }
 
@@ -210,78 +211,78 @@ void Shape_Chunk::destroy_auxiliary_chunks()
 {
     //split up into different blocks to stop compiler crashing when optimizations are turned on
 
-    List<Chunk *> chlst;
+    std::vector<Chunk *> chlst;
 
     lookup_child("SHPZSPDT", chlst);
     while (chlst.size()) {
-        delete chlst.first_entry();
-        chlst.delete_first_entry();
+        delete chlst.front();
+        chlst.erase(chlst.begin());
     }
 
     lookup_child("SHPMRGDT", chlst);
     while (chlst.size()) {
-        delete chlst.first_entry();
-        chlst.delete_first_entry();
+        delete chlst.front();
+        chlst.erase(chlst.begin());
     }
 
     lookup_child("SHPMORPH", chlst);
     while (chlst.size()) {
-        delete chlst.first_entry();
-        chlst.delete_first_entry();
+        delete chlst.front();
+        chlst.erase(chlst.begin());
     }
 
     lookup_child("TEXTANIM", chlst);
     while (chlst.size()) {
-        delete chlst.first_entry();
-        chlst.delete_first_entry();
+        delete chlst.front();
+        chlst.erase(chlst.begin());
     }
 
     lookup_child("SHPPCINF", chlst);
     while (chlst.size()) {
-        delete chlst.first_entry();
-        chlst.delete_first_entry();
+        delete chlst.front();
+        chlst.erase(chlst.begin());
     }
 
     lookup_child("SHPFRAGS", chlst);
     while (chlst.size()) {
-        delete chlst.first_entry();
-        chlst.delete_first_entry();
+        delete chlst.front();
+        chlst.erase(chlst.begin());
     }
 
     lookup_child("ANIMSEQU", chlst);
     while (chlst.size()) {
-        delete chlst.first_entry();
-        chlst.delete_first_entry();
+        delete chlst.front();
+        chlst.erase(chlst.begin());
     }
 
     lookup_child("PNOTINBB", chlst);
     while (chlst.size()) {
-        delete chlst.first_entry();
-        chlst.delete_first_entry();
+        delete chlst.front();
+        chlst.erase(chlst.begin());
     }
 
     lookup_child("ANSHCEN2", chlst);
     while (chlst.size()) {
-        delete chlst.first_entry();
-        chlst.delete_first_entry();
+        delete chlst.front();
+        chlst.erase(chlst.begin());
     }
 
     lookup_child("CONSHAPE", chlst);
     while (chlst.size()) {
-        delete chlst.first_entry();
-        chlst.delete_first_entry();
+        delete chlst.front();
+        chlst.erase(chlst.begin());
     }
 
     lookup_child("ASALTTEX", chlst);
     while (chlst.size()) {
-        delete chlst.first_entry();
-        chlst.delete_first_entry();
+        delete chlst.front();
+        chlst.erase(chlst.begin());
     }
 
     lookup_child("SHPPRPRO", chlst);
     while (chlst.size()) {
-        delete chlst.first_entry();
-        chlst.delete_first_entry();
+        delete chlst.front();
+        chlst.erase(chlst.begin());
     }
 }
 
@@ -295,14 +296,14 @@ BOOL Shape_Chunk::file_equals(HANDLE &rif_file)
         return (FALSE);
 
     // get header list
-    List<int> obhead;
+    std::vector<int> obhead;
     list_chunks_in_file(&obhead, rif_file, "SHPHEAD1");
 
     if (obhead.size() != 1)
         return FALSE;
 
     // get object identifier
-    SetFilePointer(rif_file, obhead.first_entry() + 32, 0, FILE_BEGIN);
+    SetFilePointer(rif_file, obhead.front() + 32, 0, FILE_BEGIN);
     ReadFile(rif_file, (long *) &(id), 4, &bytes_read, 0);
 
     if (hdptr->file_id_num == id)
@@ -368,18 +369,19 @@ BOOL Shape_Chunk::assoc_with_object_list(File_Chunk *fc)
     if (!hdptr)
         return (FALSE);
 
-    List<Chunk *> chlst;
+    std::vector<Chunk *> chlst;
     fc->lookup_child("RBOBJECT", chlst);
 
     for (char *object_name : hdptr->object_names_store) {
-        LIF<Chunk *> l(&chlst);
+        // LIF<Chunk *> l(&chlst);
+        auto it = chlst.begin();
 
-        for (; !l.done(); l.next()) {
-            ob = (Object_Chunk *) l();
+        for (; it != chlst.end(); ++it) {
+            ob = (Object_Chunk *) *it;
             if (!strcmp(ob->object_data.o_name, object_name))
                 break;
         }
-        if (!l.done())
+        if (it != chlst.end())
             assoc_with_object(ob);
         else {
             return (FALSE);
@@ -392,48 +394,48 @@ BOOL Shape_Chunk::update_my_chunkshape(ChunkShape &cshp)
 {
     // Firstly lose all the chunks that were with
     // the old chunk shape
-    List<Chunk *> chlst;
+    std::vector<Chunk *> chlst;
 
     lookup_child("SHPRAWVT", chlst);
 
     while (chlst.size()) {
-        delete chlst.first_entry();
-        chlst.delete_first_entry();
+        delete chlst.front();
+        chlst.erase(chlst.begin());
     }
 
     lookup_child("SHPVNORM", chlst);
 
     while (chlst.size()) {
-        delete chlst.first_entry();
-        chlst.delete_first_entry();
+        delete chlst.front();
+        chlst.erase(chlst.begin());
     }
 
     lookup_child("SHPPNORM", chlst);
 
     while (chlst.size()) {
-        delete chlst.first_entry();
-        chlst.delete_first_entry();
+        delete chlst.front();
+        chlst.erase(chlst.begin());
     }
 
     lookup_child("SHPPOLYS", chlst);
 
     while (chlst.size()) {
-        delete chlst.first_entry();
-        chlst.delete_first_entry();
+        delete chlst.front();
+        chlst.erase(chlst.begin());
     }
 
     lookup_child("SHPUVCRD", chlst);
 
     while (chlst.size()) {
-        delete chlst.first_entry();
-        chlst.delete_first_entry();
+        delete chlst.front();
+        chlst.erase(chlst.begin());
     }
 
     lookup_child("SHPTEXFN", chlst);
 
     while (chlst.size()) {
-        delete chlst.first_entry();
-        chlst.delete_first_entry();
+        delete chlst.front();
+        chlst.erase(chlst.begin());
     }
 
     *shape_data_store = cshp;
@@ -472,14 +474,14 @@ BOOL Shape_Chunk::update_my_chunkshape(ChunkShape &cshp)
 
 Console_Shape_Chunk *Shape_Chunk::get_console_shape_data(Console_Type ct)
 {
-    List<Chunk *> chlist;
+    std::vector<Chunk *> chlist;
     lookup_child("CONSHAPE", chlist);
-    for (LIF<Chunk *> chlif(&chlist); !chlif.done(); chlif.next()) {
-        Console_Shape_Chunk *csc = (Console_Shape_Chunk *) chlif();
-        List<Chunk *> chlist2;
+    for (const auto &chlif : chlist) {
+        Console_Shape_Chunk *csc = (Console_Shape_Chunk *) chlif;
+        std::vector<Chunk *> chlist2;
         csc->lookup_child("CONSTYPE", chlist2);
         if (chlist2.size()) {
-            if (((Console_Type_Chunk *) chlist2.first_entry())->console == ct)
+            if (((Console_Type_Chunk *) chlist2.front())->console == ct)
                 return csc;
         }
     }
@@ -1366,12 +1368,13 @@ void Shape_Header_Chunk::prepare_for_output()
         delete[] object_name;
     object_names_store.clear();
 
-    for (LIF<Object_Chunk *> aosl(&associated_objects_store); !aosl.done(); aosl.next()) {
-        if (aosl()->get_header())
-            aosl()->get_header()->shape_id_no = file_id_num;
+#warning if chunks go wild it might be my fault
+    for (const auto &aosl : associated_objects_store) {
+        if (aosl->get_header())
+            aosl->get_header()->shape_id_no = file_id_num;
 
-        str = new char[strlen(aosl()->object_data.o_name) + 1];
-        strcpy(str, aosl()->object_data.o_name);
+        str = new char[strlen(aosl->object_data.o_name) + 1];
+        strcpy(str, aosl->object_data.o_name);
         object_names_store.push_back(str);
     }
 
@@ -1673,18 +1676,18 @@ void Shape_Morphing_Data_Chunk::prepare_for_output()
 {
     int max_id = 0;
 
-    List<Chunk *> cl;
+    std::vector<Chunk *> cl;
     lookup_child("SUBSHAPE", cl);
 
-    LIF<Chunk *> cli(&cl);
+    // LIF<Chunk *> cli(&cl);
 
-    for (; !cli.done(); cli.next()) {
-        max_id = max(max_id, ((Shape_Sub_Shape_Chunk *) cli())->get_header()->file_id_num);
+    for (const auto &cli : cl) {
+        max_id = max(max_id, ((Shape_Sub_Shape_Chunk *) cli)->get_header()->file_id_num);
     }
 
-    for (cli.restart(); !cli.done(); cli.next()) {
-        if (((Shape_Sub_Shape_Chunk *) cli())->get_header()->file_id_num == -1) {
-            ((Shape_Sub_Shape_Chunk *) cli())->get_header()->file_id_num = ++max_id;
+    for (const auto &cli : cl) {
+        if (((Shape_Sub_Shape_Chunk *) cli)->get_header()->file_id_num == -1) {
+            ((Shape_Sub_Shape_Chunk *) cli)->get_header()->file_id_num = ++max_id;
         }
     }
     Chunk_With_Children::prepare_for_output();
@@ -1794,19 +1797,20 @@ void Shape_Morphing_Frame_Data_Chunk::prepare_for_output()
 
 void Shape_Morphing_Frame_Data_Chunk::post_input_processing()
 {
-    List<Shape_Sub_Shape_Chunk *> shplist;
-    List<Chunk *> child_lists;
+    std::vector<Shape_Sub_Shape_Chunk *> shplist;
+    std::vector<Chunk *> child_lists;
 
     Shape_Morphing_Data_Chunk *pchnk = (Shape_Morphing_Data_Chunk *) parent;
 
     pchnk->lookup_child("SUBSHAPE", child_lists);
 
     while (child_lists.size()) {
-        shplist.add_entry((Shape_Sub_Shape_Chunk *) child_lists.first_entry());
-        child_lists.delete_first_entry();
+        shplist.push_back((Shape_Sub_Shape_Chunk *) child_lists.front());
+        child_lists.erase(child_lists.begin());
     }
 
-    LIF<Shape_Sub_Shape_Chunk *> sl(&shplist);
+    // LIF<Shape_Sub_Shape_Chunk *> sl(&shplist);
+    auto it = shplist.begin();
 
     for (int i = 0; i < num_frames; i++) {
         Shape_Chunk *sh1b = 0, *sh2b = 0;
@@ -1816,26 +1820,26 @@ void Shape_Morphing_Frame_Data_Chunk::post_input_processing()
         if (frame_store[i * 2] == -1) {
             sh1b = pchnk->parent_shape;
         } else {
-            for (; !sl.done(); sl.next()) {
-                if (sl()->get_header())
-                    if (sl()->get_header()->file_id_num == frame_store[i])
+            for (; it != shplist.end(); ++it) {
+                if ((*it)->get_header())
+                    if ((*it)->get_header()->file_id_num == frame_store[i])
                         break;
             }
-            if (!sl.done()) {
-                sh1a = sl();
+            if (it != shplist.end()) {
+                sh1a = *it;
             }
         }
 
         if (frame_store[i * 2 + 1] == -1) {
             sh2b = pchnk->parent_shape;
         } else {
-            for (sl.restart(); !sl.done(); sl.next()) {
-                if (sl()->get_header())
-                    if (sl()->get_header()->file_id_num == frame_store[i + 1])
+            for (it = shplist.begin(); it != shplist.end(); ++it) {
+                if ((*it)->get_header())
+                    if ((*it)->get_header()->file_id_num == frame_store[i + 1])
                         break;
             }
-            if (!sl.done()) {
-                sh2a = sl();
+            if (it != shplist.end()) {
+                sh2a = *it;
             }
         }
         if ((sh1a || sh1b) && (sh2a || sh2b)) {
@@ -1970,48 +1974,48 @@ BOOL Shape_Sub_Shape_Chunk::update_my_chunkshape(ChunkShape &cshp)
 {
     // Firstly lose all the chunks that were with
     // the old chunk shape
-    List<Chunk *> chlst;
+    std::vector<Chunk *> chlst;
 
     lookup_child("SHPRAWVT", chlst);
 
     while (chlst.size()) {
-        delete chlst.first_entry();
-        chlst.delete_first_entry();
+        delete chlst.front();
+        chlst.erase(chlst.begin());
     }
 
     lookup_child("SHPVNORM", chlst);
 
     while (chlst.size()) {
-        delete chlst.first_entry();
-        chlst.delete_first_entry();
+        delete chlst.front();
+        chlst.erase(chlst.begin());
     }
 
     lookup_child("SHPPNORM", chlst);
 
     while (chlst.size()) {
-        delete chlst.first_entry();
-        chlst.delete_first_entry();
+        delete chlst.front();
+        chlst.erase(chlst.begin());
     }
 
     lookup_child("SHPPOLYS", chlst);
 
     while (chlst.size()) {
-        delete chlst.first_entry();
-        chlst.delete_first_entry();
+        delete chlst.front();
+        chlst.erase(chlst.begin());
     }
 
     lookup_child("SHPUVCRD", chlst);
 
     while (chlst.size()) {
-        delete chlst.first_entry();
-        chlst.delete_first_entry();
+        delete chlst.front();
+        chlst.erase(chlst.begin());
     }
 
     lookup_child("SHPTEXFN", chlst);
 
     while (chlst.size()) {
-        delete chlst.first_entry();
-        chlst.delete_first_entry();
+        delete chlst.front();
+        chlst.erase(chlst.begin());
     }
 
     *shape_data_store = cshp;
@@ -2060,14 +2064,14 @@ const char *Shape_Sub_Shape_Chunk::get_shape_name()
 
 Console_Shape_Chunk *Shape_Sub_Shape_Chunk::get_console_shape_data(Console_Type ct)
 {
-    List<Chunk *> chlist;
+    std::vector<Chunk *> chlist;
     lookup_child("CONSHAPE", chlist);
-    for (LIF<Chunk *> chlif(&chlist); !chlif.done(); chlif.next()) {
-        Console_Shape_Chunk *csc = (Console_Shape_Chunk *) chlif();
-        List<Chunk *> chlist2;
+    for (const auto &chlif : chlist) {
+        Console_Shape_Chunk *csc = (Console_Shape_Chunk *) chlif;
+        std::vector<Chunk *> chlist2;
         csc->lookup_child("CONSTYPE", chlist2);
         if (chlist2.size()) {
-            if (((Console_Type_Chunk *) chlist2.first_entry())->console == ct)
+            if (((Console_Type_Chunk *) chlist2.front())->console == ct)
                 return csc;
         }
     }

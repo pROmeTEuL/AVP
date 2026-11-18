@@ -84,7 +84,7 @@ public:
 
     Shape_Chunk *make_copy_of_chunk();
 
-    List<Object_Chunk *> const &list_assoc_objs();
+    std::vector<Object_Chunk *> const &list_assoc_objs();
 
     BOOL assoc_with_object(Object_Chunk *);
 
@@ -594,7 +594,7 @@ private:
 
     int file_id_num;
 
-    List<Object_Chunk *> associated_objects_store;
+    std::vector<Object_Chunk *> associated_objects_store;
 
     // constructor from data
     Shape_Header_Chunk(Shape_Chunk *parent)
@@ -867,14 +867,14 @@ private:
 class Shape_Poly_Change_Info_Chunk : public Chunk
 {
 public:
-    Shape_Poly_Change_Info_Chunk(Shape_Chunk *parent, List<poly_change_info> &pci, int orig_num_v)
+    Shape_Poly_Change_Info_Chunk(Shape_Chunk *parent, std::vector<poly_change_info> &pci, int orig_num_v)
         : Chunk(parent, "SHPPCINF")
         , original_num_verts(orig_num_v)
         , change_list(pci)
     {}
 
     int original_num_verts;
-    List<poly_change_info> change_list;
+    std::vector<poly_change_info> change_list;
 
     virtual void fill_data_block(char *);
     virtual size_t size_chunk() { return (chunk_size = 12 + 4 + 4 + change_list.size() * 12); }
